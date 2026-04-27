@@ -1,0 +1,202 @@
+<!-- GSD:project-start source:PROJECT.md -->
+## Project
+
+**oto**
+
+`oto` is a personal, production-grade hybrid AI-CLI framework that combines the best of [Get Shit Done (GSD)](https://github.com/gsd-build/get-shit-done) and [Superpowers](https://github.com/obra/superpowers) under a unified `/oto-*` command surface. Built for a single developer who likes GSD's spec-driven workflow but doesn't want to switch frameworks to access the capabilities Superpowers offers.
+
+**Core Value:** **Stop framework-switching.** One installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface — across Claude Code, Codex, and Gemini CLI.
+
+### Constraints
+
+- **Tech stack**: Node.js — both upstreams are Node-based (npm packages with `.cjs`/`.js` binaries and JSON tooling). Diverging would require rewriting both ecosystems.
+- **Runtime targets**: Claude Code (primary), Codex, Gemini CLI. Each has its own instruction file (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md`) and command/skill conventions to honor.
+- **Distribution**: Installable via `npm install -g github:<owner>/oto-hybrid-framework`. No npm registry publish. Versioning via git tags.
+- **Licensing**: Both upstreams are MIT-licensed. oto must preserve attribution and license notices for ported code.
+- **Personal-use cost ceiling**: Decisions that add significant ongoing maintenance burden (e.g., OpenCode support, plugin marketplaces) need to clear a high bar — the project succeeds if it makes the user's daily flow better, not if it serves a community.
+<!-- GSD:project-end -->
+
+<!-- GSD:stack-start source:research/STACK.md -->
+## Technology Stack
+
+## TL;DR — The Prescription
+| Concern | Recommendation | Confidence |
+|---------|----------------|------------|
+| Language | **JavaScript (CommonJS `.cjs` for tooling, raw `.js`/`.md` for shipped artifacts)** — NOT TypeScript at the top level | HIGH |
+| Runtime | **Node.js >= 22.0.0** (engines field), CI-tested on 22 + 24 | HIGH |
+| Module system | **CJS for installer/tooling; markdown-only payload otherwise.** ESM only inside an isolated optional `sdk/` subpackage if a programmatic API is ever desired | HIGH |
+| TypeScript | **No** at the top level. Optional, isolated, **only inside `sdk/` subpackage** with its own `package.json` and `tsconfig.json` (mirrors GSD's pattern), and only if/when oto grows a programmatic API. Not part of v1. | HIGH |
+| Build step (top level) | **None.** Ship raw `.cjs` / `.js` / `.md`. The only "build" is the hooks copy script (a syntax-validating file copy). | HIGH |
+| Package layout | `bin/install.js` + `bin/oto-tools.cjs` (top level) + `oto/bin/lib/*.cjs` (library) + `commands/`, `agents/`, `skills/`, `hooks/`, `scripts/` content roots | HIGH |
+| Install mechanism | `npm install -g github:owner/oto-hybrid-framework[#vX.Y.Z]` → bin script `oto` runs the installer, which **copies/symlinks files** into `~/.claude`, `~/.codex`, `~/.gemini` | HIGH |
+| Test framework | **`node:test`** (built-in, zero-deps) for installer/library `.cjs` tests; **Vitest** only inside the optional `sdk/` subpackage | HIGH |
+| CI | GitHub Actions: `test.yml` (matrix: ubuntu × node 22/24 + 1 macos), `install-smoke.yml` (real `npm install -g <tarball>` + `<unpacked dir>`), `release.yml` (tag → GitHub Release) | HIGH |
+| Versioning | **Git tags `vX.Y.Z` (semver)**. No npm registry publish. `npm install -g github:owner/repo#vX.Y.Z` for pinning. | HIGH |
+| Runtime detection | **Caller specifies the runtime explicitly** via install flag (`oto install --claude` / `--codex` / `--gemini`). At install time, paths and instruction filenames (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md`) are written per-runtime. No "auto-detect at runtime" needed because the framework is the installer, not a process living inside the runtime. | HIGH |
+## Why These Choices (Evidence-Grounded)
+### 1. Language & Runtime: Node 22+, CommonJS top-level
+- `package.json` declares `"engines": { "node": ">=22.0.0" }`
+- The top-level `tsconfig.json` is a **stub** — `{ "files": [], "references": [{ "path": "sdk" }] }`. **There is no top-level TypeScript.**
+- All 33 library files in `get-shit-done/bin/lib/` are **`.cjs`** (e.g., `commands.cjs`, `core.cjs`, `state.cjs`, `init.cjs`, `phase.cjs`, …). The installer (`bin/install.js`) is plain `.js` using `require()`.
+- Test files are `tests/*.test.cjs`, run via the built-in `node --test` runner (`scripts/run-tests.cjs` calls `process.execPath` with `--test --test-concurrency=4`).
+- TypeScript exists **only** inside the isolated `sdk/` subpackage (its own `package.json`, `"type": "module"`, ESM, `tsc` build, Vitest tests).
+- `package.json` is a **6-line stub** declaring `"type": "module"` and pointing to `.opencode/plugins/superpowers.js`. There is essentially no Node code — Superpowers is a **content distribution** of skills/commands/agents (markdown).
+- Distribution is via plugin manifests (`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`) and **manual `git clone` + `ln -s`** (per `.codex/INSTALL.md`). No installer binary.
+- GSD's installer and library are deeply CJS (`require()`, `__dirname`, `module.exports`). Rewriting them in ESM during the rebrand would multiply the rebrand surface for zero user benefit.
+- The installer path needs `__dirname` at runtime to locate sibling files (`get-shit-done/bin/lib/...`). ESM's `import.meta.url` works but is uglier and adds churn.
+- `node --test` works with both, but CJS test files compose better with `require` of CJS libraries under test.
+- GSD doesn't use it for the installer or library, despite being the more mature codebase. The shipped surface is markdown + small Node scripts; types add a build step, a publish trap (mode-644 / executable-bit issues — see GSD issue #2453), and zero runtime safety for a personal tool.
+- TypeScript would need a `prepare` script (which `npm install -g github:...` runs) to compile on install — adding install-time toolchain risk for users who already have everything they need.
+- If oto ever grows a programmatic SDK, copy GSD's pattern: isolate it in `sdk/` with its own package, build there, ship `dist/`.
+### 2. Package Layout
+- `"bin": { "oto": "bin/install.js" }` — exposes the `oto` command after `npm install -g github:...`.
+- `"files"` — explicit allowlist; without this, npm publishes everything tracked by git, which is fine for github-installs but `files` makes intent explicit and matches GSD's convention.
+- `"prepare"` — runs automatically when installing from a git URL, perfect for the hooks-build step. (See "Install mechanism" below for why this is the right place.)
+- **No `"main"` and no `"exports"`** at v1 — oto isn't a library you `require()`, it's a CLI installer.
+### 3. Install Mechanism — How `npm install -g github:...` Actually Works for oto
+| Runtime | Global config dir | Override env var | Instruction file |
+|---------|-------------------|------------------|------------------|
+| Claude Code | `~/.claude/` | `CLAUDE_CONFIG_DIR` | `CLAUDE.md` |
+| Codex | `~/.codex/` | `CODEX_HOME` | `AGENTS.md` |
+| Gemini CLI | `~/.gemini/` | `GEMINI_CONFIG_DIR` | `GEMINI.md` |
+- npm installs the package into `~/.npm/lib/node_modules/oto/` (or platform equivalent), but that path is volatile (re-installs replace it). Symlinking from `~/.claude/commands/oto-foo.md` → `~/.npm/lib/node_modules/oto/commands/oto-foo.md` would break on every re-install.
+- Copy is dumb-simple, works cross-platform (Windows symlinks need elevation), and uninstall is trivial (delete files matching the OTO marker prefix).
+- **Exception:** Superpowers' `~/.codex/superpowers/` clone-and-symlink model works for them because they tell the user to `git clone` directly. We're npm-installing, so copy wins.
+### 4. Test Framework — `node:test`, not Vitest, not Jest
+- **Zero dependencies.** Every dep we add is a supply-chain risk and a `prepare` failure point.
+- **Already shipped in Node 22+.** No install step, no version drift.
+- **Plays well with CJS.** Vitest is ESM-first; using it for CJS code paths means jumping through `vite-node` interop hoops.
+- **Coverage via `c8`** (which GSD does use, ^11.x): ~700KB single dep, no transformer, just reads V8 coverage data. Perfect for `.cjs`.
+- **Jest.** Heavy, slow startup, requires Babel/`ts-jest` for any non-trivial setup, ESM support is still rough in 2026. Replaced by Vitest in modern projects and replaced by `node:test` for plain Node.
+- **AVA / tape / Mocha.** Don't add a dep when `node:test` is built-in.
+### 5. CI — GitHub Actions
+- Job A: `npm pack` → `npm install -g <tarball>` → assert `oto` is on PATH and executable. (Tarball is the canonical ship path.)
+- Job B: `npm install -g <unpacked-dir>` (no pack). Catches the **mode-644 trap** GSD hit in #2453: npm does NOT chmod bin targets when installing from an unpacked directory, so any stale build output without the executable bit will fail here before users see it.
+- Validates `package.json` version matches tag
+- Runs full test + install-smoke as a `workflow_call` gate
+- Creates a GitHub Release with auto-generated notes
+- **No npm publish** (per project constraint — public GitHub install only)
+### 6. Versioning — Semver Git Tags
+- `npm install -g github:owner/oto-hybrid-framework` → installs `HEAD` of default branch (main).
+- `npm install -g github:owner/oto-hybrid-framework#v1.2.3` → installs the commit tagged `v1.2.3`. **This is the production-grade pinning mechanism.**
+- `npm install -g github:owner/oto-hybrid-framework#main` → explicit main pin.
+- `npm install -g github:owner/oto-hybrid-framework#<sha>` → exact-commit pin.
+- `MAJOR`: rebrand-tool format change (rename map shape changes); install path changes; instruction-file marker format changes
+- `MINOR`: new `/oto-*` command; new skill; new runtime supported
+- `PATCH`: bug fix, doc update, dep bump
+### 7. Multi-Runtime Adapter Pattern
+- The "runtime" is the CLI process (Claude Code, Codex, Gemini CLI). Each one looks in its own config dir for commands/agents/skills.
+- Once installed, files in `~/.claude/commands/oto-foo.md` are only ever read by Claude Code. Files in `~/.codex/commands/oto-foo.md` only by Codex. There is no shared in-process detection.
+- Runtime-specific differences (instruction filename, hook config syntax, agent-frontmatter dialect, sandbox policy) are baked in at install time by the installer's per-runtime conversion logic.
+| Concern | Claude | Codex | Gemini |
+|---------|--------|-------|--------|
+| Instruction file | `CLAUDE.md` | `AGENTS.md` | `GEMINI.md` |
+| Config file | `~/.claude/settings.json` (JSON) | `~/.codex/config.toml` (TOML) | `~/.gemini/settings.json` |
+| Skill location | `~/.claude/skills/` | `~/.codex/skills/` (or `~/.agents/skills/` per Superpowers convention — pick one and document) | `~/.gemini/skills/` |
+| Hook syntax | Claude Code hook events (`PreToolUse`, `PostToolUse`, `UserPromptSubmit`, …) | Codex `[hooks]` table in `config.toml` with agent sandbox declarations | Gemini equivalent |
+| Agent frontmatter | Claude `tools:` field, `model:` field | Codex requires `sandbox:` (`workspace-write` / `read-only`) — see `CODEX_AGENT_SANDBOX` map in GSD's installer | Gemini-flavored |
+| Tool name mapping | Native (`Read`, `Write`, `Bash`, …) | Native or mapped | Native or mapped |
+| Markdown command body | Native | Native | May need slight conversion |
+- `configDir({ explicitDir })` — resolves install target (consult `--config-dir` flag, then env var, then default `~/.<runtime>`)
+- `instructionFile()` — returns `'CLAUDE.md' | 'AGENTS.md' | 'GEMINI.md'`
+- `installCommands(srcDir, targetDir)`, `installAgents(...)`, `installSkills(...)`, `installHooks(...)`
+- `mergeConfig(targetDir, otoBlock)` — merges hook registrations / agent sandboxes into runtime config file
+- `injectInstructionMarker(targetDir, otoMarkdown)` — wraps oto's instruction injection between `<!-- OTO Configuration -->` markers in the runtime's instruction file
+- Auto-detection requires running code inside the runtime's process — but oto's payload is mostly markdown, which has no runtime. Hooks run in the runtime, but they're already runtime-specific by virtue of where they're installed.
+- The user knows which CLI they want oto to power. Asking them once, at install time, is cheaper than reading env/process state on every command.
+## Installation (Recommended Commands)
+# Install latest from main
+# Pin to a release tag (production-grade)
+# Set up runtimes
+# Per-project install (no global pollution)
+# Update later
+## Alternatives Considered
+| Recommended | Alternative | Why Not the Alternative |
+|-------------|-------------|-------------------------|
+| Node 22+ CJS | Node 22+ ESM throughout | GSD installer is deeply CJS; converting would multiply rebrand surface. ESM offers no runtime benefit for an installer that runs once. |
+| Plain JS top-level | TypeScript top-level | Adds compile step → `prepare` must run TS → install-time toolchain failure surface. GSD chose JS for the same reasons. |
+| `node:test` for tooling | Vitest for everything | Vitest is ESM-first; using it on CJS installer code requires interop; adds 50+ MB of deps for zero personal-tool benefit. Use Vitest only inside `sdk/` if it ever exists. |
+| `node:test` | Jest | Slow, ESM is still painful in Jest 30, requires Babel/`ts-jest`, not the trajectory most JS projects are on in 2026. |
+| Copy files at install | Symlink files at install | npm volatile install path breaks symlinks on re-install; Windows needs elevation; copy is dumber and reliable. |
+| GitHub install + tags | npm registry publish | Project constraint: personal use, no npm publish overhead. `npm install -g github:owner/repo#vX.Y.Z` covers cross-machine portability. |
+| 3 runtimes (Claude/Codex/Gemini) | + OpenCode + Cursor + … | Out of scope per `PROJECT.md`. GSD supports 14; cutting to 3 halves the rebrand and test matrix. |
+| Per-runtime adapters at install | "Universal" content with runtime detection at agent time | Each runtime reads its own dir; in-process detection has no place to run since most of the payload is markdown. |
+## What NOT to Use
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| TypeScript at top level | Forces a build step in `prepare`; install-time toolchain failure surface; GSD doesn't and ships fine | Plain `.cjs`; isolate TS to optional `sdk/` if/when needed |
+| `npm publish` | Project constraint says no; adds 2FA, scope, maintenance | `npm install -g github:owner/repo#vX.Y.Z` |
+| Bundlers (esbuild/rollup/webpack) at top level | Both upstreams ship raw `.js` — adding bundling solves no problem and creates source-map / debugging headaches | None — ship raw files |
+| `pnpm`/`yarn` workspaces at top level | A single package; workspaces add tooling for no reason | npm |
+| Auto-detect runtime at agent execution time | Runtime is determined by which CLI invoked the file; detection has nothing to detect from | Install-time `--claude`/`--codex`/`--gemini` flags + per-runtime install dirs |
+| Symlink-based install for global | Volatile npm install paths break on re-install; cross-platform pain | Copy files; track with marker comments for clean uninstall |
+| Jest | Slow, ESM-painful, heavy deps | `node:test` for tooling; Vitest for any TS subpackage |
+| `prepublishOnly` as the only build trigger | `npm install -g github:...` does NOT run `prepublishOnly`; it runs `prepare` | Use `prepare` (or both, with `prepare` doing the work) |
+| Carrying GSD's OpenCode/Cursor/Windsurf/Augment/Trae/etc. install branches | Out of scope per `PROJECT.md`; doubles rebrand and test surface | Delete those code paths during the rebrand; keep only Claude/Codex/Gemini |
+| Bash-only installer | GSD's installer is 7,755 lines of Node — bash can't replicate the JSON/TOML merging logic safely | Node-based installer (single language, cross-platform) |
+## Stack Patterns by Variant
+- Mirror GSD's `sdk/` pattern: separate `sdk/package.json` with `"type": "module"`, `tsc` build to `dist/`, Vitest tests, separate `bin/oto-sdk.js` thin wrapper at top level
+- Keep TS confined there; don't let it bleed into the installer
+- Add a small `oto/bin/lib/state.cjs` for cross-runtime state in `~/.oto/` (not in any single runtime's dir)
+- GSD does this: `~/.gsd/defaults.json` (line 633 of `install.js`) is GSD's neutral state location
+- Add the hook script to `hooks/` as a Node `.js`
+- Update `scripts/build-hooks.js`'s `HOOKS_TO_COPY` allowlist (this is where validation happens — DO NOT skip the syntax-check pass)
+- Update the per-runtime adapter's `mergeConfig` to register it in `~/.claude/settings.json`
+## Version Compatibility
+| Component | Version | Notes |
+|-----------|---------|-------|
+| Node.js | >=22.0.0 | Engines field. CI tests on 22 + 24. Built-in `node --test` works fully on 22.x; some flags (e.g., `--test-concurrency`) require ≥22. |
+| npm | >=10 (ships with Node 22+) | `prepare` script behavior on git installs is stable in npm 10+. |
+| `c8` (coverage, optional) | ^11 | Matches GSD; minimal, V8-coverage-based, plays well with CJS. |
+| GitHub Actions runner images | `ubuntu-latest`, `macos-latest` | Pinned action versions by SHA in workflow files. |
+## Sources
+- `foundation-frameworks/get-shit-done-main/package.json` — engines, deps, scripts, files allowlist (HIGH confidence; primary evidence)
+- `foundation-frameworks/get-shit-done-main/bin/install.js` (7,755 lines) — install paths, runtime detection, env vars, target dirs, hooks merge, instruction-file markers (HIGH)
+- `foundation-frameworks/get-shit-done-main/get-shit-done/bin/lib/*.cjs` (33 CJS files) — confirms CommonJS at the library layer (HIGH)
+- `foundation-frameworks/get-shit-done-main/sdk/{package.json,tsconfig.json}` — confirms TS is confined to the optional SDK subpackage with its own ESM module system (HIGH)
+- `foundation-frameworks/get-shit-done-main/scripts/{build-hooks.js,run-tests.cjs}` — hooks build pattern with vm-based syntax validation; `node --test` runner via `process.execPath` (HIGH)
+- `foundation-frameworks/get-shit-done-main/.github/workflows/{test.yml,install-smoke.yml}` — CI matrix shape; `npm pack`-then-install + unpacked-dir install smoke pattern that catches mode-644 issues (HIGH)
+- `foundation-frameworks/superpowers-main/package.json` + `.codex/INSTALL.md` — confirms Superpowers ships content + plugin manifests + manual symlink (no installer); useful as anti-pattern for oto since we need an installer (HIGH)
+- `foundation-frameworks/superpowers-main/.{claude,codex,opencode}-plugin/` — plugin manifest formats (MEDIUM confidence on whether oto needs them; for npm-installer model, plugin manifests are optional)
+- npm docs on git URL installs (`prepare` runs, `prepublishOnly` does NOT) — well-known npm behavior, confirmed by GSD's `prepublishOnly` use only for npm-registry path and `prepare` not being needed because they publish to registry (HIGH on npm semantics; oto must use `prepare` since it has no npm-registry path)
+<!-- GSD:stack-end -->
+
+<!-- GSD:conventions-start source:CONVENTIONS.md -->
+## Conventions
+
+Conventions not yet established. Will populate as patterns emerge during development.
+<!-- GSD:conventions-end -->
+
+<!-- GSD:architecture-start source:ARCHITECTURE.md -->
+## Architecture
+
+Architecture not yet mapped. Follow existing patterns found in the codebase.
+<!-- GSD:architecture-end -->
+
+<!-- GSD:skills-start source:skills/ -->
+## Project Skills
+
+No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, or `.github/skills/` with a `SKILL.md` index file.
+<!-- GSD:skills-end -->
+
+<!-- GSD:workflow-start source:GSD defaults -->
+## GSD Workflow Enforcement
+
+Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+
+Use these entry points:
+- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
+- `/gsd-debug` for investigation and bug fixing
+- `/gsd-execute-phase` for planned phase work
+
+Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+<!-- GSD:workflow-end -->
+
+
+
+<!-- GSD:profile-start -->
+## Developer Profile
+
+> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
+> This section is managed by `generate-claude-profile` -- do not edit manually.
+<!-- GSD:profile-end -->

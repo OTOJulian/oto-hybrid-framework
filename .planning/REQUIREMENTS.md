@@ -190,17 +190,128 @@ Deferred to post-v0.1.0. Tracked but not in v1 roadmap.
 
 ## Traceability
 
-Empty initially — populated by roadmap creation in `/gsd-roadmapper`.
+Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| FND-01 | Phase 2 | Pending |
+| FND-02 | Phase 2 | Pending |
+| FND-03 | Phase 2 | Pending |
+| FND-04 | Phase 2 | Pending |
+| FND-05 | Phase 10 | Pending |
+| FND-06 | Phase 1 | Pending |
+| ARCH-01 | Phase 1 | Pending |
+| ARCH-02 | Phase 1 | Pending |
+| ARCH-03 | Phase 1 | Pending |
+| ARCH-04 | Phase 1 | Pending |
+| ARCH-05 | Phase 1 | Pending |
+| ARCH-06 | Phase 1 | Pending |
+| REB-01 | Phase 2 | Pending |
+| REB-02 | Phase 1 | Pending |
+| REB-03 | Phase 2 | Pending |
+| REB-04 | Phase 2 | Pending |
+| REB-05 | Phase 2 | Pending |
+| REB-06 | Phase 2 | Pending |
+| INS-01 | Phase 3 | Pending |
+| INS-02 | Phase 3 | Pending |
+| INS-03 | Phase 3 | Pending |
+| INS-04 | Phase 3 | Pending |
+| INS-05 | Phase 3 | Pending |
+| INS-06 | Phase 3 | Pending |
+| WF-01 | Phase 4 | Pending |
+| WF-02 | Phase 4 | Pending |
+| WF-03 | Phase 4 | Pending |
+| WF-04 | Phase 4 | Pending |
+| WF-05 | Phase 4 | Pending |
+| WF-06 | Phase 4 | Pending |
+| WF-07 | Phase 4 | Pending |
+| WF-08 | Phase 4 | Pending |
+| WF-09 | Phase 4 | Pending |
+| WF-10 | Phase 4 | Pending |
+| WF-11 | Phase 4 | Pending |
+| WF-12 | Phase 4 | Pending |
+| WF-13 | Phase 4 | Pending |
+| WF-14 | Phase 4 | Pending |
+| WF-15 | Phase 4 | Pending |
+| WF-16 | Phase 4 | Pending |
+| WF-17 | Phase 4 | Pending |
+| WF-18 | Phase 4 | Pending |
+| WF-19 | Phase 4 | Pending |
+| WF-20 | Phase 4 | Pending |
+| WF-21 | Phase 4 | Pending |
+| WF-22 | Phase 4 | Pending |
+| WF-23 | Phase 4 | Pending |
+| WF-24 | Phase 4 | Pending |
+| WF-25 | Phase 4 | Pending |
+| WF-26 | Phase 7 | Pending |
+| WF-27 | Phase 7 | Pending |
+| WF-28 | Phase 4 | Pending |
+| WF-29 | Phase 4 | Pending |
+| WF-30 | Phase 4 | Pending |
+| AGT-01 | Phase 1 | Pending |
+| AGT-02 | Phase 4 | Pending |
+| AGT-03 | Phase 4 | Pending |
+| AGT-04 | Phase 4 | Pending |
+| SKL-01 | Phase 6 | Pending |
+| SKL-02 | Phase 6 | Pending |
+| SKL-03 | Phase 6 | Pending |
+| SKL-04 | Phase 6 | Pending |
+| SKL-05 | Phase 6 | Pending |
+| SKL-06 | Phase 6 | Pending |
+| SKL-07 | Phase 6 | Pending |
+| SKL-08 | Phase 6 | Pending |
+| HK-01 | Phase 5 | Pending |
+| HK-02 | Phase 5 | Pending |
+| HK-03 | Phase 5 | Pending |
+| HK-04 | Phase 5 | Pending |
+| HK-05 | Phase 5 | Pending |
+| HK-06 | Phase 5 | Pending |
+| HK-07 | Phase 5 | Pending |
+| SYN-01 | Phase 9 | Pending |
+| SYN-02 | Phase 9 | Pending |
+| SYN-03 | Phase 9 | Pending |
+| SYN-04 | Phase 9 | Pending |
+| SYN-05 | Phase 9 | Pending |
+| SYN-06 | Phase 9 | Pending |
+| SYN-07 | Phase 9 | Pending |
+| MR-01 | Phase 4 | Pending (gate) |
+| MR-02 | Phase 8 | Pending |
+| MR-03 | Phase 8 | Pending |
+| MR-04 | Phase 8 | Pending |
+| CI-01 | Phase 10 | Pending |
+| CI-02 | Phase 10 | Pending |
+| CI-03 | Phase 10 | Pending |
+| CI-04 | Phase 10 | Pending |
+| CI-05 | Phase 10 | Pending |
+| CI-06 | Phase 10 | Pending |
+| CI-07 | Phase 10 | Pending |
+| CI-08 | Phase 10 | Pending |
+| CI-09 | Phase 10 | Pending |
+| CI-10 | Phase 10 | Pending |
+| DOC-01 | Phase 10 | Pending |
+| DOC-02 | Phase 10 | Pending |
+| DOC-03 | Phase 10 | Pending |
+| DOC-04 | Phase 10 | Pending |
+| DOC-05 | Phase 1 | Pending |
+| DOC-06 | Phase 10 | Pending |
 
 **Coverage:**
-- v1 requirements: 86 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 86 ⚠️ (will resolve after roadmap creation)
+- v1 requirements: 100 total
+- Mapped to phases: 100 (every requirement assigned to exactly one phase, no orphans, no duplicates)
+- Unmapped: 0
+
+**Per-phase counts:**
+- Phase 1 (Inventory & Architecture Decisions): 10 — ARCH-01..06, AGT-01, REB-02, DOC-05, FND-06
+- Phase 2 (Rebrand Engine & Distribution Skeleton): 9 — FND-01..04, REB-01, REB-03..06
+- Phase 3 (Installer Fork & Claude Adapter): 6 — INS-01..06
+- Phase 4 (Core Workflows & Agents Port): 32 — WF-01..25, WF-28..30, AGT-02..04, MR-01
+- Phase 5 (Hooks Port & Consolidation): 7 — HK-01..07
+- Phase 6 (Skills Port & Cross-System Integration): 8 — SKL-01..08
+- Phase 7 (Workstreams & Workspaces Port): 2 — WF-26, WF-27
+- Phase 8 (Codex & Gemini Runtime Parity): 3 — MR-02..04
+- Phase 9 (Upstream Sync Pipeline): 7 — SYN-01..07
+- Phase 10 (Tests, CI, Docs & v0.1.0 Release): 16 — CI-01..10, DOC-01..04, DOC-06, FND-05
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 after initial definition*
+*Last updated: 2026-04-27 — traceability populated by roadmap creation (10 phases)*
