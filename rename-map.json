@@ -1,0 +1,59 @@
+{
+  "version": "1",
+  "rules": {
+    "identifier": [
+      { "from": "gsd", "to": "oto", "boundary": "word", "case_variants": ["lower", "upper", "title"] },
+      { "from": "get-shit-done", "to": "oto", "boundary": "word" },
+      { "from": "get-shit-done-cc", "to": "oto", "boundary": "exact" },
+      { "from": "Get Shit Done", "to": "oto", "boundary": "exact" },
+      { "from": "gsd_state_version", "to": "oto_state_version", "boundary": "word" },
+      { "from": "gsd-hook-version", "to": "oto-hook-version", "boundary": "word" },
+      { "from": "GSD_VERSION", "to": "OTO_VERSION", "boundary": "exact" },
+      { "from": "superpowers", "to": "oto", "boundary": "word", "case_variants": ["lower", "title"], "do_not_match": ["Superpowers (the upstream framework)"] }
+    ],
+    "path": [
+      { "from": ".planning", "to": ".oto", "match": "segment" },
+      { "from": "get-shit-done/", "to": "oto/", "match": "prefix" },
+      { "from": "commands/gsd/", "to": "commands/oto/", "match": "prefix" },
+      { "from": "agents/gsd-", "to": "agents/oto-", "match": "prefix" }
+    ],
+    "command": [
+      { "from": "/gsd-", "to": "/oto-" }
+    ],
+    "skill_ns": [
+      { "from": "superpowers:", "to": "oto:" }
+    ],
+    "package": [
+      { "from": "get-shit-done-cc", "to": "oto", "fields": ["name", "bin"] },
+      { "from": "gsd-sdk", "to": "oto-sdk", "fields": ["bin"] }
+    ],
+    "url": [
+      { "from": "github.com/gsd-build/get-shit-done", "to": "github.com/{{GITHUB_OWNER}}/oto-hybrid-framework", "preserve_in_attribution": true },
+      { "from": "github.com/obra/superpowers", "to": "github.com/{{GITHUB_OWNER}}/oto-hybrid-framework", "preserve_in_attribution": true }
+    ],
+    "env_var": [
+      { "from": "GSD_", "to": "OTO_", "apply_to_pattern": "^GSD_[A-Z][A-Z0-9_]*$" }
+    ]
+  },
+  "do_not_rename": [
+    "LICENSE",
+    "LICENSE.md",
+    "THIRD-PARTY-LICENSES.md",
+    "foundation-frameworks/**",
+    "Lex Christopherson",
+    "Jesse Vincent",
+    "github.com/gsd-build/get-shit-done",
+    "github.com/obra/superpowers",
+    "Copyright (c) 2025 Lex Christopherson",
+    "Copyright (c) 2025 Jesse Vincent",
+    "CLAUDE_PLUGIN_ROOT",
+    "CLAUDE_CONFIG_DIR",
+    "CODEX_HOME",
+    "GEMINI_CONFIG_DIR",
+    "CURSOR_PLUGIN_ROOT",
+    "COPILOT_CLI",
+    { "pattern": "subagent_type=\"(general-purpose|generalPurpose|general|X|general_purpose_task)\"", "reason": "Generic agent-type values in install.js examples, not gsd-* identifiers" },
+    { "pattern": "Superpowers \\(the upstream framework\\)", "reason": "Attribution context - preserve upstream name when explicitly attributed" }
+  ],
+  "deprecated_drop": []
+}
