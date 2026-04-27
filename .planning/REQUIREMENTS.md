@@ -23,7 +23,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [x] **ARCH-03**: Single consolidated SessionStart hook decided (replaces both upstreams' hooks to prevent double-injection)
 - [x] **ARCH-04**: Agent ID collision resolution documented (e.g., GSD `gsd-code-reviewer` vs Superpowers `code-reviewer`)
 - [x] **ARCH-05**: Internal skill namespace decided (`oto:<skill-name>` for `Skill()` calls inside agents)
-- [ ] **ARCH-06**: File inventory complete — every file in both upstreams categorized as keep / drop / merge with reason
+- [x] **ARCH-06**: File inventory complete — every file in both upstreams categorized as keep / drop / merge with reason
 
 ### Rebrand Engine
 
