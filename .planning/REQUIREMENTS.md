@@ -18,11 +18,11 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Architecture Decisions
 
-- [ ] **ARCH-01**: Canonical state directory name decided and locked (`.oto/` recommended; replaces GSD's `.planning/`)
-- [ ] **ARCH-02**: Skill-vs-command routing policy documented in `decisions/skill-vs-command.md`
-- [ ] **ARCH-03**: Single consolidated SessionStart hook decided (replaces both upstreams' hooks to prevent double-injection)
-- [ ] **ARCH-04**: Agent ID collision resolution documented (e.g., GSD `gsd-code-reviewer` vs Superpowers `code-reviewer`)
-- [ ] **ARCH-05**: Internal skill namespace decided (`oto:<skill-name>` for `Skill()` calls inside agents)
+- [x] **ARCH-01**: Canonical state directory name decided and locked (`.oto/` recommended; replaces GSD's `.planning/`)
+- [x] **ARCH-02**: Skill-vs-command routing policy documented in `decisions/skill-vs-command.md`
+- [x] **ARCH-03**: Single consolidated SessionStart hook decided (replaces both upstreams' hooks to prevent double-injection)
+- [x] **ARCH-04**: Agent ID collision resolution documented (e.g., GSD `gsd-code-reviewer` vs Superpowers `code-reviewer`)
+- [x] **ARCH-05**: Internal skill namespace decided (`oto:<skill-name>` for `Skill()` calls inside agents)
 - [ ] **ARCH-06**: File inventory complete — every file in both upstreams categorized as keep / drop / merge with reason
 
 ### Rebrand Engine
@@ -78,7 +78,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Agents
 
-- [ ] **AGT-01**: Audit GSD's 33 agents — keep, drop, or merge each. Document decisions in `decisions/agent-audit.md`
+- [x] **AGT-01**: Audit GSD's 33 agents — keep, drop, or merge each. Document decisions in `decisions/agent-audit.md`
 - [ ] **AGT-02**: Drop Superpowers' `code-reviewer` example agent (resolves identity collision with `oto-code-reviewer`)
 - [ ] **AGT-03**: All retained agents rebranded (`name:` frontmatter, file paths, registry references) and pass schema validation
 - [ ] **AGT-04**: Codex `CODEX_AGENT_SANDBOX` config map updated for all retained agents (per-agent sandbox mode)
@@ -140,7 +140,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **DOC-02**: `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses
 - [ ] **DOC-03**: `docs/upstream-sync.md` — how to pull and apply upstream changes
 - [ ] **DOC-04**: `docs/rebrand-engine.md` — how the rename engine works, how to add rules
-- [ ] **DOC-05**: `decisions/` directory containing architecture decisions (skill-vs-command routing, agent audit, state directory choice)
+- [x] **DOC-05**: `decisions/` directory containing architecture decisions (skill-vs-command routing, agent audit, state directory choice)
 - [ ] **DOC-06**: Auto-generated `commands/INDEX.md` listing all `/oto-*` commands with one-line descriptions
 
 ## v2 Requirements
