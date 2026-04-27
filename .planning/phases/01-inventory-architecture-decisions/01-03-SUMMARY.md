@@ -51,7 +51,8 @@ completed: 2026-04-27
 - Created `tests/phase-01-rename-map.test.cjs` and `tests/phase-01-licenses.test.cjs`.
 - Created root `rename-map.json` with all seven rule types, `{{GITHUB_OWNER}}` URL placeholders, and a license/runtime allowlist.
 - Created `LICENSE` for oto's added work and `THIRD-PARTY-LICENSES.md` preserving both upstream MIT texts.
-- Verified cumulative Phase 1 tests: 34/34 passing.
+- Verified cumulative Phase 1 tests: 36/36 passing.
+- Tightened post-review rename-map schema semantics so all seven rule families are required and non-empty at schema level.
 
 ## Task Commits
 
@@ -91,8 +92,8 @@ Phase 1 requirements are now represented by concrete artifacts. Phase 2 can star
 
 ## Self-Check: PASSED
 
-- `node --test tests/phase-01-rename-map.test.cjs tests/phase-01-licenses.test.cjs` passes 18/18.
-- `node --test tests/phase-01-*.test.cjs` passes 34/34.
+- `node --test tests/phase-01-rename-map.test.cjs tests/phase-01-licenses.test.cjs` passes 19/19.
+- `node --test tests/phase-01-*.test.cjs` passes 36/36.
 - `rename-map.json` contains `{{GITHUB_OWNER}}` in both URL rules.
 - `LICENSE` contains `Copyright (c) 2026 Julian Isaac`.
 - `THIRD-PARTY-LICENSES.md` contains both `Copyright (c) 2025 Lex Christopherson` and `Copyright (c) 2025 Jesse Vincent`.

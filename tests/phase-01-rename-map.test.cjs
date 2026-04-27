@@ -8,6 +8,11 @@ const { validate } = require('./helpers/load-schema');
 const REPO_ROOT = path.join(__dirname, '..');
 const MAP_PATH = path.join(REPO_ROOT, 'rename-map.json');
 const SCHEMA_PATH = path.join(REPO_ROOT, 'schema', 'rename-map.json');
+const REQUIRED_RULE_TYPES = ['identifier', 'path', 'command', 'skill_ns', 'package', 'url', 'env_var'];
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
 
 test('schema/rename-map.json exists and is valid JSON', () => {
   assert.ok(fs.existsSync(SCHEMA_PATH));
@@ -26,9 +31,24 @@ test('rename-map.json validates against schema', () => {
   assert.ok(result.valid, `Schema errors:\n${result.errors.join('\n')}`);
 });
 
+test('schema rejects missing or empty required rule families', () => {
+  const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+  const data = JSON.parse(fs.readFileSync(MAP_PATH, 'utf8'));
+
+  for (const ruleType of REQUIRED_RULE_TYPES) {
+    const missing = clone(data);
+    delete missing.rules[ruleType];
+    assert.equal(validate(missing, schema).valid, false, `schema accepted missing rules.${ruleType}`);
+
+    const empty = clone(data);
+    empty.rules[ruleType] = [];
+    assert.equal(validate(empty, schema).valid, false, `schema accepted empty rules.${ruleType}`);
+  }
+});
+
 test('rules object contains all 7 required rule types and each has >=1 entry', () => {
   const data = JSON.parse(fs.readFileSync(MAP_PATH, 'utf8'));
-  for (const k of ['identifier', 'path', 'command', 'skill_ns', 'package', 'url', 'env_var']) {
+  for (const k of REQUIRED_RULE_TYPES) {
     assert.ok(Array.isArray(data.rules[k]) && data.rules[k].length >= 1, `rules.${k} missing or empty`);
   }
 });

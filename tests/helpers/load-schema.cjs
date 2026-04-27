@@ -37,6 +37,9 @@ function check(data, schema, root, path, errors) {
   if (schema.minLength !== undefined && typeof data === 'string' && data.length < schema.minLength) {
     errors.push(`${path}: minLength ${schema.minLength} not met (length ${data.length})`);
   }
+  if (schema.minItems !== undefined && Array.isArray(data) && data.length < schema.minItems) {
+    errors.push(`${path}: minItems ${schema.minItems} not met (length ${data.length})`);
+  }
   if (schema.minimum !== undefined && typeof data === 'number' && data < schema.minimum) errors.push(`${path}: minimum ${schema.minimum} not met`);
   if (schema.maximum !== undefined && typeof data === 'number' && data > schema.maximum) errors.push(`${path}: maximum ${schema.maximum} exceeded`);
 

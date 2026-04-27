@@ -55,6 +55,22 @@ test('every merge has merge_source_files', () => {
   }
 });
 
+test('license entries use explicit consolidation contract', () => {
+  const data = JSON.parse(fs.readFileSync(INVENTORY_PATH, 'utf8'));
+  const licenseEntries = data.entries.filter((e) => e.category === 'license');
+  assert.equal(licenseEntries.length, 2, 'expected two upstream license entries');
+
+  for (const e of licenseEntries) {
+    assert.equal(e.verdict, 'merge', `${e.upstream}/${e.path}: license entries should merge into attribution file`);
+    assert.equal(e.target_path, 'THIRD-PARTY-LICENSES.md');
+    assert.ok(!e.target_path.includes('('), `${e.upstream}/${e.path}: target_path should be a real path, not a note`);
+    assert.deepEqual(e.merge_source_files, [
+      'foundation-frameworks/get-shit-done-main/LICENSE',
+      'foundation-frameworks/superpowers-main/LICENSE',
+    ]);
+  }
+});
+
 test('entries sorted by path ASC', () => {
   const data = JSON.parse(fs.readFileSync(INVENTORY_PATH, 'utf8'));
   for (let i = 1; i < data.entries.length; i++) {

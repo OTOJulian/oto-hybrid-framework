@@ -8,15 +8,16 @@
     "version": { "type": "string", "const": "1" },
     "rules": {
       "type": "object",
+      "required": ["identifier", "path", "command", "skill_ns", "package", "url", "env_var"],
       "additionalProperties": false,
       "properties": {
-        "identifier": { "type": "array", "items": { "$ref": "#/$defs/identifier_rule" } },
-        "path": { "type": "array", "items": { "$ref": "#/$defs/path_rule" } },
-        "command": { "type": "array", "items": { "$ref": "#/$defs/command_rule" } },
-        "skill_ns": { "type": "array", "items": { "$ref": "#/$defs/skill_ns_rule" } },
-        "package": { "type": "array", "items": { "$ref": "#/$defs/package_rule" } },
-        "url": { "type": "array", "items": { "$ref": "#/$defs/url_rule" } },
-        "env_var": { "type": "array", "items": { "$ref": "#/$defs/env_var_rule" } }
+        "identifier": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/identifier_rule" } },
+        "path": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/path_rule" } },
+        "command": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/command_rule" } },
+        "skill_ns": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/skill_ns_rule" } },
+        "package": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/package_rule" } },
+        "url": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/url_rule" } },
+        "env_var": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/env_var_rule" } }
       }
     },
     "do_not_rename": {
@@ -89,7 +90,7 @@
       "properties": {
         "from": { "type": "string", "minLength": 1 },
         "to": { "type": "string", "minLength": 1 },
-        "fields": { "type": "array", "items": { "enum": ["name", "bin", "main", "exports", "repository.url"] } }
+        "fields": { "type": "array", "minItems": 1, "items": { "enum": ["name", "bin", "main", "exports", "repository.url"] } }
       }
     },
     "url_rule": {

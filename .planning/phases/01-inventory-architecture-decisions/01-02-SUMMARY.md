@@ -49,7 +49,8 @@ completed: 2026-04-27
 - Created `tests/phase-01-inventory.test.cjs` with schema, row-count, sorting, target-path, merge-source, duplicate, and unclassified-verdict checks.
 - Created `scripts/gen-inventory.cjs`, a deterministic zero-dependency CommonJS walker.
 - Generated `decisions/file-inventory.json` and `decisions/file-inventory.md`.
-- Classified 1,128 upstream files: 363 keep, 760 drop, 5 merge.
+- Classified 1,128 upstream files: 361 keep, 760 drop, 7 merge.
+- Tightened post-review license inventory semantics so upstream license rows are explicit `merge` entries targeting `THIRD-PARTY-LICENSES.md`.
 
 ## Task Commits
 
@@ -102,7 +103,7 @@ Plan 03 can now rely on `tests/helpers/load-schema`, the completed `decisions/` 
 ## Self-Check: PASSED
 
 - `node scripts/gen-inventory.cjs` exits 0.
-- `node --test tests/phase-01-inventory.test.cjs` passes 9/9.
+- `node --test tests/phase-01-inventory.test.cjs` passes 10/10.
 - `node --test tests/phase-01-decisions-dir.test.cjs` now passes after inventory output generation.
 - The 10 dropped agents in `decisions/agent-audit.md` have matching `verdict: "drop"` inventory entries.
 - `get-shit-done/bin/gsd-tools.cjs` has `verdict: "merge"` and `deprecation_status: "deprecated"`.

@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generated_at": "2026-04-27T23:08:36.739Z",
+  "generated_at": "2026-04-27T23:22:04.396Z",
   "upstream_versions": {
     "gsd": "v1.38.5",
     "superpowers": "v5.0.7"
@@ -315,9 +315,13 @@
     {
       "path": "LICENSE",
       "upstream": "gsd",
-      "verdict": "keep",
-      "reason": "License file preserved verbatim per ADR-13",
-      "target_path": "THIRD-PARTY-LICENSES.md (consolidated)",
+      "verdict": "merge",
+      "reason": "Consolidated into THIRD-PARTY-LICENSES.md per ADR-13",
+      "target_path": "THIRD-PARTY-LICENSES.md",
+      "merge_source_files": [
+        "foundation-frameworks/get-shit-done-main/LICENSE",
+        "foundation-frameworks/superpowers-main/LICENSE"
+      ],
       "rebrand_required": false,
       "phase_owner": 1,
       "category": "license"
@@ -9371,9 +9375,13 @@
     {
       "path": "LICENSE",
       "upstream": "superpowers",
-      "verdict": "keep",
-      "reason": "License file preserved verbatim per ADR-13",
-      "target_path": "THIRD-PARTY-LICENSES.md (consolidated)",
+      "verdict": "merge",
+      "reason": "Consolidated into THIRD-PARTY-LICENSES.md per ADR-13",
+      "target_path": "THIRD-PARTY-LICENSES.md",
+      "merge_source_files": [
+        "foundation-frameworks/get-shit-done-main/LICENSE",
+        "foundation-frameworks/superpowers-main/LICENSE"
+      ],
       "rebrand_required": false,
       "phase_owner": 1,
       "category": "license"

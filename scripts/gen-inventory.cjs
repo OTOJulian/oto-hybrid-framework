@@ -67,9 +67,13 @@ function classify(upstream, relPath) {
 
   if (/^LICENSE(\.md)?$/.test(filename) || filename === 'THIRD-PARTY-LICENSES.md') {
     return {
-      verdict: 'keep',
-      reason: 'License file preserved verbatim per ADR-13',
-      target_path: 'THIRD-PARTY-LICENSES.md (consolidated)',
+      verdict: 'merge',
+      reason: 'Consolidated into THIRD-PARTY-LICENSES.md per ADR-13',
+      target_path: 'THIRD-PARTY-LICENSES.md',
+      merge_source_files: [
+        'foundation-frameworks/get-shit-done-main/LICENSE',
+        'foundation-frameworks/superpowers-main/LICENSE',
+      ],
       rebrand_required: false,
       phase_owner: 1,
       category: 'license',
