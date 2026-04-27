@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
   - [x] 01-01-decisions-and-adrs-PLAN.md — Lock 14 ADRs + agent-audit (AGT-01) + skill-vs-command routing reference (ARCH-01..05, DOC-05, AGT-01)
   - [x] 01-02-inventory-PLAN.md — Generate file-inventory.json + .md classifying every upstream file (ARCH-06)
-  - [ ] 01-03-rename-map-and-licenses-PLAN.md — Ship rename-map.json + LICENSE + THIRD-PARTY-LICENSES.md (REB-02, FND-06)
+  - [x] 01-03-rename-map-and-licenses-PLAN.md — Ship rename-map.json + LICENSE + THIRD-PARTY-LICENSES.md (REB-02, FND-06)
 
 ### Phase 2: Rebrand Engine & Distribution Skeleton
 **Goal**: Ship the rule-typed rebrand engine and the Node package skeleton that makes the repo installable from GitHub, with all the lifecycle hooks correctly wired so `npm install -g github:...` works without a manual build step.
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Inventory & Architecture Decisions | 2/3 | In progress | - |
+| 1. Inventory & Architecture Decisions | 3/3 | Verifying | - |
 | 2. Rebrand Engine & Distribution Skeleton | 0/TBD | Not started | - |
 | 3. Installer Fork & Claude Adapter | 0/TBD | Not started | - |
 | 4. Core Workflows & Agents Port | 0/TBD | Not started | - |

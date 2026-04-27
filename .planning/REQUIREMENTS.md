@@ -14,7 +14,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `prepare` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
 - [ ] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g github:<owner>/oto-hybrid-framework[#vX.Y.Z]`
 - [ ] **FND-05**: First tagged release (`v0.1.0`) creates a clean install for at least one runtime (Claude Code)
-- [ ] **FND-06**: License attribution for both upstreams preserved in repo (`LICENSE` for oto's added work; `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses)
+- [x] **FND-06**: License attribution for both upstreams preserved in repo (`LICENSE` for oto's added work; `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses)
 
 ### Architecture Decisions
 
@@ -28,7 +28,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 ### Rebrand Engine
 
 - [ ] **REB-01**: Rule-typed rename engine (`scripts/rebrand.cjs`) — separate rule classes for identifiers (`\b`-bounded), paths, slash commands, URLs, env vars
-- [ ] **REB-02**: `rename-map.json` schema with explicit before/after for every internal ID, command name, agent name, skill namespace
+- [x] **REB-02**: `rename-map.json` schema with explicit before/after for every internal ID, command name, agent name, skill namespace
 - [ ] **REB-03**: Do-not-rename allowlist — `LICENSE` files, `foundation-frameworks/`, copyright lines, upstream URLs in attribution context
 - [ ] **REB-04**: Dry-run mode produces classified report (per-file: planned changes by rule type)
 - [ ] **REB-05**: Coverage manifest — pre-rebrand and post-rebrand counts of `gsd`, `GSD`, `Get Shit Done`, `superpowers`, `Superpowers` per file class; CI fails if any non-allowlisted occurrence remains
