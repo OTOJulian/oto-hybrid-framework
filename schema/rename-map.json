@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/{{GITHUB_OWNER}}/oto-hybrid-framework/schema/rename-map.json",
+  "type": "object",
+  "required": ["version", "rules", "do_not_rename"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string", "const": "1" },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identifier": { "type": "array", "items": { "$ref": "#/$defs/identifier_rule" } },
+        "path": { "type": "array", "items": { "$ref": "#/$defs/path_rule" } },
+        "command": { "type": "array", "items": { "$ref": "#/$defs/command_rule" } },
+        "skill_ns": { "type": "array", "items": { "$ref": "#/$defs/skill_ns_rule" } },
+        "package": { "type": "array", "items": { "$ref": "#/$defs/package_rule" } },
+        "url": { "type": "array", "items": { "$ref": "#/$defs/url_rule" } },
+        "env_var": { "type": "array", "items": { "$ref": "#/$defs/env_var_rule" } }
+      }
+    },
+    "do_not_rename": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "required": ["pattern", "reason"],
+            "properties": {
+              "pattern": { "type": "string" },
+              "reason": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "deprecated_drop": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "identifier_rule": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "boundary": { "enum": ["word", "prefix", "exact"] },
+        "case_variants": { "type": "array", "items": { "enum": ["upper", "lower", "title", "kebab", "snake"] } },
+        "do_not_match": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "path_rule": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "match": { "enum": ["segment", "prefix", "exact"] }
+      }
+    },
+    "command_rule": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "pattern": "^/[a-z][a-z0-9-]*-?$" },
+        "to": { "type": "string", "pattern": "^/[a-z][a-z0-9-]*-?$" }
+      }
+    },
+    "skill_ns_rule": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "pattern": ":$" },
+        "to": { "type": "string", "pattern": ":$" }
+      }
+    },
+    "package_rule": {
+      "type": "object",
+      "required": ["from", "to", "fields"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "fields": { "type": "array", "items": { "enum": ["name", "bin", "main", "exports", "repository.url"] } }
+      }
+    },
+    "url_rule": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "preserve_in_attribution": { "type": "boolean" }
+      }
+    },
+    "env_var_rule": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*_?$" },
+        "to": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*_?$" },
+        "apply_to_pattern": { "type": "string" }
+      }
+    }
+  }
+}
