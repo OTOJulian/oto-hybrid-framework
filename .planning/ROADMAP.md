@@ -12,7 +12,7 @@
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Inventory & Architecture Decisions** - Lock canonical decisions and rebrand schema before any code is touched
+- [x] **Phase 1: Inventory & Architecture Decisions** - Lock canonical decisions and rebrand schema before any code is touched
 - [ ] **Phase 2: Rebrand Engine & Distribution Skeleton** - Rule-typed rebrand engine + Node package shape + GitHub-installable repo
 - [ ] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
 - [ ] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
@@ -157,8 +157,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Inventory & Architecture Decisions | 3/3 | Verifying | - |
-| 2. Rebrand Engine & Distribution Skeleton | 0/TBD | Not started | - |
+| 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
+| 2. Rebrand Engine & Distribution Skeleton | 0/TBD | Ready to plan | - |
 | 3. Installer Fork & Claude Adapter | 0/TBD | Not started | - |
 | 4. Core Workflows & Agents Port | 0/TBD | Not started | - |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |

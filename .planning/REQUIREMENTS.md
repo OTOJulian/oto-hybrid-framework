@@ -199,15 +199,15 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | FND-03 | Phase 2 | Pending |
 | FND-04 | Phase 2 | Pending |
 | FND-05 | Phase 10 | Pending |
-| FND-06 | Phase 1 | Pending |
-| ARCH-01 | Phase 1 | Pending |
-| ARCH-02 | Phase 1 | Pending |
-| ARCH-03 | Phase 1 | Pending |
-| ARCH-04 | Phase 1 | Pending |
-| ARCH-05 | Phase 1 | Pending |
-| ARCH-06 | Phase 1 | Pending |
+| FND-06 | Phase 1 | Complete |
+| ARCH-01 | Phase 1 | Complete |
+| ARCH-02 | Phase 1 | Complete |
+| ARCH-03 | Phase 1 | Complete |
+| ARCH-04 | Phase 1 | Complete |
+| ARCH-05 | Phase 1 | Complete |
+| ARCH-06 | Phase 1 | Complete |
 | REB-01 | Phase 2 | Pending |
-| REB-02 | Phase 1 | Pending |
+| REB-02 | Phase 1 | Complete |
 | REB-03 | Phase 2 | Pending |
 | REB-04 | Phase 2 | Pending |
 | REB-05 | Phase 2 | Pending |
@@ -248,7 +248,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | WF-28 | Phase 4 | Pending |
 | WF-29 | Phase 4 | Pending |
 | WF-30 | Phase 4 | Pending |
-| AGT-01 | Phase 1 | Pending |
+| AGT-01 | Phase 1 | Complete |
 | AGT-02 | Phase 4 | Pending |
 | AGT-03 | Phase 4 | Pending |
 | AGT-04 | Phase 4 | Pending |
@@ -292,7 +292,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | DOC-02 | Phase 10 | Pending |
 | DOC-03 | Phase 10 | Pending |
 | DOC-04 | Phase 10 | Pending |
-| DOC-05 | Phase 1 | Pending |
+| DOC-05 | Phase 1 | Complete |
 | DOC-06 | Phase 10 | Pending |
 
 **Coverage:**
