@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/{{GITHUB_OWNER}}/oto-hybrid-framework/schema/file-inventory.json",
+  "type": "object",
+  "required": ["version", "generated_at", "entries"],
+  "properties": {
+    "version": { "type": "string", "const": "1" },
+    "generated_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}" },
+    "upstream_versions": {
+      "type": "object",
+      "properties": {
+        "gsd": { "type": "string" },
+        "superpowers": { "type": "string" }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": ["path", "upstream", "verdict", "reason", "rebrand_required", "phase_owner", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "upstream": { "enum": ["gsd", "superpowers"] },
+        "verdict": { "enum": ["keep", "drop", "merge"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "target_path": { "type": "string" },
+        "deprecation_status": { "enum": ["active", "deprecated", "removed-upstream"] },
+        "rebrand_required": { "type": "boolean" },
+        "merge_source_files": { "type": "array", "items": { "type": "string" } },
+        "phase_owner": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "category": { "enum": ["agent", "command", "workflow", "reference", "template", "context", "hook", "lib", "script", "test", "sdk", "manifest", "doc", "license", "asset", "config", "installer", "skill", "meta"] }
+      },
+      "allOf": [
+        { "if": { "properties": { "verdict": { "enum": ["keep", "merge"] } }, "required": ["verdict"] }, "then": { "required": ["target_path"] } },
+        { "if": { "properties": { "verdict": { "const": "merge" } }, "required": ["verdict"] }, "then": { "required": ["merge_source_files"] } }
+      ]
+    }
+  }
+}
