@@ -19,7 +19,7 @@
   "scripts": {
     "postinstall": "node scripts/build-hooks.js",
     "test": "node --test --test-concurrency=4 tests/",
-    "rebrand": "node scripts/rebrand.cjs",
+    "rebrand": "node scripts/rebrand.cjs --apply --force",
     "rebrand:dry-run": "node scripts/rebrand.cjs --dry-run",
     "rebrand:roundtrip": "node scripts/rebrand.cjs --verify-roundtrip"
   },
