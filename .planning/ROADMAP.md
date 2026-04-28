@@ -41,12 +41,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 01-03-rename-map-and-licenses-PLAN.md — Ship rename-map.json + LICENSE + THIRD-PARTY-LICENSES.md (REB-02, FND-06)
 
 ### Phase 2: Rebrand Engine & Distribution Skeleton
-**Goal**: Ship the rule-typed rebrand engine and the Node package skeleton that makes the repo installable from GitHub, with all the lifecycle hooks correctly wired so `npm install -g github:...` works without a manual build step.
+**Goal**: Ship the rule-typed rebrand engine and the Node package skeleton that makes the repo installable from GitHub, with all the lifecycle hooks correctly wired so `npm install -g https://github.com/.../archive/<ref>.tar.gz` works without a manual build step.
 **Depends on**: Phase 1
 **Requirements**: FND-01, FND-02, FND-03, FND-04, REB-01, REB-03, REB-04, REB-05, REB-06
 **Success Criteria** (what must be TRUE):
   1. `package.json` declares `engines.node >=22.0.0`, CommonJS, `"bin": { "oto": "bin/install.js" }`, an explicit `"files"` allowlist, and a `postinstall` script (NOT `prepublishOnly`) that runs `scripts/build-hooks.js`
-  2. Repo is hosted on public GitHub and `npm install -g github:<owner>/oto-hybrid-framework` clones cleanly (the installer itself may not yet do anything useful — that's Phase 3)
+  2. Repo is hosted on public GitHub and `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/<ref>.tar.gz` installs cleanly (the installer itself may not yet do anything useful — that's Phase 3)
   3. `scripts/rebrand.cjs` runs in dry-run mode against the `foundation-frameworks/` upstream copy and emits a per-file classified report (changes grouped by rule type: identifier / path / command / URL / env var); reports zero unclassified matches
   4. Re-applying the rename map to already-rebranded code produces a zero-change diff (round-trip assertion passes)
   5. The rebrand engine respects a do-not-rename allowlist covering `LICENSE*`, `THIRD-PARTY-LICENSES.md`, `foundation-frameworks/`, copyright lines, and upstream URLs in attribution context (verified by a fixture run)
@@ -150,7 +150,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. License-attribution CI check confirms `THIRD-PARTY-LICENSES.md` exists and contains both upstream MIT licenses verbatim (with `Lex Christopherson` and `Jesse Vincent` copyright lines present)
   4. Skill-auto-trigger regression test, SessionStart-output snapshot fixture, and state-leak detection test (no `.planning/` references) all pass; GitHub Actions are pinned by SHA, not major tag
   5. Public docs are present: `README.md` (what oto is, install instruction with tagged ref, upstream attribution, command index), `docs/upstream-sync.md`, `docs/rebrand-engine.md`, auto-generated `commands/INDEX.md` listing every `/oto-*` command with a one-line description
-  6. **v0.1.0 tagged release**: `git tag v0.1.0` triggers `release.yml`, GitHub Release is created, and `npm install -g github:<owner>/oto-hybrid-framework#v0.1.0` on a clean machine produces a working Claude Code install
+  6. **v0.1.0 tagged release**: `git tag v0.1.0` triggers `release.yml`, GitHub Release is created, and `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/v0.1.0.tar.gz` on a clean machine produces a working Claude Code install
 **Plans**: TBD
 
 ## Progress

@@ -67,12 +67,12 @@ User selected all four candidate areas (the first four). Decisions for the latte
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Manual repo creation, phase verifies real clone | User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand. Phase ships `install-smoke.cjs` that runs `npm install -g github:OTOJulian/oto-hybrid-framework#<sha>` against live remote. | ✓ |
+| Manual repo creation, phase verifies real clone | User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand. Phase ships `install-smoke.cjs` that runs `npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/<sha>.tar.gz` against live remote. | ✓ |
 | Local `npm pack` + tarball install only | Verify install via `npm pack` + `npm install -g <tarball>` locally. Real GitHub clone deferred. | |
 | Phase scripts `gh repo create` | Scripted via `gh repo create` automatically. | |
 
 **User's choice:** Manual repo creation, phase verifies real clone (Recommended)
-**Notes:** Repo creation is a one-time outside-tooling action (visibility, topics, description). Pitfall 5 (`prepublishOnly` vs install lifecycle) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`, not under `npm pack` tarball install.
+**Notes:** Repo creation is a one-time outside-tooling action (visibility, topics, description). Pitfall 5 (`prepublishOnly` vs install lifecycle) and Pitfall 16 (bin collisions) only manifest under a real public GitHub install URL, not under a local tarball install.
 
 ---
 

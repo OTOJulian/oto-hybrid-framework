@@ -5,10 +5,10 @@ oto is a personal hybrid AI-CLI framework that combines GSD's planning and execu
 ## Install
 
 ```sh
-npm install -g github:OTOJulian/oto-hybrid-framework#vX.Y.Z
+npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/vX.Y.Z.tar.gz
 ```
 
-Replace `#vX.Y.Z` with a release tag when one is available, or omit it to install the current default branch.
+Replace `vX.Y.Z` with a release tag when one is available.
 
 ## Status
 

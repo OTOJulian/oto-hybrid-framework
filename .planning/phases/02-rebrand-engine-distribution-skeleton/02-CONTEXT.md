@@ -9,7 +9,7 @@
 Ship two things in Phase 2:
 
 1. **The rule-typed rebrand engine** (`scripts/rebrand/`) that consumes `rename-map.json` and emits classified dry-run reports + applied trees + coverage manifests + round-trip assertions.
-2. **The Node package skeleton** that makes `npm install -g github:OTOJulian/oto-hybrid-framework[#tag]` clone cleanly with all lifecycle hooks correctly wired (`postinstall`, `bin`, `files`, `engines`).
+2. **The Node package skeleton** that makes `npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/<ref>.tar.gz` install cleanly with all lifecycle hooks correctly wired (`postinstall`, `bin`, `files`, `engines`).
 
 Phase 2 builds and exercises the engine against `foundation-frameworks/` (the upstream copy) into a scratch out-dir for verification. Phase 2 does **not** apply the rebrand into `oto/` to produce the actual ported workflows/agents/skills — that's Phase 4.
 
@@ -96,10 +96,10 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
 ### GitHub Repo Creation & Install Smoke (FND-04, Pitfall 16)
 
 - **D-08:** **Manual repo creation, phase verifies real clone**:
-  - User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand before phase declares complete. (Repo visibility: **public** — required by `npm install -g github:...` to work without PAT/SSH auth setup, and aligns with FND-04.)
-  - Phase 2 ships `scripts/install-smoke.cjs` that runs `npm install -g github:OTOJulian/oto-hybrid-framework#<commit-sha> --prefix /tmp/oto-install-smoke-XXXX` against the live remote, asserts `oto` is on PATH and `oto --version` exits 0 (the `oto` bin in Phase 2 is a stub — see D-09).
+  - User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand before phase declares complete. (Repo visibility: **public** — required by the GitHub archive install URL to work without PAT/SSH auth setup, and aligns with FND-04.)
+  - Phase 2 ships `scripts/install-smoke.cjs` that runs `npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/<commit-sha>.tar.gz --prefix /tmp/oto-install-smoke-XXXX` against the live remote, asserts `oto` is on PATH and `oto --version` exits 0 (the `oto` bin in Phase 2 is a stub — see D-09).
   - Phase 2 success gate: install-smoke passes against the real remote (not just `npm pack`).
-- **D-08 rationale:** Repo creation is a one-time manual op (visibility, topics, description) you'll want to control by hand. `gh repo create` scripted is overkill for a single repo. Local-only `npm pack` testing is insufficient — Pitfall 5 (`postinstall` vs `prepublishOnly`) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`.
+- **D-08 rationale:** Repo creation is a one-time manual op (visibility, topics, description) you'll want to control by hand. `gh repo create` scripted is overkill for a single repo. Local-only `npm pack` testing is insufficient — Pitfall 5 (`postinstall` vs `prepublishOnly`) and Pitfall 16 (bin collisions) only manifest under a real public GitHub install URL.
 
 ### `package.json` Skeleton (FND-01, FND-02)
 
@@ -136,7 +136,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
   }
   ```
   - **No `"main"`, no `"exports"`, no `"type"`** at v1 (CJS default; oto isn't `require()`-ed as a library).
-  - **No `prepublishOnly`** (Pitfall 5: `npm install -g github:...` does NOT run `prepublishOnly`; `postinstall` runs on both git-install AND publish).
+  - **No `prepublishOnly`** (Pitfall 5: the public GitHub install path does NOT run `prepublishOnly`; `postinstall` runs during install).
   - **No top-level dependencies** at Phase 2. The engine and walker use only Node 22+ built-ins (`fs/promises`, `node:fs.glob`, `node:path`, `node:vm`).
   - `version: "0.1.0-alpha.1"` so tag-pinned installs are meaningful before v0.1.0 ships in Phase 10.
 
@@ -173,7 +173,7 @@ The user picked recommended for every selected gray area; D-08, D-09, D-12 were 
 - Exact filename and structure of synthetic fixtures under `tests/fixtures/rebrand/` (only the categories from D-07 are locked)
 - Markdown report layout details (column ordering, table grouping)
 - Exit-code conventions (engine non-zero on any unclassified match, on round-trip diff, on coverage assertion failure — beyond that, Claude decides)
-- README.md content for Phase 2 (must mention install command + `npm install -g github:OTOJulian/oto-hybrid-framework#<tag>`; everything else is at planner's discretion)
+- README.md content for Phase 2 (must mention install command + `npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/<tag>.tar.gz`; everything else is at planner's discretion)
 
 </decisions>
 

@@ -12,7 +12,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **FND-01**: Repository structured as Node.js npm package (Node >= 22.0.0, CommonJS, no top-level TypeScript, no build step at top level)
 - [ ] **FND-02**: `package.json` declares `"bin": { "oto": "bin/install.js" }` and an explicit `"files"` allowlist
 - [ ] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `postinstall` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
-- [ ] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g github:<owner>/oto-hybrid-framework[#vX.Y.Z]`
+- [ ] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`
 - [ ] **FND-05**: First tagged release (`v0.1.0`) creates a clean install for at least one runtime (Claude Code)
 - [x] **FND-06**: License attribution for both upstreams preserved in repo (`LICENSE` for oto's added work; `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses)
 
@@ -136,7 +136,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Documentation
 
-- [ ] **DOC-01**: `README.md` with: what oto is, install instructions (`npm install -g github:<owner>/oto-hybrid-framework#vX.Y.Z`), upstream attribution, command index
+- [ ] **DOC-01**: `README.md` with: what oto is, install instructions (`npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`), upstream attribution, command index
 - [ ] **DOC-02**: `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses
 - [ ] **DOC-03**: `docs/upstream-sync.md` — how to pull and apply upstream changes
 - [ ] **DOC-04**: `docs/rebrand-engine.md` — how the rename engine works, how to add rules
