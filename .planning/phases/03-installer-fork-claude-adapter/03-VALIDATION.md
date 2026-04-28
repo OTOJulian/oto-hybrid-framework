@@ -50,6 +50,7 @@ created: 2026-04-28
 | INS-03 | `--config-dir` flag wins over env var and default | unit | `node --test tests/phase-03-args.test.cjs` | ❌ W0 | ⬜ pending |
 | INS-03 | Env var wins over default when no flag | unit | `node --test tests/phase-03-args.test.cjs` | ❌ W0 | ⬜ pending |
 | INS-03 | Default = `~/.<runtime>` when no flag and no env | unit | `node --test tests/phase-03-args.test.cjs` | ❌ W0 | ⬜ pending |
+| INS-04 | copyTree/removeTree/sha256File/walkTree primitives (unit-level fast feedback) | unit | `node --test tests/phase-03-copy-files.test.cjs` | ❌ W0 | ⬜ pending |
 | INS-04 | Files copied (not symlinked) into target | integration | `node --test tests/phase-03-install-claude.integration.test.cjs` | ❌ W0 | ⬜ pending |
 | INS-04 | Re-install is idempotent (file-set stable) | integration | `node --test tests/phase-03-install-claude.integration.test.cjs` | ❌ W0 | ⬜ pending |
 | INS-04 | Uninstall removes all installed files + restores user content | integration | `node --test tests/phase-03-install-claude.integration.test.cjs` | ❌ W0 | ⬜ pending |
@@ -73,6 +74,7 @@ Phase 3 requires creating these test files BEFORE any production code (TDD-style
 - [ ] `tests/phase-03-runtime-detect.test.cjs` — covers INS-06 `--all` detection
 - [ ] `tests/phase-03-marker.test.cjs` — covers marker injection idempotency (INS-04 indirectly)
 - [ ] `tests/phase-03-install-state.test.cjs` — covers state schema validation
+- [ ] `tests/phase-03-copy-files.test.cjs` — covers INS-04 unit-level copy/hash/walk/remove primitives (Plan 04 fast-feedback layer)
 - [ ] `tests/phase-03-runtime-claude.test.cjs` — covers INS-02 adapter contract (Claude)
 - [ ] `tests/phase-03-runtime-codex.test.cjs` — covers INS-02 adapter contract (Codex)
 - [ ] `tests/phase-03-runtime-gemini.test.cjs` — covers INS-02 adapter contract (Gemini)
@@ -101,7 +103,7 @@ Phase 3 requires creating these test files BEFORE any production code (TDD-style
 
 - [ ] All tasks have `<automated>` verify or Wave 0 dependencies
 - [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (15 test files)
+- [ ] Wave 0 covers all MISSING references (16 test files)
 - [ ] No watch-mode flags (single-run `node --test` only)
 - [ ] Feedback latency < 10s per wave; < 30s full suite
 - [ ] `nyquist_compliant: true` set in frontmatter (after Wave 0 lands)
