@@ -39,7 +39,7 @@ test('INS-04: injectMarkerBlock replaces only content between markers when prese
   const filePath = path.join(tmpDir(t), 'CLAUDE.md');
   fs.writeFileSync(
     filePath,
-    '# User Notes\n\n<!-- OTO Configuration -->\nold body\n<!-- /OTO Configuration -->\n\nDo not touch this.\n',
+    '# User Notes\n\n<!-- OTO Configuration -->\nold body\n<!-- /OTO Configuration -->\n\nDo not touch this.',
   );
 
   injectMarkerBlock(filePath, OPEN_MARKER, CLOSE_MARKER, 'new body');
