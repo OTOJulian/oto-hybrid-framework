@@ -1,0 +1,28 @@
+{
+  "name": "oto",
+  "version": "0.1.0-alpha.1",
+  "description": "Hybrid AI-CLI framework: GSD planning + Superpowers skills under /oto-* across Claude/Codex/Gemini",
+  "engines": { "node": ">=22.0.0" },
+  "bin": { "oto": "bin/install.js" },
+  "files": [
+    "bin/",
+    "scripts/rebrand/",
+    "scripts/build-hooks.js",
+    "rename-map.json",
+    "schema/",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "THIRD-PARTY-LICENSES.md"
+  ],
+  "scripts": {
+    "prepare": "node scripts/build-hooks.js",
+    "test": "node --test --test-concurrency=4 tests/",
+    "rebrand": "node scripts/rebrand.cjs",
+    "rebrand:dry-run": "node scripts/rebrand.cjs --dry-run",
+    "rebrand:roundtrip": "node scripts/rebrand.cjs --verify-roundtrip"
+  },
+  "repository": { "type": "git", "url": "git+https://github.com/julianisaac/oto-hybrid-framework.git" },
+  "license": "MIT",
+  "author": "Julian Isaac"
+}
