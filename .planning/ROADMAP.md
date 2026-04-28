@@ -53,7 +53,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   6. Pre/post coverage manifest counts every occurrence of `gsd`, `GSD`, `Get Shit Done`, `superpowers`, `Superpowers` per file class; the post-rebrand count outside the allowlist is zero
 **Plans**: 3 plans
   - [x] 02-01-distribution-skeleton-PLAN.md — package.json + bin/install.js stub + scripts/build-hooks.js + scripts/install-smoke.cjs + .gitignore + README; live install-smoke against public repo (FND-01..04)
-  - [ ] 02-02-rebrand-rules-and-walker-PLAN.md — 7 per-rule modules + walker + hand-rolled schema validator + 9 synthetic fixtures + per-rule unit tests (REB-01, REB-03)
+  - [x] 02-02-rebrand-rules-and-walker-PLAN.md — 7 per-rule modules + walker + hand-rolled schema validator + 9 synthetic fixtures + per-rule unit tests (REB-01, REB-03)
   - [ ] 02-03-rebrand-engine-and-cli-PLAN.md — engine orchestrator + manifest + report + CLI; real-tree dry-run/apply/round-trip against foundation-frameworks/ (REB-04, REB-05, REB-06)
 
 ### Phase 3: Installer Fork & Claude Adapter

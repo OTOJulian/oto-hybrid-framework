@@ -1,9 +1,9 @@
 ---
 phase: 2
 slug: rebrand-engine-distribution-skeleton
-status: planned
+status: executing
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-28
 last_updated: 2026-04-28
 ---
@@ -51,9 +51,9 @@ last_updated: 2026-04-28
 
 | Task | Requirement | Test Type | Automated Command | Status |
 |------|-------------|-----------|-------------------|--------|
-| 02-02-T1: validate-schema move + walker.cjs + 9 fixtures + schema-validate test + walker test | REB-01 (D-16), REB-03 | unit | `node --test tests/phase-02-walker.test.cjs tests/phase-02-schema-validate.test.cjs tests/phase-01-rename-map.test.cjs` | ⬜ |
-| 02-02-T2: identifier.cjs + path.cjs + command.cjs + skill_ns.cjs + 4 rule tests | REB-01 | unit | `node --test tests/phase-02-rules-identifier.test.cjs tests/phase-02-rules-path.test.cjs tests/phase-02-rules-command.test.cjs tests/phase-02-rules-skill_ns.test.cjs` | ⬜ |
-| 02-02-T3: package.cjs + url.cjs + env_var.cjs + 3 rule tests | REB-01 | unit | `node --test tests/phase-02-rules-package.test.cjs tests/phase-02-rules-url.test.cjs tests/phase-02-rules-env_var.test.cjs` | ⬜ |
+| 02-02-T1: validate-schema move + walker.cjs + 9 fixtures + schema-validate test + walker test | REB-01 (D-16), REB-03 | unit | `node --test tests/phase-02-walker.test.cjs tests/phase-02-schema-validate.test.cjs tests/phase-01-rename-map.test.cjs` | ✅ |
+| 02-02-T2: identifier.cjs + path.cjs + command.cjs + skill_ns.cjs + 4 rule tests | REB-01 | unit | `node --test tests/phase-02-rules-identifier.test.cjs tests/phase-02-rules-path.test.cjs tests/phase-02-rules-command.test.cjs tests/phase-02-rules-skill_ns.test.cjs` | ✅ |
+| 02-02-T3: package.cjs + url.cjs + env_var.cjs + 3 rule tests | REB-01 | unit | `node --test tests/phase-02-rules-package.test.cjs tests/phase-02-rules-url.test.cjs tests/phase-02-rules-env_var.test.cjs` | ✅ |
 
 ### Plan 02-03: Rebrand Engine + CLI
 
@@ -94,19 +94,19 @@ last_updated: 2026-04-28
 
 Files created (with owning task):
 
-- [ ] `tests/phase-02-package-json.test.cjs` (02-01-T1) — FND-01, FND-02
-- [ ] `tests/phase-02-gitignore.test.cjs` (02-01-T1) — D-17
-- [ ] `tests/phase-02-bin-stub.test.cjs` (02-01-T1) — FND-02
-- [ ] `tests/phase-02-build-hooks.test.cjs` (02-01-T2) — FND-03
-- [ ] `tests/phase-02-walker.test.cjs` (02-02-T1) — REB-03 walker contract
-- [ ] `tests/phase-02-schema-validate.test.cjs` (02-02-T1) — REB-01 (D-16)
-- [ ] `tests/phase-02-rules-identifier.test.cjs` (02-02-T2) — REB-01 + Pitfall 1
-- [ ] `tests/phase-02-rules-path.test.cjs` (02-02-T2) — REB-01
-- [ ] `tests/phase-02-rules-command.test.cjs` (02-02-T2) — REB-01
-- [ ] `tests/phase-02-rules-skill_ns.test.cjs` (02-02-T2) — REB-01
-- [ ] `tests/phase-02-rules-package.test.cjs` (02-02-T3) — REB-01
-- [ ] `tests/phase-02-rules-url.test.cjs` (02-02-T3) — REB-01 (D-14)
-- [ ] `tests/phase-02-rules-env_var.test.cjs` (02-02-T3) — REB-01
+- [x] `tests/phase-02-package-json.test.cjs` (02-01-T1) — FND-01, FND-02
+- [x] `tests/phase-02-gitignore.test.cjs` (02-01-T1) — D-17
+- [x] `tests/phase-02-bin-stub.test.cjs` (02-01-T1) — FND-02
+- [x] `tests/phase-02-build-hooks.test.cjs` (02-01-T2) — FND-03
+- [x] `tests/phase-02-walker.test.cjs` (02-02-T1) — REB-03 walker contract
+- [x] `tests/phase-02-schema-validate.test.cjs` (02-02-T1) — REB-01 (D-16)
+- [x] `tests/phase-02-rules-identifier.test.cjs` (02-02-T2) — REB-01 + Pitfall 1
+- [x] `tests/phase-02-rules-path.test.cjs` (02-02-T2) — REB-01
+- [x] `tests/phase-02-rules-command.test.cjs` (02-02-T2) — REB-01
+- [x] `tests/phase-02-rules-skill_ns.test.cjs` (02-02-T2) — REB-01
+- [x] `tests/phase-02-rules-package.test.cjs` (02-02-T3) — REB-01
+- [x] `tests/phase-02-rules-url.test.cjs` (02-02-T3) — REB-01 (D-14)
+- [x] `tests/phase-02-rules-env_var.test.cjs` (02-02-T3) — REB-01
 - [ ] `tests/phase-02-engine-classify.test.cjs` (02-03-T1) — REB-01, REB-04
 - [ ] `tests/phase-02-engine-no-source-mutation.test.cjs` (02-03-T1) — REB-04
 - [ ] `tests/phase-02-coverage-manifest.test.cjs` (02-03-T1) — REB-05, REB-06
@@ -116,7 +116,7 @@ Files created (with owning task):
 - [ ] `tests/phase-02-dryrun-report.test.cjs` (02-03-T2) — REB-04
 - [ ] `tests/phase-02-roundtrip.test.cjs` (02-03-T2) — REB-06
 - [ ] `tests/phase-02-roundtrip-isolation.test.cjs` (02-03-T2) — REB-06 isolation guarantee
-- [ ] `tests/fixtures/rebrand/` (02-02-T1) — synthetic-fixture tree (D-07 categories)
+- [x] `tests/fixtures/rebrand/` (02-02-T1) — synthetic-fixture tree (D-07 categories)
 
 *Existing helpers: `tests/helpers/load-schema.cjs` is reusable (becomes a re-export of `scripts/rebrand/lib/validate-schema.cjs` in 02-02-T1). Existing test layout: `tests/phase-01-*.test.cjs` is the naming precedent.*
 
