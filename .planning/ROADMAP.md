@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Inventory & Architecture Decisions** - Lock canonical decisions and rebrand schema before any code is touched
 - [x] **Phase 2: Rebrand Engine & Distribution Skeleton** - Rule-typed rebrand engine + Node package shape + GitHub-installable repo
-- [ ] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
+- [x] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
 - [ ] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
 - [ ] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
 - [ ] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
@@ -73,7 +73,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 03-04-PLAN.md — Wave 1: bin/lib/copy-files.cjs (copyTree/removeTree/sha256File/walkTree, Pitfall B safe, symlink-rejecting) (INS-04)
   - [x] 03-05-PLAN.md — Wave 2: 3 runtime adapters (claude full, codex+gemini minimum-viable per D-12) (INS-02, INS-05)
   - [x] 03-06-PLAN.md — Wave 3: bin/lib/install.cjs orchestrator (full D-09/D-10 lifecycles) + 4 integration tests (INS-02, INS-04, INS-05, INS-06)
-  - [ ] 03-07-PLAN.md — Wave 4: bin/install.js thin shell + scripts/install-smoke.cjs extension + 4 enforcement tests (INS-01, INS-02, INS-05)
+  - [x] 03-07-PLAN.md — Wave 4: bin/install.js thin shell + scripts/install-smoke.cjs extension + 4 enforcement tests (INS-01, INS-02, INS-05)
 **UI hint**: yes
 
 ### Phase 4: Core Workflows & Agents Port
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
-| 3. Installer Fork & Claude Adapter | 6/7 | In Progress | - |
+| 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
 | 4. Core Workflows & Agents Port | 0/TBD | Not started | - |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
