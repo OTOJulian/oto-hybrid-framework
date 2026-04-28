@@ -12,6 +12,10 @@ function runHelp() {
   return spawnSync(process.execPath, ['bin/install.js', '--help'], { encoding: 'utf8' });
 }
 
+function runInstaller(args) {
+  return spawnSync(process.execPath, ['bin/install.js', ...args], { encoding: 'utf8' });
+}
+
 test('INS-01 / D-15: oto install --help mentions --claude, --codex, --gemini, --all, --config-dir', () => {
   const result = runHelp();
   for (const token of ['--claude', '--codex', '--gemini', '--all', '--config-dir']) {
@@ -72,4 +76,16 @@ test('INS-01: help does NOT mention any of opencode/kilo/cursor/windsurf/antigra
   ]) {
     assert.ok(!lower.includes(name), `unexpected ${name}`);
   }
+});
+
+test('INS-06: install --config-dir with multiple runtimes exits 3', () => {
+  const result = runInstaller(['install', '--claude', '--codex', '--config-dir', '/tmp/oto-multi-runtime']);
+  assert.equal(result.status, 3);
+  assert.match(result.stderr, /--config-dir cannot be combined with multiple runtimes/);
+});
+
+test('INS-06: uninstall --config-dir with multiple runtimes exits 3', () => {
+  const result = runInstaller(['uninstall', '--claude', '--codex', '--config-dir', '/tmp/oto-multi-runtime']);
+  assert.equal(result.status, 3);
+  assert.match(result.stderr, /--config-dir cannot be combined with multiple runtimes/);
 });

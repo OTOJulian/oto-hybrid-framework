@@ -57,6 +57,26 @@ test('INS-06: --all + --config-dir rejected at parse time (exit 3)', () => {
   );
 });
 
+test('INS-06: --config-dir + multiple runtimes rejected at parse time (exit 3)', () => {
+  assert.throws(
+    () => parseCliArgs(['install', '--claude', '--codex', '--config-dir', '/tmp/x']),
+    {
+      name: 'Error',
+      message: '--config-dir cannot be combined with multiple runtimes',
+      exitCode: 3,
+    },
+  );
+
+  assert.throws(
+    () => parseCliArgs(['uninstall', '--claude', '--codex', '--config-dir', '/tmp/x']),
+    {
+      name: 'Error',
+      message: '--config-dir cannot be combined with multiple runtimes',
+      exitCode: 3,
+    },
+  );
+});
+
 test('INS-06: --all + --claude rejected (mutual exclusion)', () => {
   assert.throws(
     () => parseCliArgs(['install', '--all', '--claude']),

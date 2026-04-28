@@ -62,6 +62,10 @@ function parseCliArgs(argv) {
     throw new ArgError('--config-dir cannot be used with --all (--config-dir targets a single runtime)', 3);
   }
 
+  if (values['config-dir'] && runtimes.length > 1) {
+    throw new ArgError('--config-dir cannot be combined with multiple runtimes', 3);
+  }
+
   if (!values.all && !values.help && runtimes.length === 0) {
     if (action === 'install') {
       runtimes.push('claude');
