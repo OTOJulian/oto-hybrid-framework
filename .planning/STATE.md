@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: executing
-stopped_at: Completed 03-06-PLAN.md
-last_updated: "2026-04-28T23:12:30.752Z"
+status: verifying
+stopped_at: Completed 03-07-PLAN.md
+last_updated: "2026-04-28T23:27:11.522Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 10
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 13
-  completed_plans: 12
-  percent: 92
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 
 ## Current Position
 
-Phase: 03 (installer-fork-claude-adapter) — EXECUTING
+Phase: 03 (installer-fork-claude-adapter) — COMPLETE
 Plan: 7 of 7
-Status: Ready to execute
+Status: Ready for /gsd-verify-work
 Last activity: 2026-04-28
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [█████████░] 92%
 | Phase 03 P04 | 4 min | 2 tasks | 2 files |
 | Phase 03 P05 | 8 min | 3 tasks | 6 files |
 | Phase 03 P06 | 8 min | 3 tasks | 5 files |
+| Phase 03 P07 | 10 min | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - 03-05 Codex and Gemini transforms remain Phase 3 identity stubs with exact Phase 5/8 TODO markers for future parity work.
 - 03-06 installAll uses opts.homeDir both for runtime detection and per-adapter configDir resolution.
 - 03-06 installRuntime records only current source-manifest files so stale target files do not survive state diff cleanup.
+- 03-07: oto with no args prints install-scoped help instead of defaulting to a real install.
+- 03-07: install-smoke prefixes PATH with the temporary npm install bin directory before invoking oto.
 
 ### Pending Todos
 
@@ -99,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T23:12:30.740Z
-Stopped at: Completed 03-06-PLAN.md
+Last session: 2026-04-28T23:27:11.514Z
+Stopped at: Completed 03-07-PLAN.md
 Resume file: None
