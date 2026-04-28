@@ -11,7 +11,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 - [ ] **FND-01**: Repository structured as Node.js npm package (Node >= 22.0.0, CommonJS, no top-level TypeScript, no build step at top level)
 - [ ] **FND-02**: `package.json` declares `"bin": { "oto": "bin/install.js" }` and an explicit `"files"` allowlist
-- [ ] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `prepare` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
+- [ ] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `postinstall` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
 - [ ] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g github:<owner>/oto-hybrid-framework[#vX.Y.Z]`
 - [ ] **FND-05**: First tagged release (`v0.1.0`) creates a clean install for at least one runtime (Claude Code)
 - [x] **FND-06**: License attribution for both upstreams preserved in repo (`LICENSE` for oto's added work; `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses)

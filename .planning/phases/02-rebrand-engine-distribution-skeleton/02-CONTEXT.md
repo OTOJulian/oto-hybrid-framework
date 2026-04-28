@@ -9,7 +9,7 @@
 Ship two things in Phase 2:
 
 1. **The rule-typed rebrand engine** (`scripts/rebrand/`) that consumes `rename-map.json` and emits classified dry-run reports + applied trees + coverage manifests + round-trip assertions.
-2. **The Node package skeleton** that makes `npm install -g github:OTOJulian/oto-hybrid-framework[#tag]` clone cleanly with all lifecycle hooks correctly wired (`prepare`, `bin`, `files`, `engines`).
+2. **The Node package skeleton** that makes `npm install -g github:OTOJulian/oto-hybrid-framework[#tag]` clone cleanly with all lifecycle hooks correctly wired (`postinstall`, `bin`, `files`, `engines`).
 
 Phase 2 builds and exercises the engine against `foundation-frameworks/` (the upstream copy) into a scratch out-dir for verification. Phase 2 does **not** apply the rebrand into `oto/` to produce the actual ported workflows/agents/skills — that's Phase 4.
 
@@ -99,7 +99,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
   - User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand before phase declares complete. (Repo visibility: **public** — required by `npm install -g github:...` to work without PAT/SSH auth setup, and aligns with FND-04.)
   - Phase 2 ships `scripts/install-smoke.cjs` that runs `npm install -g github:OTOJulian/oto-hybrid-framework#<commit-sha> --prefix /tmp/oto-install-smoke-XXXX` against the live remote, asserts `oto` is on PATH and `oto --version` exits 0 (the `oto` bin in Phase 2 is a stub — see D-09).
   - Phase 2 success gate: install-smoke passes against the real remote (not just `npm pack`).
-- **D-08 rationale:** Repo creation is a one-time manual op (visibility, topics, description) you'll want to control by hand. `gh repo create` scripted is overkill for a single repo. Local-only `npm pack` testing is insufficient — Pitfall 5 (`prepare` vs `prepublishOnly`) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`.
+- **D-08 rationale:** Repo creation is a one-time manual op (visibility, topics, description) you'll want to control by hand. `gh repo create` scripted is overkill for a single repo. Local-only `npm pack` testing is insufficient — Pitfall 5 (`postinstall` vs `prepublishOnly`) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`.
 
 ### `package.json` Skeleton (FND-01, FND-02)
 
@@ -113,6 +113,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
     "bin": { "oto": "bin/install.js" },
     "files": [
       "bin/",
+      "hooks/",
       "scripts/rebrand/",
       "scripts/build-hooks.js",
       "rename-map.json",
@@ -123,7 +124,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
       "THIRD-PARTY-LICENSES.md"
     ],
     "scripts": {
-      "prepare": "node scripts/build-hooks.js",
+      "postinstall": "node scripts/build-hooks.js",
       "test": "node --test --test-concurrency=4 tests/",
       "rebrand": "node scripts/rebrand.cjs",
       "rebrand:dry-run": "node scripts/rebrand.cjs --dry-run",
@@ -135,7 +136,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
   }
   ```
   - **No `"main"`, no `"exports"`, no `"type"`** at v1 (CJS default; oto isn't `require()`-ed as a library).
-  - **No `prepublishOnly`** (Pitfall 5: `npm install -g github:...` does NOT run `prepublishOnly`; `prepare` runs on both git-install AND publish).
+  - **No `prepublishOnly`** (Pitfall 5: `npm install -g github:...` does NOT run `prepublishOnly`; `postinstall` runs on both git-install AND publish).
   - **No top-level dependencies** at Phase 2. The engine and walker use only Node 22+ built-ins (`fs/promises`, `node:fs.glob`, `node:path`, `node:vm`).
   - `version: "0.1.0-alpha.1"` so tag-pinned installs are meaningful before v0.1.0 ships in Phase 10.
 
@@ -144,7 +145,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
 - **D-10:** `foundation-frameworks/` is **NOT** in the npm tarball. The `files` allowlist (D-09) explicitly excludes it. Justification: ~20MB+ of upstream source bloats install for zero install-time benefit; Phase 9 sync clones fresh upstreams anyway.
 - **D-11:** `tests/`, `decisions/`, `.planning/`, `reports/`, `.oto-rebrand-out/` excluded from tarball — internal artifacts. (Future phases may need to ship `decisions/skill-vs-command.md` if commands reference it at runtime; revisit in Phase 4. For Phase 2: out.)
 
-### `prepare` Lifecycle & `scripts/build-hooks.js` Stub (FND-03)
+### `postinstall` Lifecycle & `scripts/build-hooks.js` Stub (FND-03)
 
 - **D-12:** Phase 2 ships a real `scripts/build-hooks.js` that scans `hooks/` for `.js`/`.cjs` files, validates each with `node:vm` `vm.Script(source, { filename })`, and copies validated sources to `hooks/dist/`. **In Phase 2 the `hooks/` directory is empty (or contains a `.gitkeep`)**, so the script is a verified no-op that exits 0. Phase 5 fills `hooks/`.
 - **D-12 rationale:** The lifecycle contract must not regress between Phase 2 install (empty hooks) and Phase 5 install (filled hooks). Shipping the stub at Phase 2 means Phase 5's only delta is adding hook source files — the script is already wired and tested. Mirrors `foundation-frameworks/get-shit-done-main/scripts/build-hooks.js` (vm-validated copy pattern, per CLAUDE.md TL;DR row "Build step (top level)").
@@ -204,13 +205,13 @@ The user picked recommended for every selected gray area; D-08, D-09, D-12 were 
 
 ### Research artifacts (HIGH confidence, dated 2026-04-27)
 - `.planning/research/SUMMARY.md` — Stack recommendations, build-order implications, expected feature counts
-- `.planning/research/STACK.md` — Read alongside CLAUDE.md; Node 22, CJS, no top-level TS, `node:test`, `prepare` hook, github-install model
-- `.planning/research/PITFALLS.md` — 23 pitfalls with phase mapping. Phase 2 must address: **Pitfall 1** (substring collisions — D-01 rule-typed engine), **Pitfall 5** (`prepublishOnly` vs `prepare` — D-09), **Pitfall 6** (license preservation — D-07 fixture, D-10 allowlist), **Pitfall 11** (rigor inflation — D-15 zero deps, D-16 hand-rolled validator, D-18 defer c8), **Pitfall 12** (branch-pinned drift — D-09 alpha tag), **Pitfall 13** (deprecated upstream — `deprecated_drop` field consumed by engine), **Pitfall 15** (literal-string identity — D-07 hook-injection fixtures), **Pitfall 16** (bin collision — D-09 `bin: oto` distinct from `get-shit-done-cc`), **Pitfall 18** (translated READMEs — drop list in inventory), **Pitfall 20** (hook version tokens — D-07 fixture)
+- `.planning/research/STACK.md` — Read alongside CLAUDE.md; Node 22, CJS, no top-level TS, `node:test`, `postinstall` hook, github-install model
+- `.planning/research/PITFALLS.md` — 23 pitfalls with phase mapping. Phase 2 must address: **Pitfall 1** (substring collisions — D-01 rule-typed engine), **Pitfall 5** (`prepublishOnly` vs `postinstall` — D-09), **Pitfall 6** (license preservation — D-07 fixture, D-10 allowlist), **Pitfall 11** (rigor inflation — D-15 zero deps, D-16 hand-rolled validator, D-18 defer c8), **Pitfall 12** (branch-pinned drift — D-09 alpha tag), **Pitfall 13** (deprecated upstream — `deprecated_drop` field consumed by engine), **Pitfall 15** (literal-string identity — D-07 hook-injection fixtures), **Pitfall 16** (bin collision — D-09 `bin: oto` distinct from `get-shit-done-cc`), **Pitfall 18** (translated READMEs — drop list in inventory), **Pitfall 20** (hook version tokens — D-07 fixture)
 - `.planning/research/ARCHITECTURE.md` — Option A (GSD spine + Superpowers skills as first-class peer); component boundaries; Phase 2 fits "rebrand-tooling" component
 - `.planning/research/FEATURES.md` — Feature inventory (Phase 4 input; informational for Phase 2)
 
 ### Upstream sources (preserved, do-not-rebrand — read for engine reference only)
-- `foundation-frameworks/get-shit-done-main/package.json` — Template for `package.json` shape (esp. `engines`, `bin`, `files`, `prepare`, `scripts`); confirm CJS-style and zero-deps choice
+- `foundation-frameworks/get-shit-done-main/package.json` — Template for `package.json` shape (esp. `engines`, `bin`, `files`, `postinstall`, `scripts`); confirm CJS-style and zero-deps choice
 - `foundation-frameworks/get-shit-done-main/scripts/build-hooks.js` — Canonical `vm`-validated copy pattern for D-12 stub
 - `foundation-frameworks/get-shit-done-main/scripts/run-tests.cjs` — `node --test --test-concurrency=4` invocation pattern for D-18
 - `foundation-frameworks/get-shit-done-main/.github/workflows/{test.yml,install-smoke.yml}` — Reference only; CI lands in Phase 10 not Phase 2

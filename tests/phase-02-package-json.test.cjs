@@ -34,8 +34,9 @@ test('package metadata matches Phase 2 distribution decisions', () => {
   assert.equal(pkg.author, 'Julian Isaac');
 });
 
-test('scripts use prepare and zero prepublishOnly', () => {
-  assert.equal(pkg.scripts.prepare, 'node scripts/build-hooks.js');
+test('scripts use install-time hook build and zero prepublishOnly', () => {
+  assert.equal(pkg.scripts.postinstall, 'node scripts/build-hooks.js');
+  assert.equal(Object.hasOwn(pkg.scripts, 'prepare'), false);
   assert.equal(pkg.scripts.test, 'node --test --test-concurrency=4 tests/');
   assert.equal(pkg.scripts.rebrand, 'node scripts/rebrand.cjs');
   assert.ok(pkg.scripts['rebrand:dry-run']);
@@ -46,6 +47,7 @@ test('scripts use prepare and zero prepublishOnly', () => {
 test('files allowlist includes only the intended package surface', () => {
   assert.deepEqual(pkg.files, [
     'bin/',
+    'hooks/',
     'scripts/rebrand/',
     'scripts/build-hooks.js',
     'rename-map.json',

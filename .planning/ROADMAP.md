@@ -45,13 +45,16 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Phase 1
 **Requirements**: FND-01, FND-02, FND-03, FND-04, REB-01, REB-03, REB-04, REB-05, REB-06
 **Success Criteria** (what must be TRUE):
-  1. `package.json` declares `engines.node >=22.0.0`, CommonJS, `"bin": { "oto": "bin/install.js" }`, an explicit `"files"` allowlist, and a `prepare` script (NOT `prepublishOnly`) that runs `scripts/build-hooks.js`
+  1. `package.json` declares `engines.node >=22.0.0`, CommonJS, `"bin": { "oto": "bin/install.js" }`, an explicit `"files"` allowlist, and a `postinstall` script (NOT `prepublishOnly`) that runs `scripts/build-hooks.js`
   2. Repo is hosted on public GitHub and `npm install -g github:<owner>/oto-hybrid-framework` clones cleanly (the installer itself may not yet do anything useful — that's Phase 3)
   3. `scripts/rebrand.cjs` runs in dry-run mode against the `foundation-frameworks/` upstream copy and emits a per-file classified report (changes grouped by rule type: identifier / path / command / URL / env var); reports zero unclassified matches
   4. Re-applying the rename map to already-rebranded code produces a zero-change diff (round-trip assertion passes)
   5. The rebrand engine respects a do-not-rename allowlist covering `LICENSE*`, `THIRD-PARTY-LICENSES.md`, `foundation-frameworks/`, copyright lines, and upstream URLs in attribution context (verified by a fixture run)
   6. Pre/post coverage manifest counts every occurrence of `gsd`, `GSD`, `Get Shit Done`, `superpowers`, `Superpowers` per file class; the post-rebrand count outside the allowlist is zero
-**Plans**: TBD
+**Plans**: 3 plans
+  - [ ] 02-01-distribution-skeleton-PLAN.md — package.json + bin/install.js stub + scripts/build-hooks.js + scripts/install-smoke.cjs + .gitignore + README; live install-smoke against public repo (FND-01..04)
+  - [ ] 02-02-rebrand-rules-and-walker-PLAN.md — 7 per-rule modules + walker + hand-rolled schema validator + 9 synthetic fixtures + per-rule unit tests (REB-01, REB-03)
+  - [ ] 02-03-rebrand-engine-and-cli-PLAN.md — engine orchestrator + manifest + report + CLI; real-tree dry-run/apply/round-trip against foundation-frameworks/ (REB-04, REB-05, REB-06)
 
 ### Phase 3: Installer Fork & Claude Adapter
 **Goal**: Fork and trim `bin/install.js` to support exactly three runtimes (Claude Code, Codex, Gemini), with Claude as the locked-in v0.1.0 happy path; Codex and Gemini work but parity is best-effort and proven later.

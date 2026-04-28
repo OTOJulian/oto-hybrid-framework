@@ -18,7 +18,7 @@
 | Reports & coverage manifest format | JSON / markdown / both | ✓ |
 | GitHub repo & install-smoke timing | Manual / scripted / local-only | ✓ |
 | GitHub owner placeholder resolution | Hardcoded / env / config / flag | (locked upfront — hardcoded `OTOJulian` + `--owner` override) |
-| `prepare` / `build-hooks.js` stub | Stub now / defer to Phase 5 | (locked upfront — stub at Phase 2) |
+| `postinstall` / `build-hooks.js` stub | Stub now / defer to Phase 5 | (locked upfront — stub at Phase 2) |
 
 User selected all four candidate areas (the first four). Decisions for the latter two were locked upfront with rationale shown in the gray-area-selection prompt.
 
@@ -72,7 +72,7 @@ User selected all four candidate areas (the first four). Decisions for the latte
 | Phase scripts `gh repo create` | Scripted via `gh repo create` automatically. | |
 
 **User's choice:** Manual repo creation, phase verifies real clone (Recommended)
-**Notes:** Repo creation is a one-time outside-tooling action (visibility, topics, description). Pitfall 5 (`prepublishOnly` vs `prepare`) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`, not under `npm pack` tarball install.
+**Notes:** Repo creation is a one-time outside-tooling action (visibility, topics, description). Pitfall 5 (`prepublishOnly` vs install lifecycle) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`, not under `npm pack` tarball install.
 
 ---
 
@@ -120,7 +120,7 @@ User selected all four candidate areas (the first four). Decisions for the latte
 Areas where the user accepted Claude's locked-upfront defaults or where planning details were left to downstream agents:
 
 - **GitHub owner placeholder resolution** — locked to hardcoded `OTOJulian` per Phase 1 D-16 + `--owner` CLI override (no env var, no config file).
-- **`prepare` / `build-hooks.js` stub** — locked to "ship the stub at Phase 2 (no-op when `hooks/` empty)".
+- **`postinstall` / `build-hooks.js` stub** — locked to "ship the stub at Phase 2 (no-op when `hooks/` empty)".
 - Glob library fallback choice (only if `node:fs.glob` proves insufficient during execute).
 - Synthetic fixture filenames and sub-structure (categories are locked in CONTEXT.md D-07; arrangement is at planner's discretion).
 - Markdown report column ordering and table grouping.
