@@ -37,7 +37,7 @@ test('package metadata matches Phase 2 distribution decisions', () => {
 test('scripts use install-time hook build and zero prepublishOnly', () => {
   assert.equal(pkg.scripts.postinstall, 'node scripts/build-hooks.js');
   assert.equal(Object.hasOwn(pkg.scripts, 'prepare'), false);
-  assert.equal(pkg.scripts.test, 'node --test --test-concurrency=4 tests/');
+  assert.equal(pkg.scripts.test, 'node --test --test-concurrency=4 tests/*.test.cjs');
   assert.equal(pkg.scripts.rebrand, 'node scripts/rebrand.cjs --apply --force');
   assert.ok(pkg.scripts['rebrand:dry-run']);
   assert.ok(pkg.scripts['rebrand:roundtrip']);
