@@ -42,6 +42,13 @@ async function installRuntime(adapter, opts = {}) {
 
   const statePath = path.join(configDir, 'oto', '.install.json');
   const priorState = readState(statePath);
+  if (priorState && priorState.runtime !== adapter.name) {
+    const err = new Error(
+      `state runtime mismatch: found ${priorState.runtime} at ${configDir}, refusing to install ${adapter.name}`
+    );
+    err.exitCode = 1;
+    throw err;
+  }
 
   const preCtx = { configDir, priorState, otoVersion: OTO_VERSION };
   if (typeof adapter.onPreInstall === 'function') {

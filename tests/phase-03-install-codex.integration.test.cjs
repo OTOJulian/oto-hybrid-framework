@@ -91,3 +91,30 @@ test('INS-05: uninstall refuses state belonging to a different runtime', (t) => 
   assert.equal(fs.readFileSync(statePath, 'utf8'), beforeState);
   assert.equal(fs.readFileSync(agentsPath, 'utf8'), beforeAgents);
 });
+
+test('INS-05: install refuses to overwrite state belonging to a different runtime', (t) => {
+  const configDir = tmpDir(t);
+  const installCodex = spawnSync(
+    process.execPath,
+    ['bin/install.js', 'install', '--codex', '--config-dir', configDir],
+    { cwd: REPO_ROOT, encoding: 'utf8' }
+  );
+  assert.equal(installCodex.status, 0, installCodex.stderr || installCodex.stdout);
+
+  const statePath = path.join(configDir, 'oto', '.install.json');
+  const agentsPath = path.join(configDir, 'AGENTS.md');
+  const beforeState = fs.readFileSync(statePath, 'utf8');
+  const beforeAgents = fs.readFileSync(agentsPath, 'utf8');
+
+  const installClaude = spawnSync(
+    process.execPath,
+    ['bin/install.js', 'install', '--claude', '--config-dir', configDir],
+    { cwd: REPO_ROOT, encoding: 'utf8' }
+  );
+
+  assert.equal(installClaude.status, 1);
+  assert.match(installClaude.stderr, /state runtime mismatch: found codex/);
+  assert.equal(fs.readFileSync(statePath, 'utf8'), beforeState);
+  assert.equal(fs.readFileSync(agentsPath, 'utf8'), beforeAgents);
+  assert.equal(fs.existsSync(path.join(configDir, 'CLAUDE.md')), false);
+});
