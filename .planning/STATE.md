@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-28T22:18:05.570Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-28T22:27:48.985Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 13
-  completed_plans: 7
-  percent: 54
+  completed_plans: 8
+  percent: 62
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 03 (installer-fork-claude-adapter) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
-Progress: [█████░░░░░] 54%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [█████░░░░░] 54%
 
 *Updated after each plan completion*
 | Phase 03 P01 | 6 min | 3 tasks | 17 files |
+| Phase 03 P02 | 5 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - Defer hybrid architecture to research phase — RESOLVED by research/ARCHITECTURE.md (Option A: GSD spine + Superpowers skills as a first-class peer)
 - Drop OpenCode support — RESOLVED by v1 scope and Phase 01 inventory decisions
 - Clean-slate build, no carry-over of personal `~/.claude/` tweaks — RESOLVED by v1 scope
+- 03-02 keeps config-dir resolution descriptor-based: flag, then adapter env var, then adapter default segment.
+- 03-02 runtime detection is presence-only and limited to claude, codex, and gemini config dirs.
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T22:18:05.566Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-28T22:27:48.982Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
