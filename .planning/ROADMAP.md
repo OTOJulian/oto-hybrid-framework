@@ -13,7 +13,7 @@
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Inventory & Architecture Decisions** - Lock canonical decisions and rebrand schema before any code is touched
-- [ ] **Phase 2: Rebrand Engine & Distribution Skeleton** - Rule-typed rebrand engine + Node package shape + GitHub-installable repo
+- [x] **Phase 2: Rebrand Engine & Distribution Skeleton** - Rule-typed rebrand engine + Node package shape + GitHub-installable repo
 - [ ] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
 - [ ] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
 - [ ] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
@@ -54,7 +54,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
   - [x] 02-01-distribution-skeleton-PLAN.md — package.json + bin/install.js stub + scripts/build-hooks.js + scripts/install-smoke.cjs + .gitignore + README; live install-smoke against public repo (FND-01..04)
   - [x] 02-02-rebrand-rules-and-walker-PLAN.md — 7 per-rule modules + walker + hand-rolled schema validator + 9 synthetic fixtures + per-rule unit tests (REB-01, REB-03)
-  - [ ] 02-03-rebrand-engine-and-cli-PLAN.md — engine orchestrator + manifest + report + CLI; real-tree dry-run/apply/round-trip against foundation-frameworks/ (REB-04, REB-05, REB-06)
+  - [x] 02-03-rebrand-engine-and-cli-PLAN.md — engine orchestrator + manifest + report + CLI; real-tree dry-run/apply/round-trip against foundation-frameworks/ (REB-04, REB-05, REB-06)
 
 ### Phase 3: Installer Fork & Claude Adapter
 **Goal**: Fork and trim `bin/install.js` to support exactly three runtimes (Claude Code, Codex, Gemini), with Claude as the locked-in v0.1.0 happy path; Codex and Gemini work but parity is best-effort and proven later.
@@ -161,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
-| 2. Rebrand Engine & Distribution Skeleton | 0/TBD | Ready to plan | - |
+| 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
 | 3. Installer Fork & Claude Adapter | 0/TBD | Not started | - |
 | 4. Core Workflows & Agents Port | 0/TBD | Not started | - |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |

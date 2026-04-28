@@ -9,10 +9,10 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Foundation
 
-- [ ] **FND-01**: Repository structured as Node.js npm package (Node >= 22.0.0, CommonJS, no top-level TypeScript, no build step at top level)
-- [ ] **FND-02**: `package.json` declares `"bin": { "oto": "bin/install.js" }` and an explicit `"files"` allowlist
-- [ ] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `postinstall` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
-- [ ] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`
+- [x] **FND-01**: Repository structured as Node.js npm package (Node >= 22.0.0, CommonJS, no top-level TypeScript, no build step at top level)
+- [x] **FND-02**: `package.json` declares `"bin": { "oto": "bin/install.js" }` and an explicit `"files"` allowlist
+- [x] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `postinstall` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
+- [x] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`
 - [ ] **FND-05**: First tagged release (`v0.1.0`) creates a clean install for at least one runtime (Claude Code)
 - [x] **FND-06**: License attribution for both upstreams preserved in repo (`LICENSE` for oto's added work; `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses)
 
@@ -27,12 +27,12 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Rebrand Engine
 
-- [ ] **REB-01**: Rule-typed rename engine (`scripts/rebrand.cjs`) — separate rule classes for identifiers (`\b`-bounded), paths, slash commands, URLs, env vars
+- [x] **REB-01**: Rule-typed rename engine (`scripts/rebrand.cjs`) — separate rule classes for identifiers (`\b`-bounded), paths, slash commands, URLs, env vars
 - [x] **REB-02**: `rename-map.json` schema with explicit before/after for every internal ID, command name, agent name, skill namespace
-- [ ] **REB-03**: Do-not-rename allowlist — `LICENSE` files, `foundation-frameworks/`, copyright lines, upstream URLs in attribution context
-- [ ] **REB-04**: Dry-run mode produces classified report (per-file: planned changes by rule type)
-- [ ] **REB-05**: Coverage manifest — pre-rebrand and post-rebrand counts of `gsd`, `GSD`, `Get Shit Done`, `superpowers`, `Superpowers` per file class; CI fails if any non-allowlisted occurrence remains
-- [ ] **REB-06**: Round-trip assertion — re-applying the rename map to already-rebranded code produces no further changes
+- [x] **REB-03**: Do-not-rename allowlist — `LICENSE` files, `foundation-frameworks/`, copyright lines, upstream URLs in attribution context
+- [x] **REB-04**: Dry-run mode produces classified report (per-file: planned changes by rule type)
+- [x] **REB-05**: Coverage manifest — pre-rebrand and post-rebrand counts of `gsd`, `GSD`, `Get Shit Done`, `superpowers`, `Superpowers` per file class; CI fails if any non-allowlisted occurrence remains
+- [x] **REB-06**: Round-trip assertion — re-applying the rename map to already-rebranded code produces no further changes
 
 ### Installer
 
@@ -194,10 +194,10 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 | Phase 2 | Pending |
-| FND-02 | Phase 2 | Pending |
-| FND-03 | Phase 2 | Pending |
-| FND-04 | Phase 2 | Pending |
+| FND-01 | Phase 2 | Complete |
+| FND-02 | Phase 2 | Complete |
+| FND-03 | Phase 2 | Complete |
+| FND-04 | Phase 2 | Complete |
 | FND-05 | Phase 10 | Pending |
 | FND-06 | Phase 1 | Complete |
 | ARCH-01 | Phase 1 | Complete |
@@ -206,12 +206,12 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | ARCH-04 | Phase 1 | Complete |
 | ARCH-05 | Phase 1 | Complete |
 | ARCH-06 | Phase 1 | Complete |
-| REB-01 | Phase 2 | Pending |
+| REB-01 | Phase 2 | Complete |
 | REB-02 | Phase 1 | Complete |
-| REB-03 | Phase 2 | Pending |
-| REB-04 | Phase 2 | Pending |
-| REB-05 | Phase 2 | Pending |
-| REB-06 | Phase 2 | Pending |
+| REB-03 | Phase 2 | Complete |
+| REB-04 | Phase 2 | Complete |
+| REB-05 | Phase 2 | Complete |
+| REB-06 | Phase 2 | Complete |
 | INS-01 | Phase 3 | Pending |
 | INS-02 | Phase 3 | Pending |
 | INS-03 | Phase 3 | Pending |

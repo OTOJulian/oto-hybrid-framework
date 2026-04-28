@@ -1,7 +1,7 @@
 ---
 phase: 2
 slug: rebrand-engine-distribution-skeleton
-status: executing
+status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-04-28
@@ -59,8 +59,8 @@ last_updated: 2026-04-28
 
 | Task | Requirement | Test Type | Automated Command | Status |
 |------|-------------|-----------|-------------------|--------|
-| 02-03-T1: engine.cjs + manifest.cjs + report.cjs + 6 integration tests | REB-04, REB-05, REB-06 | integration | `node --test tests/phase-02-engine-classify.test.cjs tests/phase-02-engine-no-source-mutation.test.cjs tests/phase-02-coverage-manifest.test.cjs tests/phase-02-allowlist.test.cjs tests/phase-02-owner-override.test.cjs tests/phase-02-summary-line.test.cjs` | ⬜ |
-| 02-03-T2: rebrand.cjs CLI + dryrun-report + roundtrip + roundtrip-isolation tests; real-tree end-to-end | REB-04, REB-06 | integration | `node --test tests/phase-02-dryrun-report.test.cjs tests/phase-02-roundtrip.test.cjs tests/phase-02-roundtrip-isolation.test.cjs && npm run rebrand:dry-run && npm run rebrand && npm run rebrand:roundtrip` | ⬜ |
+| 02-03-T1: engine.cjs + manifest.cjs + report.cjs + 6 integration tests | REB-04, REB-05, REB-06 | integration | `node --test tests/phase-02-engine-classify.test.cjs tests/phase-02-engine-no-source-mutation.test.cjs tests/phase-02-coverage-manifest.test.cjs tests/phase-02-allowlist.test.cjs tests/phase-02-owner-override.test.cjs tests/phase-02-summary-line.test.cjs` | ✅ |
+| 02-03-T2: rebrand.cjs CLI + dryrun-report + roundtrip + roundtrip-isolation tests; real-tree end-to-end | REB-04, REB-06 | integration | `node --test tests/phase-02-dryrun-report.test.cjs tests/phase-02-roundtrip.test.cjs tests/phase-02-roundtrip-isolation.test.cjs && npm run rebrand:dry-run && npm run rebrand && npm run rebrand:roundtrip` | ✅ |
 
 ### Cross-Cutting Invariants (covered by tasks above)
 
@@ -107,15 +107,15 @@ Files created (with owning task):
 - [x] `tests/phase-02-rules-package.test.cjs` (02-02-T3) — REB-01
 - [x] `tests/phase-02-rules-url.test.cjs` (02-02-T3) — REB-01 (D-14)
 - [x] `tests/phase-02-rules-env_var.test.cjs` (02-02-T3) — REB-01
-- [ ] `tests/phase-02-engine-classify.test.cjs` (02-03-T1) — REB-01, REB-04
-- [ ] `tests/phase-02-engine-no-source-mutation.test.cjs` (02-03-T1) — REB-04
-- [ ] `tests/phase-02-coverage-manifest.test.cjs` (02-03-T1) — REB-05, REB-06
-- [ ] `tests/phase-02-allowlist.test.cjs` (02-03-T1) — REB-03, REB-06
-- [ ] `tests/phase-02-owner-override.test.cjs` (02-03-T1) — REB-04 (D-14)
-- [ ] `tests/phase-02-summary-line.test.cjs` (02-03-T1) — cross-cut UX
-- [ ] `tests/phase-02-dryrun-report.test.cjs` (02-03-T2) — REB-04
-- [ ] `tests/phase-02-roundtrip.test.cjs` (02-03-T2) — REB-06
-- [ ] `tests/phase-02-roundtrip-isolation.test.cjs` (02-03-T2) — REB-06 isolation guarantee
+- [x] `tests/phase-02-engine-classify.test.cjs` (02-03-T1) — REB-01, REB-04
+- [x] `tests/phase-02-engine-no-source-mutation.test.cjs` (02-03-T1) — REB-04
+- [x] `tests/phase-02-coverage-manifest.test.cjs` (02-03-T1) — REB-05, REB-06
+- [x] `tests/phase-02-allowlist.test.cjs` (02-03-T1) — REB-03, REB-06
+- [x] `tests/phase-02-owner-override.test.cjs` (02-03-T1) — REB-04 (D-14)
+- [x] `tests/phase-02-summary-line.test.cjs` (02-03-T1) — cross-cut UX
+- [x] `tests/phase-02-dryrun-report.test.cjs` (02-03-T2) — REB-04
+- [x] `tests/phase-02-roundtrip.test.cjs` (02-03-T2) — REB-06
+- [x] `tests/phase-02-roundtrip-isolation.test.cjs` (02-03-T2) — REB-06 isolation guarantee
 - [x] `tests/fixtures/rebrand/` (02-02-T1) — synthetic-fixture tree (D-07 categories)
 
 *Existing helpers: `tests/helpers/load-schema.cjs` is reusable (becomes a re-export of `scripts/rebrand/lib/validate-schema.cjs` in 02-02-T1). Existing test layout: `tests/phase-01-*.test.cjs` is the naming precedent.*

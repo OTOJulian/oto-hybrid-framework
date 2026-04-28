@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: executing
-stopped_at: Phase 02 Plan 02 complete; ready for Plan 02-03
-last_updated: "2026-04-28T20:05:12.000Z"
-last_activity: 2026-04-28 -- Completed Phase 02 Plan 02 rebrand rules and walker
+status: ready_to_plan
+stopped_at: Phase 02 complete; ready for Phase 03 planning
+last_updated: "2026-04-28T20:20:20.000Z"
+last_activity: 2026-04-28 -- Completed Phase 02 rebrand engine and distribution skeleton
 progress:
   total_phases: 10
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 4
-  percent: 67
+  completed_plans: 6
+  percent: 20
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 02 — rebrand-engine-distribution-skeleton
+**Current focus:** Phase 03 — installer-fork-&-claude-adapter
 
 ## Current Position
 
-Phase: 02 (rebrand-engine-distribution-skeleton) — EXECUTING
-Plan: 3 of 3
-Status: Executing Phase 02
-Last activity: 2026-04-28 -- Completed Phase 02 Plan 02 rebrand rules and walker
+Phase: 03 (installer-fork-&-claude-adapter)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-04-28 -- Completed Phase 02 rebrand engine and distribution skeleton
 
-Progress: [███████---] 67%
+Progress: [██--------] 20%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
+- Total plans completed: 6
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -45,6 +45,7 @@ Progress: [███████---] 67%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 3 | - | - |
+| 02 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -63,6 +64,7 @@ Recent decisions affecting current work:
 - Command prefix `/oto-*` and internal `oto:<skill-name>` namespace — RESOLVED by Phase 01 ADRs
 - Distribute via public GitHub archive install URL — RESOLVED by Phase 02 Plan 01; owner resolved to `OTOJulian`, smoke path is `https://github.com/OTOJulian/oto-hybrid-framework/archive/<ref>.tar.gz`
 - Rebrand primitives are isolated CommonJS rule modules with `.cjs` canonical files and `.js` extensionless require shims — RESOLVED by Phase 02 Plan 02
+- Rebrand engine dry-run/apply/round-trip modes are working against `foundation-frameworks/` with zero unclassified matches and zero post-coverage residue — RESOLVED by Phase 02 Plan 03
 - Track upstream via automated rebrand tool, not manual diff — RESOLVED by Phase 01 inventory and rename-map contracts
 - Defer hybrid architecture to research phase — RESOLVED by research/ARCHITECTURE.md (Option A: GSD spine + Superpowers skills as a first-class peer)
 - Drop OpenCode support — RESOLVED by v1 scope and Phase 01 inventory decisions
