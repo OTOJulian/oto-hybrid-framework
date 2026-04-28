@@ -36,12 +36,12 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Installer
 
-- [ ] **INS-01**: Forked + trimmed `bin/install.js` — supports only Claude Code, Codex, Gemini CLI (drops OpenCode, Kilo, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen, CodeBuddy, Cline, Copilot)
-- [ ] **INS-02**: Per-runtime adapter modules (`runtime-claude.cjs`, `runtime-codex.cjs`, `runtime-gemini.cjs`) own runtime-specific paths, instruction filenames, agent frontmatter dialect, hook registration syntax
-- [ ] **INS-03**: Install resolution order: `--config-dir` flag → env var (`CLAUDE_CONFIG_DIR` / `CODEX_HOME` / `GEMINI_CONFIG_DIR`) → `~/.<runtime>` default
-- [ ] **INS-04**: Files copied (not symlinked) into runtime config dirs at install time
-- [ ] **INS-05**: `oto install --claude` is the documented v0.1.0 happy path; `--codex` and `--gemini` work but parity is best-effort
-- [ ] **INS-06**: `--all` flag installs to all detected runtimes
+- [x] **INS-01**: Forked + trimmed `bin/install.js` — supports only Claude Code, Codex, Gemini CLI (drops OpenCode, Kilo, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen, CodeBuddy, Cline, Copilot)
+- [x] **INS-02**: Per-runtime adapter modules (`runtime-claude.cjs`, `runtime-codex.cjs`, `runtime-gemini.cjs`) own runtime-specific paths, instruction filenames, agent frontmatter dialect, hook registration syntax
+- [x] **INS-03**: Install resolution order: `--config-dir` flag → env var (`CLAUDE_CONFIG_DIR` / `CODEX_HOME` / `GEMINI_CONFIG_DIR`) → `~/.<runtime>` default
+- [x] **INS-04**: Files copied (not symlinked) into runtime config dirs at install time
+- [x] **INS-05**: `oto install --claude` is the documented v0.1.0 happy path; `--codex` and `--gemini` work but parity is best-effort
+- [x] **INS-06**: `--all` flag installs to all detected runtimes
 
 ### Workflows (GSD Spine — Ported & Rebranded)
 
@@ -212,12 +212,12 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | REB-04 | Phase 2 | Complete |
 | REB-05 | Phase 2 | Complete |
 | REB-06 | Phase 2 | Complete |
-| INS-01 | Phase 3 | Pending |
-| INS-02 | Phase 3 | Pending |
-| INS-03 | Phase 3 | Pending |
-| INS-04 | Phase 3 | Pending |
-| INS-05 | Phase 3 | Pending |
-| INS-06 | Phase 3 | Pending |
+| INS-01 | Phase 3 | Complete |
+| INS-02 | Phase 3 | Complete |
+| INS-03 | Phase 3 | Complete |
+| INS-04 | Phase 3 | Complete |
+| INS-05 | Phase 3 | Complete |
+| INS-06 | Phase 3 | Complete |
 | WF-01 | Phase 4 | Pending |
 | WF-02 | Phase 4 | Pending |
 | WF-03 | Phase 4 | Pending |

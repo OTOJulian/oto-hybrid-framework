@@ -67,7 +67,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Eleven unwanted runtimes (OpenCode, Kilo, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen, CodeBuddy, Cline, Copilot) are entirely removed from `bin/install.js` — grep returns zero hits
   5. `oto install --all` detects which of the 3 supported runtimes are present on disk and installs to each; `--codex` and `--gemini` flags work standalone but are documented as best-effort until Phase 8
 **Plans**: 7 plans
-  - [ ] 03-01-PLAN.md — Wave 0: 15 test scaffolds for INS-01..06 with t.todo() placeholders
+  - [x] 03-01-PLAN.md — Wave 0: 16 test scaffolds for INS-01..06 with t.todo() placeholders
   - [ ] 03-02-PLAN.md — Wave 1: bin/lib/args.cjs (parseCliArgs, resolveConfigDir, expandTilde, ArgError) + bin/lib/runtime-detect.cjs (INS-01, INS-03, INS-06)
   - [ ] 03-03-PLAN.md — Wave 1: bin/lib/marker.cjs (D-08 dual marker) + bin/lib/install-state.cjs (D-08 schema, Pitfall H) (INS-04)
   - [ ] 03-04-PLAN.md — Wave 1: bin/lib/copy-files.cjs (copyTree/removeTree/sha256File/walkTree, Pitfall B safe, symlink-rejecting) (INS-04)
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
-| 3. Installer Fork & Claude Adapter | 0/7 | Planned | - |
+| 3. Installer Fork & Claude Adapter | 1/7 | In Progress | - |
 | 4. Core Workflows & Agents Port | 0/TBD | Not started | - |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
