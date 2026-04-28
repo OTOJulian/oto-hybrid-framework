@@ -28,6 +28,7 @@ function isAttributionContext(line, filePath = '') {
   const normalized = filePath.split(path.sep).join('/');
   if (normalized === 'THIRD-PARTY-LICENSES.md' || normalized.endsWith('/THIRD-PARTY-LICENSES.md')) return true;
   if (normalized === 'LICENSE' || normalized === 'LICENSE.md' || normalized.endsWith('/LICENSE') || normalized.endsWith('/LICENSE.md')) return true;
+  if (/non-attribution/i.test(line)) return false;
   if (/(copyright|\(c\)|attribution|upstream|original|based on)/i.test(line)) return true;
   return /\[.*?(upstream|original|based on).*?\]/i.test(line);
 }

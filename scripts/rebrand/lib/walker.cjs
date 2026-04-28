@@ -11,6 +11,9 @@ function escapeRegExp(value) {
 }
 
 function globToRegExp(glob) {
+  if (PATH_ALLOWLIST_BASENAMES.has(glob)) {
+    return new RegExp(`(^|.*/)${escapeRegExp(glob)}$`);
+  }
   let source = '';
   for (let i = 0; i < glob.length; i += 1) {
     const char = glob[i];
@@ -32,7 +35,9 @@ function compileAllowlist(doNotRename = []) {
   const compiled = { pathGlobs: [], literals: [], regexes: [] };
   for (const entry of doNotRename) {
     if (typeof entry === 'string') {
-      if (entry.includes('/') || entry.includes('*') || PATH_ALLOWLIST_BASENAMES.has(entry)) {
+      if (entry.includes('://') || entry.startsWith('github.com/')) {
+        compiled.literals.push(entry);
+      } else if (entry.includes('/') || entry.includes('*') || PATH_ALLOWLIST_BASENAMES.has(entry)) {
         compiled.pathGlobs.push({ source: entry, regex: globToRegExp(entry) });
       } else {
         compiled.literals.push(entry);
