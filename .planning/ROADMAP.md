@@ -71,7 +71,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 03-02-PLAN.md — Wave 1: bin/lib/args.cjs (parseCliArgs, resolveConfigDir, expandTilde, ArgError) + bin/lib/runtime-detect.cjs (INS-01, INS-03, INS-06)
   - [x] 03-03-PLAN.md — Wave 1: bin/lib/marker.cjs (D-08 dual marker) + bin/lib/install-state.cjs (D-08 schema, Pitfall H) (INS-04)
   - [x] 03-04-PLAN.md — Wave 1: bin/lib/copy-files.cjs (copyTree/removeTree/sha256File/walkTree, Pitfall B safe, symlink-rejecting) (INS-04)
-  - [ ] 03-05-PLAN.md — Wave 2: 3 runtime adapters (claude full, codex+gemini minimum-viable per D-12) (INS-02, INS-05)
+  - [x] 03-05-PLAN.md — Wave 2: 3 runtime adapters (claude full, codex+gemini minimum-viable per D-12) (INS-02, INS-05)
   - [ ] 03-06-PLAN.md — Wave 3: bin/lib/install.cjs orchestrator (full D-09/D-10 lifecycles) + 4 integration tests (INS-02, INS-04, INS-05, INS-06)
   - [ ] 03-07-PLAN.md — Wave 4: bin/install.js thin shell + scripts/install-smoke.cjs extension + 4 enforcement tests (INS-01, INS-02, INS-05)
 **UI hint**: yes
