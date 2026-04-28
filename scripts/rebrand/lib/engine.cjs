@@ -58,6 +58,20 @@ function ensureReportsDir() {
   return reportsDir;
 }
 
+async function writeFileAtomic(filePath, content) {
+  const tmpPath = path.join(
+    path.dirname(filePath),
+    `.${path.basename(filePath)}.${process.pid}.${Date.now()}.${crypto.randomUUID()}.tmp`
+  );
+  try {
+    await fsp.writeFile(tmpPath, content);
+    await fsp.rename(tmpPath, filePath);
+  } catch (error) {
+    await fsp.rm(tmpPath, { force: true });
+    throw error;
+  }
+}
+
 function resolveOut(outPath) {
   const root = repoRoot();
   const resolvedOut = path.resolve(outPath || path.join(root, '.oto-rebrand-out'));
@@ -210,8 +224,8 @@ function applyRelPath(relPath, map) {
 
 async function writeJsonAndMarkdownReports(dryrun) {
   const reportsDir = ensureReportsDir();
-  await fsp.writeFile(path.join(reportsDir, 'rebrand-dryrun.json'), `${JSON.stringify(dryrun, null, 2)}\n`);
-  await fsp.writeFile(path.join(reportsDir, 'rebrand-dryrun.md'), report.renderDryrunMarkdown(dryrun));
+  await writeFileAtomic(path.join(reportsDir, 'rebrand-dryrun.json'), `${JSON.stringify(dryrun, null, 2)}\n`);
+  await writeFileAtomic(path.join(reportsDir, 'rebrand-dryrun.md'), report.renderDryrunMarkdown(dryrun));
 }
 
 async function runDryRun(target, map, allowlist, inventoryByPath, owner) {
@@ -271,9 +285,9 @@ async function applyTree(target, out, map, allowlist, inventoryByPath, owner, fo
     const reportsDir = ensureReportsDir();
     const pre = await manifest.buildPre(target, allowlist, inventoryByPath);
     const post = await manifest.buildPost(out, allowlist, inventoryByPath);
-    await fsp.writeFile(path.join(reportsDir, 'coverage-manifest.pre.json'), `${JSON.stringify(pre, null, 2)}\n`);
-    await fsp.writeFile(path.join(reportsDir, 'coverage-manifest.post.json'), `${JSON.stringify(post, null, 2)}\n`);
-    await fsp.writeFile(path.join(reportsDir, 'coverage-manifest.delta.md'), report.renderCoverageDeltaMarkdown(pre, post, allowlist));
+    await writeFileAtomic(path.join(reportsDir, 'coverage-manifest.pre.json'), `${JSON.stringify(pre, null, 2)}\n`);
+    await writeFileAtomic(path.join(reportsDir, 'coverage-manifest.post.json'), `${JSON.stringify(post, null, 2)}\n`);
+    await writeFileAtomic(path.join(reportsDir, 'coverage-manifest.delta.md'), report.renderCoverageDeltaMarkdown(pre, post, allowlist));
     const failures = manifest.assertZeroOutsideAllowlist(post, allowlist);
     if (failures.length > 0) {
       const err = new Error(`Coverage assertion failed: ${failures.slice(0, 10).map((f) => `${f.path}:${f.token}=${f.count}`).join(', ')}`);
