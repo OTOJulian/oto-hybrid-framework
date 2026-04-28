@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/{{GITHUB_OWNER}}/oto-hybrid-framework/schema/rename-map.json",
   "type": "object",
-  "required": ["version", "rules", "do_not_rename"],
+  "required": ["version", "rules", "do_not_rename", "deprecated_drop"],
   "additionalProperties": false,
   "properties": {
     "version": { "type": "string", "const": "1" },

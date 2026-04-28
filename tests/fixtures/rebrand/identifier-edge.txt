@@ -1,0 +1,3 @@
+POSITIVE: gsd, GSD, Gsd, get-shit-done, get-shit-done-cc, GSD_VERSION, gsd_state_version, gsd-hook-version, superpowers, Superpowers
+NEGATIVE_substring: stagsd, gsdfoo, megsd, GSDFOO, supergsd
+NEGATIVE_attribution: Superpowers (the upstream framework)

@@ -1,0 +1,6 @@
+{
+  "name": "get-shit-done-cc",
+  "version": "1.0.0",
+  "description": "test fixture for package rule - gsd in description should also be rewritten",
+  "bin": { "get-shit-done-cc": "./bin/cli.js", "gsd-sdk": "./bin/sdk.js" }
+}

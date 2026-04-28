@@ -1,0 +1,4 @@
+Copyright (c) 2025 Lex Christopherson
+Copyright (c) 2025 Jesse Vincent
+Licensed under MIT
+(these names must NEVER be rewritten by any rule)

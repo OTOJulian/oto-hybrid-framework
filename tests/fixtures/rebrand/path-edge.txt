@@ -1,0 +1,5 @@
+see .planning/STATE.md
+see /other/.planning/file (segment match should still work)
+path: get-shit-done/bin/install.js
+agent file: agents/gsd-planner.md
+not-a-path: get-shit-done-cc.identifier (the .identifier suffix means this is a hostname, but identifier rule handles it; path rule must NOT mismatch)

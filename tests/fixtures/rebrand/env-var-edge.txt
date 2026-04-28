@@ -1,0 +1,2 @@
+POSITIVE: GSD_VERSION, GSD_RUNTIME, GSD_FOO_BAR
+NEGATIVE: MY_GSD_VAR, GSDFOO, _GSD_, gsd_lower (lowercase handled by identifier rule, not env_var)
