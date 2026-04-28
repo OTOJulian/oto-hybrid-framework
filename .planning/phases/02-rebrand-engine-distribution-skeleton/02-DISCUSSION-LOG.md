@@ -17,7 +17,7 @@
 | Engine apply-mode scope | Dry-run only vs all three modes vs apply-deferred | ✓ |
 | Reports & coverage manifest format | JSON / markdown / both | ✓ |
 | GitHub repo & install-smoke timing | Manual / scripted / local-only | ✓ |
-| GitHub owner placeholder resolution | Hardcoded / env / config / flag | (locked upfront — hardcoded `julianisaac` + `--owner` override) |
+| GitHub owner placeholder resolution | Hardcoded / env / config / flag | (locked upfront — hardcoded `OTOJulian` + `--owner` override) |
 | `prepare` / `build-hooks.js` stub | Stub now / defer to Phase 5 | (locked upfront — stub at Phase 2) |
 
 User selected all four candidate areas (the first four). Decisions for the latter two were locked upfront with rationale shown in the gray-area-selection prompt.
@@ -67,7 +67,7 @@ User selected all four candidate areas (the first four). Decisions for the latte
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Manual repo creation, phase verifies real clone | User creates `github.com/julianisaac/oto-hybrid-framework` (public) by hand. Phase ships `install-smoke.cjs` that runs `npm install -g github:julianisaac/oto-hybrid-framework#<sha>` against live remote. | ✓ |
+| Manual repo creation, phase verifies real clone | User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand. Phase ships `install-smoke.cjs` that runs `npm install -g github:OTOJulian/oto-hybrid-framework#<sha>` against live remote. | ✓ |
 | Local `npm pack` + tarball install only | Verify install via `npm pack` + `npm install -g <tarball>` locally. Real GitHub clone deferred. | |
 | Phase scripts `gh repo create` | Scripted via `gh repo create` automatically. | |
 
@@ -119,7 +119,7 @@ User selected all four candidate areas (the first four). Decisions for the latte
 
 Areas where the user accepted Claude's locked-upfront defaults or where planning details were left to downstream agents:
 
-- **GitHub owner placeholder resolution** — locked to hardcoded `julianisaac` per Phase 1 D-16 + `--owner` CLI override (no env var, no config file).
+- **GitHub owner placeholder resolution** — locked to hardcoded `OTOJulian` per Phase 1 D-16 + `--owner` CLI override (no env var, no config file).
 - **`prepare` / `build-hooks.js` stub** — locked to "ship the stub at Phase 2 (no-op when `hooks/` empty)".
 - Glob library fallback choice (only if `node:fs.glob` proves insufficient during execute).
 - Synthetic fixture filenames and sub-structure (categories are locked in CONTEXT.md D-07; arrangement is at planner's discretion).

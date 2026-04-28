@@ -9,7 +9,7 @@
 Ship two things in Phase 2:
 
 1. **The rule-typed rebrand engine** (`scripts/rebrand/`) that consumes `rename-map.json` and emits classified dry-run reports + applied trees + coverage manifests + round-trip assertions.
-2. **The Node package skeleton** that makes `npm install -g github:julianisaac/oto-hybrid-framework[#tag]` clone cleanly with all lifecycle hooks correctly wired (`prepare`, `bin`, `files`, `engines`).
+2. **The Node package skeleton** that makes `npm install -g github:OTOJulian/oto-hybrid-framework[#tag]` clone cleanly with all lifecycle hooks correctly wired (`prepare`, `bin`, `files`, `engines`).
 
 Phase 2 builds and exercises the engine against `foundation-frameworks/` (the upstream copy) into a scratch out-dir for verification. Phase 2 does **not** apply the rebrand into `oto/` to produce the actual ported workflows/agents/skills — that's Phase 4.
 
@@ -96,8 +96,8 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
 ### GitHub Repo Creation & Install Smoke (FND-04, Pitfall 16)
 
 - **D-08:** **Manual repo creation, phase verifies real clone**:
-  - User creates `github.com/julianisaac/oto-hybrid-framework` (public) by hand before phase declares complete. (Repo visibility: **public** — required by `npm install -g github:...` to work without PAT/SSH auth setup, and aligns with FND-04.)
-  - Phase 2 ships `scripts/install-smoke.cjs` that runs `npm install -g github:julianisaac/oto-hybrid-framework#<commit-sha> --prefix /tmp/oto-install-smoke-XXXX` against the live remote, asserts `oto` is on PATH and `oto --version` exits 0 (the `oto` bin in Phase 2 is a stub — see D-09).
+  - User creates `github.com/OTOJulian/oto-hybrid-framework` (public) by hand before phase declares complete. (Repo visibility: **public** — required by `npm install -g github:...` to work without PAT/SSH auth setup, and aligns with FND-04.)
+  - Phase 2 ships `scripts/install-smoke.cjs` that runs `npm install -g github:OTOJulian/oto-hybrid-framework#<commit-sha> --prefix /tmp/oto-install-smoke-XXXX` against the live remote, asserts `oto` is on PATH and `oto --version` exits 0 (the `oto` bin in Phase 2 is a stub — see D-09).
   - Phase 2 success gate: install-smoke passes against the real remote (not just `npm pack`).
 - **D-08 rationale:** Repo creation is a one-time manual op (visibility, topics, description) you'll want to control by hand. `gh repo create` scripted is overkill for a single repo. Local-only `npm pack` testing is insufficient — Pitfall 5 (`prepare` vs `prepublishOnly`) and Pitfall 16 (bin collisions) only manifest under real `npm install -g github:...`.
 
@@ -129,7 +129,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
       "rebrand:dry-run": "node scripts/rebrand.cjs --dry-run",
       "rebrand:roundtrip": "node scripts/rebrand.cjs --verify-roundtrip"
     },
-    "repository": { "type": "git", "url": "git+https://github.com/julianisaac/oto-hybrid-framework.git" },
+    "repository": { "type": "git", "url": "git+https://github.com/OTOJulian/oto-hybrid-framework.git" },
     "license": "MIT",
     "author": "Julian Isaac"
   }
@@ -155,7 +155,7 @@ User selected the recommended path for every gray area discussed; D-08 and D-09 
 
 ### GitHub Owner Placeholder Resolution (locked upfront)
 
-- **D-14:** `{{GITHUB_OWNER}}` placeholder in `rename-map.json` URL rules resolves to the literal string `julianisaac` per Phase 1 D-16, with a `--owner <name>` CLI override on the rebrand engine for forks/test fixtures. No env var, no config file — simplest path consistent with personal-use scope (Pitfall 11). The engine substitutes the placeholder at apply time, not load time, so the on-disk `rename-map.json` keeps the placeholder for upstream-sync portability.
+- **D-14:** `{{GITHUB_OWNER}}` placeholder in `rename-map.json` URL rules resolves to the literal string `OTOJulian` per the Phase 2 repo-creation checkpoint, with a `--owner <name>` CLI override on the rebrand engine for forks/test fixtures. No env var, no config file — simplest path consistent with personal-use scope (Pitfall 11). The engine substitutes the placeholder at apply time, not load time, so the on-disk `rename-map.json` keeps the placeholder for upstream-sync portability.
 
 ### Engine Implementation Constraints (cross-cutting)
 
@@ -172,7 +172,7 @@ The user picked recommended for every selected gray area; D-08, D-09, D-12 were 
 - Exact filename and structure of synthetic fixtures under `tests/fixtures/rebrand/` (only the categories from D-07 are locked)
 - Markdown report layout details (column ordering, table grouping)
 - Exit-code conventions (engine non-zero on any unclassified match, on round-trip diff, on coverage assertion failure — beyond that, Claude decides)
-- README.md content for Phase 2 (must mention install command + `npm install -g github:julianisaac/oto-hybrid-framework#<tag>`; everything else is at planner's discretion)
+- README.md content for Phase 2 (must mention install command + `npm install -g github:OTOJulian/oto-hybrid-framework#<tag>`; everything else is at planner's discretion)
 
 </decisions>
 
@@ -190,7 +190,7 @@ The user picked recommended for every selected gray area; D-08, D-09, D-12 were 
 
 ### Phase 1 ADRs (locked upstream of Phase 2)
 - `decisions/ADR-10-rename-map-schema.md` — `rename-map.json` schema is a Phase 1 deliverable; Phase 2 builds the engine that consumes it
-- `decisions/ADR-11-distribution.md` — GitHub install model, owner = `julianisaac`, repo name `oto-hybrid-framework`, bin = `oto`, no `npm publish`
+- `decisions/ADR-11-distribution.md` — GitHub install model, owner resolved at the Phase 2 checkpoint as `OTOJulian`, repo name `oto-hybrid-framework`, bin = `oto`, no `npm publish`
 - `decisions/ADR-12-sdk-strategy.md` — SDK deferred to v2; Phase 2 has zero TS, zero `sdk/` subpackage, zero compiled artifacts
 - `decisions/ADR-13-license-attribution.md` — `LICENSE` + `THIRD-PARTY-LICENSES.md` allowlist mechanics (engine must preserve)
 - `decisions/ADR-14-inventory-scope.md` — Inventory verdicts (`keep|drop|merge`) drive what files Phase 4 ports; Phase 2 engine doesn't filter by verdict (it's a content rebrand tool, not a port tool)

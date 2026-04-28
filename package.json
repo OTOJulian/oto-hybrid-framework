@@ -22,7 +22,7 @@
     "rebrand:dry-run": "node scripts/rebrand.cjs --dry-run",
     "rebrand:roundtrip": "node scripts/rebrand.cjs --verify-roundtrip"
   },
-  "repository": { "type": "git", "url": "git+https://github.com/julianisaac/oto-hybrid-framework.git" },
+  "repository": { "type": "git", "url": "git+https://github.com/OTOJulian/oto-hybrid-framework.git" },
   "license": "MIT",
   "author": "Julian Isaac"
 }

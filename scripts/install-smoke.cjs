@@ -17,8 +17,8 @@ const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-install-smoke-'));
 const expectedVersion = require(path.join(__dirname, '..', 'package.json')).version;
 
 try {
-  console.log(`Smoke: installing github:julianisaac/oto-hybrid-framework#${ref} into ${tmpdir}...`);
-  execSync(`npm install -g github:julianisaac/oto-hybrid-framework#${ref} --prefix ${tmpdir}`, {
+  console.log(`Smoke: installing github:OTOJulian/oto-hybrid-framework#${ref} into ${tmpdir}...`);
+  execSync(`npm install -g github:OTOJulian/oto-hybrid-framework#${ref} --prefix ${tmpdir}`, {
     stdio: 'inherit',
   });
 

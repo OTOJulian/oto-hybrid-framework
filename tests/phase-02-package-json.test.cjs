@@ -60,5 +60,5 @@ test('files allowlist includes only the intended package surface', () => {
 });
 
 test('repository points to the public GitHub install target', () => {
-  assert.equal(pkg.repository.url, 'git+https://github.com/julianisaac/oto-hybrid-framework.git');
+  assert.equal(pkg.repository.url, 'git+https://github.com/OTOJulian/oto-hybrid-framework.git');
 });
