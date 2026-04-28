@@ -2,8 +2,8 @@
 phase: 3
 slug: installer-fork-claude-adapter
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-28
 ---
 
@@ -70,22 +70,22 @@ created: 2026-04-28
 
 Phase 3 requires creating these test files BEFORE any production code (TDD-style scaffolds; assertions filled as production code lands):
 
-- [ ] `tests/phase-03-args.test.cjs` — covers INS-03 + INS-06 arg validation
-- [ ] `tests/phase-03-runtime-detect.test.cjs` — covers INS-06 `--all` detection
-- [ ] `tests/phase-03-marker.test.cjs` — covers marker injection idempotency (INS-04 indirectly)
-- [ ] `tests/phase-03-install-state.test.cjs` — covers state schema validation
-- [ ] `tests/phase-03-copy-files.test.cjs` — covers INS-04 unit-level copy/hash/walk/remove primitives (Plan 04 fast-feedback layer)
-- [ ] `tests/phase-03-runtime-claude.test.cjs` — covers INS-02 adapter contract (Claude)
-- [ ] `tests/phase-03-runtime-codex.test.cjs` — covers INS-02 adapter contract (Codex)
-- [ ] `tests/phase-03-runtime-gemini.test.cjs` — covers INS-02 adapter contract (Gemini)
-- [ ] `tests/phase-03-no-unwanted-runtimes.test.cjs` — covers INS-01 / SC#4 grep enforcement
-- [ ] `tests/phase-03-no-runtime-conditionals.test.cjs` — covers INS-02 / SC#2
-- [ ] `tests/phase-03-bin-shell.test.cjs` — covers INS-01 thin-shell shape
-- [ ] `tests/phase-03-help-output.test.cjs` — covers INS-01 / D-15
-- [ ] `tests/phase-03-install-claude.integration.test.cjs` — covers INS-04 + INS-05
-- [ ] `tests/phase-03-install-codex.integration.test.cjs` — covers INS-05
-- [ ] `tests/phase-03-install-gemini.integration.test.cjs` — covers INS-05
-- [ ] `tests/phase-03-install-all.integration.test.cjs` — covers INS-06
+- [x] `tests/phase-03-args.test.cjs` — covers INS-03 + INS-06 arg validation
+- [x] `tests/phase-03-runtime-detect.test.cjs` — covers INS-06 `--all` detection
+- [x] `tests/phase-03-marker.test.cjs` — covers marker injection idempotency (INS-04 indirectly)
+- [x] `tests/phase-03-install-state.test.cjs` — covers state schema validation
+- [x] `tests/phase-03-copy-files.test.cjs` — covers INS-04 unit-level copy/hash/walk/remove primitives (Plan 04 fast-feedback layer)
+- [x] `tests/phase-03-runtime-claude.test.cjs` — covers INS-02 adapter contract (Claude)
+- [x] `tests/phase-03-runtime-codex.test.cjs` — covers INS-02 adapter contract (Codex)
+- [x] `tests/phase-03-runtime-gemini.test.cjs` — covers INS-02 adapter contract (Gemini)
+- [x] `tests/phase-03-no-unwanted-runtimes.test.cjs` — covers INS-01 / SC#4 grep enforcement
+- [x] `tests/phase-03-no-runtime-conditionals.test.cjs` — covers INS-02 / SC#2
+- [x] `tests/phase-03-bin-shell.test.cjs` — covers INS-01 thin-shell shape
+- [x] `tests/phase-03-help-output.test.cjs` — covers INS-01 / D-15
+- [x] `tests/phase-03-install-claude.integration.test.cjs` — covers INS-04 + INS-05
+- [x] `tests/phase-03-install-codex.integration.test.cjs` — covers INS-05
+- [x] `tests/phase-03-install-gemini.integration.test.cjs` — covers INS-05
+- [x] `tests/phase-03-install-all.integration.test.cjs` — covers INS-06
 
 **Framework install:** none required. `node:test` is built-in to Node 22+. Test fixture conventions reuse Phase 1+2 patterns (`os.tmpdir()` + `t.after()` cleanup; see `tests/phase-02-allowlist.test.cjs:16-24`).
 
