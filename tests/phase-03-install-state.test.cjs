@@ -79,6 +79,21 @@ test('INS-04: validateState rejects absolute paths in files[].path', () => {
   );
 });
 
+test('INS-04: validateState rejects traversal in instruction_file.path', () => {
+  const errors = validateState(validState({
+    instruction_file: {
+      path: '../outside.md',
+      open_marker: '<!-- OTO Configuration -->',
+      close_marker: '<!-- /OTO Configuration -->',
+    },
+  }));
+
+  assert.ok(
+    errors.some((error) => error.includes('state.instruction_file.path must be relative to configDir')),
+    errors.join('\n'),
+  );
+});
+
 test('INS-04: validateState rejects non-64-hex sha256', () => {
   const errors = validateState(validState({
     files: [{ path: 'commands/oto-help.md', sha256: 'short' }],

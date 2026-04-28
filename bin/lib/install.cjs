@@ -137,7 +137,7 @@ async function uninstallRuntime(adapter, opts = {}) {
   }
 
   const instruction = state.instruction_file || {};
-  const instructionPath = path.join(configDir, instruction.path || adapter.instructionFilename);
+  const instructionPath = assertWithin(configDir, instruction.path || adapter.instructionFilename);
   removeMarkerBlock(
     instructionPath,
     instruction.open_marker || OPEN_MARKER,

@@ -130,6 +130,34 @@ test('INS-04: uninstall restores CLAUDE.md to pre-install user content (block st
   assert.equal(fs.readFileSync(path.join(configDir, 'CLAUDE.md'), 'utf8').trim(), userContent.trim());
 });
 
+test('INS-04: uninstall rejects state instruction_file.path traversal before touching outside files', async (t) => {
+  const configDir = tmpDir(t);
+  const outsidePath = path.join(path.dirname(configDir), 'outside.md');
+  const outsideContent = [
+    'outside before',
+    OPEN_MARKER,
+    'must remain',
+    CLOSE_MARKER,
+    'outside after',
+    '',
+  ].join('\n');
+  fs.writeFileSync(outsidePath, outsideContent);
+  t.after(() => fs.rmSync(outsidePath, { force: true }));
+
+  await installRuntime(adapter, installOpts(configDir));
+
+  const statePath = path.join(configDir, 'oto', '.install.json');
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  state.instruction_file.path = '../outside.md';
+  fs.writeFileSync(statePath, JSON.stringify(state, null, 2) + '\n');
+
+  await assert.rejects(
+    () => uninstallRuntime(adapter, installOpts(configDir)),
+    /state file invalid: state\.instruction_file\.path must be relative to configDir/,
+  );
+  assert.equal(fs.readFileSync(outsidePath, 'utf8'), outsideContent);
+});
+
 test('INS-04: copied files are regular files, not symlinks (lstat().isSymbolicLink() === false)', async (t) => {
   const configDir = tmpDir(t);
 

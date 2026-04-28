@@ -41,6 +41,13 @@ function parseCliArgs(argv) {
 
   const { values, positionals } = parsed;
   const action = positionals[0] || 'install';
+  if (!['install', 'uninstall'].includes(action)) {
+    throw new ArgError(`unknown action: ${action}`, 3);
+  }
+  if (positionals.length > 1) {
+    throw new ArgError(`unexpected positional argument: ${positionals[1]}`, 3);
+  }
+
   const runtimes = [];
 
   if (values.claude) runtimes.push('claude');
@@ -55,8 +62,12 @@ function parseCliArgs(argv) {
     throw new ArgError('--config-dir cannot be used with --all (--config-dir targets a single runtime)', 3);
   }
 
-  if (!values.all && !values.help && runtimes.length === 0 && action === 'install') {
-    runtimes.push('claude');
+  if (!values.all && !values.help && runtimes.length === 0) {
+    if (action === 'install') {
+      runtimes.push('claude');
+    } else {
+      throw new ArgError('uninstall requires --claude, --codex, --gemini, or --all', 3);
+    }
   }
 
   return {

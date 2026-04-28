@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { execSync, spawnSync } = require('node:child_process');
+const { execFileSync, spawnSync } = require('node:child_process');
 const { parseArgs } = require('node:util');
 
 const { values } = parseArgs({
@@ -12,16 +12,19 @@ const { values } = parseArgs({
   strict: true,
 });
 
-const ref = values.ref || execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+const ref = values.ref || execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-install-smoke-'));
 const expectedVersion = require(path.join(__dirname, '..', 'package.json')).version;
 
 try {
   const spec = `https://github.com/OTOJulian/oto-hybrid-framework/archive/${ref}.tar.gz`;
   console.log(`Smoke: installing ${spec} into ${tmpdir}...`);
-  execSync(`npm install -g ${spec} --prefix ${tmpdir}`, {
+  const install = spawnSync('npm', ['install', '-g', spec, '--prefix', tmpdir], {
     stdio: 'inherit',
   });
+  if (install.status !== 0) {
+    process.exit(install.status || 1);
+  }
 
   const binPath = path.join(tmpdir, 'bin', 'oto');
   if (!fs.existsSync(binPath)) {

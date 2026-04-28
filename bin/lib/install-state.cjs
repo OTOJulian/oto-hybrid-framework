@@ -22,12 +22,23 @@ function validateState(state) {
       }
       if (typeof f.path !== 'string') errors.push(`state.files[${i}].path must be a string`);
       else if (f.path.length === 0) errors.push(`state.files[${i}].path must be a non-empty string`);
-      if (typeof f.path === 'string' && path.isAbsolute(f.path)) errors.push(`state.files[${i}].path must be relative to configDir, got absolute: ${f.path}`);
+      if (typeof f.path === 'string' && !isSafeRelativePath(f.path)) errors.push(`state.files[${i}].path must be relative to configDir: ${f.path}`);
       if (typeof f.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(f.sha256)) errors.push(`state.files[${i}].sha256 must be 64-hex string`);
     }
   }
-  if (!state.instruction_file || typeof state.instruction_file !== 'object') errors.push('state.instruction_file required');
+  if (!state.instruction_file || typeof state.instruction_file !== 'object') {
+    errors.push('state.instruction_file required');
+  } else {
+    const instructionPath = state.instruction_file.path;
+    if (typeof instructionPath !== 'string') errors.push('state.instruction_file.path must be a string');
+    else if (instructionPath.length === 0) errors.push('state.instruction_file.path must be a non-empty string');
+    else if (!isSafeRelativePath(instructionPath)) errors.push(`state.instruction_file.path must be relative to configDir: ${instructionPath}`);
+  }
   return errors;
+}
+
+function isSafeRelativePath(p) {
+  return !path.isAbsolute(p) && !p.split(/[\\/]+/).includes('..');
 }
 
 function readState(statePath) {

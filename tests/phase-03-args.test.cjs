@@ -76,3 +76,36 @@ test('INS-06: parseCliArgs returns runtimes array for --claude --codex combinati
   assert.equal(help.help, true);
   assert.deepEqual(help.runtimes, []);
 });
+
+test('INS-06: unknown actions are rejected with invalid args exit code', () => {
+  assert.throws(
+    () => parseCliArgs(['deploy']),
+    {
+      name: 'Error',
+      message: 'unknown action: deploy',
+      exitCode: 3,
+    },
+  );
+});
+
+test('INS-06: extra positional args are rejected', () => {
+  assert.throws(
+    () => parseCliArgs(['install', 'extra']),
+    {
+      name: 'Error',
+      message: 'unexpected positional argument: extra',
+      exitCode: 3,
+    },
+  );
+});
+
+test('INS-06: uninstall requires a runtime selector or --all', () => {
+  assert.throws(
+    () => parseCliArgs(['uninstall']),
+    {
+      name: 'Error',
+      message: 'uninstall requires --claude, --codex, --gemini, or --all',
+      exitCode: 3,
+    },
+  );
+});
