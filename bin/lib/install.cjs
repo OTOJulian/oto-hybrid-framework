@@ -129,6 +129,14 @@ async function uninstallRuntime(adapter, opts = {}) {
     return { runtime: adapter.name, configDir, statePath, removed: false, filesRemoved: 0 };
   }
 
+  if (state.runtime !== adapter.name) {
+    const err = new Error(
+      `state runtime mismatch: found ${state.runtime} at ${configDir}, refusing to uninstall ${adapter.name}`
+    );
+    err.exitCode = 2;
+    throw err;
+  }
+
   let filesRemoved = 0;
   for (const file of state.files) {
     const safe = assertWithin(configDir, file.path);

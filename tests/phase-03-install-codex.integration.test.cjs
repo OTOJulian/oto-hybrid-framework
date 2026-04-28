@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const { OPEN_MARKER, CLOSE_MARKER } = require('../bin/lib/marker.cjs');
 
 const REPO_ROOT = path.join(__dirname, '..');
@@ -63,4 +64,30 @@ test('INS-05: uninstall --codex round-trips clean (state file gone, AGENTS.md re
 
   assert.equal(fs.existsSync(path.join(configDir, 'oto', '.install.json')), false);
   assert.equal(fs.readFileSync(path.join(configDir, 'AGENTS.md'), 'utf8').trim(), userContent.trim());
+});
+
+test('INS-05: uninstall refuses state belonging to a different runtime', (t) => {
+  const configDir = tmpDir(t);
+  const install = spawnSync(
+    process.execPath,
+    ['bin/install.js', 'install', '--codex', '--config-dir', configDir],
+    { cwd: REPO_ROOT, encoding: 'utf8' }
+  );
+  assert.equal(install.status, 0, install.stderr || install.stdout);
+
+  const statePath = path.join(configDir, 'oto', '.install.json');
+  const agentsPath = path.join(configDir, 'AGENTS.md');
+  const beforeState = fs.readFileSync(statePath, 'utf8');
+  const beforeAgents = fs.readFileSync(agentsPath, 'utf8');
+
+  const uninstall = spawnSync(
+    process.execPath,
+    ['bin/install.js', 'uninstall', '--claude', '--config-dir', configDir],
+    { cwd: REPO_ROOT, encoding: 'utf8' }
+  );
+
+  assert.equal(uninstall.status, 2);
+  assert.match(uninstall.stderr, /state runtime mismatch: found codex/);
+  assert.equal(fs.readFileSync(statePath, 'utf8'), beforeState);
+  assert.equal(fs.readFileSync(agentsPath, 'utf8'), beforeAgents);
 });
