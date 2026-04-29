@@ -79,8 +79,8 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 ### Agents
 
 - [x] **AGT-01**: Audit GSD's 33 agents — keep, drop, or merge each. Document decisions in `decisions/agent-audit.md`
-- [ ] **AGT-02**: Drop Superpowers' `code-reviewer` example agent (resolves identity collision with `oto-code-reviewer`)
-- [ ] **AGT-03**: All retained agents rebranded (`name:` frontmatter, file paths, registry references) and pass schema validation
+- [x] **AGT-02**: Drop Superpowers' `code-reviewer` example agent (resolves identity collision with `oto-code-reviewer`)
+- [x] **AGT-03**: All retained agents rebranded (`name:` frontmatter, file paths, registry references) and pass schema validation
 - [x] **AGT-04**: Codex `CODEX_AGENT_SANDBOX` config map updated for all retained agents (per-agent sandbox mode)
 
 ### Skills (Superpowers Subset — Ported & Rebranded)
@@ -249,8 +249,8 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | WF-29 | Phase 4 | Pending |
 | WF-30 | Phase 4 | Pending |
 | AGT-01 | Phase 1 | Complete |
-| AGT-02 | Phase 4 | Pending |
-| AGT-03 | Phase 4 | Pending |
+| AGT-02 | Phase 4 | Complete |
+| AGT-03 | Phase 4 | Complete |
 | AGT-04 | Phase 4 | Complete |
 | SKL-01 | Phase 6 | Pending |
 | SKL-02 | Phase 6 | Pending |

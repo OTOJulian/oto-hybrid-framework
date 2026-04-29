@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-04-29T23:26:43.229Z"
+stopped_at: Completed 04-07-PLAN.md
+last_updated: "2026-04-29T23:42:52.055Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 21
-  completed_plans: 19
-  percent: 90
+  completed_plans: 20
+  percent: 95
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (core-workflows-agents-port) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [█████████░] 90%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -47,7 +47,7 @@ Progress: [█████████░] 90%
 | 01 | 3 | - | - |
 | 02 | 3 | - | - |
 | 03 | 7 | - | - |
-| 04 | 6 | 29 min | 5 min |
+| 04 | 7 | 39 min | 6 min |
 
 **Recent Trend:**
 
@@ -68,6 +68,7 @@ Progress: [█████████░] 90%
 | Phase 04 P04 | 4 min | 2 tasks | 3 files |
 | Phase 04 P05 | 6 min | 3 tasks | 7 files |
 | Phase 04 P06 | 2 min | 1 tasks | 2 files |
+| Phase 04 P07 | 10 min | 3 tasks | 152 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,9 @@ Recent decisions affecting current work:
 - 04-05: Remove stale dropped-agent substrings from shipped reference/template files when they block the plan-level no-dropped grep.
 - 04-06: Keep Codex sandbox data on runtime-codex.cjs as a descriptor field; do not modify bin/install.js or TOML writing behavior.
 - 04-06: Enumerate all 23 retained agents so Codex sandbox fallback behavior is never used for retained agents.
+- 04-07: Include oto/ in package.json files so the packed distribution actually carries the Phase 4 runtime payload.
+- 04-07: Use temp npm cache and temp pack destination in MR-01 smoke tests to avoid user npm cache and repo-root tarball side effects.
+- 04-07: Enforce shipped payload roots with no dropped-agent substrings and no path-like .planning references.
 
 ### Pending Todos
 
@@ -123,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T23:26:43.229Z
-Stopped at: Completed 04-06-PLAN.md
+Last session: 2026-04-29T23:42:52.055Z
+Stopped at: Completed 04-07-PLAN.md
 Resume file: None

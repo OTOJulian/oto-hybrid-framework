@@ -94,7 +94,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 04-04-PLAN.md — Wave 2: AI-integration scaffolding rewrite per D-17/D-18/D-20 (WF-28 bounded scope)
   - [x] 04-05-PLAN.md — Wave 2: Other dropped-agent fixups (eval-review, ingest-docs deferred; profile-user deleted)
   - [x] 04-06-PLAN.md — Wave 2: Codex agentSandboxes map population in runtime-codex.cjs (AGT-04)
-  - [ ] 04-07-PLAN.md — Wave 3: Implement 9 verification test bodies (AGT-02, AGT-03, AGT-04, D-09/10/12/13, MR-01 auto)
+  - [x] 04-07-PLAN.md — Wave 3: Implement 9 verification test bodies (AGT-02, AGT-03, AGT-04, D-09/10/12/13, MR-01 auto)
   - [ ] 04-08-PLAN.md — Wave 4: MR-01 disposable dogfood + UAT (manual; D-05/06/07/08)
 **UI hint**: yes
 
@@ -178,7 +178,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
 | 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
-| 4. Core Workflows & Agents Port | 6/8 | In Progress | - |
+| 4. Core Workflows & Agents Port | 7/8 | In Progress | - |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
 | 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |
