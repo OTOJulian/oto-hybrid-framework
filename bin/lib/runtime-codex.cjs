@@ -21,6 +21,37 @@ module.exports = {
     skills: 'skills',
     hooks: 'hooks',
   },
+  // AGT-04: Codex sandbox mode per retained agent.
+  // 11 entries pass through from upstream foundation-frameworks/get-shit-done-main/bin/install.js:26-38
+  // (gsd-* renamed to oto-* per Phase 1 ADR-07). 12 additional entries inferred from
+  // per-agent `tools:` field: agents with Write/Edit/Bash get workspace-write, pure-read agents
+  // get read-only. Source-of-truth analysis: .planning/phases/04-core-workflows-agents-port/04-RESEARCH.md
+  // § "Agent sandbox map".
+  agentSandboxes: {
+    'oto-advisor-researcher': 'read-only',
+    'oto-assumptions-analyzer': 'read-only',
+    'oto-code-fixer': 'workspace-write',
+    'oto-code-reviewer': 'workspace-write',
+    'oto-codebase-mapper': 'workspace-write',
+    'oto-debugger': 'workspace-write',
+    'oto-doc-verifier': 'workspace-write',
+    'oto-doc-writer': 'workspace-write',
+    'oto-domain-researcher': 'workspace-write',
+    'oto-executor': 'workspace-write',
+    'oto-integration-checker': 'read-only',
+    'oto-nyquist-auditor': 'workspace-write',
+    'oto-phase-researcher': 'workspace-write',
+    'oto-plan-checker': 'read-only',
+    'oto-planner': 'workspace-write',
+    'oto-project-researcher': 'workspace-write',
+    'oto-research-synthesizer': 'workspace-write',
+    'oto-roadmapper': 'workspace-write',
+    'oto-security-auditor': 'workspace-write',
+    'oto-ui-auditor': 'workspace-write',
+    'oto-ui-checker': 'read-only',
+    'oto-ui-researcher': 'workspace-write',
+    'oto-verifier': 'workspace-write',
+  },
 
   renderInstructionBlock(ctx) {
     return `<!-- managed by oto v${ctx.otoVersion} — do not edit between markers -->\n` +
