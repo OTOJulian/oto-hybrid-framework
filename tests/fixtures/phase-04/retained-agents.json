@@ -1,0 +1,48 @@
+{
+  "source": "decisions/agent-audit.md (KEEP rows)",
+  "count": 23,
+  "agents": [
+    "oto-advisor-researcher",
+    "oto-assumptions-analyzer",
+    "oto-code-fixer",
+    "oto-code-reviewer",
+    "oto-codebase-mapper",
+    "oto-debugger",
+    "oto-doc-verifier",
+    "oto-doc-writer",
+    "oto-domain-researcher",
+    "oto-executor",
+    "oto-integration-checker",
+    "oto-nyquist-auditor",
+    "oto-phase-researcher",
+    "oto-plan-checker",
+    "oto-planner",
+    "oto-project-researcher",
+    "oto-research-synthesizer",
+    "oto-roadmapper",
+    "oto-security-auditor",
+    "oto-ui-auditor",
+    "oto-ui-checker",
+    "oto-ui-researcher",
+    "oto-verifier"
+  ],
+  "dropped_agents_for_leak_test": [
+    "oto-pattern-mapper",
+    "oto-doc-classifier",
+    "oto-doc-synthesizer",
+    "oto-debug-session-manager",
+    "oto-ai-researcher",
+    "oto-eval-auditor",
+    "oto-eval-planner",
+    "oto-framework-selector",
+    "oto-intel-updater",
+    "oto-user-profiler"
+  ],
+  "generic_allowlist": [
+    "general-purpose",
+    "generalPurpose",
+    "general",
+    "X",
+    "general_purpose_task"
+  ]
+}
