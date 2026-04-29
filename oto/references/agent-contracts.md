@@ -30,7 +30,6 @@ This doc describes what IS, not what should be. Casing inconsistencies are docum
 | oto-doc-verifier | Doc validation | No marker (writes JSON to `.planning/tmp/`) |
 | oto-doc-writer | Doc generation | No marker (writes docs directly) |
 | oto-advisor-researcher | Advisory research | No marker (utility agent) |
-| oto-user-profiler | User profiling | No marker (returns JSON in analysis tags) |
 | oto-intel-updater | Codebase intelligence analysis | `## INTEL UPDATE COMPLETE`, `## INTEL UPDATE FAILED` |
 
 ## Marker Rules

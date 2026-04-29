@@ -1,6 +1,6 @@
 # AI Evaluation Reference
 
-> Reference used by `oto-eval-planner` and `oto-eval-auditor`.
+> Reference used by AI-SPEC scaffolding and future eval-planning/audit workflows.
 > Based on "AI Evals for Everyone" course (Reganti & Badam) + industry practice.
 
 ---

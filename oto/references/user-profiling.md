@@ -1,10 +1,10 @@
 # User Profiling: Detection Heuristics Reference
 
-This reference document defines detection heuristics for behavioral profiling across 8 dimensions. The oto-user-profiler agent applies these rules when analyzing extracted session messages. Do not invent dimensions or scoring rules beyond what is defined here.
+This reference document defines detection heuristics for behavioral profiling across 8 dimensions. It is retained for future user-profiling support, but the executable profiling workflow is deferred in v0.1.0. Do not invent dimensions or scoring rules beyond what is defined here.
 
 ## How to Use This Document
 
-1. The oto-user-profiler agent reads this document before analyzing any messages
+1. A future user-profiling workflow reads this document before analyzing any messages
 2. For each dimension, the agent scans messages for the signal patterns defined below
 3. The agent applies the detection heuristics to classify the developer's pattern
 4. Confidence is scored using the thresholds defined per dimension
