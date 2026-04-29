@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 04-05-PLAN.md
-last_updated: "2026-04-29T23:17:10.693Z"
+stopped_at: Completed 04-06-PLAN.md
+last_updated: "2026-04-29T23:26:43.229Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 21
-  completed_plans: 18
-  percent: 86
+  completed_plans: 19
+  percent: 90
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (core-workflows-agents-port) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 14
+- Total plans completed: 19
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -47,7 +47,7 @@ Progress: [█████████░] 86%
 | 01 | 3 | - | - |
 | 02 | 3 | - | - |
 | 03 | 7 | - | - |
-| 04 | 1 | 4 min | 4 min |
+| 04 | 6 | 29 min | 5 min |
 
 **Recent Trend:**
 
@@ -67,6 +67,7 @@ Progress: [█████████░] 86%
 | Phase 04 P03 | 7 min | 2 tasks | 3 files |
 | Phase 04 P04 | 4 min | 2 tasks | 3 files |
 | Phase 04 P05 | 6 min | 3 tasks | 7 files |
+| Phase 04 P06 | 2 min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,8 @@ Recent decisions affecting current work:
 - 04-05: Keep /oto-eval-review and /oto-ingest-docs discoverable, but mark their bodies DEFERRED because their executable paths depended on dropped agents.
 - 04-05: Delete oto/workflows/profile-user.md after confirming no command, workflow, or agent includes it.
 - 04-05: Remove stale dropped-agent substrings from shipped reference/template files when they block the plan-level no-dropped grep.
+- 04-06: Keep Codex sandbox data on runtime-codex.cjs as a descriptor field; do not modify bin/install.js or TOML writing behavior.
+- 04-06: Enumerate all 23 retained agents so Codex sandbox fallback behavior is never used for retained agents.
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T23:17:10.689Z
-Stopped at: Completed 04-05-PLAN.md
+Last session: 2026-04-29T23:26:43.229Z
+Stopped at: Completed 04-06-PLAN.md
 Resume file: None
