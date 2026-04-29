@@ -201,13 +201,13 @@ Generate slug from user input description:
 
 ## 3. Initial Session Setup (new session)
 
-Create the debug session file before delegating to the session manager.
+Create the debug session file before delegating to oto-debugger.
 
 Print to console before file creation:
 ```
 [debug] Session: .oto/debug/{slug}.md
 [debug] Status: investigating
-[debug] Delegating loop to session manager...
+[debug] Delegating loop to oto-debugger...
 ```
 
 Create `.planning/debug/{slug}.md` with initial state using the Write tool (never use heredoc):
@@ -243,7 +243,7 @@ specialist_dispatch_enabled: true
 )
 ```
 
-Display the compact summary returned by the session manager.
+Display the compact summary returned by oto-debugger.
 
 If summary shows `DEBUG SESSION COMPLETE`: done.
 If summary shows `ABANDONED`: note session saved at `.planning/debug/{slug}.md` for later `/oto-debug continue {slug}`.
