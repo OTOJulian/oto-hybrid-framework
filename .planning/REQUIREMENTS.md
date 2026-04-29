@@ -47,14 +47,14 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 - [ ] **WF-01**: `/oto-new-project` — initialize new project (questioning → research → requirements → roadmap)
 - [ ] **WF-02**: `/oto-discuss-phase` — gather phase context through adaptive questioning
-- [ ] **WF-03**: `/oto-plan-phase` — create detailed phase plan with verification loop
+- [x] **WF-03**: `/oto-plan-phase` — create detailed phase plan with verification loop
 - [ ] **WF-04**: `/oto-execute-phase` — execute phase with wave-based parallelization
 - [ ] **WF-05**: `/oto-verify-work` — validate built features through conversational UAT
 - [ ] **WF-06**: `/oto-ship` — create PR, run review, prepare for merge
 - [ ] **WF-07**: `/oto-progress`, `/oto-next`, `/oto-resume-work`, `/oto-pause-work` — navigation/state
 - [ ] **WF-08**: `/oto-help`, `/oto-update`, `/oto-health`, `/oto-stats`, `/oto-settings` — meta-commands
 - [ ] **WF-09**: `/oto-undo` — safe git revert for phase/plan commits
-- [ ] **WF-10**: `/oto-debug` — systematic debugging with persistent state
+- [x] **WF-10**: `/oto-debug` — systematic debugging with persistent state
 - [ ] **WF-11**: `/oto-fast`, `/oto-quick` — lightweight execution paths for trivial work
 - [ ] **WF-12**: `/oto-do` — route freeform text to the right oto command automatically
 - [ ] **WF-13**: `/oto-spike`, `/oto-spike-wrap-up` — timeboxed exploration
@@ -220,14 +220,14 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | INS-06 | Phase 3 | Complete |
 | WF-01 | Phase 4 | Pending |
 | WF-02 | Phase 4 | Pending |
-| WF-03 | Phase 4 | Pending |
+| WF-03 | Phase 4 | Complete |
 | WF-04 | Phase 4 | Pending |
 | WF-05 | Phase 4 | Pending |
 | WF-06 | Phase 4 | Pending |
 | WF-07 | Phase 4 | Pending |
 | WF-08 | Phase 4 | Pending |
 | WF-09 | Phase 4 | Pending |
-| WF-10 | Phase 4 | Pending |
+| WF-10 | Phase 4 | Complete |
 | WF-11 | Phase 4 | Pending |
 | WF-12 | Phase 4 | Pending |
 | WF-13 | Phase 4 | Pending |

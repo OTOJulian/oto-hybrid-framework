@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-29T22:42:07.204Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-04-29T22:54:42.936Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 21
-  completed_plans: 15
-  percent: 71
+  completed_plans: 16
+  percent: 76
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (core-workflows-agents-port) — EXECUTING
-Plan: 3 of 8
+Plan: 4 of 8
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 76%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [███████░░░] 71%
 | Phase 03 P07 | 10 min | 4 tasks | 7 files |
 | Phase 04 P01 | 4 min | 2 tasks | 11 files |
 | Phase 04 P02 | 6 min | 2 tasks | 339 files |
+| Phase 04 P03 | 7 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Recent decisions affecting current work:
 - 04-01: Keep retained-agent data in tests/fixtures/phase-04/retained-agents.json so multiple Phase 4 checks share one source.
 - 04-02: Use inventory target_path values as the source of truth for generated output layout.
 - 04-02: Keep the REQUIREMENTS out-of-scope override for ultraplan-phase by deleting the emitted workflow file after generation.
+- 04-03: Route debug sessions directly through oto-debugger because ADR-07 absorbs debug-session-manager responsibilities.
+- 04-03: Keep optional codebase pattern mapping deferred instead of silently substituting oto-codebase-mapper.
 
 ### Pending Todos
 
@@ -110,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T22:42:07.200Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-29T22:54:42.930Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None

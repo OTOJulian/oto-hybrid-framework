@@ -90,7 +90,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 8 plans
   - [x] 04-01-PLAN.md — Wave 0: Test scaffolds for 10 verification tests + retained-agents fixture
   - [x] 04-02-PLAN.md — Wave 1: Rebrand engine apply against upstream into oto/ tree (bulk port; ultraplan deletion)
-  - [ ] 04-03-PLAN.md — Wave 2: Drop-agent rewrites in plan-phase.md (pattern-mapper) and debug.md (debug-session-manager)
+  - [x] 04-03-PLAN.md — Wave 2: Drop-agent rewrites in plan-phase.md (pattern-mapper) and debug.md (debug-session-manager)
   - [ ] 04-04-PLAN.md — Wave 2: AI-integration scaffolding rewrite per D-17/D-18/D-20 (WF-28 bounded scope)
   - [ ] 04-05-PLAN.md — Wave 2: Other dropped-agent fixups (eval-review, ingest-docs deferred; profile-user deleted)
   - [ ] 04-06-PLAN.md — Wave 2: Codex agentSandboxes map population in runtime-codex.cjs (AGT-04)
@@ -178,7 +178,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
 | 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
-| 4. Core Workflows & Agents Port | 2/8 | In Progress | - |
+| 4. Core Workflows & Agents Port | 3/8 | In Progress | - |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
 | 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |
