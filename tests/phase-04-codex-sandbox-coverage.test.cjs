@@ -4,13 +4,16 @@
 // Will: require runtime-codex.cjs and assert agentSandboxes has set equality with the retained-agents fixture.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const retainedAgents = require('./fixtures/phase-04/retained-agents.json');
+const adapter = require('../bin/lib/runtime-codex.cjs');
 
-const REPO_ROOT = path.resolve(__dirname, '..');
-
-test('phase-04 codex-sandbox-coverage: retained agents have Codex sandbox entries', (t) => {
-  t.todo('Implemented in Wave 3 (plan 04-07) after plan 04-06 populates agentSandboxes.');
+test('phase-04 codex-sandbox-coverage: agentSandboxes covers exactly the retained set', () => {
+  assert.ok(adapter.agentSandboxes && typeof adapter.agentSandboxes === 'object', 'agentSandboxes must be an object');
+  const keys = Object.keys(adapter.agentSandboxes).sort();
+  const expected = [...retainedAgents.agents].sort();
+  assert.deepEqual(keys, expected, 'agentSandboxes keys must equal retained-agents fixture');
+  assert.equal(keys.length, 23);
+  for (const [k, v] of Object.entries(adapter.agentSandboxes)) {
+    assert.ok(v === 'workspace-write' || v === 'read-only', `${k}: invalid sandbox mode "${v}"`);
+  }
 });
-
