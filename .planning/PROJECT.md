@@ -14,21 +14,21 @@
 
 <!-- Shipped and confirmed valuable. -->
 
-(None yet — ship to validate)
+- [x] Phase 1 locked the architecture decisions, agent audit, file inventory, rename map, and license attribution.
+- [x] Phase 2 shipped the Node package skeleton, public GitHub install target, rebrand engine, dry-run/apply reports, and round-trip verification.
+- [x] Phase 3 shipped the trimmed installer for exactly Claude Code, Codex, and Gemini CLI, with Claude as the v0.1.0 happy path and Codex/Gemini explicitly best-effort until parity work.
 
 ### Active
 
 <!-- Current scope. Building toward these. The hybrid architecture is research-driven; these requirements scope the framework, not the merge strategy. -->
 
-- [ ] Inventory and analyze GSD's command/agent/workflow surface (what to keep, drop, merge)
-- [ ] Inventory and analyze Superpowers' skill/command surface (what to keep, drop, merge)
-- [ ] Decide hybrid architecture (which framework's spine, how the other layers in) via research
-- [ ] Full rebrand: `/gsd-*` → `/oto-*`, internal directories (`.planning/` → `.oto/` or chosen name), agent IDs, state files, env vars, and all internal references
-- [ ] Multi-runtime support: Claude Code, Codex (`AGENTS.md`), Gemini CLI
-- [ ] Public GitHub repo, installable via `npm install -g github:<owner>/oto-hybrid-framework` (no npm registry publish)
-- [ ] Automated rebrand/sync tool: pull upstream GSD and Superpowers changes, apply rename map, surface conflicts for manual resolution
-- [ ] Tests covering core command/skill behavior, install, and the rebrand pipeline
-- [ ] Project documentation (README, install guide, command reference, contribution/upstream-sync guide)
+- [ ] Phase 4: Port the GSD core workflow and retained agent spine so `/oto-*` commands work end-to-end on Claude Code.
+- [ ] Phase 5: Port and consolidate hooks with one SessionStart bootstrap and version-tagged hook sources.
+- [ ] Phase 6: Port the curated Superpowers skill subset under `oto:<skill>` and wire canonical agent skill calls.
+- [ ] Phase 7: Port workstreams and isolated workspace management.
+- [ ] Phase 8: Bring Codex and Gemini CLI to runtime parity after Claude Code is daily-use stable.
+- [ ] Phase 9: Build the upstream sync pipeline for renamed snapshots and conflict surfacing.
+- [ ] Phase 10: Harden tests, CI, docs, and the v0.1.0 tagged release.
 
 ### Out of Scope
 
@@ -71,12 +71,13 @@
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Command prefix `/oto-*` (full rebrand depth) | User wants a unified, recognizable surface; partial rebrand leaks upstream identities into daily UX | — Pending |
-| Distribute via public GitHub, install via `npm install -g github:...` | Personal use doesn't justify npm registry overhead; GitHub gives cross-machine portability and free public hosting | — Pending |
-| Track upstream via automated rebrand tool, not manual diff | Full rebrand makes manual porting too costly across a multi-month build; tooling pays back the upfront effort | — Pending |
-| Defer hybrid architecture to research phase | Pre-committing without an inventory would lock in a worse design; both frameworks deserve apples-to-apples comparison | — Pending |
-| Drop OpenCode support | User doesn't use it; supporting it doubles rebrand and test surface for no personal benefit | — Pending |
-| Clean-slate build, no carry-over of personal `~/.claude/` tweaks | User confirmed nothing currently customized that needs preserving | — Pending |
+| Command prefix `/oto-*` (full rebrand depth) | User wants a unified, recognizable surface; partial rebrand leaks upstream identities into daily UX | Resolved in Phase 1 ADRs |
+| Distribute via public GitHub, install via `npm install -g github:...` | Personal use doesn't justify npm registry overhead; GitHub gives cross-machine portability and free public hosting | Resolved in Phase 2 as `https://github.com/OTOJulian/oto-hybrid-framework/archive/<ref>.tar.gz` |
+| Track upstream via automated rebrand tool, not manual diff | Full rebrand makes manual porting too costly across a multi-month build; tooling pays back the upfront effort | Resolved in Phase 2 rebrand engine |
+| Defer hybrid architecture to research phase | Pre-committing without an inventory would lock in a worse design; both frameworks deserve apples-to-apples comparison | Resolved in Phase 1 research: GSD spine plus Superpowers skills |
+| Drop OpenCode support | User doesn't use it; supporting it doubles rebrand and test surface for no personal benefit | Resolved in Phase 1 scope and enforced in Phase 3 installer |
+| Clean-slate build, no carry-over of personal `~/.claude/` tweaks | User confirmed nothing currently customized that needs preserving | Resolved in Phase 1 scope |
+| Claude installer first, Codex/Gemini later parity | MR-01 requires Claude Code stability before spending effort on cross-runtime parity | Resolved in Phase 3; Phase 8 owns parity hardening |
 
 ## Evolution
 
@@ -96,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 after initialization*
+*Last updated: 2026-04-29 after Phase 03 closeout*
