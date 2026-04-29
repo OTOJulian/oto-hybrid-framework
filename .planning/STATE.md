@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: ready_to_plan
-stopped_at: Phase 04 context gathered
-last_updated: "2026-04-29T21:21:36.063Z"
-last_activity: 2026-04-29 -- Completed Phase 03 installer fork and Claude adapter
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-04-29T22:29:27.514Z"
+last_activity: 2026-04-29
 progress:
   total_phases: 10
   completed_phases: 3
-  total_plans: 13
-  completed_plans: 13
-  percent: 30
+  total_plans: 21
+  completed_plans: 14
+  percent: 67
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 04 — core-workflows-&-agents-port
+**Current focus:** Phase 04 — core-workflows-agents-port
 
 ## Current Position
 
-Phase: 04 (core-workflows-&-agents-port)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-29 -- Completed Phase 03 installer fork and Claude adapter
+Phase: 04 (core-workflows-agents-port) — EXECUTING
+Plan: 2 of 8
+Status: Ready to execute
+Last activity: 2026-04-29
 
-Progress: [███-------] 30%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -47,6 +47,7 @@ Progress: [███-------] 30%
 | 01 | 3 | - | - |
 | 02 | 3 | - | - |
 | 03 | 7 | - | - |
+| 04 | 1 | 4 min | 4 min |
 
 **Recent Trend:**
 
@@ -61,6 +62,7 @@ Progress: [███-------] 30%
 | Phase 03 P05 | 8 min | 3 tasks | 6 files |
 | Phase 03 P06 | 8 min | 3 tasks | 5 files |
 | Phase 03 P07 | 10 min | 4 tasks | 7 files |
+| Phase 04 P01 | 4 min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -87,6 +89,8 @@ Recent decisions affecting current work:
 - 03-06 installRuntime records only current source-manifest files so stale target files do not survive state diff cleanup.
 - 03-07: oto with no args prints install-scoped help instead of defaulting to a real install.
 - 03-07: install-smoke prefixes PATH with the temporary npm install bin directory before invoking oto.
+- 04-01: Use intentional t.todo() scaffolds so downstream Phase 4 plans fill existing verification files instead of inventing new names.
+- 04-01: Keep retained-agent data in tests/fixtures/phase-04/retained-agents.json so multiple Phase 4 checks share one source.
 
 ### Pending Todos
 
@@ -103,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T21:21:36.063Z
-Stopped at: Phase 04 context gathered
-Resume file: .planning/phases/04-core-workflows-agents-port/04-CONTEXT.md
+Last session: 2026-04-29T22:29:27.514Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
