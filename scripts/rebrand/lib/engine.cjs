@@ -52,6 +52,11 @@ function buildInventoryMap() {
   return new Map((inventory.entries || []).map((entry) => [entry.path, entry]));
 }
 
+function inventoryEntryFor(relPath, inventoryByPath) {
+  const normalized = relPath.split(path.sep).join('/');
+  return inventoryByPath.get(normalized) || inventoryByPath.get(relPath);
+}
+
 function ensureReportsDir() {
   const reportsDir = path.join(repoRoot(), 'reports');
   fs.mkdirSync(reportsDir, { recursive: true });
@@ -222,6 +227,24 @@ function applyRelPath(relPath, map) {
   return RULES.path.applyToFilename(relPath, map.rules.path || []);
 }
 
+function outputRelPathFor(entry, map, outRoot, inventoryByPath) {
+  const inventoryEntry = inventoryEntryFor(entry.relPath, inventoryByPath);
+  const targetPath = inventoryEntry && inventoryEntry.target_path;
+  let outRelPath = targetPath || applyRelPath(entry.relPath, map);
+  outRelPath = outRelPath.split(path.sep).join('/');
+
+  if (path.basename(outRoot) === 'oto' && outRelPath.startsWith('oto/')) {
+    outRelPath = outRelPath.slice('oto/'.length);
+  }
+
+  return outRelPath;
+}
+
+function shouldSkipInventoryEntry(relPath, inventoryByPath) {
+  const inventoryEntry = inventoryEntryFor(relPath, inventoryByPath);
+  return inventoryEntry && inventoryEntry.verdict === 'drop';
+}
+
 async function writeJsonAndMarkdownReports(dryrun) {
   const reportsDir = ensureReportsDir();
   await writeFileAtomic(path.join(reportsDir, 'rebrand-dryrun.json'), `${JSON.stringify(dryrun, null, 2)}\n`);
@@ -233,6 +256,7 @@ async function runDryRun(target, map, allowlist, inventoryByPath, owner) {
   const summaryByRule = Object.fromEntries(DRYRUN_RULE_ORDER.map((ruleType) => [ruleType, 0]));
   let matchTotal = 0;
   for await (const entry of walker.walk(target, allowlist, inventoryByPath)) {
+    if (shouldSkipInventoryEntry(entry.relPath, inventoryByPath)) continue;
     const context = contextFor(entry, owner, allowlist, inventoryByPath);
     const matches = dryrunMatches(entry, map, context);
     for (const match of matches) summaryByRule[match.rule_type] += 1;
@@ -267,8 +291,9 @@ async function applyTree(target, out, map, allowlist, inventoryByPath, owner, fo
   let files = 0;
   let matches = 0;
   for await (const entry of walker.walk(target, allowlist, inventoryByPath)) {
+    if (shouldSkipInventoryEntry(entry.relPath, inventoryByPath)) continue;
     files += 1;
-    const outRelPath = entry.allowlisted ? entry.relPath : applyRelPath(entry.relPath, map);
+    const outRelPath = entry.allowlisted ? entry.relPath : outputRelPathFor(entry, map, out, inventoryByPath);
     const outPath = path.join(out, outRelPath);
     await fsp.mkdir(path.dirname(outPath), { recursive: true });
     if (entry.allowlisted) {
