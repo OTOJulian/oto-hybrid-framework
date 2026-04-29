@@ -15,7 +15,6 @@ Read all files referenced by the invoking prompt's execution_context before star
 <available_agent_types>
 Valid OTO subagent types (use exact names — do not fall back to 'general-purpose'):
 - oto-phase-researcher — Researches technical approaches for a phase
-- oto-pattern-mapper — Analyzes codebase for existing patterns, produces PATTERNS.md
 - oto-planner — Creates detailed plans from phase scope
 - oto-plan-checker — Reviews plan quality before execution
 </available_agent_types>
@@ -635,68 +634,13 @@ If missing and Nyquist is still enabled/applicable — ask user:
    `oto-sdk query config-set workflow.nyquist_validation false`
 3. Continue anyway (plans fail Dimension 8)
 
-Proceed to Step 7.8 (or Step 8 if pattern mapper is disabled) only if user selects 2 or 3.
+Proceed to Step 8 only if user selects 2 or 3.
 
-## 7.8. Spawn oto-pattern-mapper Agent (Optional)
+## 7.8. Codebase Pattern Mapping (Deferred — see ADR-07)
 
-**Skip if** `workflow.pattern_mapper` is explicitly set to `false` in config.json (absent key = enabled). Also skip if no CONTEXT.md and no RESEARCH.md exist for this phase (nothing to extract file lists from).
+<!-- DEFERRED: The optional codebase pattern mapping agent was dropped per ADR-07 (decisions/agent-audit.md). This step is deferred until a v2 replacement agent is designed. To approximate it manually, run `/oto-map-codebase` through oto-codebase-mapper and feed the output into the planning context. See Phase 4 research, Category A item 1. -->
 
-Check config:
-```bash
-PATTERN_MAPPER_CFG=$(oto-sdk query config-get workflow.pattern_mapper 2>/dev/null || echo "true")
-```
-
-**If `PATTERN_MAPPER_CFG` is `false`:** Skip to step 8.
-
-**If PATTERNS.md already exists** (`PATTERNS_PATH` is non-empty from step 7): Skip to step 8 (use existing).
-
-Display banner:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- OTO ► PATTERN MAPPING PHASE {X}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-◆ Spawning pattern mapper...
-```
-
-Pattern mapper prompt:
-
-```markdown
-<pattern_mapping_context>
-**Phase:** {phase_number} - {phase_name}
-**Phase directory:** {phase_dir}
-**Padded phase:** {padded_phase}
-
-<files_to_read>
-- {context_path} (USER DECISIONS from /oto-discuss-phase)
-- {research_path} (Technical Research)
-</files_to_read>
-
-**Output file:** {phase_dir}/{padded_phase}-PATTERNS.md
-
-Extract the list of files to be created/modified from CONTEXT.md and RESEARCH.md. For each file, classify by role and data flow, find the closest existing analog in the codebase, extract concrete code excerpts, and produce PATTERNS.md.
-</pattern_mapping_context>
-```
-
-Spawn with:
-```
-Task(
-  prompt="{above}",
-  subagent_type="oto-pattern-mapper",
-  model="{researcher_model}",
-)
-```
-
-> **ORCHESTRATOR RULE — CODEX RUNTIME**: After calling Task() above, stop working on this task immediately. Do not read more files, edit code, or run tests related to this task while the subagent is active. Wait for the subagent to return its result. This prevents duplicate work, conflicting edits, and wasted context. Only resume when the subagent result is available.
-
-**Handle return:**
-- **`## PATTERN MAPPING COMPLETE`:** Update `PATTERNS_PATH` to the created file path, continue to step 8.
-- **Any error or empty return:** Log warning, continue to step 8 without patterns (non-blocking).
-
-After pattern mapper completes, update the path variable:
-```bash
-PATTERNS_PATH="${PHASE_DIR}/${PADDED_PHASE}-PATTERNS.md"
-```
+Skip to step 8.
 
 ## 8. Spawn oto-planner Agent
 
