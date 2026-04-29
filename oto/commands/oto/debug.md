@@ -27,8 +27,7 @@ Debug issues using scientific method with subagent isolation.
 
 <available_agent_types>
 Valid OTO subagent types (use exact names — do not fall back to 'general-purpose'):
-- oto-debug-session-manager — manages debug checkpoint/continuation loop in isolated context
-- oto-debugger — investigates bugs using scientific method
+- oto-debugger — investigates bugs using scientific method and manages debug checkpoint/continuation loop in isolated context
 </available_agent_types>
 
 <context>
@@ -130,7 +129,7 @@ Evidence entries: {count}
 Eliminated: {count}
 ```
 
-Surface to user. Then delegate directly to the session manager (skip Steps 2 and 3 — pass `symptoms_prefilled: true` and set the slug from SLUG variable). The existing file IS the context.
+Surface to user. Then delegate directly to oto-debugger (skip Steps 2 and 3 — pass `symptoms_prefilled: true` and set the slug from SLUG variable). The existing file IS the context.
 
 Print before spawning:
 ```
@@ -138,10 +137,10 @@ Print before spawning:
 [debug] Status: {status}
 [debug] Hypothesis: {hypothesis}
 [debug] Next: {next_action}
-[debug] Delegating loop to session manager...
+[debug] Delegating loop to oto-debugger...
 ```
 
-Spawn session manager:
+Spawn debugger:
 
 ```
 Task(
@@ -160,13 +159,13 @@ goal: find_and_fix
 specialist_dispatch_enabled: true
 </session_params>
 """,
-  subagent_type="oto-debug-session-manager",
+  subagent_type="oto-debugger",
   model="{debugger_model}",
   description="Continue debug session {SLUG}"
 )
 ```
 
-Display the compact summary returned by the session manager.
+Display the compact summary returned by oto-debugger.
 
 ## 1d. Check Active Sessions (SUBCMD=debug)
 
@@ -217,9 +216,9 @@ Create `.planning/debug/{slug}.md` with initial state using the Write tool (neve
 - symptoms: all gathered values from Step 2
 - Current Focus: next_action = "gather initial evidence"
 
-## 4. Session Management (delegated to oto-debug-session-manager)
+## 4. Session Management (delegated to oto-debugger)
 
-After initial context setup, spawn the session manager to handle the full checkpoint/continuation loop. The session manager handles specialist_hint dispatch internally: when oto-debugger returns ROOT CAUSE FOUND it extracts the specialist_hint field and invokes the matching skill (e.g. typescript-expert, swift-concurrency) before offering fix options.
+After initial context setup, spawn oto-debugger to handle the full checkpoint/continuation loop. The debugger handles specialist_hint dispatch internally: when root cause is found it extracts the specialist_hint field and invokes the matching skill (e.g. typescript-expert, swift-concurrency) before offering fix options.
 
 ```
 Task(
@@ -238,7 +237,7 @@ goal: {if diagnose_only: "find_root_cause_only", else: "find_and_fix"}
 specialist_dispatch_enabled: true
 </session_params>
 """,
-  subagent_type="oto-debug-session-manager",
+  subagent_type="oto-debugger",
   model="{debugger_model}",
   description="Debug session {slug}"
 )
@@ -254,10 +253,10 @@ If summary shows `ABANDONED`: note session saved at `.planning/debug/{slug}.md` 
 <success_criteria>
 - [ ] Subcommands (list/status/continue) handled before any agent spawn
 - [ ] Active sessions checked for SUBCMD=debug
-- [ ] Current Focus (hypothesis + next_action) surfaced before session manager spawn
+- [ ] Current Focus (hypothesis + next_action) surfaced before oto-debugger spawn
 - [ ] Symptoms gathered (if new session)
 - [ ] Debug session file created with initial state before delegating
-- [ ] oto-debug-session-manager spawned with security-hardened session_params
-- [ ] Session manager handles full checkpoint/continuation loop in isolated context
-- [ ] Compact summary displayed to user after session manager returns
+- [ ] oto-debugger spawned with security-hardened session_params
+- [ ] oto-debugger handles full checkpoint/continuation loop in isolated context
+- [ ] Compact summary displayed to user after oto-debugger returns
 </success_criteria>
