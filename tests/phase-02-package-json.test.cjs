@@ -47,6 +47,7 @@ test('scripts use install-time hook build and zero prepublishOnly', () => {
 test('files allowlist includes only the intended package surface', () => {
   assert.deepEqual(pkg.files, [
     'bin/',
+    'oto/',
     'hooks/',
     'scripts/rebrand/',
     'scripts/build-hooks.js',

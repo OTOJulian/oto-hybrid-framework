@@ -6,6 +6,7 @@
   "bin": { "oto": "bin/install.js" },
   "files": [
     "bin/",
+    "oto/",
     "hooks/",
     "scripts/rebrand/",
     "scripts/build-hooks.js",
