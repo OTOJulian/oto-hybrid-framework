@@ -62,7 +62,7 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 
 ### USER-PROFILE.md
 - **Shape**: Calibration tier and preferences profile
-- **Lifecycle**: Created by `profile-user` → Updated as preferences are observed
+- **Lifecycle**: Manually maintained in v0.1.0 → Future profile tooling may update as preferences are observed
 - **Location**: `~/.claude/oto/USER-PROFILE.md`
 - **Consumed by**: `discuss-phase-assumptions` (calibration tier), `plan-phase`
 

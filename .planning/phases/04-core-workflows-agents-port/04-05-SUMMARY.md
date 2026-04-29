@@ -69,6 +69,7 @@ completed: 2026-04-29
 - Replaced `oto/workflows/ingest-docs.md` with a non-executable DEFERRED workflow that points authoring use cases to `/oto-docs-update`.
 - Deleted `oto/workflows/profile-user.md` after confirming no shipped command, workflow, or agent referenced it.
 - Removed stale dropped-agent substrings from shipped reference/template files so the plan-level dropped-agent grep passes.
+- Removed stale `/oto-profile-user` and profile tooling references from shipped templates/references after the deleted profile workflow left no command target.
 
 ## Task Commits
 
@@ -89,6 +90,7 @@ Each task was committed atomically:
 - `oto/references/user-profiling.md` - Reframed profiling heuristics as retained future-support reference material.
 - `oto/references/ai-evals.md` - Removed stale dropped eval-auditor reference from the reference header.
 - `oto/templates/AI-SPEC.md` - Removed stale dropped eval-auditor reference from the template header.
+- `oto/templates/claude-md.md`, `oto/templates/dev-preferences.md`, `oto/references/artifact-types.md` - Removed stale references to unavailable profile generation commands/tooling.
 
 ## Action Matrix
 
@@ -120,6 +122,10 @@ Each task was committed atomically:
 
 **Total deviations:** 1 auto-fixed (1 blocking)
 **Impact on plan:** The cleanup stayed within the plan's shipped-payload no-dropped-agent goal and did not add new behavior.
+
+### Post-plan Spot-Check Cleanup
+
+After the metadata commit, orchestration spot-checks found stale `/oto-profile-user` and `profile-user` references in shipped templates/references even though `oto/workflows/profile-user.md` and `oto/commands/oto/profile-user.md` do not exist. These references were reworded to v0.1.0 manual/future profile support so the shipped payload does not direct users to a missing command.
 
 ## Issues Encountered
 
