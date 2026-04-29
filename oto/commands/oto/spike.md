@@ -18,14 +18,14 @@ allowed-tools:
 <objective>
 Spike an idea through experiential exploration — build focused experiments to feel the pieces
 of a future app, validate feasibility, and produce verified knowledge for the real build.
-Spikes live in `.planning/spikes/` and integrate with OTO commit patterns, state tracking,
+Spikes live in `.oto/spikes/` and integrate with OTO commit patterns, state tracking,
 and handoff workflows.
 
 Two modes:
 - **Idea mode** (default) — describe an idea to spike
 - **Frontier mode** (no argument or "frontier") — analyzes existing spike landscape and proposes integration and frontier spikes
 
-Does not require `/oto-new-project` — auto-creates `.planning/spikes/` if needed.
+Does not require `/oto-new-project` — auto-creates `.oto/spikes/` if needed.
 </objective>
 
 <execution_context>

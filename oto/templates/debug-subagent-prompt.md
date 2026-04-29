@@ -77,7 +77,7 @@ Continue debugging {slug}. Evidence is in the debug file.
 </objective>
 
 <prior_state>
-Debug file: @.planning/debug/{slug}.md
+Debug file: @.oto/debug/{slug}.md
 </prior_state>
 
 <checkpoint_response>

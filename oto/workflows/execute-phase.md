@@ -119,7 +119,7 @@ When `CONTEXT_WINDOW < 200000` (sub-200K models), subagent prompts are thinned t
 
 **If `phase_found` is false:** Error — phase directory not found.
 **If `plan_count` is 0:** Error — no plans found in phase.
-**If `state_exists` is false but `.planning/` exists:** Offer reconstruct or continue.
+**If `state_exists` is false but `.oto/` exists:** Offer reconstruct or continue.
 
 When `parallelization` is false, plans within a wave execute sequentially.
 
@@ -696,9 +696,9 @@ increases monotonically across waves. `{status}` is `complete` (success),
        # --diff-filter=D HEAD~1 HEAD shows files deleted by the merge commit itself.
        # Exclude .oto/ — orchestrator-owned deletions there are expected (resurrections
        # are handled below). Require ALLOW_BULK_DELETE=1 to bypass for intentional large refactors.
-       MERGE_DEL_COUNT=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -vc '^\.planning/' || true)
+       MERGE_DEL_COUNT=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -vc '^\.oto/' || true)
        if [ "$MERGE_DEL_COUNT" -gt 5 ] && [ "${ALLOW_BULK_DELETE:-0}" != "1" ]; then
-         MERGE_DELETIONS=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -v '^\.planning/' || true)
+         MERGE_DELETIONS=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -v '^\.oto/' || true)
          echo "⚠ BLOCKED: Merge of $WT_BRANCH deleted $MERGE_DEL_COUNT files outside .oto/ — reverting to protect repository integrity (#2384)"
          echo "$MERGE_DELETIONS"
          echo "  If these deletions are intentional, re-run with ALLOW_BULK_DELETE=1"
@@ -1542,7 +1542,7 @@ fi
 PROJECT.md tracks validated requirements, decisions, and current state. Without this step,
 PROJECT.md falls behind silently over multiple phases.
 
-1. Read `.planning/PROJECT.md`
+1. Read `.oto/PROJECT.md`
 2. If the file exists and has a `## Validated Requirements` or `## Requirements` section:
    - Move any requirements validated by this phase from Active → Validated
    - Add a brief note: `Validated in Phase {X}: {Name}`
@@ -1555,7 +1555,7 @@ PROJECT.md falls behind silently over multiple phases.
 oto-sdk query commit "docs(phase-{X}): evolve PROJECT.md after phase completion" --files .oto/PROJECT.md
 ```
 
-**Skip this step if** `.planning/PROJECT.md` does not exist.
+**Skip this step if** `.oto/PROJECT.md` does not exist.
 </step>
 
 <step name="offer_next">

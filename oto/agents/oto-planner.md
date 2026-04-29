@@ -418,9 +418,9 @@ Output: [Artifacts created]
 </execution_context>
 
 <context>
-@.planning/PROJECT.md
-@.planning/ROADMAP.md
-@.planning/STATE.md
+@.oto/PROJECT.md
+@.oto/ROADMAP.md
+@.oto/STATE.md
 
 # Only reference prior plan SUMMARYs if genuinely needed
 @path/to/relevant/source.ts
@@ -462,7 +462,7 @@ Output: [Artifacts created]
 </success_criteria>
 
 <output>
-After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
+After completion, create `.oto/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 </output>
 ```
 
@@ -1077,7 +1077,7 @@ The filename MUST follow the exact pattern: `{padded_phase}-{NN}-PLAN.md`
 - ❌ `plan-01.md`
 - ❌ `01-01-plan.md` (lowercase)
 
-Full write path: `.planning/phases/{padded_phase}-{slug}/{padded_phase}-{NN}-PLAN.md`
+Full write path: `.oto/phases/{padded_phase}-{slug}/{padded_phase}-{NN}-PLAN.md`
 
 Include all frontmatter fields.
 </step>
@@ -1113,7 +1113,7 @@ Returns JSON: `{ valid, errors, warnings, task_count, tasks }`
 <step name="update_roadmap">
 Update ROADMAP.md to finalize phase placeholders:
 
-1. Read `.planning/ROADMAP.md`
+1. Read `.oto/ROADMAP.md`
 2. Find phase entry (`### Phase {N}:`)
 3. Update placeholders:
 

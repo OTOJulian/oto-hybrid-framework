@@ -132,7 +132,7 @@ Identify gaps that couldn't be resolved and need attention during planning.
 
 Use template: ~/.claude/oto/templates/research-project/SUMMARY.md
 
-Write to `.planning/research/SUMMARY.md`
+Write to `.oto/research/SUMMARY.md`
 
 ## Step 7: Commit All Research
 

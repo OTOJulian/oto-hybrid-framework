@@ -26,7 +26,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Extract from init JSON: `executor_model`, `commit_docs`, `sub_repos`, `phase_dir`, `phase_number`, `plans`, `summaries`, `incomplete_plans`, `state_path`, `config_path`.
 
-If `.planning/` missing: error.
+If `.oto/` missing: error.
 </step>
 
 <step name="identify_plan">
@@ -331,7 +331,7 @@ If user_setup exists: create `{phase}-USER-SETUP.md` using template `~/.claude/o
 </step>
 
 <step name="create_summary">
-Create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`. Use `~/.claude/oto/templates/summary.md`.
+Create `{phase}-{plan}-SUMMARY.md` at `.oto/phases/XX-name/`. Use `~/.claude/oto/templates/summary.md`.
 
 **Frontmatter:** phase, plan, subsystem, tags | requires/provides/affects | tech-stack.added/patterns | key-files.created/modified | key-decisions | requirements-completed (**MUST** copy `requirements` array from PLAN.md frontmatter verbatim) | duration ($DURATION), completed ($PLAN_END_TIME date).
 

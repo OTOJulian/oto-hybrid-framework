@@ -1,6 +1,6 @@
 # State Template
 
-Template for `.planning/STATE.md` — the project's living memory.
+Template for `.oto/STATE.md` — the project's living memory.
 
 ---
 

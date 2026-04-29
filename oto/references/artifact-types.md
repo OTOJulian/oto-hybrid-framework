@@ -11,43 +11,43 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 ### ROADMAP.md
 - **Shape**: Milestone + phase listing with goals and canonical refs
 - **Lifecycle**: Created → Updated per milestone → Archived
-- **Location**: `.planning/ROADMAP.md`
+- **Location**: `.oto/ROADMAP.md`
 - **Consumed by**: `plan-phase`, `discuss-phase`, `execute-phase`, `progress`, `state` commands
 
 ### STATE.md
 - **Shape**: Current position tracker (phase, plan, progress, decisions)
 - **Lifecycle**: Continuously updated throughout the project
-- **Location**: `.planning/STATE.md`
+- **Location**: `.oto/STATE.md`
 - **Consumed by**: All orchestration workflows; `resume-project`, `progress`, `next` commands
 
 ### REQUIREMENTS.md
 - **Shape**: Numbered acceptance criteria with traceability table
 - **Lifecycle**: Created at project start → Updated as requirements are satisfied
-- **Location**: `.planning/REQUIREMENTS.md`
+- **Location**: `.oto/REQUIREMENTS.md`
 - **Consumed by**: `discuss-phase`, `plan-phase`, CONTEXT.md generation; executor marks complete
 
 ### CONTEXT.md (per-phase)
 - **Shape**: 6-section format: domain, decisions, canonical_refs, code_context, specifics, deferred
 - **Lifecycle**: Created before planning → Used during planning and execution → Superseded by next phase
-- **Location**: `.planning/phases/XX-name/XX-CONTEXT.md`
+- **Location**: `.oto/phases/XX-name/XX-CONTEXT.md`
 - **Consumed by**: `plan-phase` (reads decisions), `execute-phase` (reads code_context and canonical_refs)
 
 ### PLAN.md (per-plan)
 - **Shape**: Frontmatter + objective + tasks with types + success criteria + output spec
 - **Lifecycle**: Created by planner → Executed → SUMMARY.md produced
-- **Location**: `.planning/phases/XX-name/XX-YY-PLAN.md`
+- **Location**: `.oto/phases/XX-name/XX-YY-PLAN.md`
 - **Consumed by**: `execute-phase` executor; task commits reference plan IDs
 
 ### SUMMARY.md (per-plan)
 - **Shape**: Frontmatter with dependency graph + narrative + deviations + self-check
 - **Lifecycle**: Created at plan completion → Read by subsequent plans in same phase
-- **Location**: `.planning/phases/XX-name/XX-YY-SUMMARY.md`
+- **Location**: `.oto/phases/XX-name/XX-YY-SUMMARY.md`
 - **Consumed by**: Orchestrator (progress), planner (context for future plans), `milestone-summary`
 
 ### HANDOFF.json / .continue-here.md
 - **Shape**: Structured pause state (JSON machine-readable + Markdown human-readable)
 - **Lifecycle**: Created on pause → Consumed on resume → Replaced by next pause
-- **Location**: `.planning/HANDOFF.json` + `.planning/phases/XX-name/.continue-here.md` (or spike/deliberation path)
+- **Location**: `.oto/HANDOFF.json` + `.oto/phases/XX-name/.continue-here.md` (or spike/deliberation path)
 - **Consumed by**: `resume-project` workflow
 
 ---
@@ -57,7 +57,7 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 ### DISCUSSION-LOG.md (per-phase)
 - **Shape**: Audit trail of assumptions and corrections from discuss-phase
 - **Lifecycle**: Created at discussion time → Read-only audit record
-- **Location**: `.planning/phases/XX-name/XX-DISCUSSION-LOG.md`
+- **Location**: `.oto/phases/XX-name/XX-DISCUSSION-LOG.md`
 - **Consumed by**: Human review; not read by automated workflows
 
 ### USER-PROFILE.md
@@ -69,25 +69,25 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 ### SPIKE.md / DESIGN.md (per-spike)
 - **Shape**: Research question + methodology + findings + recommendation
 - **Lifecycle**: Created → Investigated → Decided → Archived
-- **Location**: `.planning/spikes/SPIKE-NNN/`
+- **Location**: `.oto/spikes/SPIKE-NNN/`
 - **Consumed by**: Planner when spike is referenced; `pause-work` for spike context handoff
 
 ### Spike README.md / MANIFEST.md (per-spike, via /oto-spike)
 - **Shape**: YAML frontmatter (spike, name, validates, verdict, related, tags) + run instructions + results
 - **Lifecycle**: Created by `/oto-spike` → Verified → Wrapped up by `/oto-spike-wrap-up`
-- **Location**: `.planning/spikes/NNN-name/README.md`, `.planning/spikes/MANIFEST.md`
+- **Location**: `.oto/spikes/NNN-name/README.md`, `.oto/spikes/MANIFEST.md`
 - **Consumed by**: `/oto-spike-wrap-up` for curation; `pause-work` for spike context handoff
 
 ### Sketch README.md / MANIFEST.md / index.html (per-sketch)
 - **Shape**: YAML frontmatter (sketch, name, question, winner, tags) + variants as tabbed HTML
 - **Lifecycle**: Created by `/oto-sketch` → Evaluated → Wrapped up by `/oto-sketch-wrap-up`
-- **Location**: `.planning/sketches/NNN-name/README.md`, `.planning/sketches/NNN-name/index.html`, `.planning/sketches/MANIFEST.md`
+- **Location**: `.oto/sketches/NNN-name/README.md`, `.oto/sketches/NNN-name/index.html`, `.oto/sketches/MANIFEST.md`
 - **Consumed by**: `/oto-sketch-wrap-up` for curation; `pause-work` for sketch context handoff
 
 ### WRAP-UP-SUMMARY.md (per wrap-up session)
 - **Shape**: Curation results, included/excluded items, feature/design area groupings
 - **Lifecycle**: Created by `/oto-spike-wrap-up` or `/oto-sketch-wrap-up`
-- **Location**: `.planning/spikes/WRAP-UP-SUMMARY.md` or `.planning/sketches/WRAP-UP-SUMMARY.md`
+- **Location**: `.oto/spikes/WRAP-UP-SUMMARY.md` or `.oto/sketches/WRAP-UP-SUMMARY.md`
 - **Consumed by**: Project history; not read by automated workflows
 
 ---
@@ -98,7 +98,7 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 
 - **Shape**: Standing reference — reusable interpretive frameworks (lenses) that apply across phases
 - **Lifecycle**: Created → Active → Superseded (when a lens is replaced by a better one)
-- **Location**: `.planning/METHODOLOGY.md` (project-scoped, not phase-scoped)
+- **Location**: `.oto/METHODOLOGY.md` (project-scoped, not phase-scoped)
 - **Contents**: Named lenses, each documenting:
   - What it diagnoses (the class of problem it detects)
   - What it recommends (the class of response it prescribes)

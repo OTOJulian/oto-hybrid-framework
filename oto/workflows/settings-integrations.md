@@ -2,7 +2,7 @@
 Interactive configuration of third-party integrations for OTO — search API keys
 (Brave / Firecrawl / Exa), code-review CLI routing (`review.models.<cli>`), and
 agent-skill injection (`agent_skills.<agent-type>`). Writes to
-`.planning/config.json` via `oto-sdk`/`oto-tools` so unrelated keys are
+`.oto/config.json` via `oto-sdk`/`oto-tools` so unrelated keys are
 preserved, never clobbered.
 
 This command is deliberately separate from `/oto-settings` (workflow toggles)
@@ -12,7 +12,7 @@ cross-tool routing are *connectivity* concerns, not workflow or tuning knobs.
 
 <security>
 **API keys are secrets.** They are written as plaintext to
-`.planning/config.json` — that is where secrets live on disk, and file
+`.oto/config.json` — that is where secrets live on disk, and file
 permissions are the security boundary. The UI must never display, echo, or
 log the plaintext value. The workflow follows these rules:
 
@@ -21,7 +21,7 @@ log the plaintext value. The workflow follows these rules:
   secret does not leak a meaningful fraction of its bytes. Unset values render
   as `(unset)`.
 - **Plaintext is never echoed by AskUserQuestion descriptions, confirmation
-  tables, or any log line.** It is not written to any file under `.planning/`
+  tables, or any log line.** It is not written to any file under `.oto/`
   other than `config.json` itself.
 - **`config-set` output is masked** for keys in the secret set
   (`brave_search`, `firecrawl`, `exa_search`) — see

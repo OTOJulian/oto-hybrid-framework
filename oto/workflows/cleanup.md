@@ -1,14 +1,14 @@
 <purpose>
 
-Archive accumulated phase directories from completed milestones into `.planning/milestones/v{X.Y}-phases/`. Identifies which phases belong to each completed milestone, shows a dry-run summary, and moves directories on confirmation.
+Archive accumulated phase directories from completed milestones into `.oto/milestones/v{X.Y}-phases/`. Identifies which phases belong to each completed milestone, shows a dry-run summary, and moves directories on confirmation.
 
 </purpose>
 
 <required_reading>
 
-1. `.planning/MILESTONES.md`
-2. `.planning/milestones/` directory listing
-3. `.planning/phases/` directory listing
+1. `.oto/MILESTONES.md`
+2. `.oto/milestones/` directory listing
+3. `.oto/phases/` directory listing
 
 </required_reading>
 
@@ -16,7 +16,7 @@ Archive accumulated phase directories from completed milestones into `.planning/
 
 <step name="identify_completed_milestones">
 
-Read `.planning/MILESTONES.md` to identify completed milestones and their versions.
+Read `.oto/MILESTONES.md` to identify completed milestones and their versions.
 
 ```bash
 cat .oto/MILESTONES.md
@@ -52,13 +52,13 @@ cat .oto/milestones/v{X.Y}-ROADMAP.md
 
 Extract phase numbers and names from the archived roadmap (e.g., Phase 1: Foundation, Phase 2: Auth).
 
-Check which of those phase directories still exist in `.planning/phases/`:
+Check which of those phase directories still exist in `.oto/phases/`:
 
 ```bash
 ls -d .oto/phases/*/ 2>/dev/null || true
 ```
 
-Match phase directories to milestone membership. Only include directories that still exist in `.planning/phases/`.
+Match phase directories to milestone membership. Only include directories that still exist in `.oto/phases/`.
 
 </step>
 
@@ -148,7 +148,7 @@ Archived:
 - [ ] All completed milestones without existing phase archives identified
 - [ ] Phase membership determined from archived ROADMAP snapshots
 - [ ] Dry-run summary shown and user confirmed
-- [ ] Phase directories moved to `.planning/milestones/v{X.Y}-phases/`
+- [ ] Phase directories moved to `.oto/milestones/v{X.Y}-phases/`
 - [ ] Changes committed
 
 </success_criteria>

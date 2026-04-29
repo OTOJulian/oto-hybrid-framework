@@ -290,7 +290,7 @@ STALE ITEMS (>30 days, no activity)
 ===================================================================
 ```
 
-Write this report to `.planning/INBOX-TRIAGE.md` if a `.planning/` directory exists,
+Write this report to `.oto/INBOX-TRIAGE.md` if a `.oto/` directory exists,
 otherwise print to console only.
 </step>
 

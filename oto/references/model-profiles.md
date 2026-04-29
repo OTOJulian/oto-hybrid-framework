@@ -117,7 +117,7 @@ Overrides take precedence over the profile. Valid values: `opus`, `sonnet`, `hai
 
 Runtime: `/oto-set-profile <profile>`
 
-Per-project default: Set in `.planning/config.json`:
+Per-project default: Set in `.oto/config.json`:
 ```json
 {
   "model_profile": "balanced"

@@ -40,7 +40,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Check `roadmap_exists` from init JSON. If false:
 ```
-ERROR: No roadmap found (.planning/ROADMAP.md)
+ERROR: No roadmap found (.oto/ROADMAP.md)
 ```
 Exit.
 </step>
@@ -56,7 +56,7 @@ The CLI handles:
 - Verifying target phase exists in ROADMAP.md
 - Calculating next decimal phase number (checking existing decimals on disk)
 - Generating slug from description
-- Creating the phase directory (`.planning/phases/{N.M}-{slug}/`)
+- Creating the phase directory (`.oto/phases/{N.M}-{slug}/`)
 - Inserting the phase entry into ROADMAP.md after the target phase with (INSERTED) marker
 
 Extract from result: `phase_number`, `after_phase`, `name`, `slug`, `directory`.

@@ -13,23 +13,23 @@ Template for spawning oto-planner agent. The agent contains all planning experti
 **Mode:** {standard | gap_closure}
 
 **Project State:**
-@.planning/STATE.md
+@.oto/STATE.md
 
 **Roadmap:**
-@.planning/ROADMAP.md
+@.oto/ROADMAP.md
 
 **Requirements (if exists):**
-@.planning/REQUIREMENTS.md
+@.oto/REQUIREMENTS.md
 
 **Phase Context (if exists):**
-@.planning/phases/{phase_dir}/{phase_num}-CONTEXT.md
+@.oto/phases/{phase_dir}/{phase_num}-CONTEXT.md
 
 **Research (if exists):**
-@.planning/phases/{phase_dir}/{phase_num}-RESEARCH.md
+@.oto/phases/{phase_dir}/{phase_num}-RESEARCH.md
 
 **Gap Closure (if --gaps mode):**
-@.planning/phases/{phase_dir}/{phase_num}-VERIFICATION.md
-@.planning/phases/{phase_dir}/{phase_num}-UAT.md
+@.oto/phases/{phase_dir}/{phase_num}-VERIFICATION.md
+@.oto/phases/{phase_dir}/{phase_num}-UAT.md
 
 </planning_context>
 
@@ -98,8 +98,8 @@ Continue planning for Phase {phase_number}: {phase_name}
 </objective>
 
 <prior_state>
-Phase directory: @.planning/phases/{phase_dir}/
-Existing plans: @.planning/phases/{phase_dir}/*-PLAN.md
+Phase directory: @.oto/phases/{phase_dir}/
+Existing plans: @.oto/phases/{phase_dir}/*-PLAN.md
 </prior_state>
 
 <checkpoint_response>

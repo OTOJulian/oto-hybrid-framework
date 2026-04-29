@@ -259,7 +259,7 @@ For workspaces with separate git repos (e.g., `backend/`, `frontend/`, `shared/`
 
 ### Configuration
 
-In `.planning/config.json`, list sub-repo directories under `planning.sub_repos`:
+In `.oto/config.json`, list sub-repo directories under `planning.sub_repos`:
 
 ```json
 {
@@ -277,7 +277,7 @@ Set `commit_docs: false` so planning docs stay local and are not committed to an
 1. **Auto-detection:** During `/oto-new-project`, directories with their own `.git` folder are detected and offered for selection as sub-repos. On subsequent runs, `loadConfig` auto-syncs the `sub_repos` list with the filesystem — adding newly created repos and removing deleted ones. This means `config.json` may be rewritten automatically when repos change on disk.
 2. **File grouping:** Code files are grouped by their sub-repo prefix (e.g., `backend/src/api/users.ts` belongs to the `backend/` repo).
 3. **Independent commits:** Each sub-repo receives its own atomic commit via `oto-tools.cjs commit-to-subrepo`. File paths are made relative to the sub-repo root before staging.
-4. **Planning stays local:** The `.planning/` directory is not committed; it acts as cross-repo coordination.
+4. **Planning stays local:** The `.oto/` directory is not committed; it acts as cross-repo coordination.
 
 ### Commit Routing
 

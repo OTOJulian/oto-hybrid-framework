@@ -12,7 +12,7 @@ allowed-tools:
 ---
 <objective>
 Curate spike experiment findings and package them into a persistent project skill that Claude
-auto-loads in future build conversations. Also writes a summary to `.planning/spikes/` for
+auto-loads in future build conversations. Also writes a summary to `.oto/spikes/` for
 project history. Output skill goes to `./.claude/skills/spike-findings-[project]/` (project-local).
 </objective>
 

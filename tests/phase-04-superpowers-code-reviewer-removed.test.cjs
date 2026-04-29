@@ -9,7 +9,13 @@ const path = require('node:path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-test('phase-04 superpowers-code-reviewer-removed: only oto-code-reviewer ships', (t) => {
-  t.todo('Implemented in Wave 3 (plan 04-07) after Wave 1 creates oto/agents/.');
+test('phase-04 superpowers code-reviewer absent', () => {
+  assert.ok(
+    !fs.existsSync(path.join(REPO_ROOT, 'oto/agents/code-reviewer.md')),
+    'Superpowers code-reviewer.md should not exist (AGT-02 collision resolution)',
+  );
+  assert.ok(
+    fs.existsSync(path.join(REPO_ROOT, 'oto/agents/oto-code-reviewer.md')),
+    'Rebranded oto-code-reviewer.md should exist',
+  );
 });
-

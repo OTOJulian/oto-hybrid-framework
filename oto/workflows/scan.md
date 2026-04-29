@@ -1,6 +1,6 @@
 <purpose>
 Lightweight codebase assessment. Spawns a single oto-codebase-mapper agent for one focus area,
-producing targeted documents in `.planning/codebase/`.
+producing targeted documents in `.oto/codebase/`.
 </purpose>
 
 <required_reading>
@@ -45,7 +45,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Look up which documents would be produced for the selected focus (from the mapping table above).
 
-For each target document, check if it already exists in `.planning/codebase/`:
+For each target document, check if it already exists in `.oto/codebase/`:
 ```bash
 ls -la .oto/codebase/{DOCUMENT}.md 2>/dev/null
 ```

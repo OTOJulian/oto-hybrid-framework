@@ -102,7 +102,7 @@ Additional checks:
 **2. Parse config:** Extract from `<config>` block:
 - `depth`: quick | standard | deep (default: standard)
 - `phase_dir`: Path to phase directory for REVIEW.md output
-- `review_path`: Full path for REVIEW.md output (e.g., `.planning/phases/02-code-review-command/02-REVIEW.md`). If absent, derived from phase_dir.
+- `review_path`: Full path for REVIEW.md output (e.g., `.oto/phases/02-code-review-command/02-REVIEW.md`). If absent, derived from phase_dir.
 - `files`: Array of changed files to review (passed by workflow — primary scoping mechanism)
 - `diff_base`: Git commit hash for diff range (passed by workflow when files not available)
 
@@ -131,7 +131,7 @@ Do NOT invent a heuristic (e.g., HEAD~5) — silent mis-scoping is worse than fa
 
 If DIFF_BASE is set, run:
 ```bash
-git diff --name-only ${DIFF_BASE}..HEAD -- . ':!.planning/' ':!ROADMAP.md' ':!STATE.md' ':!*-SUMMARY.md' ':!*-VERIFICATION.md' ':!*-PLAN.md' ':!package-lock.json' ':!yarn.lock' ':!Gemfile.lock' ':!poetry.lock'
+git diff --name-only ${DIFF_BASE}..HEAD -- . ':!.oto/' ':!ROADMAP.md' ':!STATE.md' ':!*-SUMMARY.md' ':!*-VERIFICATION.md' ':!*-PLAN.md' ':!package-lock.json' ':!yarn.lock' ':!Gemfile.lock' ':!poetry.lock'
 ```
 
 **4. Load project context:** Read `./CLAUDE.md` and check for `.claude/skills/` or `.agents/skills/` (as described in `<project_context>`).
@@ -139,7 +139,7 @@ git diff --name-only ${DIFF_BASE}..HEAD -- . ':!.planning/' ':!ROADMAP.md' ':!ST
 
 <step name="scope_files">
 **1. Filter file list:** Exclude non-source files:
-- `.planning/` directory (all planning artifacts)
+- `.oto/` directory (all planning artifacts)
 - Planning markdown: `ROADMAP.md`, `STATE.md`, `*-SUMMARY.md`, `*-VERIFICATION.md`, `*-PLAN.md`
 - Lock files: `package-lock.json`, `yarn.lock`, `Gemfile.lock`, `poetry.lock`
 - Generated files: `*.min.js`, `*.bundle.js`, `dist/`, `build/`

@@ -17,7 +17,7 @@ allowed-tools:
 ---
 <objective>
 Explore design directions through throwaway HTML mockups before committing to implementation.
-Each sketch produces 2-3 variants for comparison. Sketches live in `.planning/sketches/` and
+Each sketch produces 2-3 variants for comparison. Sketches live in `.oto/sketches/` and
 integrate with OTO commit patterns, state tracking, and handoff workflows. Loads spike
 findings to ground mockups in real data shapes and validated interaction patterns.
 
@@ -25,7 +25,7 @@ Two modes:
 - **Idea mode** (default) — describe a design idea to sketch
 - **Frontier mode** (no argument or "frontier") — analyzes existing sketch landscape and proposes consistency and frontier sketches
 
-Does not require `/oto-new-project` — auto-creates `.planning/sketches/` if needed.
+Does not require `/oto-new-project` — auto-creates `.oto/sketches/` if needed.
 </objective>
 
 <execution_context>

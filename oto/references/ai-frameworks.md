@@ -1,6 +1,6 @@
 # AI Framework Decision Matrix
 
-> Reference used by `oto-framework-selector` and `oto-ai-researcher`.
+> Reference used by `framework-selection step` and `AI research step`.
 > Distilled from official docs, benchmarks, and developer reports (2026).
 
 ---

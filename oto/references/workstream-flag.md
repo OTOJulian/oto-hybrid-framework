@@ -10,12 +10,12 @@ parallel milestone work by multiple Claude Code instances on the same codebase.
 1. `--ws <name>` flag (explicit, highest priority)
 2. `OTO_WORKSTREAM` environment variable (per-instance)
 3. Session-scoped active workstream pointer in temp storage (per runtime session / terminal)
-4. `.planning/active-workstream` file (legacy shared fallback when no session key exists)
+4. `.oto/active-workstream` file (legacy shared fallback when no session key exists)
 5. `null` — flat mode (no workstreams)
 
 ## Why session-scoped pointers exist
 
-The shared `.planning/active-workstream` file is fundamentally unsafe when multiple
+The shared `.oto/active-workstream` file is fundamentally unsafe when multiple
 Claude/Codex instances are active on the same repo at the same time. One session can
 silently repoint another session's `STATE.md`, `ROADMAP.md`, and phase paths.
 
@@ -36,7 +36,7 @@ When OTO resolves the session-scoped pointer in step 3 above, it uses this order
 3. A single best-effort `tty` probe, but only when stdin is interactive
 
 If none of those produce a stable identity, OTO does not keep probing. It falls
-back directly to the legacy shared `.planning/active-workstream` file.
+back directly to the legacy shared `.oto/active-workstream` file.
 
 This matters in headless or stripped environments: when stdin is already
 non-interactive, OTO intentionally skips shelling out to `tty` because that path

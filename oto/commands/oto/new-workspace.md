@@ -19,11 +19,11 @@ allowed-tools:
 </context>
 
 <objective>
-Create a physical workspace directory containing copies of specified git repos (as worktrees or clones) with an independent `.planning/` directory for isolated OTO sessions.
+Create a physical workspace directory containing copies of specified git repos (as worktrees or clones) with an independent `.oto/` directory for isolated OTO sessions.
 
 **Use cases:**
 - Multi-repo orchestration: work on a subset of repos in parallel with isolated OTO state
-- Feature branch isolation: create a worktree of the current repo with its own `.planning/`
+- Feature branch isolation: create a worktree of the current repo with its own `.oto/`
 
 **Creates:**
 - `<path>/WORKSPACE.md` — workspace manifest

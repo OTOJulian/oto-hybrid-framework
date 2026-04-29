@@ -27,10 +27,10 @@ This doc describes what IS, not what should be. Casing inconsistencies are docum
 | oto-security-auditor | Security audit | `## OPEN_THREATS`, `## ESCALATE` (non-standard) |
 | oto-codebase-mapper | Codebase analysis | No marker (writes docs directly) |
 | oto-assumptions-analyzer | Assumption extraction | No marker (returns `## Assumptions` sections) |
-| oto-doc-verifier | Doc validation | No marker (writes JSON to `.planning/tmp/`) |
+| oto-doc-verifier | Doc validation | No marker (writes JSON to `.oto/tmp/`) |
 | oto-doc-writer | Doc generation | No marker (writes docs directly) |
 | oto-advisor-researcher | Advisory research | No marker (utility agent) |
-| oto-intel-updater | Codebase intelligence analysis | `## INTEL UPDATE COMPLETE`, `## INTEL UPDATE FAILED` |
+| intelligence update step | Codebase intelligence analysis | `## INTEL UPDATE COMPLETE`, `## INTEL UPDATE FAILED` |
 
 ## Marker Rules
 

@@ -215,7 +215,7 @@ if [ ${#REVIEW_FILES[@]} -eq 0 ]; then
     
     # Run git diff with specific exclusions (per D-03)
     DIFF_FILES=$(git diff --name-only "${DIFF_BASE}..HEAD" -- . \
-      ':!.planning/' ':!ROADMAP.md' ':!STATE.md' \
+      ':!.oto/' ':!ROADMAP.md' ':!STATE.md' \
       ':!*-SUMMARY.md' ':!*-VERIFICATION.md' ':!*-PLAN.md' \
       ':!package-lock.json' ':!yarn.lock' ':!Gemfile.lock' ':!poetry.lock' 2>/dev/null)
     

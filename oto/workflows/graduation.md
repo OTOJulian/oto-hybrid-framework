@@ -65,7 +65,7 @@ For each category independently, cluster items using Jaccard similarity on token
 
 ## Step 4: Check graduation_backlog in STATE.md
 
-Read `.planning/STATE.md` `graduation_backlog` section (if present). Format:
+Read `.oto/STATE.md` `graduation_backlog` section (if present). Format:
 
 ```yaml
 graduation_backlog:
@@ -139,7 +139,7 @@ Use `AskUserQuestion` (or equivalent HITL primitive for the current runtime). If
 
 **On `D` (Defer):**
 
-Write to `.planning/STATE.md` under `graduation_backlog`:
+Write to `.oto/STATE.md` under `graduation_backlog`:
 ```yaml
 - cluster_id: "{sha256}"
   status: "deferred"
@@ -149,7 +149,7 @@ Write to `.planning/STATE.md` under `graduation_backlog`:
 
 **On `X` (Dismiss):**
 
-Write to `.planning/STATE.md` under `graduation_backlog`:
+Write to `.oto/STATE.md` under `graduation_backlog`:
 ```yaml
 - cluster_id: "{sha256}"
   status: "dismissed"

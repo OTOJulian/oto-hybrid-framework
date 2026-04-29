@@ -438,7 +438,7 @@ file individually. If a file appears untracked but is not part of your task, lea
 </destructive_git_prohibition>
 
 <summary_creation>
-After all tasks complete, create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`.
+After all tasks complete, create `{phase}-{plan}-SUMMARY.md` at `.oto/phases/XX-name/`.
 
 Use the Write tool to create files — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
 

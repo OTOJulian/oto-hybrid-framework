@@ -8,9 +8,9 @@ allowed-tools:
   - AskUserQuestion
 ---
 <objective>
-Archive phase directories from completed milestones into `.planning/milestones/v{X.Y}-phases/`.
+Archive phase directories from completed milestones into `.oto/milestones/v{X.Y}-phases/`.
 
-Use when `.planning/phases/` has accumulated directories from past milestones.
+Use when `.oto/phases/` has accumulated directories from past milestones.
 </objective>
 
 <execution_context>

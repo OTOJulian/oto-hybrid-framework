@@ -262,7 +262,7 @@ TaskOutput tool:
   timeout: {subagent_timeout from init context, default 300000}
 ```
 
-> The timeout is configurable via `workflow.subagent_timeout` in `.planning/config.json` (milliseconds). Default: 300000 (5 minutes). Increase for large codebases or slower models.
+> The timeout is configurable via `workflow.subagent_timeout` in `.oto/config.json` (milliseconds). Default: 300000 (5 minutes). Increase for large codebases or slower models.
 
 Call TaskOutput for all 4 agents in parallel (single message with 4 TaskOutput calls).
 
@@ -274,8 +274,8 @@ Once all TaskOutput calls return, read each agent's output file to collect confi
 
 **Focus:** {focus}
 **Documents written:**
-- `.planning/codebase/{DOC1}.md` ({N} lines)
-- `.planning/codebase/{DOC2}.md` ({N} lines)
+- `.oto/codebase/{DOC1}.md` ({N} lines)
+- `.oto/codebase/{DOC2}.md` ({N} lines)
 
 Ready for orchestrator summary.
 ```
@@ -300,22 +300,22 @@ Perform all 4 mapping passes sequentially:
 
 **Pass 1: Tech Focus**
 - Explore package.json/Cargo.toml/go.mod/requirements.txt, config files, dependency trees
-- Write `.planning/codebase/STACK.md` — Languages, runtime, frameworks, dependencies, configuration
-- Write `.planning/codebase/INTEGRATIONS.md` — External APIs, databases, auth providers, webhooks
+- Write `.oto/codebase/STACK.md` — Languages, runtime, frameworks, dependencies, configuration
+- Write `.oto/codebase/INTEGRATIONS.md` — External APIs, databases, auth providers, webhooks
 
 **Pass 2: Architecture Focus**
 - Explore directory structure, entry points, module boundaries, data flow
-- Write `.planning/codebase/ARCHITECTURE.md` — Pattern, layers, data flow, abstractions, entry points
-- Write `.planning/codebase/STRUCTURE.md` — Directory layout, key locations, naming conventions
+- Write `.oto/codebase/ARCHITECTURE.md` — Pattern, layers, data flow, abstractions, entry points
+- Write `.oto/codebase/STRUCTURE.md` — Directory layout, key locations, naming conventions
 
 **Pass 3: Quality Focus**
 - Explore code style, error handling patterns, test files, CI config
-- Write `.planning/codebase/CONVENTIONS.md` — Code style, naming, patterns, error handling
-- Write `.planning/codebase/TESTING.md` — Framework, structure, mocking, coverage
+- Write `.oto/codebase/CONVENTIONS.md` — Code style, naming, patterns, error handling
+- Write `.oto/codebase/TESTING.md` — Framework, structure, mocking, coverage
 
 **Pass 4: Concerns Focus**
 - Explore TODOs, known issues, fragile areas, security patterns
-- Write `.planning/codebase/CONCERNS.md` — Tech debt, bugs, security, performance, fragile areas
+- Write `.oto/codebase/CONCERNS.md` — Tech debt, bugs, security, performance, fragile areas
 
 Use the same document templates as the `oto-codebase-mapper` agent. Include actual file paths formatted with backticks.
 

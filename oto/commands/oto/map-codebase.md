@@ -14,7 +14,7 @@ allowed-tools:
 <objective>
 Analyze existing codebase using parallel oto-codebase-mapper agents to produce structured codebase documents.
 
-Each mapper agent explores a focus area and **writes documents directly** to `.planning/codebase/`. The orchestrator only receives confirmations, keeping context usage minimal.
+Each mapper agent explores a focus area and **writes documents directly** to `.oto/codebase/`. The orchestrator only receives confirmations, keeping context usage minimal.
 
 Output: .oto/codebase/ folder with 7 structured documents about the codebase state.
 </objective>

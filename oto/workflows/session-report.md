@@ -24,13 +24,13 @@ git log --oneline --since="24 hours ago" --no-merges 2>/dev/null || echo "No rec
 git diff --stat HEAD~10 HEAD 2>/dev/null | tail -1 || echo "No diff available"
 ```
 
-Read `.planning/STATE.md` to get:
+Read `.oto/STATE.md` to get:
 - Current milestone and phase
 - Progress percentage
 - Active blockers
 - Recent decisions
 
-Read `.planning/ROADMAP.md` to get milestone name and goals.
+Read `.oto/ROADMAP.md` to get milestone name and goals.
 
 Check for existing reports:
 ```bash
@@ -58,7 +58,7 @@ Create the report directory and file:
 mkdir -p .oto/reports
 ```
 
-Write `.planning/reports/SESSION_REPORT.md` (or `.planning/reports/YYYYMMDD-session-report.md` if previous reports exist):
+Write `.oto/reports/SESSION_REPORT.md` (or `.oto/reports/YYYYMMDD-session-report.md` if previous reports exist):
 
 ```markdown
 # OTO Session Report
@@ -120,7 +120,7 @@ Show the user:
 ```
 ## Session Report Generated
 
-📄 `.planning/reports/[filename].md`
+📄 `.oto/reports/[filename].md`
 
 ### Highlights
 - **Commits:** [N]

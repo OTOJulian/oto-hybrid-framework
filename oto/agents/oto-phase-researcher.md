@@ -255,7 +255,7 @@ Priority: Context7 > Exa (verified) > Firecrawl (official docs) > Official GitHu
 
 ## RESEARCH.md Structure
 
-**Location:** `.planning/phases/XX-name/{phase_num}-RESEARCH.md`
+**Location:** `.oto/phases/XX-name/{phase_num}-RESEARCH.md`
 
 ```markdown
 # Phase [X]: [Name] - Research
@@ -514,7 +514,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Extract from init JSON: `phase_dir`, `padded_phase`, `phase_number`, `commit_docs`.
 
-Also read `.planning/config.json` — include Validation Architecture section in RESEARCH.md unless `workflow.nyquist_validation` is explicitly `false`. If the key is absent or `true`, include the section.
+Also read `.oto/config.json` — include Validation Architecture section in RESEARCH.md unless `workflow.nyquist_validation` is explicitly `false`. If the key is absent or `true`, include the section.
 
 Then read CONTEXT.md if exists:
 ```bash

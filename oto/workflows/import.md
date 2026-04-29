@@ -70,13 +70,13 @@ File not found: {FILEPATH}
 
 Load project context for conflict detection:
 
-1. Read `.planning/ROADMAP.md` — extract phase structure, phase numbers, dependencies
-2. Read `.planning/PROJECT.md` — extract project constraints, tech stack, scope boundaries.
+1. Read `.oto/ROADMAP.md` — extract phase structure, phase numbers, dependencies
+2. Read `.oto/PROJECT.md` — extract project constraints, tech stack, scope boundaries.
    **If PROJECT.md does not exist:** skip constraint checks that rely on it and display:
    ```
    OTO > Note: No PROJECT.md found. Conflict checks against project constraints will be skipped.
    ```
-3. Read `.planning/REQUIREMENTS.md` — extract existing requirements for overlap and contradiction checks.
+3. Read `.oto/REQUIREMENTS.md` — extract existing requirements for overlap and contradiction checks.
    **If REQUIREMENTS.md does not exist:** skip requirement conflict checks and continue.
 4. Glob for all CONTEXT.md files across phase directories:
    ```bash
@@ -212,11 +212,11 @@ If the checker returns clean:
 
 <step name="plan_finalize">
 
-Update `.planning/ROADMAP.md` to reflect the new plan:
+Update `.oto/ROADMAP.md` to reflect the new plan:
 - Add the plan to the Plans list under the correct phase section
 - Include the plan name and description
 
-Update `.planning/STATE.md` if appropriate (e.g., increment total plan count).
+Update `.oto/STATE.md` if appropriate (e.g., increment total plan count).
 
 Commit the imported plan and updated files:
 ```bash
@@ -242,7 +242,7 @@ Do NOT:
 - Violate the shared conflict-engine contract in `references/doc-conflict-engine.md` (no markdown tables, no new severity labels, no bypass of the BLOCKER gate)
 - Write PLAN.md files as `PLAN-01.md` or `plan-01.md` — always use `{NN}-{MM}-PLAN.md`
 - Use `pbr:plan-checker` or `pbr:planner` — use `oto-plan-checker` and `oto-planner`
-- Write `.planning/.active-skill` — this is a PBR pattern with no OTO equivalent
+- Write `.oto/.active-skill` — this is a PBR pattern with no OTO equivalent
 - Reference `pbr-tools`, `pbr:`, or `PLAN-BUILD-RUN` anywhere
 - Write any PLAN.md file when blockers exist — the safety gate must hold
 - Skip path validation on the --from file argument

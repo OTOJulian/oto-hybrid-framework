@@ -12,9 +12,9 @@ VERSION="$ARGUMENTS"
 ```
 
 If `$ARGUMENTS` is empty:
-1. Check `.planning/STATE.md` for current milestone version
-2. Check `.planning/milestones/` for the latest archived version
-3. If neither found, check if `.planning/ROADMAP.md` exists (project may be mid-milestone)
+1. Check `.oto/STATE.md` for current milestone version
+2. Check `.oto/milestones/` for the latest archived version
+3. If neither found, check if `.oto/ROADMAP.md` exists (project may be mid-milestone)
 4. If nothing found: error "No milestone found. Run /oto-new-project or /oto-new-milestone first."
 
 Set `VERSION` to the resolved version (e.g., "1.0").
@@ -23,7 +23,7 @@ Set `VERSION` to the resolved version (e.g., "1.0").
 
 Determine whether the milestone is **archived** or **current**:
 
-**Archived milestone** (`.planning/milestones/v{VERSION}-ROADMAP.md` exists):
+**Archived milestone** (`.oto/milestones/v{VERSION}-ROADMAP.md` exists):
 ```
 ROADMAP_PATH=".oto/milestones/v${VERSION}-ROADMAP.md"
 REQUIREMENTS_PATH=".oto/milestones/v${VERSION}-REQUIREMENTS.md"
@@ -37,7 +37,7 @@ REQUIREMENTS_PATH=".oto/REQUIREMENTS.md"
 AUDIT_PATH=".oto/v${VERSION}-MILESTONE-AUDIT.md"
 ```
 
-Note: The audit file moves to `.planning/milestones/` on archive (per `complete-milestone` workflow). Check both locations as a fallback.
+Note: The audit file moves to `.oto/milestones/` on archive (per `complete-milestone` workflow). Check both locations as a fallback.
 
 **Always available:**
 ```
@@ -88,7 +88,7 @@ git log --oneline --since="<started_at_date>" | wc -l
 ```
 
 **Method 3 — Earliest phase commit** (if STATE.md has no date):
-Find the earliest `.planning/phases/` commit:
+Find the earliest `.oto/phases/` commit:
 ```bash
 git log --oneline --diff-filter=A -- ".oto/phases/" | tail -1
 ```
@@ -105,7 +105,7 @@ Extract (when available):
 
 ## Step 5: Generate Summary Document
 
-Write to `.planning/reports/MILESTONE_SUMMARY-v${VERSION}.md`:
+Write to `.oto/reports/MILESTONE_SUMMARY-v${VERSION}.md`:
 
 ```markdown
 # Milestone v{VERSION} — Project Summary
@@ -178,7 +178,7 @@ Present as a bulleted list of decisions with brief rationale:
 
 ## Step 6: Write and Commit
 
-**Overwrite guard:** If `.planning/reports/MILESTONE_SUMMARY-v${VERSION}.md` already exists, ask the user:
+**Overwrite guard:** If `.oto/reports/MILESTONE_SUMMARY-v${VERSION}.md` already exists, ask the user:
 > "A milestone summary for v{VERSION} already exists. Overwrite it, or view the existing one?"
 If "view": display existing file and skip to Step 8 (interactive mode). If "overwrite": proceed.
 
@@ -201,7 +201,7 @@ Display the full summary document inline.
 
 After presenting the summary:
 
-> "Summary written to `.planning/reports/MILESTONE_SUMMARY-v{VERSION}.md`.
+> "Summary written to `.oto/reports/MILESTONE_SUMMARY-v{VERSION}.md`.
 >
 > I have full context from the build artifacts. Want to ask anything about the project?
 > Architecture decisions, specific phases, requirements, tech debt — ask away."

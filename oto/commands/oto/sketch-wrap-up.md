@@ -12,7 +12,7 @@ allowed-tools:
 ---
 <objective>
 Curate sketch design findings and package them into a persistent project skill that Claude
-auto-loads when building the real UI. Also writes a summary to `.planning/sketches/` for
+auto-loads when building the real UI. Also writes a summary to `.oto/sketches/` for
 project history. Output skill goes to `./.claude/skills/sketch-findings-[project]/` (project-local).
 </objective>
 

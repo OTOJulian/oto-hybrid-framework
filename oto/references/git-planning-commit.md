@@ -6,17 +6,17 @@ Commit planning artifacts via `oto-sdk query commit`, which checks `commit_docs`
 
 Pass the message first, then file paths via `--files`. Both `commit` and `commit-to-subrepo` use `--files` to declare the paths to commit.
 
-Always use this for `.planning/` files — it handles `commit_docs` and gitignore checks automatically:
+Always use this for `.oto/` files — it handles `commit_docs` and gitignore checks automatically:
 
 ```bash
 oto-sdk query commit "docs({scope}): {description}" --files .oto/STATE.md .oto/ROADMAP.md
 ```
 
-The CLI will return `skipped` (with reason) if `commit_docs` is `false` or `.planning/` is gitignored. No manual conditional checks needed.
+The CLI will return `skipped` (with reason) if `commit_docs` is `false` or `.oto/` is gitignored. No manual conditional checks needed.
 
 ## Amend previous commit
 
-To fold `.planning/` file changes into the previous commit:
+To fold `.oto/` file changes into the previous commit:
 
 ```bash
 oto-sdk query commit "" --files .oto/codebase/*.md --amend
@@ -36,5 +36,5 @@ oto-sdk query commit "" --files .oto/codebase/*.md --amend
 ## When to Skip
 
 - `commit_docs: false` in config
-- `.planning/` is gitignored
+- `.oto/` is gitignored
 - No changes to commit (check with `git status --porcelain .oto/`)

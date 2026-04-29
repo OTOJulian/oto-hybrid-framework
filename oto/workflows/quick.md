@@ -1,5 +1,5 @@
 <purpose>
-Execute small, ad-hoc tasks with OTO guarantees (atomic commits, STATE.md tracking). Quick mode spawns oto-planner (quick mode) + oto-executor(s), tracks tasks in `.planning/quick/`, and updates STATE.md's "Quick Tasks Completed" table.
+Execute small, ad-hoc tasks with OTO guarantees (atomic commits, STATE.md tracking). Quick mode spawns oto-planner (quick mode) + oto-executor(s), tracks tasks in `.oto/quick/`, and updates STATE.md's "Quick Tasks Completed" table.
 
 With `--full` flag: enables the complete quality pipeline — discussion + research + plan-checking + verification. One flag for everything.
 
@@ -816,7 +816,7 @@ else
 fi
 
 if [ -n "$DIFF_BASE" ]; then
-  CHANGED_FILES=$(git diff --name-only "${DIFF_BASE}..HEAD" -- . ':!.planning' 2>/dev/null | tr '\n' ' ')
+  CHANGED_FILES=$(git diff --name-only "${DIFF_BASE}..HEAD" -- . ':!.oto' 2>/dev/null | tr '\n' ' ')
 else
   CHANGED_FILES=""
 fi
@@ -953,7 +953,7 @@ Stage and commit quick task artifacts. This step MUST always run — even if the
 Build file list:
 - `${QUICK_DIR}/${quick_id}-PLAN.md`
 - `${QUICK_DIR}/${quick_id}-SUMMARY.md`
-- `.planning/STATE.md`
+- `.oto/STATE.md`
 - If `$DISCUSS_MODE` and context file exists: `${QUICK_DIR}/${quick_id}-CONTEXT.md`
 - If `$RESEARCH_MODE` and research file exists: `${QUICK_DIR}/${quick_id}-RESEARCH.md`
 - If `$VALIDATE_MODE` and verification file exists: `${QUICK_DIR}/${quick_id}-VERIFICATION.md`
@@ -965,7 +965,7 @@ Build file list:
 # Filter .oto/ files from staging if commit_docs is disabled (#1783)
 COMMIT_DOCS=$(oto-sdk query config-get commit_docs 2>/dev/null || echo "true")
 if [ "$COMMIT_DOCS" = "false" ]; then
-  file_list_filtered=$(echo "${file_list}" | tr ' ' '\n' | grep -v '^\.planning/' | tr '\n' ' ')
+  file_list_filtered=$(echo "${file_list}" | tr ' ' '\n' | grep -v '^\.oto/' | tr '\n' ' ')
   git add ${file_list_filtered} 2>/dev/null
 else
   git add ${file_list} 2>/dev/null
@@ -1024,7 +1024,7 @@ Ready for next task: /oto-quick ${OTO_WS}
 - [ ] `--full` sets all booleans (`$FULL_MODE`, `$DISCUSS_MODE`, `$RESEARCH_MODE`, `$VALIDATE_MODE`)
 - [ ] Slug generated (lowercase, hyphens, max 40 chars)
 - [ ] Quick ID generated (YYMMDD-xxx format, 2s Base36 precision)
-- [ ] Directory created at `.planning/quick/YYMMDD-xxx-slug/`
+- [ ] Directory created at `.oto/quick/YYMMDD-xxx-slug/`
 - [ ] (--discuss) Gray areas identified and presented, decisions captured in `${quick_id}-CONTEXT.md`
 - [ ] (--research) Research agent spawned, `${quick_id}-RESEARCH.md` created
 - [ ] `${quick_id}-PLAN.md` created by planner (honors CONTEXT.md decisions when --discuss, uses RESEARCH.md findings when --research)

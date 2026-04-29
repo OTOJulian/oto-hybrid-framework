@@ -234,7 +234,7 @@ cat .oto/REQUIREMENTS.md 2>/dev/null || true
 cat .oto/STATE.md 2>/dev/null || true
 ```
 
-Read at most **3** prior CONTEXT.md files (most recent 3 phases before current). If `.planning/DECISIONS-INDEX.md` exists, read that instead — it is a bounded rolling summary that supersedes per-phase reads.
+Read at most **3** prior CONTEXT.md files (most recent 3 phases before current). If `.oto/DECISIONS-INDEX.md` exists, read that instead — it is a bounded rolling summary that supersedes per-phase reads.
 
 ```bash
 (find .oto/phases -name "*-CONTEXT.md" 2>/dev/null || true) | sort -r

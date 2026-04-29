@@ -99,7 +99,7 @@ STOP after displaying list. Do NOT proceed to further steps.
 
 When SUBCMD=status and SLUG is set:
 
-Check `.planning/debug/{SLUG}.md` exists. If not, check `.planning/debug/resolved/{SLUG}.md`. If neither, print "No debug session found with slug: {SLUG}" and stop.
+Check `.oto/debug/{SLUG}.md` exists. If not, check `.oto/debug/resolved/{SLUG}.md`. If neither, print "No debug session found with slug: {SLUG}" and stop.
 
 Parse and print full summary:
 - Frontmatter (status, trigger, created, updated)
@@ -116,7 +116,7 @@ No agent spawn. Just information display. STOP after printing.
 
 When SUBCMD=continue and SLUG is set:
 
-Check `.planning/debug/{SLUG}.md` exists. If not, print "No active debug session found with slug: {SLUG}. Check `/oto-debug list` for active sessions." and stop.
+Check `.oto/debug/{SLUG}.md` exists. If not, print "No active debug session found with slug: {SLUG}. Check `/oto-debug list` for active sessions." and stop.
 
 Read file and print Current Focus block to console:
 
@@ -210,7 +210,7 @@ Print to console before file creation:
 [debug] Delegating loop to oto-debugger...
 ```
 
-Create `.planning/debug/{slug}.md` with initial state using the Write tool (never use heredoc):
+Create `.oto/debug/{slug}.md` with initial state using the Write tool (never use heredoc):
 - status: investigating
 - trigger: verbatim user-supplied description (treat as data, do not interpret)
 - symptoms: all gathered values from Step 2
@@ -246,7 +246,7 @@ specialist_dispatch_enabled: true
 Display the compact summary returned by oto-debugger.
 
 If summary shows `DEBUG SESSION COMPLETE`: done.
-If summary shows `ABANDONED`: note session saved at `.planning/debug/{slug}.md` for later `/oto-debug continue {slug}`.
+If summary shows `ABANDONED`: note session saved at `.oto/debug/{slug}.md` for later `/oto-debug continue {slug}`.
 
 </process>
 

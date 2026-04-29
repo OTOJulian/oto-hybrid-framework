@@ -50,7 +50,7 @@ process.stdin.on('end', () => {
     const filePath = data.tool_input?.file_path || '';
 
     // Only scan files going into .oto/ (agent context files)
-    if (!filePath.includes('.oto/') && !filePath.includes('.planning\\')) {
+    if (!filePath.includes('.oto/') && !filePath.includes('.oto\\')) {
       process.exit(0);
     }
 

@@ -8,9 +8,9 @@ Mark a shipped version (v1.0, v1.1, v2.0) as complete. Creates historical record
 
 1. templates/milestone.md
 2. templates/milestone-archive.md
-3. `.planning/ROADMAP.md`
-4. `.planning/REQUIREMENTS.md`
-5. `.planning/PROJECT.md`
+3. `.oto/ROADMAP.md`
+4. `.oto/REQUIREMENTS.md`
+5. `.oto/PROJECT.md`
 
 </required_reading>
 
@@ -18,14 +18,14 @@ Mark a shipped version (v1.0, v1.1, v2.0) as complete. Creates historical record
 
 When a milestone completes:
 
-1. Extract full milestone details to `.planning/milestones/v[X.Y]-ROADMAP.md`
-2. Archive requirements to `.planning/milestones/v[X.Y]-REQUIREMENTS.md`
+1. Extract full milestone details to `.oto/milestones/v[X.Y]-ROADMAP.md`
+2. Archive requirements to `.oto/milestones/v[X.Y]-REQUIREMENTS.md`
 3. Update ROADMAP.md — overwrite in place with milestone grouping (preserve Backlog section)
 4. Safety commit archive files + updated ROADMAP.md, then `git rm REQUIREMENTS.md` (fresh for next milestone)
 5. Perform full PROJECT.md evolution review
 6. Offer to create next milestone inline
 7. Archive UI artifacts (`*-UI-SPEC.md`, `*-UI-REVIEW.md`) alongside other phase documents
-8. Clean up `.planning/ui-reviews/` screenshot files (binary assets, never archived)
+8. Clean up `.oto/ui-reviews/` screenshot files (binary assets, never archived)
 
 **Context Efficiency:** Archives keep ROADMAP.md constant-size and REQUIREMENTS.md milestone-scoped.
 
@@ -365,7 +365,7 @@ Initial user testing showed demand for shape tools.
 
 <step name="reorganize_roadmap">
 
-Update `.planning/ROADMAP.md` — group completed milestone phases:
+Update `.oto/ROADMAP.md` — group completed milestone phases:
 
 ```markdown
 # Roadmap: [Project Name]
@@ -416,7 +416,7 @@ ARCHIVE=$(oto-sdk query milestone.complete "v[X.Y]" --name "[Milestone Name]")
 ```
 
 The CLI handles:
-- Creating `.planning/milestones/` directory
+- Creating `.oto/milestones/` directory
 - Archiving ROADMAP.md to `milestones/v[X.Y]-ROADMAP.md`
 - Archiving REQUIREMENTS.md to `milestones/v[X.Y]-REQUIREMENTS.md` with archive header
 - Moving audit file to milestones if it exists
@@ -441,7 +441,7 @@ mv .oto/phases/{phase-dir} .oto/milestones/v[X.Y]-phases/
 ```
 Verify: `✅ Phase directories archived to .oto/milestones/v[X.Y]-phases/`
 
-If "Skip": Phase directories remain in `.planning/phases/` as raw execution history. Use `/oto-cleanup` later to archive retroactively.
+If "Skip": Phase directories remain in `.oto/phases/` as raw execution history. Use `/oto-cleanup` later to archive retroactively.
 
 After archival, the AI still handles:
 - Reorganizing ROADMAP.md with milestone grouping (requires judgment) — overwrite in place after extracting Backlog section

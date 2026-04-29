@@ -38,7 +38,7 @@ One command takes you from idea to ready-for-planning:
 - Requirements definition with v1/v2/out-of-scope scoping
 - Roadmap creation with phase breakdown and success criteria
 
-Creates all `.planning/` artifacts:
+Creates all `.oto/` artifacts:
 - `PROJECT.md` — vision and requirements
 - `config.json` — workflow mode (interactive/yolo)
 - `research/` — domain research (if selected)
@@ -52,7 +52,7 @@ Usage: `/oto-new-project`
 Map an existing codebase for brownfield projects.
 
 - Analyzes codebase with parallel Explore agents
-- Creates `.planning/codebase/` with 7 focused documents
+- Creates `.oto/codebase/` with 7 focused documents
 - Covers stack, architecture, structure, conventions, testing, integrations, concerns
 - Use before `/oto-new-project` on existing codebases
 
@@ -94,13 +94,13 @@ Usage: `/oto-list-phase-assumptions 3`
 **`/oto-plan-phase <number>`**
 Create detailed execution plan for a specific phase.
 
-- Generates `.planning/phases/XX-phase-name/XX-YY-PLAN.md`
+- Generates `.oto/phases/XX-phase-name/XX-YY-PLAN.md`
 - Breaks phase into concrete, actionable tasks
 - Includes verification criteria and success measures
 - Multiple plans per phase supported (XX-01, XX-02, etc.)
 
 Usage: `/oto-plan-phase 1`
-Result: Creates `.planning/phases/01-foundation/01-01-PLAN.md`
+Result: Creates `.oto/phases/01-foundation/01-01-PLAN.md`
 
 **PRD Express Path:** Pass `--prd path/to/requirements.md` to skip discuss-phase entirely. Your PRD becomes locked decisions in CONTEXT.md. Useful when you already have clear acceptance criteria.
 
@@ -139,7 +139,7 @@ Execute small, ad-hoc tasks with OTO guarantees but skip optional agents.
 
 Quick mode uses the same system with a shorter path:
 - Spawns planner + executor (skips researcher, checker, verifier by default)
-- Quick tasks live in `.planning/quick/` separate from planned phases
+- Quick tasks live in `.oto/quick/` separate from planned phases
 - Updates STATE.md tracking (not ROADMAP.md)
 
 Flags enable additional quality steps:
@@ -153,7 +153,7 @@ Granular flags are composable: `--discuss --research --validate` gives the same 
 Usage: `/oto-quick`
 Usage: `/oto-quick --full`
 Usage: `/oto-quick --research --validate`
-Result: Creates `.planning/quick/NNN-slug/PLAN.md`, `.planning/quick/NNN-slug/SUMMARY.md`
+Result: Creates `.oto/quick/NNN-slug/PLAN.md`, `.oto/quick/NNN-slug/SUMMARY.md`
 
 ---
 
@@ -268,10 +268,10 @@ Usage: `/oto-pause-work`
 Systematic debugging with persistent state across context resets.
 
 - Gathers symptoms through adaptive questioning
-- Creates `.planning/debug/[slug].md` to track investigation
+- Creates `.oto/debug/[slug].md` to track investigation
 - Investigates using scientific method (evidence → hypothesis → test)
 - Survives `/clear` — run `/oto-debug` with no args to resume
-- Archives resolved issues to `.planning/debug/resolved/`
+- Archives resolved issues to `.oto/debug/resolved/`
 
 Usage: `/oto-debug "login button doesn't work"`
 Usage: `/oto-debug` (resume active session)
@@ -284,7 +284,7 @@ Rapidly spike an idea with throwaway experiments to validate feasibility.
 - Decomposes idea into 2-5 focused experiments (risk-ordered)
 - Each spike answers one specific Given/When/Then question
 - Builds minimum code, runs it, captures verdict (VALIDATED/INVALIDATED/PARTIAL)
-- Saves to `.planning/spikes/` with MANIFEST.md tracking
+- Saves to `.oto/spikes/` with MANIFEST.md tracking
 - Does not require `/oto-new-project` — works in any repo
 - `--quick` skips decomposition, builds immediately
 
@@ -298,7 +298,7 @@ Rapidly sketch UI/design ideas using throwaway HTML mockups with multi-variant e
 - Each sketch produces 2-3 variants as tabbed HTML pages
 - User compares variants, cherry-picks elements, iterates
 - Shared CSS theme system compounds across sketches
-- Saves to `.planning/sketches/` with MANIFEST.md tracking
+- Saves to `.oto/sketches/` with MANIFEST.md tracking
 - Does not require `/oto-new-project` — works in any repo
 - `--quick` skips mood intake, jumps to building
 
@@ -311,7 +311,7 @@ Package spike findings into a persistent project skill.
 - Curates each spike one-at-a-time (include/exclude/partial/UAT)
 - Groups findings by feature area
 - Generates `./.claude/skills/spike-findings-[project]/` with references and sources
-- Writes summary to `.planning/spikes/WRAP-UP-SUMMARY.md`
+- Writes summary to `.oto/spikes/WRAP-UP-SUMMARY.md`
 - Adds auto-load routing line to project CLAUDE.md
 
 Usage: `/oto-spike-wrap-up`
@@ -322,7 +322,7 @@ Package sketch design findings into a persistent project skill.
 - Curates each sketch one-at-a-time (include/exclude/partial/revisit)
 - Groups findings by design area
 - Generates `./.claude/skills/sketch-findings-[project]/` with design decisions, CSS patterns, HTML structures
-- Writes summary to `.planning/sketches/WRAP-UP-SUMMARY.md`
+- Writes summary to `.oto/sketches/WRAP-UP-SUMMARY.md`
 - Adds auto-load routing line to project CLAUDE.md
 
 Usage: `/oto-sketch-wrap-up`
@@ -332,7 +332,7 @@ Usage: `/oto-sketch-wrap-up`
 **`/oto-note <text>`**
 Zero-friction idea capture — one command, instant save, no questions.
 
-- Saves timestamped note to `.planning/notes/` (or `~/.claude/notes/` globally)
+- Saves timestamped note to `.oto/notes/` (or `~/.claude/notes/` globally)
 - Three subcommands: append (default), list, promote
 - Promote converts a note into a structured todo
 - Works without a project (falls back to global scope)
@@ -348,7 +348,7 @@ Usage: `/oto-note --global cross-project idea`
 Capture idea or task as todo from current conversation.
 
 - Extracts context from conversation (or uses provided description)
-- Creates structured todo file in `.planning/todos/pending/`
+- Creates structured todo file in `.oto/todos/pending/`
 - Infers area from file paths for grouping
 - Checks for duplicates before creating
 - Updates STATE.md todo count
@@ -469,7 +469,7 @@ Configure workflow toggles and model profile interactively.
 
 - Toggle researcher, plan checker, verifier agents
 - Select model profile (quality/balanced/budget/inherit)
-- Updates `.planning/config.json`
+- Updates `.oto/config.json`
 
 Usage: `/oto-settings`
 
@@ -488,10 +488,10 @@ Usage: `/oto-set-profile budget`
 **`/oto-cleanup`**
 Archive accumulated phase directories from completed milestones.
 
-- Identifies phases from completed milestones still in `.planning/phases/`
+- Identifies phases from completed milestones still in `.oto/phases/`
 - Shows dry-run summary before moving anything
-- Moves phase dirs to `.planning/milestones/v{X.Y}-phases/`
-- Use after multiple milestones to reduce `.planning/phases/` clutter
+- Moves phase dirs to `.oto/milestones/v{X.Y}-phases/`
+- Use after multiple milestones to reduce `.oto/phases/` clutter
 
 Usage: `/oto-cleanup`
 
@@ -577,24 +577,24 @@ Set during `/oto-new-project`:
 - Executes plans without confirmation
 - Only stops for critical checkpoints
 
-Change anytime by editing `.planning/config.json`
+Change anytime by editing `.oto/config.json`
 
 ## Planning Configuration
 
-Configure how planning artifacts are managed in `.planning/config.json`:
+Configure how planning artifacts are managed in `.oto/config.json`:
 
 **`planning.commit_docs`** (default: `true`)
 - `true`: Planning artifacts committed to git (standard workflow)
 - `false`: Planning artifacts kept local-only, not committed
 
 When `commit_docs: false`:
-- Add `.planning/` to your `.gitignore`
+- Add `.oto/` to your `.gitignore`
 - Useful for OSS contributions, client projects, or keeping planning private
 - All planning files still work normally, just not tracked in git
 
 **`planning.search_gitignored`** (default: `false`)
 - `true`: Add `--no-ignore` to broad ripgrep searches
-- Only needed when `.planning/` is gitignored and you want project-wide searches to include it
+- Only needed when `.oto/` is gitignored and you want project-wide searches to include it
 
 Example config:
 ```json
@@ -660,8 +660,8 @@ Example config:
 
 ## Getting Help
 
-- Read `.planning/PROJECT.md` for project vision
-- Read `.planning/STATE.md` for current context
-- Check `.planning/ROADMAP.md` for phase status
+- Read `.oto/PROJECT.md` for project vision
+- Read `.oto/STATE.md` for current context
+- Check `.oto/ROADMAP.md` for phase status
 - Run `/oto-progress` to check where you're up to
 </reference>

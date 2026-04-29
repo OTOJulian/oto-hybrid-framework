@@ -22,7 +22,7 @@ Extract from init JSON: `project_exists`, `roadmap_exists`, `state_exists`, `pha
 DISCUSS_MODE=$(oto-sdk query config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
 ```
 
-If `project_exists` is false (no `.planning/` directory):
+If `project_exists` is false (no `.oto/` directory):
 
 ```
 No planning structure found.
@@ -521,7 +521,7 @@ Check for existence of:
 ```bash
 ls .oto/HANDOFF.json .oto/phases/*/.continue-here.md .oto/phases/*/*HANDOFF*.md 2>/dev/null || true
 ```
-Also check `.planning/continue-here.md`.
+Also check `.oto/continue-here.md`.
 
 Emit:
 - ✓ `No orphaned handoff files` — if none found
@@ -529,7 +529,7 @@ Emit:
 
 **Check 3 — Deferred scope drift**
 
-Search phase artifacts (CONTEXT.md, DISCUSSION-LOG.md, BUG-BRIEF.md, VERIFICATION.md, SUMMARY.md, HANDOFF.md files under `.planning/phases/`) for patterns:
+Search phase artifacts (CONTEXT.md, DISCUSSION-LOG.md, BUG-BRIEF.md, VERIFICATION.md, SUMMARY.md, HANDOFF.md files under `.oto/phases/`) for patterns:
 ```bash
 grep -rl "defer to Phase\|future phase\|out of scope Phase\|deferred to Phase" .oto/phases/ 2>/dev/null || true
 ```
@@ -542,7 +542,7 @@ Emit:
 
 **Check 4 — Memory-flagged pending work**
 
-Check if `.planning/MEMORY.md` or `.planning/memory/` exists:
+Check if `.oto/MEMORY.md` or `.oto/memory/` exists:
 ```bash
 ls .oto/MEMORY.md .oto/memory/*.md 2>/dev/null || true
 ```
@@ -569,13 +569,13 @@ Emit:
 **Check 6 — Uncommitted code**
 
 ```bash
-git status --porcelain 2>/dev/null | grep -v "^??" | grep -v "^.planning\/" | grep -v "^\.\." | head -10
+git status --porcelain 2>/dev/null | grep -v "^??" | grep -v "^.oto\/" | grep -v "^\.\." | head -10
 ```
 
-If output is non-empty (modified/staged files outside `.planning/`), flag as uncommitted code.
+If output is non-empty (modified/staged files outside `.oto/`), flag as uncommitted code.
 
 Emit:
-- ✓ `Working tree clean` — if no modified files outside `.planning/`
+- ✓ `Working tree clean` — if no modified files outside `.oto/`
 - ⚠ `Uncommitted changes in source files` — list up to 10 file paths
 
 ---

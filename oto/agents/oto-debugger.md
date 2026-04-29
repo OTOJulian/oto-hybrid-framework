@@ -813,8 +813,8 @@ Matching is keyword overlap, not semantic similarity. Extract nouns and error su
 ## File Location
 
 ```
-DEBUG_DIR=.planning/debug
-DEBUG_RESOLVED_DIR=.planning/debug/resolved
+DEBUG_DIR=.oto/debug
+DEBUG_RESOLVED_DIR=.oto/debug/resolved
 ```
 
 ## File Structure
@@ -964,7 +964,7 @@ At investigation decision points, apply structured reasoning:
 **Autonomous investigation. Update file continuously.**
 
 **Phase 0: Check knowledge base**
-- If `.planning/debug/knowledge-base.md` exists, read it
+- If `.oto/debug/knowledge-base.md` exists, read it
 - Extract keywords from `Symptoms.errors` and `Symptoms.actual` (nouns, error substrings, identifiers)
 - Scan knowledge base entries for 2+ keyword overlap (case-insensitive)
 - If match found:
@@ -1173,7 +1173,7 @@ oto-sdk query commit "docs: resolve debug {slug}" --files .oto/debug/resolved/{s
 
 **Append to knowledge base:**
 
-Read `.planning/debug/resolved/{slug}.md` to extract final `Resolution` values. Then append to `.planning/debug/knowledge-base.md` (create file with header if it doesn't exist):
+Read `.oto/debug/resolved/{slug}.md` to extract final `Resolution` values. Then append to `.oto/debug/knowledge-base.md` (create file with header if it doesn't exist):
 
 If creating for the first time, write this header first:
 ```markdown

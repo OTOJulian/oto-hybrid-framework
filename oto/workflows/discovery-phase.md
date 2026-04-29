@@ -116,7 +116,7 @@ For: Choosing between options, new external integration.
 
 7. Return to plan-phase.md.
 
-**Output:** `.planning/phases/XX-name/DISCOVERY.md`
+**Output:** `.oto/phases/XX-name/DISCOVERY.md`
 </step>
 
 <step name="level_3_deep_dive">
@@ -169,7 +169,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 8. Return to plan-phase.md.
 
-**Output:** `.planning/phases/XX-name/DISCOVERY.md` (comprehensive)
+**Output:** `.oto/phases/XX-name/DISCOVERY.md` (comprehensive)
 </step>
 
 <step name="identify_unknowns">
@@ -203,7 +203,7 @@ Run the discovery:
 </step>
 
 <step name="create_discovery_output">
-Write `.planning/phases/XX-name/DISCOVERY.md`:
+Write `.oto/phases/XX-name/DISCOVERY.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable

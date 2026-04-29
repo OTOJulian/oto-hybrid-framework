@@ -15,7 +15,7 @@ Interactive configuration of OTO's third-party integration surface:
 - Code-review CLI routing: `review.models.{claude,codex,gemini,opencode}`
 - Agent-skill injection: `agent_skills.<agent-type>`
 
-API keys are stored plaintext in `.planning/config.json` but are masked
+API keys are stored plaintext in `.oto/config.json` but are masked
 (`****<last-4>`) in every piece of interactive output. The workflow never
 echoes plaintext to stdout, stderr, or any log.
 

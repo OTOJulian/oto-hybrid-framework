@@ -50,36 +50,36 @@ git log --oneline "$TARGET".."$CURRENT_BRANCH" --no-merges
 ```
 
 **Structural planning files** — always preserved (repository planning state):
-- `.planning/STATE.md`
-- `.planning/ROADMAP.md`
-- `.planning/MILESTONES.md`
-- `.planning/PROJECT.md`
-- `.planning/REQUIREMENTS.md`
-- `.planning/milestones/**`
+- `.oto/STATE.md`
+- `.oto/ROADMAP.md`
+- `.oto/MILESTONES.md`
+- `.oto/PROJECT.md`
+- `.oto/REQUIREMENTS.md`
+- `.oto/milestones/**`
 
 **Transient planning files** — excluded from PR branch (reviewer noise):
-- `.planning/phases/**` (PLAN.md, SUMMARY.md, CONTEXT.md, RESEARCH.md, etc.)
-- `.planning/quick/**`
-- `.planning/research/**`
-- `.planning/threads/**`
-- `.planning/todos/**`
-- `.planning/debug/**`
-- `.planning/seeds/**`
-- `.planning/codebase/**`
-- `.planning/ui-reviews/**`
+- `.oto/phases/**` (PLAN.md, SUMMARY.md, CONTEXT.md, RESEARCH.md, etc.)
+- `.oto/quick/**`
+- `.oto/research/**`
+- `.oto/threads/**`
+- `.oto/todos/**`
+- `.oto/debug/**`
+- `.oto/seeds/**`
+- `.oto/codebase/**`
+- `.oto/ui-reviews/**`
 
 For each commit, check what it touches:
 
 ```bash
 # For each commit hash
 FILES=$(git diff-tree --no-commit-id --name-only -r $HASH)
-NON_PLANNING=$(echo "$FILES" | grep -v "^\.planning/" | wc -l)
-STRUCTURAL=$(echo "$FILES" | grep -E "^\.planning/(STATE|ROADMAP|MILESTONES|PROJECT|REQUIREMENTS)\.md|^\.planning/milestones/" | wc -l)
-TRANSIENT_ONLY=$(echo "$FILES" | grep "^\.planning/" | grep -vE "^\.planning/(STATE|ROADMAP|MILESTONES|PROJECT|REQUIREMENTS)\.md|^\.planning/milestones/" | wc -l)
+NON_PLANNING=$(echo "$FILES" | grep -v "^\.oto/" | wc -l)
+STRUCTURAL=$(echo "$FILES" | grep -E "^\.oto/(STATE|ROADMAP|MILESTONES|PROJECT|REQUIREMENTS)\.md|^\.oto/milestones/" | wc -l)
+TRANSIENT_ONLY=$(echo "$FILES" | grep "^\.oto/" | grep -vE "^\.oto/(STATE|ROADMAP|MILESTONES|PROJECT|REQUIREMENTS)\.md|^\.oto/milestones/" | wc -l)
 ```
 
 Classify:
-- **Code commits**: Touch at least one non-.planning/ file → INCLUDE
+- **Code commits**: Touch at least one non-.oto/ file → INCLUDE
 - **Structural planning commits**: Touch only structural .oto/ files (STATE.md, ROADMAP.md, MILESTONES.md, PROJECT.md, REQUIREMENTS.md, milestones/**) → INCLUDE
 - **Transient planning commits**: Touch only transient .oto/ files (phases/, quick/, research/, etc.) → EXCLUDE
 - **Mixed commits**: Touch code + any planning files → INCLUDE (transient planning changes come along; acceptable in mixed context)
@@ -125,7 +125,7 @@ git checkout "$CURRENT_BRANCH"
 <step name="verify">
 ```bash
 # Verify no .oto/ files in PR branch
-PLANNING_FILES=$(git diff --name-only "$TARGET".."$PR_BRANCH" | grep "^\.planning/" | wc -l)
+PLANNING_FILES=$(git diff --name-only "$TARGET".."$PR_BRANCH" | grep "^\.oto/" | wc -l)
 TOTAL_FILES=$(git diff --name-only "$TARGET".."$PR_BRANCH" | wc -l)
 PR_COMMITS=$(git rev-list --count "$TARGET".."$PR_BRANCH")
 ```

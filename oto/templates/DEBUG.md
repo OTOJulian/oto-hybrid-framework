@@ -1,6 +1,6 @@
 # Debug Template
 
-Template for `.planning/debug/[slug].md` — active debug session tracking.
+Template for `.oto/debug/[slug].md` — active debug session tracking.
 
 ---
 

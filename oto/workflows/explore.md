@@ -78,10 +78,10 @@ When the conversation reaches natural conclusions or the developer signals readi
 
 | Type | Destination | When to suggest |
 |------|-------------|-----------------|
-| Note | `.planning/notes/{slug}.md` | Observations, context, decisions worth remembering |
-| Todo | `.planning/todos/pending/{slug}.md` | Concrete actionable tasks identified |
-| Seed | `.planning/seeds/{slug}.md` | Forward-looking ideas with trigger conditions |
-| Research question | `.planning/research/questions.md` (append) | Open questions that need deeper investigation |
+| Note | `.oto/notes/{slug}.md` | Observations, context, decisions worth remembering |
+| Todo | `.oto/todos/pending/{slug}.md` | Concrete actionable tasks identified |
+| Seed | `.oto/seeds/{slug}.md` | Forward-looking ideas with trigger conditions |
+| Research question | `.oto/research/questions.md` (append) | Open questions that need deeper investigation |
 | Requirement | `REQUIREMENTS.md` (append) | Clear requirements that emerged from discussion |
 | New phase | `ROADMAP.md` (append) | Scope large enough to warrant its own phase |
 | Spike | `/oto-spike` (invoke) | Feasibility uncertainty surfaced — "will this API work?", "can we do X?" |
@@ -106,11 +106,11 @@ Create these? You can select specific ones or modify them.
 
 For each selected output, write the file:
 
-- **Notes:** Create `.planning/notes/{slug}.md` with frontmatter (title, date, context)
-- **Todos:** Create `.planning/todos/pending/{slug}.md` with frontmatter (title, date, priority)
-- **Seeds:** Create `.planning/seeds/{slug}.md` with frontmatter (title, trigger_condition, planted_date)
-- **Research questions:** Append to `.planning/research/questions.md`
-- **Requirements:** Append to `.planning/REQUIREMENTS.md` with next available REQ ID
+- **Notes:** Create `.oto/notes/{slug}.md` with frontmatter (title, date, context)
+- **Todos:** Create `.oto/todos/pending/{slug}.md` with frontmatter (title, date, priority)
+- **Seeds:** Create `.oto/seeds/{slug}.md` with frontmatter (title, trigger_condition, planted_date)
+- **Research questions:** Append to `.oto/research/questions.md`
+- **Requirements:** Append to `.oto/REQUIREMENTS.md` with next available REQ ID
 - **Phases:** Use existing `/oto-add-phase` command via SlashCommand
 
 Commit if `commit_docs` is enabled:

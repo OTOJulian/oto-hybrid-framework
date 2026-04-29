@@ -32,7 +32,7 @@ fi
 ```
 
 All subsequent reads and writes go through `$OTO_CONFIG_PATH`. Never hardcode
-`.planning/config.json` — workstream installs must route to their own config file.
+`.oto/config.json` — workstream installs must route to their own config file.
 </step>
 
 <step name="read_current">

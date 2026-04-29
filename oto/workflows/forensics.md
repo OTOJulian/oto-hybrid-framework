@@ -1,7 +1,7 @@
 # Forensics Workflow
 
 Post-mortem investigation for failed or stuck OTO workflows. Analyzes git history,
-`.planning/` artifacts, and file system state to detect anomalies and generate a
+`.oto/` artifacts, and file system state to detect anomalies and generate a
 structured diagnostic report.
 
 **Principle:** This is a read-only investigation. Do not modify project files.
@@ -50,9 +50,9 @@ Record:
 ### 2b. Planning State
 
 Read these files if they exist:
-- `.planning/STATE.md` — current milestone, phase, progress, blockers, last session
-- `.planning/ROADMAP.md` — phase list with status
-- `.planning/config.json` — workflow configuration
+- `.oto/STATE.md` — current milestone, phase, progress, blockers, last session
+- `.oto/ROADMAP.md` — phase list with status
+- `.oto/config.json` — workflow configuration
 
 Extract:
 - Current phase and its status
@@ -61,7 +61,7 @@ Extract:
 
 ### 2c. Phase Artifacts
 
-For each phase directory in `.planning/phases/*/`:
+For each phase directory in `.oto/phases/*/`:
 
 ```bash
 ls .oto/phases/*/
@@ -78,7 +78,7 @@ Track: which phases have complete artifact sets vs gaps.
 
 ### 2d. Session Reports
 
-Read `.planning/reports/SESSION_REPORT.md` if it exists — extract last session outcomes,
+Read `.oto/reports/SESSION_REPORT.md` if it exists — extract last session outcomes,
 work completed, token estimates.
 
 ### 2e. Git Worktree State
@@ -159,7 +159,7 @@ Create the forensics directory if needed:
 mkdir -p .oto/forensics
 ```
 
-Write to `.planning/forensics/report-$(date +%Y%m%d-%H%M%S).md`:
+Write to `.oto/forensics/report-$(date +%Y%m%d-%H%M%S).md`:
 
 ```markdown
 # Forensic Report
@@ -225,7 +225,7 @@ Display the full forensic report inline.
 
 ## Step 6: Offer Interactive Investigation
 
-> "Report saved to `.planning/forensics/report-{timestamp}.md`.
+> "Report saved to `.oto/forensics/report-{timestamp}.md`.
 >
 > I can dig deeper into any finding. Want me to:
 > - Trace a specific anomaly to its root cause?

@@ -222,7 +222,7 @@ skipped: 0
 [none yet]
 ```
 
-Write to `.planning/phases/XX-name/{phase_num}-UAT.md`
+Write to `.oto/phases/XX-name/{phase_num}-UAT.md`
 
 Proceed to `present_test`.
 </step>

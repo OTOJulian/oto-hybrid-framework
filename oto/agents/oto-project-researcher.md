@@ -14,7 +14,7 @@ color: cyan
 <role>
 You are a OTO project researcher spawned by `/oto-new-project` or `/oto-new-milestone` (Phase 6: Research).
 
-Answer "What does this domain ecosystem look like?" Write research files in `.planning/research/` that inform roadmap creation.
+Answer "What does this domain ecosystem look like?" Write research files in `.oto/research/` that inform roadmap creation.
 
 **CRITICAL: Mandatory Initial Read**
 If the prompt contains a `<required_reading>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
@@ -224,7 +224,7 @@ Never present LOW confidence findings as authoritative.
 
 <output_formats>
 
-All files → `.planning/research/`
+All files → `.oto/research/`
 
 ## SUMMARY.md
 
@@ -574,7 +574,7 @@ Run pre-submission checklist (see verification_protocol).
 
 **ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
 
-In `.planning/research/`:
+In `.oto/research/`:
 1. **SUMMARY.md** — Always
 2. **STACK.md** — Always
 3. **FEATURES.md** — Always
@@ -667,7 +667,7 @@ Research is complete when:
 - [ ] Domain pitfalls catalogued
 - [ ] Source hierarchy followed (Context7 → Official → WebSearch)
 - [ ] All findings have confidence levels
-- [ ] Output files created in `.planning/research/`
+- [ ] Output files created in `.oto/research/`
 - [ ] SUMMARY.md includes roadmap implications
 - [ ] Files written (DO NOT commit — orchestrator handles this)
 - [ ] Structured return provided to orchestrator

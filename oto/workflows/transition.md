@@ -18,9 +18,9 @@ verification. Users should never be told to run `/oto-transition`.
 
 **Read these files NOW:**
 
-1. `.planning/STATE.md`
-2. `.planning/PROJECT.md`
-3. `.planning/ROADMAP.md`
+1. `.oto/STATE.md`
+2. `.oto/PROJECT.md`
+3. `.oto/ROADMAP.md`
 4. Current phase's plan files (`*-PLAN.md`)
 5. Current phase's summary files (`*-SUMMARY.md`)
 

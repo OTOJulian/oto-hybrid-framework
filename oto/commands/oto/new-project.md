@@ -22,12 +22,12 @@ allowed-tools:
 Initialize a new project through unified flow: questioning → research (optional) → requirements → roadmap.
 
 **Creates:**
-- `.planning/PROJECT.md` — project context
-- `.planning/config.json` — workflow preferences
-- `.planning/research/` — domain research (optional)
-- `.planning/REQUIREMENTS.md` — scoped requirements
-- `.planning/ROADMAP.md` — phase structure
-- `.planning/STATE.md` — project memory
+- `.oto/PROJECT.md` — project context
+- `.oto/config.json` — workflow preferences
+- `.oto/research/` — domain research (optional)
+- `.oto/REQUIREMENTS.md` — scoped requirements
+- `.oto/ROADMAP.md` — phase structure
+- `.oto/STATE.md` — project memory
 
 **After this command:** Run `/oto-plan-phase 1` to start execution.
 </objective>

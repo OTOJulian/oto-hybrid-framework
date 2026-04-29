@@ -12,9 +12,9 @@ Valid OTO subagent types (use exact names — do not fall back to 'general-purpo
 </available_agent_types>
 
 <paths>
-DEBUG_DIR=.planning/debug
+DEBUG_DIR=.oto/debug
 
-Debug files use the `.planning/debug/` path (hidden directory with leading dot).
+Debug files use the `.oto/debug/` path (hidden directory with leading dot).
 </paths>
 
 <core_principle>

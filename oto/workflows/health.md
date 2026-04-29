@@ -1,5 +1,5 @@
 <purpose>
-Validate `.planning/` directory integrity and report actionable issues. Checks for missing files, invalid configurations, inconsistent state, and orphaned plans. Optionally repairs auto-fixable issues.
+Validate `.oto/` directory integrity and report actionable issues. Checks for missing files, invalid configurations, inconsistent state, and orphaned plans. Optionally repairs auto-fixable issues.
 </purpose>
 
 <required_reading>
@@ -156,7 +156,7 @@ Report final status.
 | resetConfig | Delete + recreate config.json | Loses custom settings |
 | regenerateState | Create STATE.md from ROADMAP structure when it is missing | Loses session history |
 | addNyquistKey | Add workflow.nyquist_validation: true to config.json | None — matches existing default |
-| backfillMilestones | Synthesize missing MILESTONES.md entries from `.planning/milestones/vX.Y-ROADMAP.md` snapshots | None — additive only; triggered by `--backfill` flag |
+| backfillMilestones | Synthesize missing MILESTONES.md entries from `.oto/milestones/vX.Y-ROADMAP.md` snapshots | None — additive only; triggered by `--backfill` flag |
 
 **Not repairable (too risky):**
 - PROJECT.md, ROADMAP.md content

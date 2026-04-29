@@ -11,7 +11,7 @@ allowed-tools:
   - AskUserQuestion
 ---
 <objective>
-Run a focused codebase scan for a single area, producing targeted documents in `.planning/codebase/`.
+Run a focused codebase scan for a single area, producing targeted documents in `.oto/codebase/`.
 Accepts an optional `--focus` flag: `tech`, `arch`, `quality`, `concerns`, or `tech+arch` (default).
 
 Lightweight alternative to `/oto-map-codebase` — spawns one mapper agent instead of four parallel ones.

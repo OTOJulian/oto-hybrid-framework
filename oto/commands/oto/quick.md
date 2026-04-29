@@ -17,7 +17,7 @@ Execute small, ad-hoc tasks with OTO guarantees (atomic commits, STATE.md tracki
 
 Quick mode is the same system with a shorter path:
 - Spawns oto-planner (quick mode) + oto-executor(s)
-- Quick tasks live in `.planning/quick/` separate from planned phases
+- Quick tasks live in `.oto/quick/` separate from planned phases
 - Updates STATE.md "Quick Tasks Completed" table (NOT ROADMAP.md)
 
 **Default:** Skips research, discussion, plan-checker, verifier. Use when you know exactly what to do.
@@ -159,7 +159,7 @@ Preserve all workflow gates (validation, task description, planning, execution, 
 </process>
 
 <notes>
-- Quick tasks live in `.planning/quick/` — separate from phases, not tracked in ROADMAP.md
+- Quick tasks live in `.oto/quick/` — separate from phases, not tracked in ROADMAP.md
 - Each quick task gets a `YYYYMMDD-{slug}/` directory with PLAN.md and eventually SUMMARY.md
 - STATE.md "Quick Tasks Completed" table is updated on completion
 - Use `list` to audit accumulated tasks; use `resume` to continue in-progress work

@@ -455,7 +455,7 @@ Continue to step 5.6. Security config is passed to the planner in step 8.
 
 ## 5.6. UI Design Contract Gate
 
-> Skip if `workflow.ui_phase` is explicitly `false` AND `workflow.ui_safety_gate` is explicitly `false` in `.planning/config.json`. If keys are absent, treat as enabled.
+> Skip if `workflow.ui_phase` is explicitly `false` AND `workflow.ui_safety_gate` is explicitly `false` in `.oto/config.json`. If keys are absent, treat as enabled.
 
 ```bash
 UI_PHASE_CFG=$(oto-sdk query config-get workflow.ui_phase 2>/dev/null || echo "true")
@@ -1386,7 +1386,7 @@ if [ "$POST_PLANNING_GAPS" = "true" ]; then
 fi
 ```
 
-(`oto-tools gap-analysis` reads `.planning/REQUIREMENTS.md`, `${PHASE_DIR}/CONTEXT.md`,
+(`oto-tools gap-analysis` reads `.oto/REQUIREMENTS.md`, `${PHASE_DIR}/CONTEXT.md`,
 and `${PHASE_DIR}/*-PLAN.md`, then prints a markdown table with one row per
 REQ-ID and D-ID. Word-boundary matching prevents `REQ-1` from being mistaken for
 `REQ-10`.)

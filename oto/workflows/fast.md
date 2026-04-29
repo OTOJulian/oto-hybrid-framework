@@ -63,7 +63,7 @@ Use conventional commit format: `fix:`, `feat:`, `docs:`, `chore:`, `refactor:` 
 </step>
 
 <step name="log_to_state">
-If `.planning/STATE.md` exists, append to the "Quick Tasks Completed" table.
+If `.oto/STATE.md` exists, append to the "Quick Tasks Completed" table.
 If the table doesn't exist, skip this step silently.
 
 ```bash

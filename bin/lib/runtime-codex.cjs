@@ -25,7 +25,7 @@ module.exports = {
   // 11 entries pass through from upstream foundation-frameworks/get-shit-done-main/bin/install.js:26-38
   // (gsd-* renamed to oto-* per Phase 1 ADR-07). 12 additional entries inferred from
   // per-agent `tools:` field: agents with Write/Edit/Bash get workspace-write, pure-read agents
-  // get read-only. Source-of-truth analysis: .planning/phases/04-core-workflows-agents-port/04-RESEARCH.md
+  // get read-only. Source-of-truth analysis: .oto/phases/04-core-workflows-agents-port/04-RESEARCH.md
   // § "Agent sandbox map".
   agentSandboxes: {
     'oto-advisor-researcher': 'read-only',

@@ -74,7 +74,7 @@
 
 ## 3. Framework Quick Reference
 
-> Fetched from official docs by `oto-ai-researcher`. Distilled for this specific use case.
+> Fetched from official docs by `AI research step`. Distilled for this specific use case.
 
 ### Installation
 ```bash
@@ -132,7 +132,7 @@ project/
 
 ## 4b. AI Systems Best Practices
 
-> Written by `oto-ai-researcher`. Cross-cutting patterns every developer building AI systems needs — independent of framework choice.
+> Written by `AI research step`. Cross-cutting patterns every developer building AI systems needs — independent of framework choice.
 
 ### Structured Outputs with Pydantic
 

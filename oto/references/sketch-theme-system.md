@@ -4,7 +4,7 @@ All sketches share a CSS variable theme so design decisions compound across sket
 
 ## Setup
 
-On the first sketch, create `.planning/sketches/themes/` with a default theme:
+On the first sketch, create `.oto/sketches/themes/` with a default theme:
 
 ```
 .oto/sketches/

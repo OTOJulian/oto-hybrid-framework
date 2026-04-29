@@ -18,8 +18,8 @@ oto-sdk query state.json 2>/dev/null || echo "{}"
 ```
 
 Also read:
-- `.planning/STATE.md` — current phase, progress, plan counts
-- `.planning/ROADMAP.md` — milestone structure and phase list
+- `.oto/STATE.md` — current phase, progress, plan counts
+- `.oto/ROADMAP.md` — milestone structure and phase list
 
 Extract:
 - `current_phase` — which phase is active
@@ -27,7 +27,7 @@ Extract:
 - `progress` — overall percentage
 - `status` — active, paused, etc.
 
-If no `.planning/` directory exists:
+If no `.oto/` directory exists:
 ```
 No OTO project detected. Run `/oto-new-project` to get started.
 ```
@@ -42,7 +42,7 @@ Print a one-line warning: `⚠ --force: skipping safety gates`
 Then proceed directly to `determine_next_action`.
 
 **Gate 1: Unresolved checkpoint**
-Check if `.planning/.continue-here.md` exists:
+Check if `.oto/.continue-here.md` exists:
 ```bash
 [ -f .oto/.continue-here.md ]
 ```
@@ -50,7 +50,7 @@ If found:
 ```
 ⛔ Hard stop: Unresolved checkpoint
 
-`.planning/.continue-here.md` exists — a previous session left
+`.oto/.continue-here.md` exists — a previous session left
 unfinished work that needs manual review before advancing.
 
 Read the file, resolve the issue, then delete it to continue.

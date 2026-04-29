@@ -48,7 +48,7 @@ If the flag is absent, keep the current behavior of continuing phase numbering f
 
 ## 2.5. Scan Planted Seeds
 
-Check `.planning/seeds/` for seed files that match the milestone goals gathered in step 2.
+Check `.oto/seeds/` for seed files that match the milestone goals gathered in step 2.
 
 ```bash
 ls .oto/seeds/SEED-*.md 2>/dev/null
@@ -93,7 +93,7 @@ AskUserQuestion(
 
 **After selection:**
 - Selected seeds become additional context for requirement definition in step 9. Store them in an accumulator (e.g. `$SELECTED_SEEDS`) so step 9 can reference the ideas and their "Why This Matters" sections when defining requirements.
-- Unselected seeds remain untouched in `.planning/seeds/` — never delete or modify seed files during this workflow.
+- Unselected seeds remain untouched in `.oto/seeds/` — never delete or modify seed files during this workflow.
 
 ## 3. Determine Milestone Version
 
@@ -255,7 +255,7 @@ mkdir -p "${phase_archive_path}"
 find .oto/phases -mindepth 1 -maxdepth 1 -type d -exec mv {} "${phase_archive_path}/" \;
 ```
 
-Then verify `.planning/phases/` no longer contains old milestone directories before continuing.
+Then verify `.oto/phases/` no longer contains old milestone directories before continuing.
 
 If `phase_dir_count > 0` but `phase_archive_path` is missing:
 - Stop and explain that reset numbering is unsafe without a completed milestone archive target.
@@ -594,10 +594,10 @@ Print a summary:
 
 | Artifact       | Location                    |
 |----------------|-----------------------------|
-| Project        | `.planning/PROJECT.md`      |
-| Research       | `.planning/research/`       |
-| Requirements   | `.planning/REQUIREMENTS.md` |
-| Roadmap        | `.planning/ROADMAP.md`      |
+| Project        | `.oto/PROJECT.md`      |
+| Research       | `.oto/research/`       |
+| Requirements   | `.oto/REQUIREMENTS.md` |
+| Roadmap        | `.oto/ROADMAP.md`      |
 
 **[N] phases** | **[X] requirements** | Ready to build ✓
 

@@ -53,7 +53,7 @@ Infer area from file paths:
 | `src/db/*`, `database/*` | `database` |
 | `tests/*`, `__tests__/*` | `testing` |
 | `docs/*` | `docs` |
-| `.planning/*` | `planning` |
+| `.oto/*` | `planning` |
 | `scripts/*`, `bin/*` | `tooling` |
 | No files or unclear | `general` |
 
@@ -89,7 +89,7 @@ Generate slug for the title:
 slug=$(oto-sdk query generate-slug "$title" --raw)
 ```
 
-Write to `.planning/todos/pending/${date}-${slug}.md`:
+Write to `.oto/todos/pending/${date}-${slug}.md`:
 
 ```markdown
 ---
@@ -111,7 +111,7 @@ files:
 </step>
 
 <step name="update_state">
-If `.planning/STATE.md` exists:
+If `.oto/STATE.md` exists:
 
 1. Use `todo_count` from init context (or re-run `init todos` if count changed)
 2. Update "### Pending Todos" under "## Accumulated Context"

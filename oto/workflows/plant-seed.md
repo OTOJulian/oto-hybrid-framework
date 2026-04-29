@@ -98,7 +98,7 @@ Generate slug from idea summary.
 </step>
 
 <step name="write_seed">
-Write `.planning/seeds/SEED-{PADDED}-{slug}.md`:
+Write `.oto/seeds/SEED-{PADDED}-{slug}.md`:
 
 ```markdown
 ---

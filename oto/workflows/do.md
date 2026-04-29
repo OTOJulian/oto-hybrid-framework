@@ -29,7 +29,7 @@ Wait for response before continuing.
 INIT=$(oto-sdk query state.load 2>/dev/null)
 ```
 
-Track whether `.planning/` exists — some routes require it, others don't.
+Track whether `.oto/` exists — some routes require it, others don't.
 </step>
 
 <step name="route">
@@ -60,7 +60,7 @@ Evaluate `$ARGUMENTS` against these routing rules. Apply the **first matching** 
 | Completing a milestone, shipping, releasing | `/oto-complete-milestone` | Milestone lifecycle |
 | A specific, actionable, small task (add feature, fix typo, update config) | `/oto-quick` | Self-contained, single executor |
 
-**Requires `.planning/` directory:** All routes except `/oto-new-project`, `/oto-map-codebase`, `/oto-spike`, `/oto-sketch`, `/oto-help`, and `/oto-join-discord`. If the project doesn't exist and the route requires it, suggest `/oto-new-project` first.
+**Requires `.oto/` directory:** All routes except `/oto-new-project`, `/oto-map-codebase`, `/oto-spike`, `/oto-sketch`, `/oto-help`, and `/oto-join-discord`. If the project doesn't exist and the route requires it, suggest `/oto-new-project` first.
 
 **Ambiguity handling:** If the text could reasonably match multiple routes, ask the user via AskUserQuestion with the top 2-3 options. For example:
 

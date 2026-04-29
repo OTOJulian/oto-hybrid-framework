@@ -61,4 +61,4 @@ PHASE_DIR=".oto/phases/${DECIMAL_PHASE}-${SLUG}"
 mkdir -p "$PHASE_DIR"
 ```
 
-Example: `.planning/phases/06.1-fix-critical-auth-bug/`
+Example: `.oto/phases/06.1-fix-critical-auth-bug/`

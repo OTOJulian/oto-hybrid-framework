@@ -1,6 +1,6 @@
 <purpose>
 Explore design directions through throwaway HTML mockups before committing to implementation.
-Each sketch produces 2-3 variants for comparison. Saves artifacts to `.planning/sketches/`.
+Each sketch produces 2-3 variants for comparison. Saves artifacts to `.oto/sketches/`.
 Companion to `/oto-sketch-wrap-up`.
 
 Supports two modes:
@@ -47,7 +47,7 @@ Parse `$ARGUMENTS` for:
 
 ### Load the Sketch Landscape
 
-If no `.planning/sketches/` directory exists, tell the user there's nothing to analyze and offer to start fresh with an idea instead.
+If no `.oto/sketches/` directory exists, tell the user there's nothing to analyze and offer to start fresh with an idea instead.
 
 Otherwise, load in this order:
 
@@ -55,7 +55,7 @@ Otherwise, load in this order:
 
 **b. Findings skills** — glob `./.claude/skills/sketch-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain curated design decisions from prior wrap-ups.
 
-**c. All sketch READMEs** — read `.planning/sketches/*/README.md` for design questions, winners, and tags.
+**c. All sketch READMEs** — read `.oto/sketches/*/README.md` for design questions, winners, and tags.
 
 ### Analyze for Consistency Sketches
 
@@ -82,11 +82,11 @@ Present frontier sketches as concrete proposals numbered from the highest existi
 
 ### Get Alignment and Execute
 
-Present all consistency and frontier candidates, then ask which to run. When the user picks sketches, update `.planning/sketches/MANIFEST.md` and proceed directly to building them starting at `build_sketches`.
+Present all consistency and frontier candidates, then ask which to run. When the user picks sketches, update `.oto/sketches/MANIFEST.md` and proceed directly to building them starting at `build_sketches`.
 </step>
 
 <step name="setup_directory">
-Create `.planning/sketches/` and themes directory if they don't exist:
+Create `.oto/sketches/` and themes directory if they don't exist:
 
 ```bash
 mkdir -p .oto/sketches/themes
@@ -130,9 +130,9 @@ If spikes exist for this project, read them to ground the sketches in reality. M
 
 **a.** Glob for `./.claude/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain validated patterns and requirements.
 
-**b.** Read `.planning/spikes/MANIFEST.md` if it exists — check the Requirements section for non-negotiable design constraints (e.g., "must support streaming", "must render markdown"). These requirements should be visible in the mockup even though the mockup doesn't implement them for real.
+**b.** Read `.oto/spikes/MANIFEST.md` if it exists — check the Requirements section for non-negotiable design constraints (e.g., "must support streaming", "must render markdown"). These requirements should be visible in the mockup even though the mockup doesn't implement them for real.
 
-**c.** Read `.planning/spikes/CONVENTIONS.md` if it exists — the established stack informs what's buildable and what interaction patterns are idiomatic.
+**c.** Read `.oto/spikes/CONVENTIONS.md` if it exists — the established stack informs what's buildable and what interaction patterns are idiomatic.
 
 **How spike context improves sketches:**
 - Use real field names and data shapes from spike findings instead of generic placeholders
@@ -188,7 +188,7 @@ Before sketching, ground the design in what's actually buildable. Sketches are H
 </step>
 
 <step name="create_manifest">
-Create or update `.planning/sketches/MANIFEST.md`:
+Create or update `.oto/sketches/MANIFEST.md`:
 
 ```markdown
 # Sketch Manifest
@@ -209,7 +209,7 @@ If MANIFEST.md already exists, append new sketches to the existing table.
 </step>
 
 <step name="create_theme">
-If no theme exists yet at `.planning/sketches/themes/default.css`, create one based on the mood/direction from the intake step. See `sketch-theme-system.md` for the full template.
+If no theme exists yet at `.oto/sketches/themes/default.css`, create one based on the mood/direction from the intake step. See `sketch-theme-system.md` for the full template.
 
 Adapt colors, fonts, spacing, and shapes to match the agreed aesthetic — don't use the defaults verbatim unless they match the mood.
 </step>
@@ -221,7 +221,7 @@ Build each sketch in order.
 
 **a.** Find next available number. Format: three-digit zero-padded + hyphenated descriptive name.
 
-**b.** Create the sketch directory: `.planning/sketches/NNN-descriptive-name/`
+**b.** Create the sketch directory: `.oto/sketches/NNN-descriptive-name/`
 
 **c.** Build `index.html` with 2-3 variants:
 
@@ -292,7 +292,7 @@ Iterate until satisfied.
 **g.** Finalize:
 1. Mark winning variant in README frontmatter (`winner: "B"`)
 2. Add ★ indicator to winning tab in HTML
-3. Update `.planning/sketches/MANIFEST.md`
+3. Update `.oto/sketches/MANIFEST.md`
 
 **h.** Commit (if `COMMIT_DOCS` is true):
 ```bash
@@ -346,7 +346,7 @@ After all sketches complete:
 </process>
 
 <success_criteria>
-- [ ] `.planning/sketches/` created (auto-creates if needed, no project init required)
+- [ ] `.oto/sketches/` created (auto-creates if needed, no project init required)
 - [ ] Design direction explored conversationally before any code (unless --quick)
 - [ ] Spike context loaded — real data shapes, requirements, and conventions inform mockups
 - [ ] Target stack researched — component availability, constraints, idioms (unless greenfield/skipped)

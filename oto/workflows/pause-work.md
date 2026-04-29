@@ -1,5 +1,5 @@
 <purpose>
-Create structured `.planning/HANDOFF.json` and `.continue-here.md` handoff files to preserve complete work state across sessions. The JSON provides machine-readable state for `/oto-resume-work`; the markdown provides human-readable context.
+Create structured `.oto/HANDOFF.json` and `.continue-here.md` handoff files to preserve complete work state across sessions. The JSON provides machine-readable state for `/oto-resume-work`; the markdown provides human-readable context.
 </purpose>
 
 <required_reading>
@@ -27,12 +27,12 @@ sketch=$(( ls -lt .oto/sketches/*/README.md .oto/sketches/*/index.html 2>/dev/nu
 deliberation=$(ls .oto/deliberations/*.md 2>/dev/null | head -1 || true)
 ```
 
-- **Phase work**: active phase directory → handoff to `.planning/phases/XX-name/.continue-here.md`
-- **Spike work**: active spike directory or spike-related files (no active phase) → handoff to `.planning/spikes/SPIKE-NNN/.continue-here.md` (create directory if needed)
-- **Sketch work**: active sketch directory (no active phase/spike) → handoff to `.planning/sketches/.continue-here.md`
-- **Deliberation work**: active deliberation file (no phase/spike/sketch) → handoff to `.planning/deliberations/.continue-here.md`
-- **Research work**: research notes exist but no phase/spike/sketch/deliberation → handoff to `.planning/.continue-here.md`
-- **Default**: no detectable context → handoff to `.planning/.continue-here.md`, note the ambiguity in `<current_state>`
+- **Phase work**: active phase directory → handoff to `.oto/phases/XX-name/.continue-here.md`
+- **Spike work**: active spike directory or spike-related files (no active phase) → handoff to `.oto/spikes/SPIKE-NNN/.continue-here.md` (create directory if needed)
+- **Sketch work**: active sketch directory (no active phase/spike) → handoff to `.oto/sketches/.continue-here.md`
+- **Deliberation work**: active deliberation file (no phase/spike/sketch) → handoff to `.oto/deliberations/.continue-here.md`
+- **Research work**: research notes exist but no phase/spike/sketch/deliberation → handoff to `.oto/.continue-here.md`
+- **Default**: no detectable context → handoff to `.oto/.continue-here.md`, note the ambiguity in `<current_state>`
 
 If phase is detected, proceed with phase handoff path. Otherwise use the first matching non-phase path above.
 </step>
@@ -63,7 +63,7 @@ Report any summaries with placeholder content as incomplete items.
 </step>
 
 <step name="write_structured">
-**Write structured handoff to `.planning/HANDOFF.json`:**
+**Write structured handoff to `.oto/HANDOFF.json`:**
 
 ```bash
 timestamp=$(oto-sdk query current-timestamp full --raw)
@@ -106,7 +106,7 @@ timestamp=$(oto-sdk query current-timestamp full --raw)
 </step>
 
 <step name="write">
-**Write handoff to the path determined in the detect step** (e.g. `.planning/phases/XX-name/.continue-here.md`, `.planning/spikes/SPIKE-NNN/.continue-here.md`, or `.planning/.continue-here.md`):
+**Write handoff to the path determined in the detect step** (e.g. `.oto/phases/XX-name/.continue-here.md`, `.oto/spikes/SPIKE-NNN/.continue-here.md`, or `.oto/.continue-here.md`):
 
 ```markdown
 ---
@@ -172,7 +172,7 @@ Completed Tasks:
 ## Required Reading (in order)
 <!-- List documents the resuming agent must read before acting -->
 1. [document] — [why it matters]
-1. `.planning/METHODOLOGY.md` (if it exists) — project analytical lenses; apply before any assumption analysis
+1. `.oto/METHODOLOGY.md` (if it exists) — project analytical lenses; apply before any assumption analysis
 
 ## Critical Anti-Patterns (do NOT repeat these)
 <!-- Mistakes discovered this session that must be structurally avoided -->

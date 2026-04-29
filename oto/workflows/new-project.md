@@ -223,14 +223,14 @@ AskUserQuestion([
 ])
 ```
 
-Create `.planning/config.json` with all settings (CLI fills in remaining defaults automatically):
+Create `.oto/config.json` with all settings (CLI fills in remaining defaults automatically):
 
 ```bash
 mkdir -p .oto
 oto-sdk query config-new-project '{"mode":"yolo","granularity":"[selected]","parallelization":true|false,"commit_docs":true|false,"model_profile":"quality|balanced|budget|inherit","workflow":{"research":true|false,"plan_check":true|false,"verifier":true|false,"nyquist_validation":true|false,"auto_advance":true}}'
 ```
 
-**If commit_docs = No:** Add `.planning/` to `.gitignore`.
+**If commit_docs = No:** Add `.oto/` to `.gitignore`.
 
 **Commit config.json:**
 
@@ -297,7 +297,7 @@ Ask inline (freeform, NOT AskUserQuestion):
 
 Wait for their response. This gives you the context needed to ask intelligent follow-up questions.
 
-**Research-before-questions mode:** Check if `workflow.research_before_questions` is enabled in `.planning/config.json` (or the config from init context). When enabled, before asking follow-up questions about a topic area:
+**Research-before-questions mode:** Check if `workflow.research_before_questions` is enabled in `.oto/config.json` (or the config from init context). When enabled, before asking follow-up questions about a topic area:
 
 1. Do a brief web search for best practices related to what the user described
 2. Mention key findings naturally as you ask questions (e.g., "Most projects like this use X — is that what you're thinking, or something different?")
@@ -347,7 +347,7 @@ Loop until "Create PROJECT.md" selected.
 
 **If auto mode:** Synthesize from provided document. No "Ready?" gate was shown — proceed directly to commit.
 
-Synthesize all context into `.planning/PROJECT.md` using the template from `templates/project.md`.
+Synthesize all context into `.oto/PROJECT.md` using the template from `templates/project.md`.
 
 **For greenfield projects:**
 
@@ -378,7 +378,7 @@ All Active requirements are hypotheses until shipped and validated.
 
 Infer Validated requirements from existing code:
 
-1. Read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
+1. Read `.oto/codebase/ARCHITECTURE.md` and `STACK.md`
 2. Identify what the codebase already does
 3. These become the initial Validated set
 
@@ -645,7 +645,7 @@ questions: [
 ]
 ```
 
-Create `.planning/config.json` with all settings (CLI fills in remaining defaults automatically):
+Create `.oto/config.json` with all settings (CLI fills in remaining defaults automatically):
 
 ```bash
 mkdir -p .oto
@@ -657,7 +657,7 @@ oto-sdk query config-new-project '{"mode":"[yolo|interactive]","granularity":"[s
 **If commit_docs = No:**
 
 - Set `commit_docs: false` in config.json
-- Add `.planning/` to `.gitignore` (create if needed)
+- Add `.oto/` to `.gitignore` (create if needed)
 
 **If commit_docs = Yes:**
 
@@ -695,7 +695,7 @@ Use AskUserQuestion:
 
 - Set `planning.sub_repos` in config.json to the selected directory names array (e.g., `["backend", "frontend"]`)
 - Auto-set `planning.commit_docs` to `false` (planning docs stay local in multi-repo workspaces)
-- Add `.planning/` to `.gitignore` if not already present
+- Add `.oto/` to `.gitignore` if not already present
 
 Config changes are saved locally — no commit needed since `commit_docs` is `false` in multi-repo mode.
 
@@ -958,7 +958,7 @@ Display research complete banner and key findings:
 **Table Stakes:** [from SUMMARY.md]
 **Watch Out For:** [from SUMMARY.md]
 
-Files: `.planning/research/`
+Files: `.oto/research/`
 ```
 
 **If "Skip research":** Continue to Step 7.
@@ -1063,7 +1063,7 @@ Cross-check requirements against Core Value from PROJECT.md. If gaps detected, s
 
 **Generate REQUIREMENTS.md:**
 
-Create `.planning/REQUIREMENTS.md` with:
+Create `.oto/REQUIREMENTS.md` with:
 
 - v1 Requirements grouped by category (checkboxes, REQ-IDs)
 - v2 Requirements (deferred)
@@ -1282,11 +1282,11 @@ Present completion summary:
 
 | Artifact       | Location                    |
 |----------------|-----------------------------|
-| Project        | `.planning/PROJECT.md`      |
-| Config         | `.planning/config.json`     |
-| Research       | `.planning/research/`       |
-| Requirements   | `.planning/REQUIREMENTS.md` |
-| Roadmap        | `.planning/ROADMAP.md`      |
+| Project        | `.oto/PROJECT.md`      |
+| Config         | `.oto/config.json`     |
+| Research       | `.oto/research/`       |
+| Requirements   | `.oto/REQUIREMENTS.md` |
+| Roadmap        | `.oto/ROADMAP.md`      |
 | Project guide  | `$INSTRUCTION_FILE`         |
 
 **[N] phases** | **[X] requirements** | Ready to build ✓
@@ -1358,17 +1358,17 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 <output>
 
-- `.planning/PROJECT.md`
-- `.planning/config.json`
-- `.planning/research/` (if research selected)
+- `.oto/PROJECT.md`
+- `.oto/config.json`
+- `.oto/research/` (if research selected)
   - `STACK.md`
   - `FEATURES.md`
   - `ARCHITECTURE.md`
   - `PITFALLS.md`
   - `SUMMARY.md`
-- `.planning/REQUIREMENTS.md`
-- `.planning/ROADMAP.md`
-- `.planning/STATE.md`
+- `.oto/REQUIREMENTS.md`
+- `.oto/ROADMAP.md`
+- `.oto/STATE.md`
 - `$INSTRUCTION_FILE` (`AGENTS.md` for Codex, `CLAUDE.md` for all other runtimes)
 
 </output>

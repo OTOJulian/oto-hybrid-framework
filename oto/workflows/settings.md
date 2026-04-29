@@ -27,7 +27,7 @@ fi
 ```
 
 Creates `config.json` (at the resolved path) with defaults if missing. `INIT` still holds `state.load` output for any step that needs STATE fields.
-Store `$OTO_CONFIG_PATH` — all subsequent reads and writes use this path, not a hardcoded `.planning/config.json`, so active-workstream installs target the correct file (#2282).
+Store `$OTO_CONFIG_PATH` — all subsequent reads and writes use this path, not a hardcoded `.oto/config.json`, so active-workstream installs target the correct file (#2282).
 </step>
 
 <step name="read_current">
@@ -40,7 +40,7 @@ Parse current values (default to `true` if not present):
 - `workflow.plan_check` — spawn plan checker during plan-phase
 - `workflow.verifier` — spawn verifier during execute-phase
 - `workflow.nyquist_validation` — validation architecture research during plan-phase (default: true if absent)
-- `workflow.pattern_mapper` — run oto-pattern-mapper between research and planning (default: true if absent)
+- `workflow.pattern_mapper` — run pattern-mapping step between research and planning (default: true if absent)
 - `workflow.ui_phase` — generate UI-SPEC.md design contracts for frontend phases (default: true if absent)
 - `workflow.ui_safety_gate` — prompt to run /oto-ui-phase before planning frontend phases (default: true if absent)
 - `workflow.ai_integration_phase` — framework selection + eval strategy for AI phases (default: true if absent)
@@ -48,7 +48,7 @@ Parse current values (default to `true` if not present):
 - `workflow.code_review` — enable /oto-code-review and /oto-code-review-fix commands (default: true if absent)
 - `workflow.code_review_depth` — default depth for /oto-code-review: `quick`, `standard`, or `deep` (default: `"standard"` if absent; only relevant when `code_review` is on)
 - `workflow.ui_review` — run visual quality audit (/oto-ui-review) in autonomous mode (default: true if absent)
-- `commit_docs` — whether `.planning/` files are committed to git (default: true if absent)
+- `commit_docs` — whether `.oto/` files are committed to git (default: true if absent)
 - `intel.enabled` — enable queryable codebase intelligence (/oto-intel) (default: false if absent)
 - `graphify.enabled` — enable project knowledge graph (/oto-graphify) (default: false if absent)
 - `model_profile` — which model each agent uses (default: `balanced`)
@@ -194,7 +194,7 @@ AskUserQuestion([
     header: "Pattern Mapper",
     multiSelect: false,
     options: [
-      { label: "Yes (Recommended)", description: "oto-pattern-mapper runs between research and plan steps. Surfaces conventions so new code follows house style." },
+      { label: "Yes (Recommended)", description: "pattern-mapping step runs between research and plan steps. Surfaces conventions so new code follows house style." },
       { label: "No", description: "Skip pattern mapping. Faster; lose consistency hinting for new files." }
     ]
   },
@@ -360,7 +360,7 @@ Merge new settings into existing config.json:
 
 **Safe merge:** Apply each chosen value via `oto-sdk query config-set <key.path> <value>` so unrelated keys are never clobbered. `code_review_depth` is written only if the code_review question was answered `on`; otherwise leave the existing value in place.
 
-Write updated config to `$OTO_CONFIG_PATH` (the workstream-aware path resolved in `ensure_and_load_config`). Never hardcode `.planning/config.json` — workstream installs route to `.planning/workstreams/<slug>/config.json`.
+Write updated config to `$OTO_CONFIG_PATH` (the workstream-aware path resolved in `ensure_and_load_config`). Never hardcode `.oto/config.json` — workstream installs route to `.oto/workstreams/<slug>/config.json`.
 </step>
 
 <step name="save_as_defaults">

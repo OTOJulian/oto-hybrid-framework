@@ -1,6 +1,6 @@
 <planning_config>
 
-Configuration options for `.planning/` directory behavior.
+Configuration options for `.oto/` directory behavior.
 
 <config_schema>
 ```json
@@ -50,8 +50,8 @@ Configuration options for `.planning/` directory behavior.
 - Full history of planning decisions preserved
 
 **When `commit_docs: false`:**
-- Skip all `git add`/`git commit` for `.planning/` files
-- User must add `.planning/` to `.gitignore`
+- Skip all `git add`/`git commit` for `.oto/` files
+- User must add `.oto/` to `.gitignore`
 - Useful for: OSS contributions, client projects, keeping planning private
 
 **Using `oto-sdk query` (preferred):**
@@ -71,7 +71,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 # commit_docs is included in all init command outputs
 ```
 
-**Auto-detection:** If `.planning/` is gitignored, `commit_docs` is automatically `false` regardless of config.json. This prevents git errors when users have `.planning/` in `.gitignore`.
+**Auto-detection:** If `.oto/` is gitignored, `commit_docs` is automatically `false` regardless of config.json. This prevents git errors when users have `.oto/` in `.gitignore`.
 
 **Commit via CLI (handles checks automatically):**
 
@@ -88,11 +88,11 @@ The CLI checks `commit_docs` config and gitignore status internally — no manua
 **When `search_gitignored: false` (default):**
 - Standard rg behavior (respects .gitignore)
 - Direct path searches work: `rg "pattern" .oto/` finds files
-- Broad searches skip gitignored: `rg "pattern"` skips `.planning/`
+- Broad searches skip gitignored: `rg "pattern"` skips `.oto/`
 
 **When `search_gitignored: true`:**
-- Add `--no-ignore` to broad rg searches that should include `.planning/`
-- Only needed when searching entire repo and expecting `.planning/` matches
+- Add `--no-ignore` to broad rg searches that should include `.oto/`
+- Only needed when searching entire repo and expecting `.oto/` matches
 
 **Note:** Most OTO operations use direct file reads or explicit paths, which work regardless of gitignore status.
 
@@ -115,13 +115,13 @@ To use uncommitted mode:
    .oto/
    ```
 
-3. **Existing tracked files:** If `.planning/` was previously tracked:
+3. **Existing tracked files:** If `.oto/` was previously tracked:
    ```bash
    git rm -r --cached .oto/
    git commit -m "chore: stop tracking planning docs"
    ```
 
-4. **Branch merges:** When using `branching_strategy: phase` or `milestone`, the `complete-milestone` workflow automatically strips `.planning/` files from staging before merge commits when `commit_docs: false`.
+4. **Branch merges:** When using `branching_strategy: phase` or `milestone`, the `complete-milestone` workflow automatically strips `.oto/` files from staging before merge commits when `commit_docs: false`.
 
 </setup_uncommitted_mode>
 
@@ -323,7 +323,7 @@ Set via `intel.*` namespace (e.g., `"intel": { "enabled": true }`). Controls the
 
 | Key | Type | Default | Allowed Values | Description |
 |-----|------|---------|----------------|-------------|
-| `intel.enabled` | boolean | `false` | `true`, `false` | Enable queryable codebase intelligence system. When `true`, `/oto-intel` commands build and query a JSON index in `.planning/intel/`. |
+| `intel.enabled` | boolean | `false` | `true`, `false` | Enable queryable codebase intelligence system. When `true`, `/oto-intel` commands build and query a JSON index in `.oto/intel/`. |
 
 ### Manager Fields
 
@@ -359,7 +359,7 @@ These can be set at top level or nested under `planning.*` (e.g., `"planning": {
 
 Several config fields affect each other or trigger special behavior:
 
-1. **`commit_docs` auto-detection** -- When no explicit value is set in config.json and `.planning/` is in `.gitignore`, `commit_docs` automatically resolves to `false`. An explicit `true` or `false` in config always overrides auto-detection.
+1. **`commit_docs` auto-detection** -- When no explicit value is set in config.json and `.oto/` is in `.gitignore`, `commit_docs` automatically resolves to `false`. An explicit `true` or `false` in config always overrides auto-detection.
 
 2. **`branching_strategy` controls branch templates** -- The `phase_branch_template` and `milestone_branch_template` fields are only used when `branching_strategy` is set to `"phase"` or `"milestone"` respectively. When `branching_strategy` is `"none"`, all template fields are ignored.
 

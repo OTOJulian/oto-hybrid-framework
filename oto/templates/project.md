@@ -1,6 +1,6 @@
 # PROJECT.md Template
 
-Template for `.planning/PROJECT.md` — the living project context document.
+Template for `.oto/PROJECT.md` — the living project context document.
 
 <template>
 

@@ -103,12 +103,12 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 Read from init: `phase_dir`, `phase_number`, `padded_phase`.
 
 Then read:
-1. `.planning/PROJECT.md` (first 80 lines — project context)
-2. Phase section from `.planning/ROADMAP.md`
+1. `.oto/PROJECT.md` (first 80 lines — project context)
+2. Phase section from `.oto/ROADMAP.md`
 3. All `*-PLAN.md` files in the phase directory
 4. `*-CONTEXT.md` if present (user decisions)
 5. `*-RESEARCH.md` if present (domain research)
-6. `.planning/REQUIREMENTS.md` (requirements this phase addresses)
+6. `.oto/REQUIREMENTS.md` (requirements this phase addresses)
 </step>
 
 <step name="build_prompt">
