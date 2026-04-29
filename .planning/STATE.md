@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-29T22:29:27.514Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-29T22:42:07.204Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 21
-  completed_plans: 14
-  percent: 67
+  completed_plans: 15
+  percent: 71
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (core-workflows-agents-port) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [███████░░░] 67%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [███████░░░] 67%
 | Phase 03 P06 | 8 min | 3 tasks | 5 files |
 | Phase 03 P07 | 10 min | 4 tasks | 7 files |
 | Phase 04 P01 | 4 min | 2 tasks | 11 files |
+| Phase 04 P02 | 6 min | 2 tasks | 339 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - 03-07: install-smoke prefixes PATH with the temporary npm install bin directory before invoking oto.
 - 04-01: Use intentional t.todo() scaffolds so downstream Phase 4 plans fill existing verification files instead of inventing new names.
 - 04-01: Keep retained-agent data in tests/fixtures/phase-04/retained-agents.json so multiple Phase 4 checks share one source.
+- 04-02: Use inventory target_path values as the source of truth for generated output layout.
+- 04-02: Keep the REQUIREMENTS out-of-scope override for ultraplan-phase by deleting the emitted workflow file after generation.
 
 ### Pending Todos
 
@@ -107,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T22:29:27.514Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-29T22:42:07.200Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
