@@ -63,12 +63,12 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **WF-16**: `/oto-note`, `/oto-add-todo`, `/oto-check-todos`, `/oto-plant-seed` — idea capture
 - [ ] **WF-17**: `/oto-new-milestone`, `/oto-complete-milestone`, `/oto-milestone-summary` — milestone lifecycle
 - [ ] **WF-18**: `/oto-add-phase`, `/oto-insert-phase`, `/oto-remove-phase`, `/oto-analyze-dependencies` — roadmap manipulation
-- [ ] **WF-19**: `/oto-secure-phase`, `/oto-validate-phase` — retroactive audits
+- [x] **WF-19**: `/oto-secure-phase`, `/oto-validate-phase` — retroactive audits
 - [ ] **WF-20**: `/oto-code-review`, `/oto-code-review-fix` — phase-level batch review
 - [ ] **WF-21**: `/oto-ui-phase`, `/oto-ui-review` — UI design contract + retroactive audit
 - [ ] **WF-22**: `/oto-add-tests` — generate tests for completed phase based on UAT criteria
 - [ ] **WF-23**: `/oto-map-codebase`, `/oto-scan` — brownfield exploration
-- [ ] **WF-24**: `/oto-docs-update` — generate/update documentation verified against codebase
+- [x] **WF-24**: `/oto-docs-update` — generate/update documentation verified against codebase
 - [ ] **WF-25**: `/oto-review` — cross-AI peer review of phase plans
 - [ ] **WF-26**: `/oto-workstreams` — manage parallel workstreams (list, create, switch, status, complete)
 - [ ] **WF-27**: `/oto-list-workspaces`, `/oto-new-workspace`, `/oto-remove-workspace` — isolated workspace management
@@ -236,12 +236,12 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | WF-16 | Phase 4 | Pending |
 | WF-17 | Phase 4 | Pending |
 | WF-18 | Phase 4 | Pending |
-| WF-19 | Phase 4 | Pending |
+| WF-19 | Phase 4 | Complete |
 | WF-20 | Phase 4 | Pending |
 | WF-21 | Phase 4 | Pending |
 | WF-22 | Phase 4 | Pending |
 | WF-23 | Phase 4 | Pending |
-| WF-24 | Phase 4 | Pending |
+| WF-24 | Phase 4 | Complete |
 | WF-25 | Phase 4 | Pending |
 | WF-26 | Phase 7 | Pending |
 | WF-27 | Phase 7 | Pending |

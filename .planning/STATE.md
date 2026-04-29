@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-04-29T23:05:46.946Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-04-29T23:17:10.693Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 21
-  completed_plans: 17
-  percent: 81
+  completed_plans: 18
+  percent: 86
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (core-workflows-agents-port) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [████████░░] 81%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 81%
 | Phase 04 P02 | 6 min | 2 tasks | 339 files |
 | Phase 04 P03 | 7 min | 2 tasks | 3 files |
 | Phase 04 P04 | 4 min | 2 tasks | 3 files |
+| Phase 04 P05 | 6 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - 04-03: Keep optional codebase pattern mapping deferred instead of silently substituting oto-codebase-mapper.
 - 04-04: Keep /oto-ai-integration-phase shippable by running only oto-domain-researcher live and surfacing unsupported steps as DEFERRED manual-fill sections.
 - 04-04: Avoid path-like .planning/ references in shipped DEFERRED comments while still citing ADR-07, preserving Phase 4 leak rules.
+- 04-05: Keep /oto-eval-review and /oto-ingest-docs discoverable, but mark their bodies DEFERRED because their executable paths depended on dropped agents.
+- 04-05: Delete oto/workflows/profile-user.md after confirming no command, workflow, or agent includes it.
+- 04-05: Remove stale dropped-agent substrings from shipped reference/template files when they block the plan-level no-dropped grep.
 
 ### Pending Todos
 
@@ -116,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T23:05:46.941Z
-Stopped at: Completed 04-04-PLAN.md
+Last session: 2026-04-29T23:17:10.689Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None

@@ -92,7 +92,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 04-02-PLAN.md — Wave 1: Rebrand engine apply against upstream into oto/ tree (bulk port; ultraplan deletion)
   - [x] 04-03-PLAN.md — Wave 2: Drop-agent rewrites in plan-phase.md (pattern-mapper) and debug.md (debug-session-manager)
   - [x] 04-04-PLAN.md — Wave 2: AI-integration scaffolding rewrite per D-17/D-18/D-20 (WF-28 bounded scope)
-  - [ ] 04-05-PLAN.md — Wave 2: Other dropped-agent fixups (eval-review, ingest-docs deferred; profile-user deleted)
+  - [x] 04-05-PLAN.md — Wave 2: Other dropped-agent fixups (eval-review, ingest-docs deferred; profile-user deleted)
   - [ ] 04-06-PLAN.md — Wave 2: Codex agentSandboxes map population in runtime-codex.cjs (AGT-04)
   - [ ] 04-07-PLAN.md — Wave 3: Implement 9 verification test bodies (AGT-02, AGT-03, AGT-04, D-09/10/12/13, MR-01 auto)
   - [ ] 04-08-PLAN.md — Wave 4: MR-01 disposable dogfood + UAT (manual; D-05/06/07/08)
