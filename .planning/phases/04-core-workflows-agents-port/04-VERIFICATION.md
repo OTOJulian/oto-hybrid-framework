@@ -936,3 +936,44 @@ After evidence capture, the disposable paths were removed:
 ### Operator approval
 
 The operator reported that pause/resume "seemed to have worked well" after `/clear` and `/oto:resume-work`. This is treated as MR-01 approval because all blocking commands in D-07 completed and no core-spine failure remained open.
+
+## Post-Dogfood Review Hardening
+
+**Date:** 2026-04-30T22:45:00Z
+**Status:** Fixed before phase-level verification.
+
+The post-plan code review found that install validation was now using the correct runtime config directory, but still used `MODEL_PROFILES` as the expected agent list. That list intentionally covers only agents with explicit model-profile rows and omits retained default-model agents such as `oto-code-reviewer`, `oto-code-fixer`, `oto-domain-researcher`, and `oto-security-auditor`.
+
+Fix:
+
+- Added `EXPECTED_AGENTS` with all 23 retained agents to `oto/bin/lib/model-profiles.cjs`.
+- Updated `checkAgentsInstalled()` to validate `EXPECTED_AGENTS`.
+- Updated MR-01 smoke coverage to assert every expected retained agent file exists after install.
+
+Verification:
+
+```text
+retained=23
+expected=23
+expectedMissing=[]
+expectedExtra=[]
+profileExtra=[]
+```
+
+Missing-agent behavior now includes retained unprofiled agents and excludes dropped agents:
+
+```text
+missing_count=23
+missing_includes_oto_code_reviewer=true
+missing_includes_oto_pattern_mapper=false
+```
+
+Focused tests:
+
+```text
+node --test tests/phase-04-mr01-install-smoke.test.cjs tests/phase-04-codex-sandbox-coverage.test.cjs tests/phase-04-no-dropped-agents.test.cjs
+1..3
+# tests 3
+# pass 3
+# fail 0
+```

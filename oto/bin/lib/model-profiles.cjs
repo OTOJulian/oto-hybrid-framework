@@ -25,6 +25,33 @@ const MODEL_PROFILES = {
   'oto-doc-writer': { quality: 'opus', balanced: 'sonnet', budget: 'haiku', adaptive: 'sonnet' },
   'oto-doc-verifier': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
 };
+
+const EXPECTED_AGENTS = [
+  'oto-advisor-researcher',
+  'oto-assumptions-analyzer',
+  'oto-code-fixer',
+  'oto-code-reviewer',
+  'oto-codebase-mapper',
+  'oto-debugger',
+  'oto-doc-verifier',
+  'oto-doc-writer',
+  'oto-domain-researcher',
+  'oto-executor',
+  'oto-integration-checker',
+  'oto-nyquist-auditor',
+  'oto-phase-researcher',
+  'oto-plan-checker',
+  'oto-planner',
+  'oto-project-researcher',
+  'oto-research-synthesizer',
+  'oto-roadmapper',
+  'oto-security-auditor',
+  'oto-ui-auditor',
+  'oto-ui-checker',
+  'oto-ui-researcher',
+  'oto-verifier',
+];
+
 const VALID_PROFILES = [...Object.keys(MODEL_PROFILES['oto-planner']), 'inherit'];
 
 /**
@@ -66,6 +93,7 @@ function getAgentToModelMapForProfile(normalizedProfile) {
 
 module.exports = {
   MODEL_PROFILES,
+  EXPECTED_AGENTS,
   VALID_PROFILES,
   formatAgentToModelMapAsTable,
   getAgentToModelMapForProfile,

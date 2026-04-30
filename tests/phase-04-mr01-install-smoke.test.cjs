@@ -8,6 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { spawnSync } = require('node:child_process');
+const { EXPECTED_AGENTS } = require('../oto/bin/lib/model-profiles.cjs');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -66,6 +67,12 @@ test('phase-04 mr01-install-smoke: tarball install populates commands, agents, a
       fs.existsSync(path.join(configDir, 'agents', 'oto-planner.md')),
       'agents/oto-planner.md not installed',
     );
+    for (const agent of EXPECTED_AGENTS) {
+      assert.ok(
+        fs.existsSync(path.join(configDir, 'agents', `${agent}.md`)),
+        `agents/${agent}.md not installed`,
+      );
+    }
     assert.ok(
       fs.existsSync(path.join(configDir, 'oto', 'workflows', 'new-project.md')),
       'oto/workflows/new-project.md not installed',

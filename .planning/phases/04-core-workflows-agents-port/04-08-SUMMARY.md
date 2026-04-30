@@ -25,6 +25,9 @@ key-files:
     - .planning/phases/04-core-workflows-agents-port/04-08-SUMMARY.md
   modified:
     - .planning/phases/04-core-workflows-agents-port/04-VERIFICATION.md
+    - oto/bin/lib/core.cjs
+    - oto/bin/lib/model-profiles.cjs
+    - tests/phase-04-mr01-install-smoke.test.cjs
 
 key-decisions:
   - "Skipped research-before-planning in the scratch dogfood because MR-01 validates the core spine, not research-heavy planning behavior."
@@ -33,6 +36,7 @@ key-decisions:
 patterns-established:
   - "Use a tiny one-phase scratch project for end-to-end runtime dogfood."
   - "Treat installer/runtime blockers found during dogfood as Phase 4 blockers, fix them, rebuild a fresh disposable env, and retry."
+  - "Keep the install validation roster separate from the profiled-agent roster so unprofiled retained agents are still checked."
 
 requirements-addressed: [MR-01]
 requirements-completed: [MR-01]
@@ -59,6 +63,8 @@ completed: 2026-04-30
   - `oto-sdk` compatibility binary missing from the installed package.
   - Runtime support directories (`oto/workflows`, `oto/references`, `oto/templates`, `oto/contexts`) missing from Claude installs.
   - Agent install detection resolving from package location instead of `CLAUDE_CONFIG_DIR`.
+- Fixed one post-approval review hardening issue:
+  - Install validation now checks all 23 retained agents, not only the 17 agents with explicit model-profile rows.
 - Confirmed the final disposable install had 23 agents, 296 manifest entries, and `agents_installed=true`.
 - Ran the required MR-01 core spine:
   - `/oto:new-project`
@@ -121,7 +127,13 @@ completed: 2026-04-30
 - **Verification:** Fresh retry reported `agents_installed=true`, `missing_agents=[]`; Phase 4 test glob passed 14/14.
 - **Committed in:** `351408c`
 
-**Total deviations:** 3 blocking dogfood issues fixed before approval.
+**4. [Rule 2 - Missing Critical] Check all retained agents during install validation**
+- **Issue:** The post-dogfood code review found `checkAgentsInstalled()` still derived its expected list from `MODEL_PROFILES`, which intentionally omits retained agents that inherit the runtime default model (`oto-code-reviewer`, `oto-code-fixer`, `oto-domain-researcher`, etc.).
+- **Fix:** Added an explicit `EXPECTED_AGENTS` roster with all 23 retained agents and made install validation use that roster instead of the profiled subset.
+- **Verification:** `EXPECTED_AGENTS` matches `tests/fixtures/phase-04/retained-agents.json` exactly; missing-agent checks now include `oto-code-reviewer` and still exclude dropped `oto-pattern-mapper`; focused Phase 4 tests passed.
+- **Committed in:** `95262de`
+
+**Total deviations:** 3 blocking dogfood issues fixed before approval; 1 review hardening issue fixed before phase verification.
 
 ## Issues Encountered
 

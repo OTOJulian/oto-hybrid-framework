@@ -7,7 +7,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { execSync, execFileSync, spawnSync } = require('child_process');
-const { MODEL_PROFILES } = require('./model-profiles.cjs');
+const { EXPECTED_AGENTS, MODEL_PROFILES } = require('./model-profiles.cjs');
 
 const WORKSTREAM_SESSION_ENV_KEYS = [
   'OTO_SESSION_KEY',
@@ -1534,7 +1534,7 @@ function getAgentsDir() {
  */
 function checkAgentsInstalled() {
   const agentsDir = getAgentsDir();
-  const expectedAgents = Object.keys(MODEL_PROFILES);
+  const expectedAgents = EXPECTED_AGENTS;
   const installed = [];
   const missing = [];
 
