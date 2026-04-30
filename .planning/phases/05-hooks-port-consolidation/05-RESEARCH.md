@@ -552,22 +552,25 @@ test('oto-session-start emits exactly one identity block on Claude runtime', () 
 
 **If this table is empty:** N/A — four assumptions documented above.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the SessionStart hook use `bash <path>` or rely on shebang + executable bit?**
    - What we know: GSD upstream uses `bash <path>` in the registered command (`bin/install.js:6789`); shebang in source files is `#!/usr/bin/env bash`.
    - What's unclear: Claude Code may handle `command: "/abs/path/to/hook"` (no `bash` prefix) by execve directly, requiring executable bit; or it may pass to `/bin/sh`.
    - Recommendation: match GSD precedent — use `bash "<configDir>/hooks/oto-session-start"` in the `command` field. Belt-and-suspenders: ALSO chmod 0o755 in the install copy (Pitfall G).
+   - **RESOLVED:** Adopted recommendation. Plan 05-04 Task 1 (`buildOtoEntries`) registers `command: "bash \"$CLAUDE/hooks/oto-session-start\""`; Plan 05-02 Task 2 chmod's bash hooks to 0o755 in the build pass.
 
 2. **Does the build script need to handle the extensionless `oto-session-start` file specially?**
    - What we know: Current `scripts/build-hooks.js:38` filters by `/\.(js|cjs|sh)$/`. The extensionless `oto-session-start` would NOT match.
    - What's unclear: D-04 specifies "extensionless (mirrors Superpowers' shape)".
    - Recommendation: extend the regex to `/\.(js|cjs|sh)$|^oto-session-start$/` OR detect bash shebang. The shebang-detection is more portable for future bash hooks. Plan should pick one explicitly.
+   - **RESOLVED:** Plan 05-02 Task 1 picks the explicit-name approach via `KEEP_NAME = new Set(['oto-session-start'])` plus the existing extension regex; chosen for explicitness over shebang-sniffing complexity.
 
 3. **Does `oto/hooks/__fixtures__/` need `.gitignore` exclusion?**
    - What we know: D-09 says ship the fixture as a static file. `package.json` `files` allowlist includes `oto/`.
    - What's unclear: Whether `__fixtures__/` should be packed into the npm tarball (it'd add bytes for end-users who don't run tests).
    - Recommendation: For Phase 5, include fixtures in the package (tiny — one JSON file). Phase 10 can revisit when CI snapshot enforcement promotes fixtures to a more formal location.
+   - **RESOLVED:** Fixture committed under `oto/hooks/__fixtures__/session-start-claude.json` and packed in the tarball (plan 05-05 Task 1; threat-model entry T-05-05-02 confirms intentional inclusion). Phase 10 may relocate.
 
 ## Environment Availability
 
@@ -603,7 +606,7 @@ Phase 5 has zero external CLI dependencies beyond what's already required for th
 | HK-03 | Context-monitor registered on `PostToolUse` with matcher `Bash\|Edit\|Write\|MultiEdit\|Agent\|Task` and `timeout: 10` | unit (covered by mergeSettings test) | `node --test tests/05-04-merge-settings.test.cjs` | ❌ Wave 0 |
 | HK-04 | Prompt-guard registered on `PreToolUse` with matcher `Write\|Edit` | unit (mergeSettings) | same | ❌ Wave 0 |
 | HK-05 | Read-injection-scanner registered on `PostToolUse` with matcher `Read` | unit (mergeSettings) | same | ❌ Wave 0 |
-| HK-06 | Validate-commit registered on `PostToolUse` with matcher `Bash` (git commit pattern enforced inside the hook body, not via the matcher) | unit (mergeSettings) | same | ❌ Wave 0 |
+| HK-06 | Validate-commit registered on `PreToolUse` with matcher `Bash` (drift from CONTEXT D-12; resolved per upstream + block-semantics — see note below) | unit (mergeSettings) | same | ❌ Wave 0 |
 | HK-07 | Token `{{OTO_VERSION}}` substitutes to current version on install; round-trip-replaceable; build produces 6 files in dist/ | unit | `node --test tests/05-02-build-hooks.test.cjs` + `tests/05-03-token-substitution.test.cjs` | ❌ Wave 0 |
 
 **Note on HK-06 matcher:** Upstream GSD registers `gsd-validate-commit.sh` on `PreToolUse` with matcher `Bash` [VERIFIED: gsd-install.js:6798-6807]. The hook body itself filters for `git commit` regex match [VERIFIED: gsd-validate-commit.sh:25]. The CONTEXT.md D-12 description says "PostToolUse with matchers Bash with git commit pattern" — this conflicts with upstream practice. The planner should resolve to **PreToolUse / matcher `Bash`** because:
