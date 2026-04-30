@@ -600,7 +600,7 @@ Operator command for retry:
 
 ```bash
 cd /tmp/oto-mr01-rerun-f0nveR
-CLAUDE_CONFIG_DIR=/tmp/oto-mr01-rerun-f0nveR/.claude claude
+PATH=/tmp/oto-bin-prefix-rerun-kUcuEr/bin:$PATH CLAUDE_CONFIG_DIR=/tmp/oto-mr01-rerun-f0nveR/.claude claude
 ```
 
 Then run:
@@ -610,3 +610,5 @@ Then run:
 ```
 
 Expected result: the workflow should progress past the previous `oto-sdk not found` failure. The gate remains open until the operator completes this retry and records approval or failure notes.
+
+Note: `PATH` is required for this disposable preflight because the package was installed with `npm install -g --prefix /tmp/oto-bin-prefix-rerun-kUcuEr`; real default global installs normally put package binaries on the user's existing shell `PATH`.
