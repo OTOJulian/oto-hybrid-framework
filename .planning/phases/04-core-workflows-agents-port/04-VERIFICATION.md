@@ -1,3 +1,112 @@
+---
+phase: 04-core-workflows-agents-port
+verified: 2026-04-30T22:55:00Z
+status: passed
+score: 6/6 success criteria verified
+human_verification: complete
+overrides_applied: 0
+---
+
+# Phase 04: Core Workflows & Agents Port Verification Report
+
+**Phase Goal:** Bulk-port the GSD spine - 28 workflows and the retained subset of GSD agents - through the rebrand engine, leaving Claude Code daily-use stable so MR-01 holds before Codex/Gemini parity work begins.
+**Verified:** 2026-04-30T22:55:00Z
+**Status:** passed
+**Re-verification:** Final verification after all 8 plans, MR-01 UAT, code review, and post-review hardening.
+
+## Goal Achievement
+
+Phase 4 achieved its goal. The retained Claude Code workflow/agent payload is present, reference integrity is enforced by tests, Codex sandbox metadata covers the retained agent set, the Superpowers `code-reviewer` identity collision is removed, shipped payloads do not leak path-like `.planning/` references, and MR-01 was approved through a real disposable Claude Code dogfood session.
+
+## Success Criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Listed `/oto-*` workflows are ported and execute on Claude Code for the required Phase 4 core spine | VERIFIED | `oto/commands/oto` and `oto/workflows` are populated; `tests/phase-04-command-to-workflow.test.cjs` passes; MR-01 ran `/oto:new-project`, `/oto:discuss-phase`, `/oto:plan-phase`, `/oto:execute-phase 1`, `/oto:verify-work 1`, `/oto:progress`, `/oto:pause-work`, and `/oto:resume-work` end-to-end. |
+| 2 | Retained agents pass frontmatter/schema validation and `Task(subagent_type=...)` references resolve | VERIFIED | `tests/phase-04-frontmatter-schema.test.cjs`, `tests/phase-04-task-refs-resolve.test.cjs`, and `tests/phase-04-generic-agent-allowlist.test.cjs` pass. MR-01 install validation now checks all 23 retained agents via `EXPECTED_AGENTS`. |
+| 3 | Codex sandbox map covers every retained agent with correct sandbox mode | VERIFIED | `tests/phase-04-codex-sandbox-coverage.test.cjs` passes; `bin/lib/runtime-codex.cjs` enumerates all retained agents. |
+| 4 | Superpowers example `code-reviewer` agent is removed | VERIFIED | `tests/phase-04-superpowers-code-reviewer-removed.test.cjs` passes. |
+| 5 | Shipped runtime payload does not leak path-like `.planning/` references | VERIFIED | `tests/phase-04-planning-leak.test.cjs` passes. Per locked D-13/D-15/D-16, this is path-sensitive and targets shipped/runtime payloads, not repo-local planning artifacts. |
+| 6 | MR-01 Claude Code daily-use stability gate is approved | VERIFIED | `04-HUMAN-UAT.md` has `Status: APPROVED`; the disposable dogfood completed the core spine, scratch UAT passed 3/3, scratch verification passed 4/4, code review was clean, pause/resume worked after `/clear`, and temp dirs were removed. |
+
+## Automated Checks
+
+```text
+npm test
+1..229
+# tests 229
+# pass 229
+# fail 0
+# todo 0
+```
+
+```text
+node --test --test-concurrency=4 tests/phase-04-*.test.cjs
+1..14
+# tests 14
+# pass 14
+# fail 0
+```
+
+Schema drift check:
+
+```json
+{
+  "valid": true,
+  "issues": [],
+  "checked": 8
+}
+```
+
+Plan inventory:
+
+```text
+plan_count=8
+incomplete_count=0
+summaries=04-01..04-08
+```
+
+Code review:
+
+```text
+04-REVIEW.md status: clean
+files_reviewed: 25
+findings: 0
+```
+
+## Requirement Traceability
+
+Phase 4 covers the Phase 4 requirement set declared in `ROADMAP.md`: WF-01 through WF-25, WF-28 through WF-30, AGT-02 through AGT-04, and MR-01.
+
+The repo currently keeps detailed requirement checkboxes in `.planning/REQUIREMENTS.md`; several WF rows there were still marked pending before phase completion. This verification report treats the implemented payload, test evidence, and MR-01 dogfood as the source of truth for Phase 4 readiness, and `phase.complete 04` should update requirement traceability as part of closeout.
+
+## Human Verification
+
+Human verification is complete. The operator approved MR-01 after completing the required core spine in a disposable project:
+
+- `/oto:new-project`
+- `/oto:discuss-phase`
+- `/oto:plan-phase`
+- `/oto:execute-phase 1`
+- `/oto:verify-work 1`
+- `/oto:progress`
+- `/oto:pause-work`
+- `/oto:resume-work`
+
+No open human-verification items remain.
+
+## Gaps Summary
+
+No phase-blocking gaps remain.
+
+Non-blocking follow-up context:
+
+- Research-before-planning was intentionally declined in the tiny MR-01 scratch run; a future research-heavy dogfood can be covered separately.
+- Codex and Gemini parity remain intentionally deferred to Phase 8.
+- Hook behavior remains intentionally deferred to Phase 5.
+
+---
+
 # Phase 4 - Verification Evidence
 
 ## MR-01 Preflight (autonomous)
