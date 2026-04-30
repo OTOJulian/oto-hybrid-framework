@@ -17,12 +17,12 @@
 - [x] Phase 1 locked the architecture decisions, agent audit, file inventory, rename map, and license attribution.
 - [x] Phase 2 shipped the Node package skeleton, public GitHub install target, rebrand engine, dry-run/apply reports, and round-trip verification.
 - [x] Phase 3 shipped the trimmed installer for exactly Claude Code, Codex, and Gemini CLI, with Claude as the v0.1.0 happy path and Codex/Gemini explicitly best-effort until parity work.
+- [x] Phase 4 shipped the GSD core workflow and retained agent spine for Claude Code, with MR-01 approved through a disposable end-to-end dogfood session.
 
 ### Active
 
 <!-- Current scope. Building toward these. The hybrid architecture is research-driven; these requirements scope the framework, not the merge strategy. -->
 
-- [ ] Phase 4: Port the GSD core workflow and retained agent spine so `/oto-*` commands work end-to-end on Claude Code.
 - [ ] Phase 5: Port and consolidate hooks with one SessionStart bootstrap and version-tagged hook sources.
 - [ ] Phase 6: Port the curated Superpowers skill subset under `oto:<skill>` and wire canonical agent skill calls.
 - [ ] Phase 7: Port workstreams and isolated workspace management.
@@ -78,6 +78,7 @@
 | Drop OpenCode support | User doesn't use it; supporting it doubles rebrand and test surface for no personal benefit | Resolved in Phase 1 scope and enforced in Phase 3 installer |
 | Clean-slate build, no carry-over of personal `~/.claude/` tweaks | User confirmed nothing currently customized that needs preserving | Resolved in Phase 1 scope |
 | Claude installer first, Codex/Gemini later parity | MR-01 requires Claude Code stability before spending effort on cross-runtime parity | Resolved in Phase 3; Phase 8 owns parity hardening |
+| MR-01 approved before parity work | The Phase 4 disposable Claude Code dogfood completed new-project, discuss, plan, execute, verify, progress, pause, clear, and resume without falling back to upstream GSD or Superpowers | Resolved in Phase 4; Phase 5 hooks can proceed before Phase 8 runtime parity |
 
 ## Evolution
 
@@ -97,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-29 after Phase 03 closeout*
+*Last updated: 2026-04-30 after Phase 04 closeout*
