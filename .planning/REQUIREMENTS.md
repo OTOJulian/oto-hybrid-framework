@@ -45,36 +45,36 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Workflows (GSD Spine — Ported & Rebranded)
 
-- [ ] **WF-01**: `/oto-new-project` — initialize new project (questioning → research → requirements → roadmap)
-- [ ] **WF-02**: `/oto-discuss-phase` — gather phase context through adaptive questioning
+- [x] **WF-01**: `/oto-new-project` — initialize new project (questioning → research → requirements → roadmap)
+- [x] **WF-02**: `/oto-discuss-phase` — gather phase context through adaptive questioning
 - [x] **WF-03**: `/oto-plan-phase` — create detailed phase plan with verification loop
-- [ ] **WF-04**: `/oto-execute-phase` — execute phase with wave-based parallelization
-- [ ] **WF-05**: `/oto-verify-work` — validate built features through conversational UAT
-- [ ] **WF-06**: `/oto-ship` — create PR, run review, prepare for merge
-- [ ] **WF-07**: `/oto-progress`, `/oto-next`, `/oto-resume-work`, `/oto-pause-work` — navigation/state
-- [ ] **WF-08**: `/oto-help`, `/oto-update`, `/oto-health`, `/oto-stats`, `/oto-settings` — meta-commands
-- [ ] **WF-09**: `/oto-undo` — safe git revert for phase/plan commits
+- [x] **WF-04**: `/oto-execute-phase` — execute phase with wave-based parallelization
+- [x] **WF-05**: `/oto-verify-work` — validate built features through conversational UAT
+- [x] **WF-06**: `/oto-ship` — create PR, run review, prepare for merge
+- [x] **WF-07**: `/oto-progress`, `/oto-next`, `/oto-resume-work`, `/oto-pause-work` — navigation/state
+- [x] **WF-08**: `/oto-help`, `/oto-update`, `/oto-health`, `/oto-stats`, `/oto-settings` — meta-commands
+- [x] **WF-09**: `/oto-undo` — safe git revert for phase/plan commits
 - [x] **WF-10**: `/oto-debug` — systematic debugging with persistent state
-- [ ] **WF-11**: `/oto-fast`, `/oto-quick` — lightweight execution paths for trivial work
-- [ ] **WF-12**: `/oto-do` — route freeform text to the right oto command automatically
-- [ ] **WF-13**: `/oto-spike`, `/oto-spike-wrap-up` — timeboxed exploration
-- [ ] **WF-14**: `/oto-sketch`, `/oto-sketch-wrap-up` — lightweight design sketching
-- [ ] **WF-15**: `/oto-explore` — Socratic ideation routing
-- [ ] **WF-16**: `/oto-note`, `/oto-add-todo`, `/oto-check-todos`, `/oto-plant-seed` — idea capture
-- [ ] **WF-17**: `/oto-new-milestone`, `/oto-complete-milestone`, `/oto-milestone-summary` — milestone lifecycle
-- [ ] **WF-18**: `/oto-add-phase`, `/oto-insert-phase`, `/oto-remove-phase`, `/oto-analyze-dependencies` — roadmap manipulation
+- [x] **WF-11**: `/oto-fast`, `/oto-quick` — lightweight execution paths for trivial work
+- [x] **WF-12**: `/oto-do` — route freeform text to the right oto command automatically
+- [x] **WF-13**: `/oto-spike`, `/oto-spike-wrap-up` — timeboxed exploration
+- [x] **WF-14**: `/oto-sketch`, `/oto-sketch-wrap-up` — lightweight design sketching
+- [x] **WF-15**: `/oto-explore` — Socratic ideation routing
+- [x] **WF-16**: `/oto-note`, `/oto-add-todo`, `/oto-check-todos`, `/oto-plant-seed` — idea capture
+- [x] **WF-17**: `/oto-new-milestone`, `/oto-complete-milestone`, `/oto-milestone-summary` — milestone lifecycle
+- [x] **WF-18**: `/oto-add-phase`, `/oto-insert-phase`, `/oto-remove-phase`, `/oto-analyze-dependencies` — roadmap manipulation
 - [x] **WF-19**: `/oto-secure-phase`, `/oto-validate-phase` — retroactive audits
-- [ ] **WF-20**: `/oto-code-review`, `/oto-code-review-fix` — phase-level batch review
-- [ ] **WF-21**: `/oto-ui-phase`, `/oto-ui-review` — UI design contract + retroactive audit
-- [ ] **WF-22**: `/oto-add-tests` — generate tests for completed phase based on UAT criteria
-- [ ] **WF-23**: `/oto-map-codebase`, `/oto-scan` — brownfield exploration
+- [x] **WF-20**: `/oto-code-review`, `/oto-code-review-fix` — phase-level batch review
+- [x] **WF-21**: `/oto-ui-phase`, `/oto-ui-review` — UI design contract + retroactive audit
+- [x] **WF-22**: `/oto-add-tests` — generate tests for completed phase based on UAT criteria
+- [x] **WF-23**: `/oto-map-codebase`, `/oto-scan` — brownfield exploration
 - [x] **WF-24**: `/oto-docs-update` — generate/update documentation verified against codebase
-- [ ] **WF-25**: `/oto-review` — cross-AI peer review of phase plans
+- [x] **WF-25**: `/oto-review` — cross-AI peer review of phase plans
 - [ ] **WF-26**: `/oto-workstreams` — manage parallel workstreams (list, create, switch, status, complete)
 - [ ] **WF-27**: `/oto-list-workspaces`, `/oto-new-workspace`, `/oto-remove-workspace` — isolated workspace management
 - [x] **WF-28**: AI-integration phase scaffolding ported (eval-planner, AI-feature workflows)
-- [ ] **WF-29**: `/oto-autonomous` — run remaining phases autonomously
-- [ ] **WF-30**: `/oto-set-profile` — switch model profile (quality/balanced/budget/inherit)
+- [x] **WF-29**: `/oto-autonomous` — run remaining phases autonomously
+- [x] **WF-30**: `/oto-set-profile` — switch model profile (quality/balanced/budget/inherit)
 
 ### Agents
 
@@ -116,7 +116,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Multi-Runtime
 
-- [ ] **MR-01**: Claude Code runtime is daily-use stable before Codex/Gemini parity is pursued
+- [x] **MR-01**: Claude Code runtime is daily-use stable before Codex/Gemini parity is pursued
 - [ ] **MR-02**: `CLAUDE.md` (Claude), `AGENTS.md` (Codex), `GEMINI.md` (Gemini) generated from a single source-of-truth template, then runtime-specific transformations applied
 - [ ] **MR-03**: Runtime-specific instruction file divergences (e.g., Codex needs `sandbox:` frontmatter) documented and tested
 - [ ] **MR-04**: Smoke test per runtime: install → run a representative `/oto-*` command → state file written correctly
@@ -218,36 +218,36 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | INS-04 | Phase 3 | Complete |
 | INS-05 | Phase 3 | Complete |
 | INS-06 | Phase 3 | Complete |
-| WF-01 | Phase 4 | Pending |
-| WF-02 | Phase 4 | Pending |
+| WF-01 | Phase 4 | Complete |
+| WF-02 | Phase 4 | Complete |
 | WF-03 | Phase 4 | Complete |
-| WF-04 | Phase 4 | Pending |
-| WF-05 | Phase 4 | Pending |
-| WF-06 | Phase 4 | Pending |
-| WF-07 | Phase 4 | Pending |
-| WF-08 | Phase 4 | Pending |
-| WF-09 | Phase 4 | Pending |
+| WF-04 | Phase 4 | Complete |
+| WF-05 | Phase 4 | Complete |
+| WF-06 | Phase 4 | Complete |
+| WF-07 | Phase 4 | Complete |
+| WF-08 | Phase 4 | Complete |
+| WF-09 | Phase 4 | Complete |
 | WF-10 | Phase 4 | Complete |
-| WF-11 | Phase 4 | Pending |
-| WF-12 | Phase 4 | Pending |
-| WF-13 | Phase 4 | Pending |
-| WF-14 | Phase 4 | Pending |
-| WF-15 | Phase 4 | Pending |
-| WF-16 | Phase 4 | Pending |
-| WF-17 | Phase 4 | Pending |
-| WF-18 | Phase 4 | Pending |
+| WF-11 | Phase 4 | Complete |
+| WF-12 | Phase 4 | Complete |
+| WF-13 | Phase 4 | Complete |
+| WF-14 | Phase 4 | Complete |
+| WF-15 | Phase 4 | Complete |
+| WF-16 | Phase 4 | Complete |
+| WF-17 | Phase 4 | Complete |
+| WF-18 | Phase 4 | Complete |
 | WF-19 | Phase 4 | Complete |
-| WF-20 | Phase 4 | Pending |
-| WF-21 | Phase 4 | Pending |
-| WF-22 | Phase 4 | Pending |
-| WF-23 | Phase 4 | Pending |
+| WF-20 | Phase 4 | Complete |
+| WF-21 | Phase 4 | Complete |
+| WF-22 | Phase 4 | Complete |
+| WF-23 | Phase 4 | Complete |
 | WF-24 | Phase 4 | Complete |
-| WF-25 | Phase 4 | Pending |
+| WF-25 | Phase 4 | Complete |
 | WF-26 | Phase 7 | Pending |
 | WF-27 | Phase 7 | Pending |
 | WF-28 | Phase 4 | Complete |
-| WF-29 | Phase 4 | Pending |
-| WF-30 | Phase 4 | Pending |
+| WF-29 | Phase 4 | Complete |
+| WF-30 | Phase 4 | Complete |
 | AGT-01 | Phase 1 | Complete |
 | AGT-02 | Phase 4 | Complete |
 | AGT-03 | Phase 4 | Complete |
@@ -274,7 +274,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | SYN-05 | Phase 9 | Pending |
 | SYN-06 | Phase 9 | Pending |
 | SYN-07 | Phase 9 | Pending |
-| MR-01 | Phase 4 | Pending (gate) |
+| MR-01 | Phase 4 | Complete |
 | MR-02 | Phase 8 | Pending |
 | MR-03 | Phase 8 | Pending |
 | MR-04 | Phase 8 | Pending |

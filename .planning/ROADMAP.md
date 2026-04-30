@@ -178,7 +178,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Inventory & Architecture Decisions | 3/3 | Complete | 2026-04-27 |
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
 | 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
-| 4. Core Workflows & Agents Port | 7/8 | In Progress | - |
+| 4. Core Workflows & Agents Port | 8/8 | Complete | 2026-04-30 |
 | 5. Hooks Port & Consolidation | 0/TBD | Not started | - |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
 | 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |

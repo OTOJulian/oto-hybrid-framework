@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: executing
-stopped_at: Completed 04-08 MR-01 operator dogfood
-last_updated: "2026-04-30T22:30:14Z"
-last_activity: 2026-04-30 -- Completed MR-01 operator dogfood
+status: ready_to_plan
+stopped_at: Phase 04 complete; ready to plan Phase 05
+last_updated: "2026-04-30T22:42:31Z"
+last_activity: 2026-04-30 -- Phase 04 complete; ready to plan Phase 05
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 21
   completed_plans: 21
-  percent: 100
+  percent: 40
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 04 — core-workflows-agents-port
+**Current focus:** Phase 05 — hooks-port-&-consolidation
 
 ## Current Position
 
-Phase: 04 (core-workflows-agents-port) — EXECUTING
-Plan: 8 of 8
-Status: MR-01 approved; phase verification pending
-Last activity: 2026-04-30 -- Completed MR-01 operator dogfood
+Phase: 5
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-04-30
 
-Progress: [██████████] 100%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -47,7 +47,7 @@ Progress: [██████████] 100%
 | 01 | 3 | - | - |
 | 02 | 3 | - | - |
 | 03 | 7 | - | - |
-| 04 | 7 | 39 min | 6 min |
+| 04 | 8 | - | - |
 
 **Recent Trend:**
 
@@ -128,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T23:42:52.055Z
-Stopped at: Completed 04-07-PLAN.md
+Last session: 2026-04-30T22:42:31Z
+Stopped at: Phase 04 complete; ready to plan Phase 05
 Resume file: None
