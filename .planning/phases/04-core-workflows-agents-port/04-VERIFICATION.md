@@ -830,3 +830,109 @@ Then run:
 ```
 
 Expected result: the workflow should progress past all previous failures: `oto-sdk not found`, missing support directories, and false missing-agent detection. The gate remains open until the operator completes this retry and records approval or failure notes.
+
+## MR-01 Operator Dogfood Result
+
+**Date:** 2026-04-30T22:30:14Z
+**Status:** APPROVED
+**Operator:** Julian
+**Claude Code version:** `2.1.123 (Claude Code)`
+
+### Final disposable environment
+
+| Variable | Value |
+|----------|-------|
+| TMP project root | `/tmp/oto-mr01-rerun3-qbykSp` |
+| Tarball | `/tmp/oto-pack-rerun3-Uhp4Or/oto-0.1.0-alpha.1.tgz` |
+| Bin prefix | `/tmp/oto-bin-prefix-rerun3-ixTeAl` |
+| Claude config dir | `/tmp/oto-mr01-rerun3-qbykSp/.claude` |
+| npm cache | `/tmp/oto-npm-cache-rerun3-lh9nh6` |
+
+### Final install checks
+
+```text
+agent_count=23
+manifest_count=296
+agents_installed=true
+missing_agents=[]
+```
+
+### Core spine exercised
+
+| Command | Result |
+|---------|--------|
+| `/oto:new-project` | Created scratch project `.oto/` artifacts for `oto-mr01-hello` |
+| `/oto:discuss-phase` | Captured minimal Phase 01 Hello CLI context |
+| `/oto:plan-phase` | Created one executable plan at `.oto/phases/01-hello-cli/01-01-PLAN.md` |
+| `/oto:execute-phase 1` | Implemented `package.json`, `scripts/hello.js`, and `README.md`; code review gate ran clean |
+| `/oto:verify-work 1` | UAT passed 3/3 |
+| `/oto:progress` | Reported scratch project complete and routed to milestone closeout |
+| `/oto:pause-work` | Wrote `.oto/HANDOFF.json` and `.oto/.continue-here.md` |
+| `/oto:resume-work` | Resumed successfully after `/clear` |
+
+### Scratch project evidence
+
+Git commits in the disposable scratch project:
+
+```text
+e1800b5 wip: milestone-complete checkpoint paused at 1/1 phases
+ce214d6 test(01): complete UAT - 3 passed, 0 issues
+e375bb1 docs(phase-01): evolve PROJECT.md after phase completion
+bf10191 docs(phase-01): complete phase execution
+0d14e61 docs(01): add code review report
+c15cb44 docs(phase-01): update tracking after wave 1
+2219bc8 chore: merge executor worktree (worktree-agent-ad408a29f0b455301)
+4a11cda docs(state): mark phase 01 in progress
+303b21b docs(01-01): complete hello-cli plan
+bdcb317 docs(01-01): replace README placeholder with usage section
+```
+
+Scratch UAT:
+
+```text
+status: complete
+total: 3
+passed: 3
+issues: 0
+pending: 0
+skipped: 0
+blocked: 0
+```
+
+Scratch verification:
+
+```text
+status: passed
+score: 4/4 must-haves verified
+```
+
+Scratch code review:
+
+```text
+status: clean
+findings: critical 0, warning 0, info 0, total 0
+```
+
+Pause/resume handoff evidence:
+
+```text
+status: milestone_complete_pending_archive
+next_action: Run /oto-complete-milestone to archive milestone v1.0
+blockers: []
+human_actions_pending: []
+```
+
+### Cleanup
+
+After evidence capture, the disposable paths were removed:
+
+```text
+/tmp/oto-mr01-rerun3-qbykSp -> removed
+/tmp/oto-bin-prefix-rerun3-ixTeAl -> removed
+/tmp/oto-pack-rerun3-Uhp4Or -> removed
+/tmp/oto-npm-cache-rerun3-lh9nh6 -> removed
+```
+
+### Operator approval
+
+The operator reported that pause/resume "seemed to have worked well" after `/clear` and `/oto:resume-work`. This is treated as MR-01 approval because all blocking commands in D-07 completed and no core-spine failure remained open.

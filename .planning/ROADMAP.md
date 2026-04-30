@@ -95,7 +95,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 04-05-PLAN.md — Wave 2: Other dropped-agent fixups (eval-review, ingest-docs deferred; profile-user deleted)
   - [x] 04-06-PLAN.md — Wave 2: Codex agentSandboxes map population in runtime-codex.cjs (AGT-04)
   - [x] 04-07-PLAN.md — Wave 3: Implement 9 verification test bodies (AGT-02, AGT-03, AGT-04, D-09/10/12/13, MR-01 auto)
-  - [ ] 04-08-PLAN.md — Wave 4: MR-01 disposable dogfood + UAT (manual; D-05/06/07/08)
+  - [x] 04-08-PLAN.md — Wave 4: MR-01 disposable dogfood + UAT (manual; D-05/06/07/08)
 **UI hint**: yes
 
 ### Phase 5: Hooks Port & Consolidation
