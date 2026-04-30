@@ -93,6 +93,24 @@ test('phase-04 mr01-install-smoke: tarball install populates commands, agents, a
     assert.ok(manifestPaths.has('oto/references/questioning.md'), 'manifest missing oto/references/questioning.md');
     assert.ok(manifestPaths.has('oto/templates/project.md'), 'manifest missing oto/templates/project.md');
     assert.ok(manifestPaths.has('oto/contexts/dev.md'), 'manifest missing oto/contexts/dev.md');
+
+    const installedSdkResult = spawnSync(
+      otoSdkBin,
+      ['query', 'init.new-project'],
+      {
+        cwd: configDir,
+        encoding: 'utf8',
+        env: { ...npmEnv, CLAUDE_CONFIG_DIR: configDir },
+      },
+    );
+    assert.equal(
+      installedSdkResult.status,
+      0,
+      `oto-sdk post-install query failed: ${installedSdkResult.stderr}\n${installedSdkResult.stdout}`,
+    );
+    const installedSdkInit = JSON.parse(installedSdkResult.stdout);
+    assert.equal(installedSdkInit.agents_installed, true);
+    assert.deepEqual(installedSdkInit.missing_agents, []);
   } finally {
     if (tarball) fs.rmSync(tarball, { force: true });
     if (packDir) fs.rmSync(packDir, { recursive: true, force: true });

@@ -1491,6 +1491,34 @@ function getAgentsDir() {
   if (process.env.OTO_AGENTS_DIR) {
     return process.env.OTO_AGENTS_DIR;
   }
+
+  const configDirEnvKeys = [
+    'CLAUDE_CONFIG_DIR',
+    'OPENCODE_CONFIG_DIR',
+    'GEMINI_CONFIG_DIR',
+    'KILO_CONFIG_DIR',
+    'CODEX_HOME',
+    'COPILOT_CONFIG_DIR',
+    'ANTIGRAVITY_CONFIG_DIR',
+    'CURSOR_CONFIG_DIR',
+    'WINDSURF_CONFIG_DIR',
+    'AUGMENT_CONFIG_DIR',
+    'TRAE_CONFIG_DIR',
+    'QWEN_CONFIG_DIR',
+    'CLINE_CONFIG_DIR',
+    'CODEBUDDY_CONFIG_DIR',
+  ];
+
+  for (const key of configDirEnvKeys) {
+    const configDir = process.env[key];
+    if (configDir) {
+      const expanded = configDir.startsWith('~/')
+        ? path.join(os.homedir(), configDir.slice(2))
+        : configDir;
+      return path.join(path.resolve(expanded), 'agents');
+    }
+  }
+
   // __dirname is oto/bin/lib/ → go up 3 levels to configDir
   return path.join(__dirname, '..', '..', '..', 'agents');
 }

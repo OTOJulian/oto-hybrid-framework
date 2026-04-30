@@ -725,3 +725,108 @@ Then run:
 ```
 
 Expected result: the workflow should progress past both previous failures: `oto-sdk not found` and missing `oto/workflows`, `oto/references`, `oto/templates`, or `oto/contexts`. The gate remains open until the operator completes this retry and records approval or failure notes.
+
+## MR-01 Agent Directory Resolver Blocker and Rebuild
+
+**Date:** 2026-04-30T21:17:00Z
+**Status:** Blocked third disposable session; rebuilt a fresh fixed install for retry.
+
+### Observed blocker
+
+The third operator dogfood session reached the `/oto:new-project` questionnaire, but `init.new-project` warned that all model-profile agents were missing:
+
+```text
+OTO agents not installed. The following agents are missing from your agents directory:
+  oto-planner
+  oto-roadmapper
+  oto-executor
+  ...
+  oto-doc-verifier
+```
+
+Local reproduction showed the installed files existed under the disposable Claude config dir:
+
+```text
+find /tmp/oto-mr01-rerun2-7V4ZQP/.claude/agents -maxdepth 1 -type f -name 'oto-*.md' | wc -l
+23
+```
+
+Diagnosis:
+
+- `getAgentsDir()` in `oto/bin/lib/core.cjs` resolved from the npm package location, not from `CLAUDE_CONFIG_DIR`.
+- The disposable install had the agents in the right runtime config dir, but the SDK checked the wrong directory.
+- `oto-pattern-mapper` was still listed in `MODEL_PROFILES` even though ADR-07 and the Phase 4 retained-agent fixture classify it as dropped.
+
+### Fix and local verification
+
+Updated `getAgentsDir()` to prefer runtime config environment variables (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CONFIG_DIR`, etc.) before falling back to package-relative lookup.
+
+Removed dropped `oto-pattern-mapper` from `MODEL_PROFILES`.
+
+Added MR-01 smoke coverage that installs into a disposable Claude config dir and then verifies:
+
+```text
+CLAUDE_CONFIG_DIR=<tmp-config> oto-sdk query init.new-project
+agents_installed=true
+missing_agents=[]
+```
+
+Focused tests:
+
+```text
+node --test tests/phase-04-no-dropped-agents.test.cjs tests/phase-04-mr01-install-smoke.test.cjs
+1..2
+# tests 2
+# pass 2
+# fail 0
+```
+
+Full Phase 4 test set after the fix:
+
+```text
+node --test --test-concurrency=4 tests/phase-04-*.test.cjs
+1..14
+# tests 14
+# pass 14
+# fail 0
+```
+
+### Fresh disposable environment for Task 2 retry
+
+| Variable | Value |
+|----------|-------|
+| TMP project root | `/tmp/oto-mr01-rerun3-qbykSp` |
+| Tarball | `/tmp/oto-pack-rerun3-Uhp4Or/oto-0.1.0-alpha.1.tgz` |
+| Bin prefix | `/tmp/oto-bin-prefix-rerun3-ixTeAl` |
+| Claude config dir | `/tmp/oto-mr01-rerun3-qbykSp/.claude` |
+| npm cache | `/tmp/oto-npm-cache-rerun3-lh9nh6` |
+
+Install output:
+
+```text
+installed: claude - 296 files copied, marker injected, state at /tmp/oto-mr01-rerun3-qbykSp/.claude/oto/.install.json
+```
+
+Fresh install checks:
+
+```text
+agent_count=23
+manifest_count=296
+agents_installed=true
+missing_agents=[]
+```
+
+Operator command for retry:
+
+```bash
+cd /tmp/oto-mr01-rerun3-qbykSp
+PATH=/tmp/oto-bin-prefix-rerun3-ixTeAl/bin:$PATH CLAUDE_CONFIG_DIR=/tmp/oto-mr01-rerun3-qbykSp/.claude claude
+```
+
+Then run:
+
+```text
+/oto:new-project
+```
+
+Expected result: the workflow should progress past all previous failures: `oto-sdk not found`, missing support directories, and false missing-agent detection. The gate remains open until the operator completes this retry and records approval or failure notes.
