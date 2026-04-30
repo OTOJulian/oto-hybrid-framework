@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Inventory & Architecture Decisions** - Lock canonical decisions and rebrand schema before any code is touched
 - [x] **Phase 2: Rebrand Engine & Distribution Skeleton** - Rule-typed rebrand engine + Node package shape + GitHub-installable repo
 - [x] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
-- [ ] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
+- [x] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
 - [ ] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
 - [ ] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
 - [ ] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems)
