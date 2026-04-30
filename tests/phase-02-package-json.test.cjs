@@ -30,6 +30,7 @@ test('package metadata matches Phase 2 distribution decisions', () => {
   assert.equal(pkg.name, 'oto');
   assert.equal(pkg.version, '0.1.0-alpha.1');
   assert.equal(pkg.bin.oto, 'bin/install.js');
+  assert.equal(pkg.bin['oto-sdk'], 'bin/oto-sdk.js');
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.author, 'Julian Isaac');
 });

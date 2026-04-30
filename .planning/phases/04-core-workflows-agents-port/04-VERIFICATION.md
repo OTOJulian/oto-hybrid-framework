@@ -502,3 +502,111 @@ PASS: files array length is 99
 ### Task 2 pending evidence
 
 Task 2 is the blocking human-action dogfood gate. No operator approval, transcript summary, post-dogfood commit SHAs, exit codes, or cleanup evidence have been recorded yet.
+
+## MR-01 Dogfood Blocker and Rebuild
+
+**Date:** 2026-04-30T20:29:52Z
+**Status:** Blocked old disposable install; rebuilt a fresh fixed install for retry.
+
+### Observed blocker
+
+The first operator dogfood session loaded `/oto:new-project`, then stalled after the command attempted to invoke `oto-sdk`:
+
+```text
+which oto-sdk 2>&1 && oto-sdk --version 2>&1 | head -5
+Error: Exit code 1
+oto-sdk not found
+```
+
+Diagnosis:
+
+- Published package exposed only `oto` in `package.json#bin`, while shipped Claude commands and workflows call `oto-sdk query ...`.
+- The compatibility CLI implementation at `oto/bin/lib/oto-tools.cjs` used stale `./lib/*.cjs` require paths even though the file itself lives in `oto/bin/lib/`.
+- The old disposable environment `/tmp/oto-mr01-Z2ho2L` is invalid for MR-01 dogfood approval because it was built before the fix.
+
+### Fix and local verification
+
+Implemented a lightweight `oto-sdk` package binary that delegates `oto-sdk query <handler>` to the existing CJS tools compatibility implementation. Also corrected the local require paths inside `oto/bin/lib/oto-tools.cjs`.
+
+Direct shim check against the previously failing project:
+
+```bash
+node bin/oto-sdk.js query init.new-project --cwd /tmp/oto-mr01-Z2ho2L
+```
+
+Result: PASS. The command returned valid init JSON with `project_exists: false`.
+
+Targeted tests:
+
+```text
+node --test tests/phase-02-package-json.test.cjs tests/phase-04-mr01-install-smoke.test.cjs
+1..6
+# tests 6
+# pass 6
+# fail 0
+# todo 0
+```
+
+Phase 4 tests:
+
+```text
+node --test --test-concurrency=4 tests/phase-04-*.test.cjs
+1..14
+# tests 14
+# pass 14
+# fail 0
+# todo 0
+```
+
+Full suite:
+
+```text
+npm test
+1..229
+# tests 229
+# pass 229
+# fail 0
+# todo 0
+```
+
+### Fresh disposable environment for Task 2 retry
+
+| Variable | Value |
+|----------|-------|
+| TMP project root | `/tmp/oto-mr01-rerun-f0nveR` |
+| Tarball | `/tmp/oto-pack-rerun-feRqWu/oto-0.1.0-alpha.1.tgz` |
+| Bin prefix | `/tmp/oto-bin-prefix-rerun-kUcuEr` |
+| Claude config dir | `/tmp/oto-mr01-rerun-f0nveR/.claude` |
+| npm cache | `/tmp/oto-npm-cache-rerun-BvTIsP` |
+| Env file | `/tmp/oto-mr01-env-oto-mr01-rerun-f0nveR.txt` |
+
+Install output:
+
+```text
+installed: claude — 99 files copied, marker injected, state at /tmp/oto-mr01-rerun-f0nveR/.claude/oto/.install.json
+```
+
+Fresh install checks:
+
+```text
+sdk_project_exists=false
+sdk_agents_installed=false
+agent_count=23
+command_exists=yes
+oto_sdk_bin=executable
+```
+
+Operator command for retry:
+
+```bash
+cd /tmp/oto-mr01-rerun-f0nveR
+CLAUDE_CONFIG_DIR=/tmp/oto-mr01-rerun-f0nveR/.claude claude
+```
+
+Then run:
+
+```text
+/oto:new-project
+```
+
+Expected result: the workflow should progress past the previous `oto-sdk not found` failure. The gate remains open until the operator completes this retry and records approval or failure notes.

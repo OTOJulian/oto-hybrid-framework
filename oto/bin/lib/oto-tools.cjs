@@ -171,24 +171,24 @@
 
 const fs = require('fs');
 const path = require('path');
-const core = require('./lib/core.cjs');
+const core = require('./core.cjs');
 const { error, findProjectRoot, getActiveWorkstream } = core;
-const state = require('./lib/state.cjs');
-const phase = require('./lib/phase.cjs');
-const roadmap = require('./lib/roadmap.cjs');
-const verify = require('./lib/verify.cjs');
-const config = require('./lib/config.cjs');
-const template = require('./lib/template.cjs');
-const milestone = require('./lib/milestone.cjs');
-const commands = require('./lib/commands.cjs');
-const init = require('./lib/init.cjs');
-const frontmatter = require('./lib/frontmatter.cjs');
-const profilePipeline = require('./lib/profile-pipeline.cjs');
-const profileOutput = require('./lib/profile-output.cjs');
-const workstream = require('./lib/workstream.cjs');
-const docs = require('./lib/docs.cjs');
-const learnings = require('./lib/learnings.cjs');
-const gapChecker = require('./lib/gap-checker.cjs');
+const state = require('./state.cjs');
+const phase = require('./phase.cjs');
+const roadmap = require('./roadmap.cjs');
+const verify = require('./verify.cjs');
+const config = require('./config.cjs');
+const template = require('./template.cjs');
+const milestone = require('./milestone.cjs');
+const commands = require('./commands.cjs');
+const init = require('./init.cjs');
+const frontmatter = require('./frontmatter.cjs');
+const profilePipeline = require('./profile-pipeline.cjs');
+const profileOutput = require('./profile-output.cjs');
+const workstream = require('./workstream.cjs');
+const docs = require('./docs.cjs');
+const learnings = require('./learnings.cjs');
+const gapChecker = require('./gap-checker.cjs');
 
 // ─── Arg parsing helpers ──────────────────────────────────────────────────────
 
@@ -258,7 +258,7 @@ async function main() {
   // Resolve worktree root: in a linked worktree, .oto/ lives in the main worktree.
   // However, in monorepo worktrees where the subdirectory itself owns .oto/,
   // skip worktree resolution — the CWD is already the correct project root.
-  const { resolveWorktreeRoot } = require('./lib/core.cjs');
+  const { resolveWorktreeRoot } = require('./core.cjs');
   if (!fs.existsSync(path.join(cwd, '.oto'))) {
     const worktreeRoot = resolveWorktreeRoot(cwd);
     if (worktreeRoot !== cwd) {
@@ -554,7 +554,7 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
         const { phase, plan, name, type, wave, fields: fieldsRaw } = parseNamedArgs(args, ['phase', 'plan', 'name', 'type', 'wave', 'fields']);
         let fields = {};
         if (fieldsRaw) {
-          const { safeJsonParse } = require('./lib/security.cjs');
+          const { safeJsonParse } = require('./security.cjs');
           const result = safeJsonParse(fieldsRaw, { label: '--fields' });
           if (!result.ok) error(result.error);
           fields = result.value;
@@ -805,13 +805,13 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
     }
 
     case 'audit-uat': {
-      const uat = require('./lib/uat.cjs');
+      const uat = require('./uat.cjs');
       uat.cmdAuditUat(cwd, raw);
       break;
     }
 
     case 'audit-open': {
-      const { auditOpenArtifacts, formatAuditReport } = require('./lib/audit.cjs');
+      const { auditOpenArtifacts, formatAuditReport } = require('./audit.cjs');
       const includeRaw = args.includes('--json');
       const result = auditOpenArtifacts(cwd);
       if (includeRaw) {
@@ -824,7 +824,7 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
 
     case 'uat': {
       const subcommand = args[1];
-      const uat = require('./lib/uat.cjs');
+      const uat = require('./uat.cjs');
       if (subcommand === 'render-checkpoint') {
         const options = parseNamedArgs(args, ['file']);
         uat.cmdRenderCheckpoint(cwd, options, raw);
@@ -1070,7 +1070,7 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
     // ─── Intel ────────────────────────────────────────────────────────────
 
     case 'intel': {
-      const intel = require('./lib/intel.cjs');
+      const intel = require('./intel.cjs');
       const subcommand = args[1];
       if (subcommand === 'query') {
         const term = args[2];
@@ -1117,7 +1117,7 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
     // ─── Graphify ──────────────────────────────────────────────────────────
 
     case 'graphify': {
-      const graphify = require('./lib/graphify.cjs');
+      const graphify = require('./graphify.cjs');
       const subcommand = args[1];
       if (subcommand === 'query') {
         const term = args[2];
@@ -1267,7 +1267,7 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
     // ─── OTO-2 Reverse Migration ───────────────────────────────────────────
 
     case 'from-oto2': {
-      const oto2Import = require('./lib/oto2-import.cjs');
+      const oto2Import = require('./gsd2-import.cjs');
       oto2Import.cmdFromGsd2(args.slice(1), cwd, raw);
       break;
     }

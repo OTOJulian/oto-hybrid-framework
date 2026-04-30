@@ -43,7 +43,15 @@ test('phase-04 mr01-install-smoke: tarball install populates oto/commands and ot
     assert.equal(installResult.status, 0, `npm install failed: ${installResult.stderr}\n${installResult.stdout}`);
 
     const otoBin = path.join(prefix, 'bin', 'oto');
+    const otoSdkBin = path.join(prefix, 'bin', 'oto-sdk');
     assert.ok(fs.existsSync(otoBin), `oto binary missing at ${otoBin}`);
+    assert.ok(fs.existsSync(otoSdkBin), `oto-sdk binary missing at ${otoSdkBin}`);
+
+    const sdkResult = spawnSync(otoSdkBin, ['query', 'init.new-project', '--cwd', configDir], { encoding: 'utf8' });
+    assert.equal(sdkResult.status, 0, `oto-sdk query failed: ${sdkResult.stderr}\n${sdkResult.stdout}`);
+    const sdkInit = JSON.parse(sdkResult.stdout);
+    assert.equal(sdkInit.project_exists, false);
+
     const otoResult = spawnSync(otoBin, ['install', '--claude', '--config-dir', configDir], { encoding: 'utf8' });
     assert.equal(otoResult.status, 0, `oto install failed: ${otoResult.stderr}\n${otoResult.stdout}`);
 
