@@ -612,3 +612,116 @@ Then run:
 Expected result: the workflow should progress past the previous `oto-sdk not found` failure. The gate remains open until the operator completes this retry and records approval or failure notes.
 
 Note: `PATH` is required for this disposable preflight because the package was installed with `npm install -g --prefix /tmp/oto-bin-prefix-rerun-kUcuEr`; real default global installs normally put package binaries on the user's existing shell `PATH`.
+
+## MR-01 Support Directory Blocker and Rebuild
+
+**Date:** 2026-04-30T20:40:46Z
+**Status:** Blocked second disposable install; rebuilt a fresh fixed install for retry.
+
+### Observed blocker
+
+The second operator dogfood session found that `/oto:new-project` could resolve `oto-sdk`, but could not load command support references:
+
+```text
+The OTO install at /tmp/oto-mr01-rerun-f0nveR/.claude/oto/ is incomplete.
+Only commands/ and agents/ were dropped — the workflows/, references/, and
+templates/ directories that commands/oto/new-project.md references via
+@~/.claude/oto/workflows/new-project.md etc. don't exist anywhere on disk.
+```
+
+Diagnosis:
+
+- Runtime adapters copied only `commands`, `agents`, `skills`, and `hooks`.
+- Phase 4 commands reference framework support docs under `@~/.claude/oto/workflows/...`, `@~/.claude/oto/references/...`, and `@~/.claude/oto/templates/...`.
+- The install manifest listed only command and agent payload files, so uninstall/reinstall state also could not manage the missing support directories.
+- The old disposable environment `/tmp/oto-mr01-rerun-f0nveR` is invalid for MR-01 dogfood approval because it was built before the support-directory fix.
+
+### Fix and local verification
+
+Extended all runtime adapters to install support payloads:
+
+- `oto/workflows` -> `<configDir>/oto/workflows`
+- `oto/references` -> `<configDir>/oto/references`
+- `oto/templates` -> `<configDir>/oto/templates`
+- `oto/contexts` -> `<configDir>/oto/contexts`
+
+Updated MR-01 smoke coverage to assert support files exist on disk and in `.install.json`.
+
+Focused installer tests:
+
+```text
+node --test tests/phase-03-runtime-claude.test.cjs tests/phase-03-runtime-codex.test.cjs tests/phase-03-runtime-gemini.test.cjs tests/phase-03-install-claude.integration.test.cjs tests/phase-04-mr01-install-smoke.test.cjs
+1..36
+# tests 36
+# pass 36
+# fail 0
+# todo 0
+```
+
+Phase 4 tests:
+
+```text
+node --test --test-concurrency=4 tests/phase-04-*.test.cjs
+1..14
+# tests 14
+# pass 14
+# fail 0
+# todo 0
+```
+
+Full suite:
+
+```text
+npm test
+1..229
+# tests 229
+# pass 229
+# fail 0
+# todo 0
+```
+
+### Fresh disposable environment for Task 2 retry
+
+| Variable | Value |
+|----------|-------|
+| TMP project root | `/tmp/oto-mr01-rerun2-7V4ZQP` |
+| Tarball | `/tmp/oto-pack-rerun2-4EYhHv/oto-0.1.0-alpha.1.tgz` |
+| Bin prefix | `/tmp/oto-bin-prefix-rerun2-952wKs` |
+| Claude config dir | `/tmp/oto-mr01-rerun2-7V4ZQP/.claude` |
+| npm cache | `/tmp/oto-npm-cache-rerun2-ugjR7l` |
+| Env file | `/tmp/oto-mr01-env-oto-mr01-rerun2-7V4ZQP.txt` |
+
+Install output:
+
+```text
+installed: claude — 296 files copied, marker injected, state at /tmp/oto-mr01-rerun2-7V4ZQP/.claude/oto/.install.json
+```
+
+Fresh install checks:
+
+```text
+sdk_project_exists=false
+agent_count=23
+command_exists=yes
+workflow_exists=yes
+reference_exists=yes
+template_exists=yes
+context_exists=yes
+manifest_count=296
+oto_sdk_bin=executable
+```
+
+Operator command for retry:
+
+```bash
+cd /tmp/oto-mr01-rerun2-7V4ZQP
+PATH=/tmp/oto-bin-prefix-rerun2-952wKs/bin:$PATH CLAUDE_CONFIG_DIR=/tmp/oto-mr01-rerun2-7V4ZQP/.claude claude
+```
+
+Then run:
+
+```text
+/oto:new-project
+```
+
+Expected result: the workflow should progress past both previous failures: `oto-sdk not found` and missing `oto/workflows`, `oto/references`, `oto/templates`, or `oto/contexts`. The gate remains open until the operator completes this retry and records approval or failure notes.

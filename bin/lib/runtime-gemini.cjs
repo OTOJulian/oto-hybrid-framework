@@ -14,12 +14,20 @@ module.exports = {
     agents: 'oto/agents',
     skills: 'oto/skills',
     hooks: 'oto/hooks/dist',
+    workflows: 'oto/workflows',
+    references: 'oto/references',
+    templates: 'oto/templates',
+    contexts: 'oto/contexts',
   },
   targetSubdirs: {
     commands: 'commands',
     agents: 'agents',
     skills: 'skills',
     hooks: 'hooks',
+    workflows: 'oto/workflows',
+    references: 'oto/references',
+    templates: 'oto/templates',
+    contexts: 'oto/contexts',
   },
 
   renderInstructionBlock(ctx) {

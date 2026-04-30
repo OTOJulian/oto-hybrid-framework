@@ -29,20 +29,46 @@ test('INS-02: adapter descriptor has settingsFilename === "settings.json" and se
   assert.equal(adapter.settingsFormat, 'json');
 });
 
-test('INS-02: adapter descriptor has sourceDirs and targetSubdirs for commands/agents/skills/hooks', () => {
-  assert.deepEqual(Object.keys(adapter.sourceDirs), ['commands', 'agents', 'skills', 'hooks']);
-  assert.deepEqual(Object.keys(adapter.targetSubdirs), ['commands', 'agents', 'skills', 'hooks']);
+test('INS-02: adapter descriptor has sourceDirs and targetSubdirs for runtime payload and support docs', () => {
+  assert.deepEqual(Object.keys(adapter.sourceDirs), [
+    'commands',
+    'agents',
+    'skills',
+    'hooks',
+    'workflows',
+    'references',
+    'templates',
+    'contexts',
+  ]);
+  assert.deepEqual(Object.keys(adapter.targetSubdirs), [
+    'commands',
+    'agents',
+    'skills',
+    'hooks',
+    'workflows',
+    'references',
+    'templates',
+    'contexts',
+  ]);
   assert.deepEqual(adapter.sourceDirs, {
     commands: 'oto/commands',
     agents: 'oto/agents',
     skills: 'oto/skills',
     hooks: 'oto/hooks/dist',
+    workflows: 'oto/workflows',
+    references: 'oto/references',
+    templates: 'oto/templates',
+    contexts: 'oto/contexts',
   });
   assert.deepEqual(adapter.targetSubdirs, {
     commands: 'commands',
     agents: 'agents',
     skills: 'skills',
     hooks: 'hooks',
+    workflows: 'oto/workflows',
+    references: 'oto/references',
+    templates: 'oto/templates',
+    contexts: 'oto/contexts',
   });
 });
 

@@ -14,12 +14,20 @@ module.exports = {
     agents: 'oto/agents',
     skills: 'oto/skills',
     hooks: 'oto/hooks/dist',
+    workflows: 'oto/workflows',
+    references: 'oto/references',
+    templates: 'oto/templates',
+    contexts: 'oto/contexts',
   },
   targetSubdirs: {
     commands: 'commands',
     agents: 'agents',
     skills: 'skills',
     hooks: 'hooks',
+    workflows: 'oto/workflows',
+    references: 'oto/references',
+    templates: 'oto/templates',
+    contexts: 'oto/contexts',
   },
   // AGT-04: Codex sandbox mode per retained agent.
   // 11 entries pass through from upstream foundation-frameworks/get-shit-done-main/bin/install.js:26-38

@@ -16,7 +16,16 @@ const { readState, writeState } = require('./install-state.cjs');
 const { detectPresentRuntimes } = require('./runtime-detect.cjs');
 const { version: OTO_VERSION } = require('../../package.json');
 
-const SRC_KEYS = ['commands', 'agents', 'skills', 'hooks'];
+const SRC_KEYS = [
+  'commands',
+  'agents',
+  'skills',
+  'hooks',
+  'workflows',
+  'references',
+  'templates',
+  'contexts',
+];
 const TRANSFORM_KEY = {
   commands: 'transformCommand',
   agents: 'transformAgent',

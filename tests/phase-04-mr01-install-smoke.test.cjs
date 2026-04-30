@@ -11,7 +11,7 @@ const { spawnSync } = require('node:child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-test('phase-04 mr01-install-smoke: tarball install populates oto/commands and oto/agents under configDir', { timeout: 120000 }, () => {
+test('phase-04 mr01-install-smoke: tarball install populates commands, agents, and support docs', { timeout: 120000 }, () => {
   let packDir;
   let tarball;
   let prefix;
@@ -66,12 +66,33 @@ test('phase-04 mr01-install-smoke: tarball install populates oto/commands and ot
       fs.existsSync(path.join(configDir, 'agents', 'oto-planner.md')),
       'agents/oto-planner.md not installed',
     );
+    assert.ok(
+      fs.existsSync(path.join(configDir, 'oto', 'workflows', 'new-project.md')),
+      'oto/workflows/new-project.md not installed',
+    );
+    assert.ok(
+      fs.existsSync(path.join(configDir, 'oto', 'references', 'questioning.md')),
+      'oto/references/questioning.md not installed',
+    );
+    assert.ok(
+      fs.existsSync(path.join(configDir, 'oto', 'templates', 'project.md')),
+      'oto/templates/project.md not installed',
+    );
+    assert.ok(
+      fs.existsSync(path.join(configDir, 'oto', 'contexts', 'dev.md')),
+      'oto/contexts/dev.md not installed',
+    );
 
     const state = JSON.parse(fs.readFileSync(marker, 'utf8'));
     assert.equal(state.runtime, 'claude');
     assert.equal(state.config_dir, configDir);
     assert.ok(Array.isArray(state.files), 'install state files must be an array');
     assert.ok(state.files.length > 50, `install state has too few files: ${state.files.length}`);
+    const manifestPaths = new Set(state.files.map((file) => file.path));
+    assert.ok(manifestPaths.has('oto/workflows/new-project.md'), 'manifest missing oto/workflows/new-project.md');
+    assert.ok(manifestPaths.has('oto/references/questioning.md'), 'manifest missing oto/references/questioning.md');
+    assert.ok(manifestPaths.has('oto/templates/project.md'), 'manifest missing oto/templates/project.md');
+    assert.ok(manifestPaths.has('oto/contexts/dev.md'), 'manifest missing oto/contexts/dev.md');
   } finally {
     if (tarball) fs.rmSync(tarball, { force: true });
     if (packDir) fs.rmSync(packDir, { recursive: true, force: true });
