@@ -1,10 +1,11 @@
 ---
 phase: 6
 slug: skills-port-cross-system-integration
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-01
+updated: 2026-05-01
 ---
 
 # Phase 6 — Validation Strategy
@@ -18,17 +19,17 @@ created: 2026-05-01
 | Property | Value |
 |----------|-------|
 | **Framework** | `node:test` (built-in, Node ≥22) |
-| **Config file** | none — runner is `scripts/run-tests.cjs` (Phase 1/2) |
-| **Quick run command** | `node scripts/run-tests.cjs --filter "06-"` |
-| **Full suite command** | `node scripts/run-tests.cjs` |
-| **Estimated runtime** | ~3–5 seconds (3 focused tests; full suite ~30s) |
+| **Config file** | none — direct `node:test` runner |
+| **Quick run command** | `node --test tests/06-*.test.cjs` |
+| **Full suite command** | `npm test` |
+| **Estimated runtime** | ~1s focused Phase 6 tests; full suite ~12s on 2026-05-01 |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `node scripts/run-tests.cjs --filter "06-"`
-- **After every plan wave:** Run `node scripts/run-tests.cjs`
+- **After every task commit:** Run the relevant focused `node --test tests/06-*.test.cjs` file or test-name pattern
+- **After every plan wave:** Run `node --test tests/06-*.test.cjs`
 - **Before `/oto-verify-work`:** Full suite must be green
 - **Max feedback latency:** 5 seconds per task, 30 seconds per merge
 
@@ -45,28 +46,28 @@ created: 2026-05-01
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 06-01-XX | 01 | 0 | SKL-01..08 | — | N/A (test scaffolds) | unit | `node --test tests/06-skill-structure.test.cjs` | ❌ W0 | ⬜ pending |
-| 06-01-XX | 01 | 0 | SKL-07 | T-15 | No upstream-identity literal leakage in `using-oto/SKILL.md` | unit (static-analysis) | `node --test tests/06-using-oto-state-gating.test.cjs` | ❌ W0 | ⬜ pending |
-| 06-01-XX | 01 | 0 | SKL-07 | — | Installer copies `oto/skills/*` byte-identically; preserves executable bit on `find-polluter.sh` | integration | `node --test tests/06-installer-skill-copy.test.cjs` | ❌ W0 | ⬜ pending |
-| 06-02-XX | 02 | 1 | SKL-01..07 | — | All 7 skills exist at `oto/skills/<name>/` with parseable frontmatter | unit (structure) | `node --test tests/06-skill-structure.test.cjs` | ❌ W0 | ⬜ pending |
-| 06-02-XX | 02 | 1 | SKL-07 | T-15 | `using-oto/SKILL.md` contains STATE.md gating directive; no upstream literals | unit (static-analysis) | `node --test tests/06-using-oto-state-gating.test.cjs` | ❌ W0 | ⬜ pending |
-| 06-03-XX | 03 | 1 | SKL-08 | — | `oto-executor.md` body contains `Skill('oto:test-driven-development')` and `Skill('oto:verification-before-completion')` | unit (static-analysis) | `node --test tests/06-skill-structure.test.cjs` | ❌ W0 | ⬜ pending |
-| 06-03-XX | 03 | 1 | SKL-08 | — | `oto-verifier.md` body contains `Skill('oto:verification-before-completion')` | unit (static-analysis) | same | ❌ W0 | ⬜ pending |
-| 06-03-XX | 03 | 1 | SKL-08 | — | `oto-debugger.md` body contains `Skill('oto:systematic-debugging')` | unit (static-analysis) | same | ❌ W0 | ⬜ pending |
-| 06-03-XX | 03 | 1 | SKL-08 | — | No `oto:<skill>` collides with any `/oto-<name>` command file | unit (collision) | same | ❌ W0 | ⬜ pending |
+| 06-01-01 | 01 | 0 | SKL-01..08 | — | N/A (test scaffolds) | unit | `node --test tests/06-skill-structure.test.cjs` | ✅ | ✅ green |
+| 06-01-02 | 01 | 0 | SKL-07 | T-15 | No upstream-identity literal leakage in `using-oto/SKILL.md` | unit (static-analysis) | `node --test tests/06-using-oto-state-gating.test.cjs` | ✅ | ✅ green |
+| 06-01-03 | 01 | 0 | SKL-07 | — | Installer copies `oto/skills/*` byte-identically; preserves executable bit on `find-polluter.sh` | integration | `node --test tests/06-installer-skill-copy.test.cjs` | ✅ | ✅ green |
+| 06-02-01 | 02 | 1 | SKL-01..07 | — | All 7 skills exist at `oto/skills/<name>/` with parseable frontmatter | unit (structure) | `node --test tests/06-skill-structure.test.cjs` | ✅ | ✅ green |
+| 06-02-02 | 02 | 1 | SKL-07 | T-15 | `using-oto/SKILL.md` contains STATE.md gating directive; no upstream literals | unit (static-analysis) | `node --test tests/06-using-oto-state-gating.test.cjs` | ✅ | ✅ green |
+| 06-03-01 | 03 | 1 | SKL-08 | — | `oto-executor.md` body contains `Skill('oto:test-driven-development')` and `Skill('oto:verification-before-completion')` | unit (static-analysis) | `node --test tests/06-skill-structure.test.cjs` | ✅ | ✅ green |
+| 06-03-02 | 03 | 1 | SKL-08 | — | `oto-verifier.md` body contains `Skill('oto:verification-before-completion')` | unit (static-analysis) | same | ✅ | ✅ green |
+| 06-03-02 | 03 | 1 | SKL-08 | — | `oto-debugger.md` body contains `Skill('oto:systematic-debugging')` | unit (static-analysis) | same | ✅ | ✅ green |
+| 06-03-02 | 03 | 1 | SKL-08 | — | No `oto:<skill>` collides with any `/oto-<name>` command file | unit (collision) | same | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
-*(Plan-letter and task IDs above are placeholders until planner assigns final plan numbers.)*
+*Execution evidence: `node --test tests/06-*.test.cjs` passed 14/14 and `npm test` passed 266/266 on 2026-05-01.*
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `tests/06-skill-structure.test.cjs` — covers SKL-01..07 (structure) + SKL-08 (collision + agent invocation prose); planner may split agent-invocation assertions into a separate file at discretion
-- [ ] `tests/06-installer-skill-copy.test.cjs` — covers SKL-07 install fidelity (D-08); recursive byte-equality, sha256 match, executable-bit preservation, install-state JSON marker
-- [ ] `tests/06-using-oto-state-gating.test.cjs` — covers SKL-07 deferral directive (D-09) + literal-string-leak defense (Pitfall 15)
-- [ ] (optional) `tests/skills/__fixtures__/STATE-active.md` — only if planner chooses to test gating prose against a real fixture; otherwise skill body anchors are sufficient
+- [x] `tests/06-skill-structure.test.cjs` — covers SKL-01..07 (structure) + SKL-08 (collision + agent invocation prose)
+- [x] `tests/06-installer-skill-copy.test.cjs` — covers SKL-07 install fidelity (D-08); recursive byte-equality, sha256 match, executable-bit preservation, install-state JSON marker
+- [x] `tests/06-using-oto-state-gating.test.cjs` — covers SKL-07 deferral directive (D-09) + literal-string-leak defense (Pitfall 15)
+- [x] `tests/skills/__fixtures__/STATE-active.md` — shipped as a reference active-workflow STATE fixture
 
 *No framework install needed — `node:test` is built-in to Node 22+.*
 
@@ -85,11 +86,11 @@ created: 2026-05-01
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (3 test files seeded; agent edits + skill files filled in Wave 1)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 5s per task
-- [ ] `nyquist_compliant: true` set in frontmatter (planner sets after Wave 0 task IDs are assigned)
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (3 test files seeded; agent edits + skill files filled in Wave 1)
+- [x] No watch-mode flags
+- [x] Feedback latency < 5s per focused Phase 6 run
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** complete
