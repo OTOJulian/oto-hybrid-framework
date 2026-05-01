@@ -34,6 +34,15 @@ function validateState(state) {
     else if (instructionPath.length === 0) errors.push('state.instruction_file.path must be a non-empty string');
     else if (!isSafeRelativePath(instructionPath)) errors.push(`state.instruction_file.path must be relative to configDir: ${instructionPath}`);
   }
+  // Phase 5 (D-11): optional hooks block records the version of the hook fleet installed.
+  // Mismatch implies upgrade; installRuntime overwrites without a warning loop.
+  if (state.hooks !== undefined) {
+    if (!state.hooks || typeof state.hooks !== 'object') {
+      errors.push('state.hooks must be object');
+    } else if (typeof state.hooks.version !== 'string') {
+      errors.push('state.hooks.version must be string');
+    }
+  }
   return errors;
 }
 
