@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-05-01T19:20:44.600Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-05-01T19:36:47.567Z"
 last_activity: 2026-05-01
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 26
-  completed_plans: 22
-  percent: 85
+  completed_plans: 23
+  percent: 88
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 05 (hooks-port-consolidation) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-01
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 22
+- Total plans completed: 23
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -48,6 +48,7 @@ Progress: [█████████░] 85%
 | 02 | 3 | - | - |
 | 03 | 7 | - | - |
 | 04 | 8 | - | - |
+| 05 | 2 | - | - |
 
 **Recent Trend:**
 
@@ -71,6 +72,7 @@ Progress: [█████████░] 85%
 | Phase 04 P07 | 10 min | 3 tasks | 152 files |
 | Phase 04 P08 | operator-driven | 2 tasks | 3 files |
 | Phase 05 P01 | 4 min | 2 tasks | 7 files |
+| Phase 05 P02 | 11 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -115,6 +117,9 @@ Recent decisions affecting current work:
 - 04-07: Enforce shipped payload roots with no dropped-agent substrings and no path-like .planning references.
 - 05-01: Use intentional t.todo() scaffolds so downstream Phase 5 plans must fill existing verification files instead of creating new names.
 - 05-01: Keep settings.json round-trip fixtures under tests/fixtures/phase-05/ for Wave 3 mergeSettings tests.
+- 05-02 keeps hook token substitution install-time only; build output remains template-pristine.
+- 05-02 ignores generated oto/hooks/dist output, matching the legacy hooks/dist pattern.
+- 05-02 exports scripts/build-hooks.js::build for isolated regression tests while preserving CLI behavior.
 
 ### Pending Todos
 
@@ -131,6 +136,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-01T19:20:44.596Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-05-01T19:36:47.563Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None

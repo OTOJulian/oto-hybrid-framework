@@ -102,7 +102,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **HK-04**: Prompt-guard hook (validates user-supplied paths/text before tool execution)
 - [ ] **HK-05**: Read-injection-scanner hook (detects prompt-injection attempts in file reads)
 - [ ] **HK-06**: Validate-commit hook (rejects commits violating workflow invariants)
-- [ ] **HK-07**: Hook source files version-tagged with `# oto-hook-version: {{OTO_VERSION}}` token rewritten at install time
+- [x] **HK-07**: Hook source files version-tagged with `# oto-hook-version: {{OTO_VERSION}}` token rewritten at install time
 
 ### Upstream Sync
 
@@ -266,7 +266,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | HK-04 | Phase 5 | Pending |
 | HK-05 | Phase 5 | Pending |
 | HK-06 | Phase 5 | Pending |
-| HK-07 | Phase 5 | Pending |
+| HK-07 | Phase 5 | Complete |
 | SYN-01 | Phase 9 | Pending |
 | SYN-02 | Phase 9 | Pending |
 | SYN-03 | Phase 9 | Pending |
