@@ -5,6 +5,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
+const TOKEN_ALLOW_EXT = new Set(['.js', '.cjs', '.sh']);
+const TOKEN_ALLOW_NAME = new Set(['oto-session-start']);
+const TOKEN_DENY_PATH_CONTAINS = ['foundation-frameworks/', '__fixtures__/'];
+
 function assertNoSymlinks(root) {
   const rootStat = fs.lstatSync(root);
   if (rootStat.isSymbolicLink()) {
@@ -54,6 +58,60 @@ async function copyTree(src, dst, opts = {}) {
   };
 }
 
+function shouldSubstitute(relPath) {
+  const norm = relPath.split(path.sep).join('/');
+  for (const needle of TOKEN_DENY_PATH_CONTAINS) {
+    if (norm.includes(needle)) return false;
+  }
+
+  const base = norm.split('/').pop() || '';
+  if (base.startsWith('LICENSE')) return false;
+  if (TOKEN_ALLOW_NAME.has(base)) return true;
+  return TOKEN_ALLOW_EXT.has(path.extname(base));
+}
+
+function tokenReplace(text, replacements) {
+  let out = text;
+  for (const key of Object.keys(replacements || {})) {
+    out = out.split('{{' + key + '}}').join(String(replacements[key]));
+  }
+  return out;
+}
+
+async function applyTokensToTree(rootDir, replacements) {
+  const files = await walkTree(rootDir);
+  let changed = 0;
+
+  for (const absPath of files) {
+    const relPath = path.relative(rootDir, absPath);
+    if (!shouldSubstitute(relPath)) continue;
+
+    const stat = fs.statSync(absPath);
+    const text = fs.readFileSync(absPath, 'utf8');
+    const replaced = tokenReplace(text, replacements);
+    if (replaced === text) continue;
+
+    fs.writeFileSync(absPath, replaced);
+    try {
+      fs.chmodSync(absPath, stat.mode & 0o777);
+    } catch {
+      // Windows may not support POSIX mode bits.
+    }
+    changed += 1;
+  }
+
+  return { changed, total: files.length };
+}
+
+async function copyTreeWithTokens(src, dst, opts = {}) {
+  const result = await copyTree(src, dst, opts);
+  const tokenResult = await applyTokensToTree(dst, opts.tokens || {});
+  return {
+    ...result,
+    tokenFilesChanged: tokenResult.changed,
+  };
+}
+
 async function removeTree(dst) {
   await fsp.rm(dst, { recursive: true, force: true });
 }
@@ -99,4 +157,13 @@ async function sha256File(absPath) {
   return crypto.createHash('sha256').update(buf).digest('hex');
 }
 
-module.exports = { copyTree, removeTree, sha256File, walkTree };
+module.exports = {
+  copyTree,
+  removeTree,
+  sha256File,
+  walkTree,
+  tokenReplace,
+  shouldSubstitute,
+  applyTokensToTree,
+  copyTreeWithTokens,
+};
