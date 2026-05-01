@@ -74,6 +74,17 @@ test('phase-05 validate-commit: validates git options and common unquoted messag
   result = runHook(t, 'git commit --message=bad');
   assert.equal(result.status, 2);
   assert.match(result.stdout, /Conventional Commits/);
+
+  for (const command of [
+    'git -p commit -m bad',
+    'git -P commit -m bad',
+    'git --no-replace-objects commit -m bad',
+    'git --config-env=user.name=USER commit -m bad',
+  ]) {
+    result = runHook(t, command);
+    assert.equal(result.status, 2);
+    assert.match(result.stdout, /Conventional Commits/);
+  }
 });
 
 test('phase-05 validate-commit: blocks commit commands without a parseable message flag', (t) => {

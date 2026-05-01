@@ -140,6 +140,7 @@ function gitSubcommandIndex(tokens) {
       '--namespace',
       '--exec-path',
       '--super-prefix',
+      '--config-env',
     ];
     if (optionWithValue.includes(token)) {
       i += 1;
@@ -151,15 +152,19 @@ function gitSubcommandIndex(tokens) {
       token.startsWith('--work-tree=') ||
       token.startsWith('--namespace=') ||
       token.startsWith('--exec-path=') ||
-      token.startsWith('--super-prefix=')
+      token.startsWith('--super-prefix=') ||
+      token.startsWith('--config-env=')
     ) {
       continue;
     }
 
     if (
+      token === '-p' ||
+      token === '-P' ||
       token === '--bare' ||
       token === '--no-pager' ||
       token === '--paginate' ||
+      token === '--no-replace-objects' ||
       token === '--no-optional-locks' ||
       token === '--literal-pathspecs' ||
       token === '--glob-pathspecs' ||
