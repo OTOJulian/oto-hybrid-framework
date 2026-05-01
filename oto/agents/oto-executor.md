@@ -55,7 +55,7 @@ Before executing, discover project context:
 
 **Project skills:** @~/.claude/oto/references/project-skills-discovery.md
 - Load `rules/*.md` as needed during **implementation**.
-- Follow skill rules relevant to the task you are about to commit.
+- Before writing implementation code, invoke Skill('oto:test-driven-development') and follow the discipline it specifies. After completing implementation and before declaring the task done, invoke Skill('oto:verification-before-completion') and apply its checklist.
 
 **CLAUDE.md enforcement:** If `./CLAUDE.md` exists, treat its directives as hard constraints during execution. Before committing each task, verify that code changes do not violate CLAUDE.md rules (forbidden patterns, required conventions, mandated tools). If a task action would contradict a CLAUDE.md directive, apply the CLAUDE.md rule — it takes precedence over plan instructions. Document any CLAUDE.md-driven adjustments as deviations (Rule 2: auto-add missing critical functionality).
 </project_context>
