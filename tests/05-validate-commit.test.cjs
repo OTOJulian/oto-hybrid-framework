@@ -9,18 +9,23 @@ const { spawnSync } = require('node:child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const HOOK = path.join(REPO_ROOT, 'oto', 'hooks', 'oto-validate-commit.sh');
+const ACTIVE_STATE = 'Phase: 05 (hooks-port-consolidation) - EXECUTING\nPlan: 6 of 6\n';
 
-function tmpProject(t) {
+function tmpProject(t, stateText = ACTIVE_STATE) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-commit-hook-'));
   fs.mkdirSync(path.join(cwd, '.oto'), { recursive: true });
   fs.writeFileSync(path.join(cwd, '.oto', 'config.json'), '{"hooks":{"session_state":true}}');
+  if (stateText !== null) {
+    fs.writeFileSync(path.join(cwd, '.oto', 'STATE.md'), stateText);
+  }
   t.after(() => fs.rmSync(cwd, { recursive: true, force: true }));
   return cwd;
 }
 
-function runHook(t, command) {
+function runHook(t, command, options = {}) {
+  const { stateText = ACTIVE_STATE } = options;
   return spawnSync('bash', [HOOK], {
-    cwd: tmpProject(t),
+    cwd: tmpProject(t, stateText),
     input: JSON.stringify({ tool_input: { command } }),
     encoding: 'utf8',
     env: { PATH: process.env.PATH, HOME: process.env.HOME },
@@ -30,6 +35,30 @@ function runHook(t, command) {
 test('phase-05 validate-commit: accepts quoted -m and --message Conventional Commit forms', (t) => {
   assert.equal(runHook(t, 'git commit -m "fix: quoted message"').status, 0);
   assert.equal(runHook(t, "git commit --message 'feat(cli): quoted message'").status, 0);
+});
+
+test('phase-05 validate-commit: blocks valid commits without active phase state', (t) => {
+  const missingState = runHook(t, 'git commit -m "fix: valid message"', { stateText: null });
+  assert.equal(missingState.status, 2);
+  assert.match(missingState.stdout, /active phase/);
+
+  const inactivePhase = runHook(t, 'git commit -m "fix: valid message"', {
+    stateText: 'Phase: Not started (defining requirements)\nPlan: -\n',
+  });
+  assert.equal(inactivePhase.status, 2);
+  assert.match(inactivePhase.stdout, /active phase/);
+});
+
+test('phase-05 validate-commit: blocks valid commits without active plan state', (t) => {
+  const result = runHook(t, 'git commit -m "fix: valid message"', {
+    stateText: 'Phase: 05 (hooks-port-consolidation) - EXECUTING\nPlan: -\n',
+  });
+  assert.equal(result.status, 2);
+  assert.match(result.stdout, /active plan/);
+});
+
+test('phase-05 validate-commit: accepts valid commits with active phase and active plan', (t) => {
+  assert.equal(runHook(t, 'git commit -m "fix: valid message"').status, 0);
 });
 
 test('phase-05 validate-commit: validates git options and common unquoted message forms', (t) => {
