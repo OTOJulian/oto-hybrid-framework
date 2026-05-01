@@ -113,7 +113,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 05-01-PLAN.md — Wave 0: 5 test scaffolds + 2 mergeSettings fixtures (HK-01..07 t.todo placeholders)
   - [x] 05-02-PLAN.md — Wave 1: tokenReplace + applyTokensToTree in copy-files.cjs; build-hooks.js retargeted to oto/hooks/ (HK-07)
   - [x] 05-03-PLAN.md — Wave 2: Rewrite oto-session-start (consolidated, D-04..D-09); rename hooks.community to hooks.session_state (HK-01)
-  - [ ] 05-04-PLAN.md — Wave 3: runtime-claude.cjs mergeSettings + unmergeSettings; install-state hooks.version; install.cjs token-substitution wiring (HK-01..07)
+  - [x] 05-04-PLAN.md — Wave 3: runtime-claude.cjs mergeSettings + unmergeSettings; install-state hooks.version; install.cjs token-substitution wiring (HK-01..07)
   - [ ] 05-05-PLAN.md — Wave 4: SessionStart fixture capture + oto/hooks/README.md + fixture-test wiring (HK-01)
 
 ### Phase 6: Skills Port & Cross-System Integration

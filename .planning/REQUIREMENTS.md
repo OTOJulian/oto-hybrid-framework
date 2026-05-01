@@ -97,11 +97,11 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 ### Hooks
 
 - [x] **HK-01**: Single consolidated SessionStart hook (replaces GSD's session-start + Superpowers' session-start; idempotent; emits one bootstrap injection per session)
-- [ ] **HK-02**: Statusline hook (workflow-aware, shows current phase / state)
-- [ ] **HK-03**: Context-monitor hook (warns at context-window thresholds)
-- [ ] **HK-04**: Prompt-guard hook (validates user-supplied paths/text before tool execution)
-- [ ] **HK-05**: Read-injection-scanner hook (detects prompt-injection attempts in file reads)
-- [ ] **HK-06**: Validate-commit hook (rejects commits violating workflow invariants)
+- [x] **HK-02**: Statusline hook (workflow-aware, shows current phase / state)
+- [x] **HK-03**: Context-monitor hook (warns at context-window thresholds)
+- [x] **HK-04**: Prompt-guard hook (validates user-supplied paths/text before tool execution)
+- [x] **HK-05**: Read-injection-scanner hook (detects prompt-injection attempts in file reads)
+- [x] **HK-06**: Validate-commit hook (rejects commits violating workflow invariants)
 - [x] **HK-07**: Hook source files version-tagged with `# oto-hook-version: {{OTO_VERSION}}` token rewritten at install time
 
 ### Upstream Sync
@@ -261,11 +261,11 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | SKL-07 | Phase 6 | Pending |
 | SKL-08 | Phase 6 | Pending |
 | HK-01 | Phase 5 | Complete |
-| HK-02 | Phase 5 | Pending |
-| HK-03 | Phase 5 | Pending |
-| HK-04 | Phase 5 | Pending |
-| HK-05 | Phase 5 | Pending |
-| HK-06 | Phase 5 | Pending |
+| HK-02 | Phase 5 | Complete |
+| HK-03 | Phase 5 | Complete |
+| HK-04 | Phase 5 | Complete |
+| HK-05 | Phase 5 | Complete |
+| HK-06 | Phase 5 | Complete |
 | HK-07 | Phase 5 | Complete |
 | SYN-01 | Phase 9 | Pending |
 | SYN-02 | Phase 9 | Pending |
