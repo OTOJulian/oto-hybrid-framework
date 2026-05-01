@@ -5,12 +5,12 @@
 # Allows conforming messages and all non-commit commands (exit 0).
 # Uses Node.js for JSON parsing (always available in OTO projects, no jq dependency).
 #
-# OPT-IN: This hook is a no-op unless config.json has hooks.community: true.
-# Enable with: "hooks": { "community": true } in .oto/config.json
+# OPT-IN: This hook is a no-op unless config.json has hooks.session_state: true.
+# Enable with: "hooks": { "session_state": true } in .oto/config.json
 
 # Check opt-in config — exit silently if not enabled
 if [ -f .oto/config.json ]; then
-  ENABLED=$(node -e "try{const c=require('./.oto/config.json');process.stdout.write(c.hooks?.community===true?'1':'0')}catch{process.stdout.write('0')}" 2>/dev/null)
+  ENABLED=$(node -e "try{const c=require('./.oto/config.json');process.stdout.write(c.hooks?.session_state===true?'1':'0')}catch{process.stdout.write('0')}" 2>/dev/null)
   if [ "$ENABLED" != "1" ]; then exit 0; fi
 else
   exit 0
