@@ -1,0 +1,573 @@
+{
+  "version": "1",
+  "mode": "dry-run",
+  "target": "/Users/Julian/Desktop/oto-hybrid-framework/foundation-frameworks/superpowers-main",
+  "files": [
+    {
+      "path": "LICENSE",
+      "file_class": "license",
+      "allowlisted": true,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "hooks/session-start",
+      "file_class": "hook",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 2,
+          "col": 25,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 12,
+          "col": 36,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "Superpowers",
+          "to": "Oto",
+          "line": 14,
+          "col": 131,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 14,
+          "col": 208,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 14,
+          "col": 340,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 17,
+          "col": 14,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 18,
+          "col": 62,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 18,
+          "col": 118,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 35,
+          "col": 50,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 35,
+          "col": 103,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 35,
+          "col": 121,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 45,
+          "col": 32,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers:using-superpowers",
+          "to": "oto:using-superpowers",
+          "line": 35,
+          "col": 103,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "github.com/obra/superpowers",
+          "to": "github.com/OTOJulian/oto-hybrid-framework",
+          "line": 45,
+          "col": 16,
+          "classification": "rename",
+          "rule_type": "url"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/dispatching-parallel-agents/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/CREATION-LOG.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 179,
+          "col": 15,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 287,
+          "col": 5,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 288,
+          "col": 5,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers:test-driven-development",
+          "to": "oto:test-driven-development",
+          "line": 179,
+          "col": 15,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "superpowers:test-driven-development",
+          "to": "oto:test-driven-development",
+          "line": 287,
+          "col": 5,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "superpowers:verification-before-completion",
+          "to": "oto:verification-before-completion",
+          "line": 288,
+          "col": 5,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/condition-based-waiting-example.ts",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/condition-based-waiting.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/defense-in-depth.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/find-polluter.sh",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/root-cause-tracing.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/test-academic.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/test-pressure-1.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/test-pressure-2.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/systematic-debugging/test-pressure-3.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/test-driven-development/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/test-driven-development/testing-anti-patterns.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/using-git-worktrees/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 46,
+          "col": 14,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 71,
+          "col": 37,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 91,
+          "col": 13,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 92,
+          "col": 21,
+          "classification": "rename",
+          "rule_type": "identifier"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/using-superpowers/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 2,
+          "col": 13,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "Superpowers",
+          "to": "Oto",
+          "line": 20,
+          "col": 1,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "Superpowers",
+          "to": "Oto",
+          "line": 23,
+          "col": 6,
+          "classification": "rename",
+          "rule_type": "identifier"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/verification-before-completion/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/SKILL.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 18,
+          "col": 46,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 283,
+          "col": 40,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 284,
+          "col": 57,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 393,
+          "col": 30,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers:test-driven-development",
+          "to": "oto:test-driven-development",
+          "line": 18,
+          "col": 46,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "superpowers:test-driven-development",
+          "to": "oto:test-driven-development",
+          "line": 283,
+          "col": 40,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "superpowers:systematic-debugging",
+          "to": "oto:systematic-debugging",
+          "line": 284,
+          "col": 57,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "superpowers:test-driven-development",
+          "to": "oto:test-driven-development",
+          "line": 393,
+          "col": 30,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/anthropic-best-practices.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/graphviz-conventions.dot",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/persuasion-principles.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/render-graphs.js",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/testing-skills-with-subagents.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 13,
+          "col": 46,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers:test-driven-development",
+          "to": "oto:test-driven-development",
+          "line": 13,
+          "col": 46,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/using-superpowers/references/codex-tools.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 29,
+          "col": 54,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 43,
+          "col": 15,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers:code-reviewer",
+          "to": "oto:code-reviewer",
+          "line": 29,
+          "col": 54,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        },
+        {
+          "from": "superpowers:code-reviewer",
+          "to": "oto:code-reviewer",
+          "line": 43,
+          "col": 15,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/using-superpowers/references/copilot-tools.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [
+        {
+          "from": "superpowers",
+          "to": "oto",
+          "line": 30,
+          "col": 30,
+          "classification": "rename",
+          "rule_type": "identifier"
+        },
+        {
+          "from": "superpowers:code-reviewer",
+          "to": "oto:code-reviewer",
+          "line": 30,
+          "col": 30,
+          "classification": "rename",
+          "rule_type": "skill_ns"
+        }
+      ],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/using-superpowers/references/gemini-tools.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    },
+    {
+      "path": "skills/writing-skills/examples/CLAUDE_MD_TESTING.md",
+      "file_class": "skill",
+      "allowlisted": false,
+      "matches": [],
+      "unclassified_count": 0
+    }
+  ],
+  "summary_by_rule_type": {
+    "identifier": 30,
+    "path": 0,
+    "command": 0,
+    "skill_ns": 12,
+    "package": 0,
+    "url": 1,
+    "env_var": 0
+  },
+  "match_total": 43,
+  "unclassified_total": 0
+}
