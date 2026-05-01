@@ -1,0 +1,9 @@
+{
+  "model": "claude-3-5-sonnet-20241022",
+  "permissions": { "allow": ["Bash(git:*)"] },
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "/Users/julian/.local/bin/user-pretool.sh" }] }
+    ]
+  }
+}
