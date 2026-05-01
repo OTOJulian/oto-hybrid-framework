@@ -96,7 +96,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Hooks
 
-- [ ] **HK-01**: Single consolidated SessionStart hook (replaces GSD's session-start + Superpowers' session-start; idempotent; emits one bootstrap injection per session)
+- [x] **HK-01**: Single consolidated SessionStart hook (replaces GSD's session-start + Superpowers' session-start; idempotent; emits one bootstrap injection per session)
 - [ ] **HK-02**: Statusline hook (workflow-aware, shows current phase / state)
 - [ ] **HK-03**: Context-monitor hook (warns at context-window thresholds)
 - [ ] **HK-04**: Prompt-guard hook (validates user-supplied paths/text before tool execution)
@@ -260,7 +260,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | SKL-06 | Phase 6 | Pending |
 | SKL-07 | Phase 6 | Pending |
 | SKL-08 | Phase 6 | Pending |
-| HK-01 | Phase 5 | Pending |
+| HK-01 | Phase 5 | Complete |
 | HK-02 | Phase 5 | Pending |
 | HK-03 | Phase 5 | Pending |
 | HK-04 | Phase 5 | Pending |

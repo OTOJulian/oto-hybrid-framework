@@ -112,7 +112,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 5 plans
   - [x] 05-01-PLAN.md — Wave 0: 5 test scaffolds + 2 mergeSettings fixtures (HK-01..07 t.todo placeholders)
   - [x] 05-02-PLAN.md — Wave 1: tokenReplace + applyTokensToTree in copy-files.cjs; build-hooks.js retargeted to oto/hooks/ (HK-07)
-  - [ ] 05-03-PLAN.md — Wave 2: Rewrite oto-session-start (consolidated, D-04..D-09); rename hooks.community to hooks.session_state (HK-01)
+  - [x] 05-03-PLAN.md — Wave 2: Rewrite oto-session-start (consolidated, D-04..D-09); rename hooks.community to hooks.session_state (HK-01)
   - [ ] 05-04-PLAN.md — Wave 3: runtime-claude.cjs mergeSettings + unmergeSettings; install-state hooks.version; install.cjs token-substitution wiring (HK-01..07)
   - [ ] 05-05-PLAN.md — Wave 4: SessionStart fixture capture + oto/hooks/README.md + fixture-test wiring (HK-01)
 
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
 | 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
 | 4. Core Workflows & Agents Port | 8/8 | Complete | 2026-04-30 |
-| 5. Hooks Port & Consolidation | 1/5 | In progress | - |
+| 5. Hooks Port & Consolidation | 3/5 | In progress | - |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
 | 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |
 | 8. Codex & Gemini Runtime Parity | 0/TBD | Not started | - |
