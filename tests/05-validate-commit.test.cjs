@@ -88,4 +88,6 @@ test('phase-05 validate-commit: blocks commit commands without a parseable messa
 
 test('phase-05 validate-commit: ignores non-commit commands', (t) => {
   assert.equal(runHook(t, 'git status').status, 0);
+  assert.equal(runHook(t, 'git -C commit status').status, 0);
+  assert.equal(runHook(t, 'git -c user.name=commit status').status, 0);
 });

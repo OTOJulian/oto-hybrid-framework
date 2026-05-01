@@ -127,6 +127,54 @@ function tokenize(segment) {
   return tokens;
 }
 
+function gitSubcommandIndex(tokens) {
+  for (let i = 1; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if (token === '--') return -1;
+
+    const optionWithValue = [
+      '-C',
+      '-c',
+      '--git-dir',
+      '--work-tree',
+      '--namespace',
+      '--exec-path',
+      '--super-prefix',
+    ];
+    if (optionWithValue.includes(token)) {
+      i += 1;
+      continue;
+    }
+
+    if (
+      token.startsWith('--git-dir=') ||
+      token.startsWith('--work-tree=') ||
+      token.startsWith('--namespace=') ||
+      token.startsWith('--exec-path=') ||
+      token.startsWith('--super-prefix=')
+    ) {
+      continue;
+    }
+
+    if (
+      token === '--bare' ||
+      token === '--no-pager' ||
+      token === '--paginate' ||
+      token === '--no-optional-locks' ||
+      token === '--literal-pathspecs' ||
+      token === '--glob-pathspecs' ||
+      token === '--noglob-pathspecs' ||
+      token === '--icase-pathspecs'
+    ) {
+      continue;
+    }
+
+    return token.startsWith('-') ? -1 : i;
+  }
+
+  return -1;
+}
+
 let sawCommit = false;
 const messages = [];
 
@@ -134,8 +182,8 @@ for (const segment of splitSegments(cmd)) {
   const tokens = tokenize(segment);
   if (tokens[0] !== 'git') continue;
 
-  const commitIndex = tokens.indexOf('commit', 1);
-  if (commitIndex === -1) continue;
+  const commitIndex = gitSubcommandIndex(tokens);
+  if (commitIndex === -1 || tokens[commitIndex] !== 'commit') continue;
   sawCommit = true;
 
   let message = null;
