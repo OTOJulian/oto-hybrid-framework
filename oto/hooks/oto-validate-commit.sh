@@ -23,39 +23,174 @@ CMD=$(echo "$INPUT" | node -e "let d='';process.stdin.on('data',c=>d+=c);process
 
 # Only check git commit commands. Supports common git options before the
 # commit subcommand, for example: git -C repo commit -m "fix: message".
-COMMIT_RE='(^|[;&|])[[:space:]]*git([[:space:]]+[^[:space:];&|]+)*[[:space:]]+commit([[:space:]]|$)'
-if [[ "$CMD" =~ $COMMIT_RE ]]; then
-  # Extract message from -m/--message forms Claude may pass through Bash.
-  MSG=""
-  DOUBLE_RE='(^|[[:space:]])(-m|--message)[[:space:]]+"([^"]+)"'
-  SINGLE_RE="(^|[[:space:]])(-m|--message)[[:space:]]+'([^']+)'"
-  EQUALS_RE='(^|[[:space:]])--message=([^[:space:];&|]+)'
-  UNQUOTED_RE='(^|[[:space:]])(-m|--message)[[:space:]]+([^[:space:];&|]+)'
-  if [[ "$CMD" =~ $DOUBLE_RE ]]; then
-    MSG="${BASH_REMATCH[3]}"
-  elif [[ "$CMD" =~ $SINGLE_RE ]]; then
-    MSG="${BASH_REMATCH[3]}"
-  elif [[ "$CMD" =~ $EQUALS_RE ]]; then
-    MSG="${BASH_REMATCH[2]}"
-  elif [[ "$CMD" =~ $UNQUOTED_RE ]]; then
-    MSG="${BASH_REMATCH[3]}"
-  else
-    echo '{"decision":"block","reason":"Commit message must be provided with -m/--message so oto can validate Conventional Commits."}'
-    exit 2
-  fi
+CMD_TO_VALIDATE="$CMD" node <<'NODE' >/dev/null 2>&1
+const cmd = process.env.CMD_TO_VALIDATE || '';
 
-  if [ -n "$MSG" ]; then
-    SUBJECT=$(echo "$MSG" | head -1)
-    # Validate Conventional Commits format
-    if ! [[ "$SUBJECT" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?:[[:space:]].+ ]]; then
-      echo '{"decision": "block", "reason": "Commit message must follow Conventional Commits: <type>(<scope>): <subject>. Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore. Subject must be <=72 chars, lowercase, imperative mood, no trailing period."}'
-      exit 2
-    fi
-    if [ ${#SUBJECT} -gt 72 ]; then
-      echo '{"decision": "block", "reason": "Commit subject must be 72 characters or less."}'
-      exit 2
-    fi
-  fi
+function splitSegments(input) {
+  const segments = [];
+  let current = '';
+  let quote = null;
+  let escaped = false;
+
+  const push = () => {
+    if (current.trim()) segments.push(current);
+    current = '';
+  };
+
+  for (const ch of input) {
+    if (escaped) {
+      current += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\') {
+      current += ch;
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      current += ch;
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      current += ch;
+      quote = ch;
+      continue;
+    }
+    if (ch === ';' || ch === '&' || ch === '|') {
+      push();
+      continue;
+    }
+    current += ch;
+  }
+
+  push();
+  return segments;
+}
+
+function tokenize(segment) {
+  const tokens = [];
+  let current = '';
+  let quote = null;
+  let escaped = false;
+  let active = false;
+
+  const push = () => {
+    if (active) tokens.push(current);
+    current = '';
+    active = false;
+  };
+
+  for (const ch of segment) {
+    if (escaped) {
+      current += ch;
+      active = true;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\') {
+      escaped = true;
+      active = true;
+      continue;
+    }
+    if (quote === "'") {
+      if (ch === "'") quote = null;
+      else {
+        current += ch;
+        active = true;
+      }
+      continue;
+    }
+    if (quote === '"') {
+      if (ch === '"') quote = null;
+      else {
+        current += ch;
+        active = true;
+      }
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      active = true;
+      continue;
+    }
+    if (/\s/.test(ch)) {
+      push();
+      continue;
+    }
+    current += ch;
+    active = true;
+  }
+
+  push();
+  return tokens;
+}
+
+let sawCommit = false;
+const messages = [];
+
+for (const segment of splitSegments(cmd)) {
+  const tokens = tokenize(segment);
+  if (tokens[0] !== 'git') continue;
+
+  const commitIndex = tokens.indexOf('commit', 1);
+  if (commitIndex === -1) continue;
+  sawCommit = true;
+
+  let message = null;
+  for (let i = commitIndex + 1; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if (token === '-m' || token === '--message') {
+      message = i + 1 < tokens.length ? tokens[i + 1] : '';
+      break;
+    }
+    if (token.startsWith('--message=')) {
+      message = token.slice('--message='.length);
+      break;
+    }
+  }
+
+  if (!message) process.exit(11);
+  messages.push(message);
+}
+
+if (!sawCommit) process.exit(10);
+
+const conventional = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?:\s.+/;
+for (const message of messages) {
+  const subject = String(message).split(/\r?\n/, 1)[0];
+  if (!conventional.test(subject)) process.exit(12);
+  if (subject.length > 72) process.exit(13);
+}
+NODE
+COMMIT_STATUS=$?
+
+if [ "$COMMIT_STATUS" -eq 10 ]; then
+  exit 0
+fi
+
+if [ "$COMMIT_STATUS" -eq 11 ]; then
+  echo '{"decision":"block","reason":"Commit message must be provided with -m/--message so oto can validate Conventional Commits."}'
+  exit 2
+fi
+
+if [ "$COMMIT_STATUS" -eq 12 ]; then
+  echo '{"decision": "block", "reason": "Commit message must follow Conventional Commits: <type>(<scope>): <subject>. Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore. Subject must be <=72 chars, lowercase, imperative mood, no trailing period."}'
+  exit 2
+fi
+
+if [ "$COMMIT_STATUS" -eq 13 ]; then
+  echo '{"decision": "block", "reason": "Commit subject must be 72 characters or less."}'
+  exit 2
+fi
+
+if [ "$COMMIT_STATUS" -ne 0 ]; then
+  echo '{"decision":"block","reason":"Unable to parse git commit command for validation."}'
+  exit 2
+fi
+
+if [ "$COMMIT_STATUS" -eq 0 ]; then
 
   if [ ! -f .oto/STATE.md ]; then
     echo '{"decision":"block","reason":"Commit blocked: no active phase found in .oto/STATE.md."}'

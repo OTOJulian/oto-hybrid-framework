@@ -59,6 +59,7 @@ test('phase-05 validate-commit: blocks valid commits without active plan state',
 
 test('phase-05 validate-commit: accepts valid commits with active phase and active plan', (t) => {
   assert.equal(runHook(t, 'git commit -m "fix: valid message"').status, 0);
+  assert.equal(runHook(t, 'echo ready && git commit -m "fix: valid; quoted message"').status, 0);
 });
 
 test('phase-05 validate-commit: validates git options and common unquoted message forms', (t) => {
@@ -76,7 +77,11 @@ test('phase-05 validate-commit: validates git options and common unquoted messag
 });
 
 test('phase-05 validate-commit: blocks commit commands without a parseable message flag', (t) => {
-  const result = runHook(t, 'git commit --amend');
+  let result = runHook(t, 'git commit --amend');
+  assert.equal(result.status, 2);
+  assert.match(result.stdout, /must be provided with -m\/--message/);
+
+  result = runHook(t, 'echo -m "fix: unrelated"; git commit --amend');
   assert.equal(result.status, 2);
   assert.match(result.stdout, /must be provided with -m\/--message/);
 });
