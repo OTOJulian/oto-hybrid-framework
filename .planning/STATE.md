@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: planning
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-30T23:10:33.635Z"
-last_activity: 2026-04-30
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-05-01T19:20:44.600Z"
+last_activity: 2026-05-01
 progress:
   total_phases: 10
   completed_phases: 4
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  total_plans: 26
+  completed_plans: 22
+  percent: 85
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 05 — hooks-port-&-consolidation
+**Current focus:** Phase 05 — hooks-port-consolidation
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-30
+Phase: 05 (hooks-port-consolidation) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-05-01
 
-Progress: [████░░░░░░] 40%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -70,6 +70,7 @@ Progress: [████░░░░░░] 40%
 | Phase 04 P06 | 2 min | 1 tasks | 2 files |
 | Phase 04 P07 | 10 min | 3 tasks | 152 files |
 | Phase 04 P08 | operator-driven | 2 tasks | 3 files |
+| Phase 05 P01 | 4 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,8 @@ Recent decisions affecting current work:
 - 04-07: Include oto/ in package.json files so the packed distribution actually carries the Phase 4 runtime payload.
 - 04-07: Use temp npm cache and temp pack destination in MR-01 smoke tests to avoid user npm cache and repo-root tarball side effects.
 - 04-07: Enforce shipped payload roots with no dropped-agent substrings and no path-like .planning references.
+- 05-01: Use intentional t.todo() scaffolds so downstream Phase 5 plans must fill existing verification files instead of creating new names.
+- 05-01: Keep settings.json round-trip fixtures under tests/fixtures/phase-05/ for Wave 3 mergeSettings tests.
 
 ### Pending Todos
 
@@ -128,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-30T23:10:33.624Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-hooks-port-consolidation/05-CONTEXT.md
+Last session: 2026-05-01T19:20:44.596Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
