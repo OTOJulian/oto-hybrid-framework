@@ -1,6 +1,7 @@
 .oto-rebrand-out/
 reports/
 hooks/dist/
+oto/hooks/dist/
 node_modules/
 *.log
 /tmp-*
