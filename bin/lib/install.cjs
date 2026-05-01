@@ -5,7 +5,7 @@ const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { resolveConfigDir } = require('./args.cjs');
-const { copyTree, removeTree, sha256File, walkTree } = require('./copy-files.cjs');
+const { copyTree, removeTree, sha256File, walkTree, applyTokensToTree } = require('./copy-files.cjs');
 const {
   CLOSE_MARKER,
   OPEN_MARKER,
@@ -90,6 +90,22 @@ async function installRuntime(adapter, opts = {}) {
     }
   }
 
+  // Phase 5 (D-03): install-time token substitution on the hooks target tree.
+  // Substitutes {{OTO_VERSION}} -> package version. Token allowlist + deny-list
+  // is enforced inside applyTokensToTree (see bin/lib/copy-files.cjs::shouldSubstitute).
+  const hooksTargetAbs = path.join(configDir, adapter.targetSubdirs.hooks);
+  if (fs.existsSync(hooksTargetAbs)) {
+    const tokenResult = await applyTokensToTree(hooksTargetAbs, { OTO_VERSION });
+    if (tokenResult.changed > 0) {
+      for (const entry of fileEntries) {
+        const absPath = path.join(configDir, entry.path);
+        if (fs.existsSync(absPath)) {
+          entry.sha256 = await sha256File(absPath);
+        }
+      }
+    }
+  }
+
   const newPaths = new Set(fileEntries.map((file) => file.path));
   for (const prior of (priorState?.files || [])) {
     if (!newPaths.has(prior.path)) {
@@ -104,9 +120,14 @@ async function installRuntime(adapter, opts = {}) {
   injectMarkerBlock(instructionPath, OPEN_MARKER, CLOSE_MARKER, body);
 
   const settingsPath = path.join(configDir, adapter.settingsFilename);
-  if (fs.existsSync(settingsPath) && typeof adapter.mergeSettings === 'function') {
-    const existing = await fsp.readFile(settingsPath, 'utf8');
-    const merged = adapter.mergeSettings(existing, '');
+  if (typeof adapter.mergeSettings === 'function') {
+    const existing = fs.existsSync(settingsPath) ? await fsp.readFile(settingsPath, 'utf8') : '';
+    const merged = adapter.mergeSettings(existing, {
+      otoVersion: OTO_VERSION,
+      configDir,
+      runtime: adapter.name,
+      installedAt: new Date().toISOString(),
+    });
     if (merged !== existing) {
       await fsp.writeFile(settingsPath, merged);
     }
@@ -125,6 +146,7 @@ async function installRuntime(adapter, opts = {}) {
       open_marker: OPEN_MARKER,
       close_marker: CLOSE_MARKER,
     },
+    hooks: { version: OTO_VERSION },
   });
 
   const ctx = { runtime: adapter.name, configDir, statePath, filesCopied: fileEntries.length };
@@ -168,7 +190,22 @@ async function uninstallRuntime(adapter, opts = {}) {
     instruction.close_marker || CLOSE_MARKER,
   );
 
-  // Phase 3 mergeSettings is identity, so there is no reverse settings merge to apply.
+  // Phase 5 (D-14): remove only oto-marked entries from settings.json; preserve user content.
+  if (typeof adapter.unmergeSettings === 'function') {
+    const settingsPath = path.join(configDir, adapter.settingsFilename);
+    if (fs.existsSync(settingsPath)) {
+      const existing = await fsp.readFile(settingsPath, 'utf8');
+      const unmerged = adapter.unmergeSettings(existing, {
+        otoVersion: state.oto_version,
+        configDir,
+        runtime: adapter.name,
+      });
+      if (unmerged !== existing) {
+        await fsp.writeFile(settingsPath, unmerged);
+      }
+    }
+  }
+
   await removeTree(path.join(configDir, 'oto'));
 
   if (opts.purge) {
