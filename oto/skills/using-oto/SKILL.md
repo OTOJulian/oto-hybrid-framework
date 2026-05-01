@@ -7,13 +7,17 @@ description: Use when starting any conversation - establishes how to find and us
 If you were dispatched as a subagent to execute a specific task, skip this skill.
 </SUBAGENT-STOP>
 
-<EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+<EXTREMELY_IMPORTANT>
+You are using oto.
+
+If you think there is even a 1% chance a skill might apply to what you are
+doing, you ABSOLUTELY MUST invoke the skill.
 
 IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 
-This is not negotiable. This is not optional. You cannot rationalize your way out of this.
-</EXTREMELY-IMPORTANT>
+This is not negotiable. This is not optional. You cannot rationalize your
+way out of this.
+</EXTREMELY_IMPORTANT>
 
 ## Instruction Priority
 
@@ -74,6 +78,19 @@ digraph skill_flow {
     "Create TodoWrite todo per item" -> "Follow skill exactly";
 }
 ```
+
+## Workflow Deference
+
+<!-- oto:state-gating-directive -->
+Before invoking any other oto skill on suspicion, read `.oto/STATE.md`.
+If the `status:` frontmatter field shows an active phase
+(`execute_phase`, `plan_phase`, `debug`, or `verify`), suppress
+ambient skill auto-fire — only canonical agent invocations and
+explicit user `Skill()` calls fire.
+
+If `.oto/STATE.md` is missing, malformed, or shows `status: complete`,
+treat as no active workflow and let skills fire normally.
+<!-- /oto:state-gating-directive -->
 
 ## Red Flags
 
