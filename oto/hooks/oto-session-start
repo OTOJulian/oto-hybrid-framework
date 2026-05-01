@@ -21,6 +21,8 @@ fi
 SKILL_PATH="${PLUGIN_ROOT}/skills/using-oto/SKILL.md"
 if [ -f "$SKILL_PATH" ]; then
   using_oto_content=$(cat "$SKILL_PATH")
+  using_oto_content="${using_oto_content//<EXTREMELY_IMPORTANT>/}"
+  using_oto_content="${using_oto_content//<\/EXTREMELY_IMPORTANT>/}"
 else
   using_oto_content="oto v{{OTO_VERSION}} is installed. The 'oto:using-oto' skill ships in Phase 6."
 fi

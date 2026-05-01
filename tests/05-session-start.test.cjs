@@ -28,12 +28,11 @@ test('phase-05 session-start: Claude branch has one rebranded identity block and
   assert.equal(out.hookSpecificOutput.hookEventName, 'SessionStart');
   const ctx = out.hookSpecificOutput.additionalContext;
   assert.equal((ctx.match(/<EXTREMELY_IMPORTANT>/g) || []).length, 1, 'Pitfall 8: exactly one identity block');
+  assert.equal((ctx.match(/<\/EXTREMELY_IMPORTANT>/g) || []).length, 1, 'Pitfall 8: exactly one closing identity block');
   assert.ok(ctx.includes('You are using oto.'), 'D-05: rebranded identity literal');
   assert.ok(ctx.includes("'oto:using-oto'"), 'D-05: oto skill namespace literal');
-  assert.ok(
-    ctx.includes("oto v{{OTO_VERSION}} is installed. The 'oto:using-oto' skill ships in Phase 6."),
-    'D-06: missing skill fallback appears'
-  );
+  assert.ok(ctx.includes('## Workflow Deference'), 'Phase 6: real using-oto skill body appears');
+  assert.ok(ctx.includes('<!-- oto:state-gating-directive -->'), 'Phase 6: gating directive appears');
   for (const banned of ['superpowers', 'Superpowers', 'gsd-', 'Get Shit Done', 'using-superpowers', 'You have superpowers']) {
     assert.equal(ctx.indexOf(banned), -1, `Pitfall 15: upstream identity leaked: ${banned}`);
   }
