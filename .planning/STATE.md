@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
 status: verifying
-stopped_at: Completed 05-05-PLAN.md
-last_updated: "2026-05-01T20:13:24.857Z"
+stopped_at: Completed 05-06-PLAN.md
+last_updated: "2026-05-01T20:53:05.377Z"
 last_activity: 2026-05-01
 progress:
   total_phases: 10
   completed_phases: 5
-  total_plans: 26
-  completed_plans: 26
+  total_plans: 27
+  completed_plans: 27
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 05 (hooks-port-consolidation) — VERIFYING
-Plan: 5 of 5
+Plan: 6 of 6
 Status: Phase complete — ready for verification
 Last activity: 2026-05-01
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 26
+- Total plans completed: 27
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -48,7 +48,7 @@ Progress: [██████████] 100%
 | 02 | 3 | - | - |
 | 03 | 7 | - | - |
 | 04 | 8 | - | - |
-| 05 | 5 | - | - |
+| 05 | 6 | - | - |
 
 **Recent Trend:**
 
@@ -76,6 +76,7 @@ Progress: [██████████] 100%
 | Phase 05 P03 | 5 min | 2 tasks | 3 files |
 | Phase 05 P04 | 9 min | 4 tasks | 5 files |
 | Phase 05 P05 | 6 min | 2 tasks | 4 files |
+| Phase 05 P06 | 4 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,7 @@ Recent decisions affecting current work:
 - 05-04: Validate-commit registers as PreToolUse/Bash and context-monitor registers as PostToolUse with the broad Bash plus Edit/Write/MultiEdit/Agent/Task matcher.
 - 05-05: Capture the SessionStart fixture from the source hook so the literal {{OTO_VERSION}} token remains part of the locked baseline.
 - 05-05: Keep the fixture test isolated from the install pipeline by respawning oto/hooks/oto-session-start directly in a temp cwd.
+- 05-06: Keep validate-commit message parsing before active .oto/STATE.md phase/plan enforcement.
 
 ### Pending Todos
 
@@ -147,6 +149,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-01T20:13:24.850Z
-Stopped at: Completed 05-05-PLAN.md
+Last session: 2026-05-01T20:53:05.377Z
+Stopped at: Completed 05-06-PLAN.md
 Resume file: None
