@@ -1,11 +1,38 @@
 'use strict';
-// Phase 5 Wave 0 scaffold - implemented in Wave 1 (plan 05-02).
-// Covers: HK-07 token substitution.
-// Will require a `tokenReplace` helper from `bin/lib/copy-files.cjs` (or sibling), feed it a fixture string containing `{{OTO_VERSION}}`, assert output substitutes the token to a semver string matching `^\d+\.\d+\.\d+(-[a-z0-9.]+)?$`. Will also assert allowlist exclusion: a fixture path containing `foundation-frameworks/` returns the input untouched. Round-trip: re-substitute the literal token back into the substituted output yields the original template (per 05-RESEARCH.md Pitfall D).
-const test = require('node:test');
-const path = require('node:path');
-const REPO_ROOT = path.resolve(__dirname, '..');
 
-test('phase-05 token-substitution: {{OTO_VERSION}} substitutes to package version', (t) => {
-  t.todo('Implemented in Wave 1 (plan 05-02) once bin/lib/copy-files.cjs::tokenReplace exists');
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+
+const REPO_ROOT = path.resolve(__dirname, '..');
+const { tokenReplace, shouldSubstitute } = require(path.join(REPO_ROOT, 'bin/lib/copy-files.cjs'));
+const pkg = require(path.join(REPO_ROOT, 'package.json'));
+
+test('phase-05 token-substitution: {{OTO_VERSION}} substitutes to package version', () => {
+  assert.equal(
+    tokenReplace('# oto-hook-version: {{OTO_VERSION}}', { OTO_VERSION: '0.1.0-alpha.1' }),
+    '# oto-hook-version: 0.1.0-alpha.1',
+  );
+  assert.equal(tokenReplace('no tokens here', { OTO_VERSION: 'x' }), 'no tokens here');
+  assert.equal(tokenReplace('{{OTO_VERSION}} {{OTO_VERSION}}', { OTO_VERSION: '1.2.3' }), '1.2.3 1.2.3');
+  assert.equal(tokenReplace('{{OTHER}}', { OTO_VERSION: 'x' }), '{{OTHER}}');
+
+  const original = '# oto-hook-version: {{OTO_VERSION}}\nbody';
+  const substituted = tokenReplace(original, { OTO_VERSION: '0.1.0-alpha.1' });
+  const reversed = substituted.split('0.1.0-alpha.1').join('{{OTO_VERSION}}');
+  assert.equal(reversed, original);
+
+  const withPackageVersion = tokenReplace('{{OTO_VERSION}}', { OTO_VERSION: pkg.version });
+  assert.match(withPackageVersion, /^\d+\.\d+\.\d+(-[a-z0-9.]+)?$/);
+});
+
+test('phase-05 token-substitution: deny-list excludes foundation-frameworks, __fixtures__, LICENSE', () => {
+  assert.equal(shouldSubstitute('oto/hooks/oto-session-start'), true);
+  assert.equal(shouldSubstitute('oto/hooks/oto-statusline.js'), true);
+  assert.equal(shouldSubstitute('oto/hooks/oto-validate-commit.sh'), true);
+  assert.equal(shouldSubstitute('oto/hooks/foundation-frameworks/something.sh'), false);
+  assert.equal(shouldSubstitute('oto/hooks/__fixtures__/golden.json'), false);
+  assert.equal(shouldSubstitute('LICENSE'), false);
+  assert.equal(shouldSubstitute('foo/LICENSE-MIT'), false);
+  assert.equal(shouldSubstitute('README.md'), false);
 });
