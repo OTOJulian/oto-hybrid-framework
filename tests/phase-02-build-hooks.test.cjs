@@ -6,7 +6,8 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const REPO_ROOT = path.join(__dirname, '..');
-const HOOKS_DIR = path.join(REPO_ROOT, 'hooks');
+const LEGACY_DIST_DIR = path.join(REPO_ROOT, 'hooks', 'dist');
+const HOOKS_DIR = path.join(REPO_ROOT, 'oto', 'hooks');
 const DIST_DIR = path.join(HOOKS_DIR, 'dist');
 const SCRIPT = path.join(REPO_ROOT, 'scripts', 'build-hooks.js');
 
@@ -17,12 +18,14 @@ function runBuildHooks() {
   });
 }
 
-test('build-hooks exits cleanly when hooks only contains .gitkeep', () => {
+test('build-hooks exits cleanly for canonical oto hooks and leaves legacy hooks/dist untouched', () => {
   fs.rmSync(DIST_DIR, { recursive: true, force: true });
+  fs.rmSync(LEGACY_DIST_DIR, { recursive: true, force: true });
   const out = runBuildHooks();
   assert.equal(out.status, 0, out.stderr);
   assert.match(out.stdout, /Build complete/);
-  assert.ok(fs.existsSync(DIST_DIR), 'hooks/dist/ was not created');
+  assert.ok(fs.existsSync(DIST_DIR), 'oto/hooks/dist/ was not created');
+  assert.equal(fs.existsSync(LEGACY_DIST_DIR), false, 'legacy hooks/dist/ should not be recreated');
 });
 
 test('build-hooks rejects syntactically invalid JS hooks', (t) => {
