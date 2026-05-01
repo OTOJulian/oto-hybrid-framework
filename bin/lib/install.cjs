@@ -5,7 +5,7 @@ const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { resolveConfigDir } = require('./args.cjs');
-const { copyTree, removeTree, sha256File, walkTree, applyTokensToTree } = require('./copy-files.cjs');
+const { copyTree, removeTree, sha256File, walkTree, tokenReplace, shouldSubstitute } = require('./copy-files.cjs');
 const {
   CLOSE_MARKER,
   OPEN_MARKER,
@@ -85,24 +85,16 @@ async function installRuntime(adapter, opts = {}) {
         }
       }
 
-      const hex = await sha256File(file.absPath);
-      fileEntries.push({ path: path.relative(configDir, file.absPath), sha256: hex });
-    }
-  }
-
-  // Phase 5 (D-03): install-time token substitution on the hooks target tree.
-  // Substitutes {{OTO_VERSION}} -> package version. Token allowlist + deny-list
-  // is enforced inside applyTokensToTree (see bin/lib/copy-files.cjs::shouldSubstitute).
-  const hooksTargetAbs = path.join(configDir, adapter.targetSubdirs.hooks);
-  if (fs.existsSync(hooksTargetAbs)) {
-    const tokenResult = await applyTokensToTree(hooksTargetAbs, { OTO_VERSION });
-    if (tokenResult.changed > 0) {
-      for (const entry of fileEntries) {
-        const absPath = path.join(configDir, entry.path);
-        if (fs.existsSync(absPath)) {
-          entry.sha256 = await sha256File(absPath);
+      if (srcKey === 'hooks' && shouldSubstitute(file.relPath)) {
+        const original = await fsp.readFile(file.absPath, 'utf8');
+        const replaced = tokenReplace(original, { OTO_VERSION });
+        if (replaced !== original) {
+          await fsp.writeFile(file.absPath, replaced);
         }
       }
+
+      const hex = await sha256File(file.absPath);
+      fileEntries.push({ path: path.relative(configDir, file.absPath), sha256: hex });
     }
   }
 

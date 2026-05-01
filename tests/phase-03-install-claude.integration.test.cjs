@@ -10,6 +10,7 @@ const { OPEN_MARKER, CLOSE_MARKER } = require('../bin/lib/marker.cjs');
 const REPO_ROOT = path.join(__dirname, '..');
 const adapter = require(path.join(REPO_ROOT, 'bin/lib/runtime-claude.cjs'));
 const { installRuntime, uninstallRuntime } = require(path.join(REPO_ROOT, 'bin/lib/install.cjs'));
+const pkg = require(path.join(REPO_ROOT, 'package.json'));
 
 function tmpDir(t) {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-install-test-'));
@@ -170,6 +171,24 @@ test('INS-04: copied files are regular files, not symlinks (lstat().isSymbolicLi
       assert.equal(fs.lstatSync(file).isSymbolicLink(), false, `${file} should be a regular file`);
     }
   }
+});
+
+test('phase-05: install substitutes tokens only in copied hooks, not pre-existing user hook files', async (t) => {
+  const configDir = tmpDir(t);
+  const hooksDir = path.join(configDir, 'hooks');
+  fs.mkdirSync(hooksDir, { recursive: true });
+  const userHook = '#!/bin/bash\n# user-owned {{OTO_VERSION}}\n';
+  fs.writeFileSync(path.join(hooksDir, 'user-hook.sh'), userHook);
+
+  await installRuntime(adapter, installOpts(configDir));
+
+  assert.equal(fs.readFileSync(path.join(hooksDir, 'user-hook.sh'), 'utf8'), userHook);
+  const sessionStart = fs.readFileSync(path.join(hooksDir, 'oto-session-start'), 'utf8');
+  assert.ok(sessionStart.includes(`# oto-hook-version: ${pkg.version}`));
+  assert.equal(sessionStart.includes('{{OTO_VERSION}}'), false);
+
+  const state = JSON.parse(fs.readFileSync(path.join(configDir, 'oto', '.install.json'), 'utf8'));
+  assert.equal(state.files.some((file) => file.path === 'hooks/user-hook.sh'), false);
 });
 
 test('INS-05: success message matches /^installed: claude — \\d+ files copied, marker injected, state at .+\\.install\\.json$/', async (t) => {
