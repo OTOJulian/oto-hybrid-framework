@@ -104,3 +104,25 @@ test('phase-05 merge-settings: every oto-injected entry has Pitfall-E-safe shape
   assert.equal(merged.statusLine.type, 'command');
   assert.equal(typeof merged.statusLine.command, 'string');
 });
+
+test('phase-05 merge-settings: hook commands shell-quote dangerous configDir as one path argument', () => {
+  const configDir = '/tmp/oto claude/"$(touch injected)`whoami`' + "'suffix";
+  const merged = JSON.parse(mergeSettings(FIX_EMPTY, { ...CTX, configDir }));
+  const normalized = configDir.replace(/\\/g, '/');
+  const shellQuote = (value) => "'" + String(value).replace(/'/g, "'\\''") + "'";
+
+  assert.equal(
+    merged.statusLine.command,
+    `node ${shellQuote(`${normalized}/hooks/oto-statusline.js`)}`,
+  );
+  assert.equal(
+    merged.hooks.SessionStart[0].hooks[0].command,
+    `bash ${shellQuote(`${normalized}/hooks/oto-session-start`)}`,
+  );
+
+  const bashEntry = merged.hooks.PreToolUse.find((entry) => entry.matcher === 'Bash');
+  assert.equal(
+    bashEntry.hooks[0].command,
+    `bash ${shellQuote(`${normalized}/hooks/oto-validate-commit.sh`)}`,
+  );
+});

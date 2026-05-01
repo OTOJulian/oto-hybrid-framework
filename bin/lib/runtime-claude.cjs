@@ -7,10 +7,15 @@ const path = require('node:path');
 // (foundation-frameworks/get-shit-done-main/bin/install.js:6798-6807).
 // context-monitor: PostToolUse / broad matcher / timeout 10
 // (foundation-frameworks/get-shit-done-main/bin/install.js:6643-6651).
+function shellQuote(value) {
+  return "'" + String(value).replace(/'/g, "'\\''") + "'";
+}
+
 function buildOtoEntries(configDir) {
   const cd = String(configDir || '').replace(/\\/g, '/');
-  const node = (rel) => `node "${cd}/hooks/${rel}"`;
-  const bash = (rel) => `bash "${cd}/hooks/${rel}"`;
+  const hookPath = (rel) => `${cd}/hooks/${rel}`;
+  const node = (rel) => `node ${shellQuote(hookPath(rel))}`;
+  const bash = (rel) => `bash ${shellQuote(hookPath(rel))}`;
   return {
     statusLine: { type: 'command', command: node('oto-statusline.js') },
     hooksBlock: {
