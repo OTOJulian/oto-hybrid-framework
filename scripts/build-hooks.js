@@ -26,16 +26,23 @@ function validateSyntax(filePath) {
   }
 }
 
-function build() {
-  if (!fs.existsSync(HOOKS_DIR)) {
-    console.error('hooks/ missing');
-    process.exit(1);
+function build(opts = {}) {
+  const hooksDir = opts.hooksDir || HOOKS_DIR;
+  const distDir = opts.distDir || path.join(hooksDir, 'dist');
+  const exit = opts.exit !== false;
+  const log = opts.log || console.log;
+  const error = opts.error || console.error;
+
+  if (!fs.existsSync(hooksDir)) {
+    error('hooks/ missing');
+    if (exit) process.exit(1);
+    return { status: 1, count: 0 };
   }
 
-  fs.rmSync(DIST_DIR, { recursive: true, force: true });
-  fs.mkdirSync(DIST_DIR, { recursive: true });
+  fs.rmSync(distDir, { recursive: true, force: true });
+  fs.mkdirSync(distDir, { recursive: true });
 
-  const entries = fs.readdirSync(HOOKS_DIR, { withFileTypes: true })
+  const entries = fs.readdirSync(hooksDir, { withFileTypes: true })
     .filter((d) => d.isFile())
     .map((d) => d.name)
     .filter((name) => /\.(js|cjs|sh)$/.test(name) || KEEP_NAME.has(name));
@@ -43,13 +50,13 @@ function build() {
   let hasErrors = false;
 
   for (const name of entries) {
-    const src = path.join(HOOKS_DIR, name);
-    const dest = path.join(DIST_DIR, name);
+    const src = path.join(hooksDir, name);
+    const dest = path.join(distDir, name);
 
     if (name.endsWith('.js') || name.endsWith('.cjs')) {
       const syntaxError = validateSyntax(src);
       if (syntaxError) {
-        console.error(`${name}: SyntaxError - ${syntaxError}`);
+        error(`${name}: SyntaxError - ${syntaxError}`);
         hasErrors = true;
         continue;
       }
@@ -69,12 +76,18 @@ function build() {
   }
 
   if (hasErrors) {
-    console.error('Build failed.');
-    process.exit(1);
+    error('Build failed.');
+    if (exit) process.exit(1);
+    return { status: 1, count };
   }
 
-  console.log(`Build complete (${count} hooks).`);
-  process.exit(0);
+  log(`Build complete (${count} hooks).`);
+  if (exit) process.exit(0);
+  return { status: 0, count };
 }
 
-build();
+if (require.main === module) {
+  build();
+}
+
+module.exports = { build, validateSyntax };

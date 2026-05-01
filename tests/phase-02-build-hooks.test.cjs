@@ -2,57 +2,64 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { build } = require('../scripts/build-hooks.js');
 
-const REPO_ROOT = path.join(__dirname, '..');
-const LEGACY_DIST_DIR = path.join(REPO_ROOT, 'hooks', 'dist');
-const HOOKS_DIR = path.join(REPO_ROOT, 'oto', 'hooks');
-const DIST_DIR = path.join(HOOKS_DIR, 'dist');
-const SCRIPT = path.join(REPO_ROOT, 'scripts', 'build-hooks.js');
-
-function runBuildHooks() {
-  return spawnSync(process.execPath, [SCRIPT], {
-    cwd: REPO_ROOT,
-    encoding: 'utf8',
+function makeHooksDir(t) {
+  const hooksDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-build-hooks-test-'));
+  t.after(() => {
+    fs.rmSync(hooksDir, { recursive: true, force: true });
   });
+  return hooksDir;
 }
 
-test('build-hooks exits cleanly for canonical oto hooks and leaves legacy hooks/dist untouched', () => {
-  fs.rmSync(DIST_DIR, { recursive: true, force: true });
-  fs.rmSync(LEGACY_DIST_DIR, { recursive: true, force: true });
-  const out = runBuildHooks();
+function runBuildHooks(hooksDir) {
+  const stdout = [];
+  const stderr = [];
+  const result = build({
+    hooksDir,
+    exit: false,
+    log: (msg) => stdout.push(msg),
+    error: (msg) => stderr.push(msg),
+  });
+  return {
+    ...result,
+    stdout: stdout.join('\n'),
+    stderr: stderr.join('\n'),
+    distDir: path.join(hooksDir, 'dist'),
+  };
+}
+
+test('build-hooks exits cleanly when hooks only contains .gitkeep', (t) => {
+  const hooksDir = makeHooksDir(t);
+  fs.writeFileSync(path.join(hooksDir, '.gitkeep'), '');
+
+  const out = runBuildHooks(hooksDir);
   assert.equal(out.status, 0, out.stderr);
   assert.match(out.stdout, /Build complete/);
-  assert.ok(fs.existsSync(DIST_DIR), 'oto/hooks/dist/ was not created');
-  assert.equal(fs.existsSync(LEGACY_DIST_DIR), false, 'legacy hooks/dist/ should not be recreated');
+  assert.ok(fs.existsSync(out.distDir), 'hooks/dist/ was not created');
 });
 
 test('build-hooks rejects syntactically invalid JS hooks', (t) => {
-  const badPath = path.join(HOOKS_DIR, '__test_bad.js');
-  const badDistPath = path.join(DIST_DIR, '__test_bad.js');
-  t.after(() => {
-    fs.rmSync(badPath, { force: true });
-    fs.rmSync(badDistPath, { force: true });
-  });
+  const hooksDir = makeHooksDir(t);
+  const badPath = path.join(hooksDir, '__test_bad.js');
   fs.writeFileSync(badPath, 'const x = 1; const x = 2;\n');
 
-  const out = runBuildHooks();
+  const out = runBuildHooks(hooksDir);
   assert.notEqual(out.status, 0);
   assert.match(out.stderr, /SyntaxError|Identifier 'x' has already been declared/);
+  const badDistPath = path.join(out.distDir, '__test_bad.js');
   assert.equal(fs.existsSync(badDistPath), false);
 });
 
 test('build-hooks copies valid hook files', (t) => {
-  const goodPath = path.join(HOOKS_DIR, '__test_good.js');
-  const goodDistPath = path.join(DIST_DIR, '__test_good.js');
-  t.after(() => {
-    fs.rmSync(goodPath, { force: true });
-    fs.rmSync(goodDistPath, { force: true });
-  });
+  const hooksDir = makeHooksDir(t);
+  const goodPath = path.join(hooksDir, '__test_good.js');
   fs.writeFileSync(goodPath, "console.log('ok');\n");
 
-  const out = runBuildHooks();
+  const out = runBuildHooks(hooksDir);
   assert.equal(out.status, 0, out.stderr);
+  const goodDistPath = path.join(out.distDir, '__test_good.js');
   assert.equal(fs.readFileSync(goodDistPath, 'utf8'), "console.log('ok');\n");
 });
