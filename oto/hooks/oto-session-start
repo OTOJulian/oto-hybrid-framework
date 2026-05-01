@@ -1,34 +1,63 @@
 #!/bin/bash
 # oto-hook-version: {{OTO_VERSION}}
-# oto-session-state.sh — SessionStart hook: inject project state reminder
-# Outputs STATE.md head on every session start for orientation.
-#
-# OPT-IN: This hook is a no-op unless config.json has hooks.community: true.
-# Enable with: "hooks": { "community": true } in .oto/config.json
+# oto-session-start - consolidated SessionStart hook (D-04)
+# Emits identity block (always-on, D-05) plus project-state reminder (opt-in via D-07).
+# Runtime-detection cascade preserved from the upstream session-start hook (D-08).
 
-# Check opt-in config — exit silently if not enabled
-if [ -f .oto/config.json ]; then
-  ENABLED=$(node -e "try{const c=require('./.oto/config.json');process.stdout.write(c.hooks?.community===true?'1':'0')}catch{process.stdout.write('0')}" 2>/dev/null)
-  if [ "$ENABLED" != "1" ]; then exit 0; fi
+set -euo pipefail
+
+# Determine plugin/install root. This works when installed under a runtime
+# config directory or invoked directly from the repository checkout.
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -d "${SCRIPT_DIR}/../skills" ]; then
+  PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+elif [ -d "${SCRIPT_DIR}/../../skills" ]; then
+  PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 else
-  exit 0
+  PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 fi
 
-echo '## Project State Reminder'
-echo ''
-
-if [ -f .oto/STATE.md ]; then
-  echo 'STATE.md exists - check for blockers and current phase.'
-  head -20 .oto/STATE.md
+# Identity-block content (D-05). Defensively read SKILL.md (D-06).
+SKILL_PATH="${PLUGIN_ROOT}/skills/using-oto/SKILL.md"
+if [ -f "$SKILL_PATH" ]; then
+  using_oto_content=$(cat "$SKILL_PATH")
 else
-  echo 'No .oto/ found - suggest /oto-new-project if starting new work.'
+  using_oto_content="oto v{{OTO_VERSION}} is installed. The 'oto:using-oto' skill ships in Phase 6."
 fi
 
-echo ''
+# JSON-escape function from the upstream session-start hook.
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
 
+using_oto_escaped=$(escape_for_json "$using_oto_content")
+
+# D-05 literal identity block. Keep this hand-authored; do not run rebrand tooling here.
+session_context="<EXTREMELY_IMPORTANT>\nYou are using oto.\n\nBelow is the full content of your 'oto:using-oto' skill — your introduction to using oto skills. For all other skills, use the Skill tool.\n\n${using_oto_escaped}\n</EXTREMELY_IMPORTANT>"
+
+# Optional project-state reminder (D-07). Default is off.
 if [ -f .oto/config.json ]; then
-  MODE=$(grep -o '"mode"[[:space:]]*:[[:space:]]*"[^"]*"' .oto/config.json 2>/dev/null || echo '"mode": "unknown"')
-  echo "Config: $MODE"
+  ENABLED=$(node -e "try{const c=require('./.oto/config.json');process.stdout.write(c.hooks?.session_state===true?'1':'0')}catch{process.stdout.write('0')}" 2>/dev/null)
+  if [ "$ENABLED" = "1" ] && [ -f .oto/STATE.md ]; then
+    state_head=$(head -20 .oto/STATE.md)
+    state_escaped=$(escape_for_json "$state_head")
+    session_context="${session_context}\n\n## Project State Reminder\n\n${state_escaped}"
+  fi
+fi
+
+# Runtime-detection cascade. Use printf instead of heredoc for shell compatibility.
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
 fi
 
 exit 0
