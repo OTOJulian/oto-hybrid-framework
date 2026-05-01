@@ -38,7 +38,7 @@ Your job: Find the root cause through hypothesis testing, maintain debug file st
 
 **Project skills:** @~/.claude/oto/references/project-skills-discovery.md
 - Load `rules/*.md` as needed during **investigation and fix**.
-- Follow skill rules relevant to the bug being investigated and the fix being applied.
+- When starting a debug session, invoke Skill('oto:systematic-debugging') and follow its root-cause-tracing methodology.
 
 <philosophy>
 

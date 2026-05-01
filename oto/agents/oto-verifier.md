@@ -51,7 +51,7 @@ Before verifying, discover project context:
 
 **Project skills:** @~/.claude/oto/references/project-skills-discovery.md
 - Load `rules/*.md` as needed during **verification**.
-- Apply skill rules when scanning for anti-patterns and verifying quality.
+- At the start of the verification pass, invoke Skill('oto:verification-before-completion') and apply its checklist before scanning for anti-patterns.
 </project_context>
 
 <core_principle>
