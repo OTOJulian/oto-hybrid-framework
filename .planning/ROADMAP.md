@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Rebrand Engine & Distribution Skeleton** - Rule-typed rebrand engine + Node package shape + GitHub-installable repo
 - [x] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
 - [x] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
-- [ ] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
+- [x] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
 - [ ] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
 - [ ] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems)
 - [ ] **Phase 8: Codex & Gemini Runtime Parity** - Single-source-of-truth instruction template + per-runtime smoke tests; only after Claude is daily-use stable
@@ -114,7 +114,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 05-02-PLAN.md — Wave 1: tokenReplace + applyTokensToTree in copy-files.cjs; build-hooks.js retargeted to oto/hooks/ (HK-07)
   - [x] 05-03-PLAN.md — Wave 2: Rewrite oto-session-start (consolidated, D-04..D-09); rename hooks.community to hooks.session_state (HK-01)
   - [x] 05-04-PLAN.md — Wave 3: runtime-claude.cjs mergeSettings + unmergeSettings; install-state hooks.version; install.cjs token-substitution wiring (HK-01..07)
-  - [ ] 05-05-PLAN.md — Wave 4: SessionStart fixture capture + oto/hooks/README.md + fixture-test wiring (HK-01)
+  - [x] 05-05-PLAN.md — Wave 4: SessionStart fixture capture + oto/hooks/README.md + fixture-test wiring (HK-01)
 
 ### Phase 6: Skills Port & Cross-System Integration
 **Goal**: Port the curated subset of 7 Superpowers skills into `oto/skills/` under the `oto:` namespace, retune the bootstrap to defer to in-progress workflows, and wire agent prompts to invoke skills at canonical points.
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Rebrand Engine & Distribution Skeleton | 3/3 | Complete | 2026-04-28 |
 | 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
 | 4. Core Workflows & Agents Port | 8/8 | Complete | 2026-04-30 |
-| 5. Hooks Port & Consolidation | 3/5 | In progress | - |
+| 5. Hooks Port & Consolidation | 5/5 | Complete | 2026-05-01 |
 | 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
 | 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |
 | 8. Codex & Gemini Runtime Parity | 0/TBD | Not started | - |
