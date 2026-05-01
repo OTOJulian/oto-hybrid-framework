@@ -21,14 +21,27 @@ INPUT=$(cat)
 # Extract command from JSON using Node (handles escaping correctly, no jq needed)
 CMD=$(echo "$INPUT" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{process.stdout.write(JSON.parse(d).tool_input?.command||'')}catch{}})" 2>/dev/null)
 
-# Only check git commit commands
-if [[ "$CMD" =~ ^git[[:space:]]+commit ]]; then
-  # Extract message from -m flag
+# Only check git commit commands. Supports common git options before the
+# commit subcommand, for example: git -C repo commit -m "fix: message".
+COMMIT_RE='(^|[;&|])[[:space:]]*git([[:space:]]+[^[:space:];&|]+)*[[:space:]]+commit([[:space:]]|$)'
+if [[ "$CMD" =~ $COMMIT_RE ]]; then
+  # Extract message from -m/--message forms Claude may pass through Bash.
   MSG=""
-  if [[ "$CMD" =~ -m[[:space:]]+\"([^\"]+)\" ]]; then
-    MSG="${BASH_REMATCH[1]}"
-  elif [[ "$CMD" =~ -m[[:space:]]+\'([^\']+)\' ]]; then
-    MSG="${BASH_REMATCH[1]}"
+  DOUBLE_RE='(^|[[:space:]])(-m|--message)[[:space:]]+"([^"]+)"'
+  SINGLE_RE="(^|[[:space:]])(-m|--message)[[:space:]]+'([^']+)'"
+  EQUALS_RE='(^|[[:space:]])--message=([^[:space:];&|]+)'
+  UNQUOTED_RE='(^|[[:space:]])(-m|--message)[[:space:]]+([^[:space:];&|]+)'
+  if [[ "$CMD" =~ $DOUBLE_RE ]]; then
+    MSG="${BASH_REMATCH[3]}"
+  elif [[ "$CMD" =~ $SINGLE_RE ]]; then
+    MSG="${BASH_REMATCH[3]}"
+  elif [[ "$CMD" =~ $EQUALS_RE ]]; then
+    MSG="${BASH_REMATCH[2]}"
+  elif [[ "$CMD" =~ $UNQUOTED_RE ]]; then
+    MSG="${BASH_REMATCH[3]}"
+  else
+    echo '{"decision":"block","reason":"Commit message must be provided with -m/--message so oto can validate Conventional Commits."}'
+    exit 2
   fi
 
   if [ -n "$MSG" ]; then
