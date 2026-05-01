@@ -25,18 +25,13 @@ else
   using_oto_content="oto v{{OTO_VERSION}} is installed. The 'oto:using-oto' skill ships in Phase 6."
 fi
 
-# JSON-escape function from the upstream session-start hook.
+# JSON-escape stdin using Node so every U+0000 through U+001F control
+# character is encoded correctly for the hook response string.
 escape_for_json() {
-  local s="$1"
-  s="${s//\\/\\\\}"
-  s="${s//\"/\\\"}"
-  s="${s//$'\n'/\\n}"
-  s="${s//$'\r'/\\r}"
-  s="${s//$'\t'/\\t}"
-  printf '%s' "$s"
+  node -e 'let d = ""; process.stdin.setEncoding("utf8"); process.stdin.on("data", c => d += c); process.stdin.on("end", () => process.stdout.write(JSON.stringify(d).slice(1, -1)));'
 }
 
-using_oto_escaped=$(escape_for_json "$using_oto_content")
+using_oto_escaped=$(printf '%s' "$using_oto_content" | escape_for_json)
 
 # D-05 literal identity block. Keep this hand-authored; do not run rebrand tooling here.
 session_context="<EXTREMELY_IMPORTANT>\nYou are using oto.\n\nBelow is the full content of your 'oto:using-oto' skill — your introduction to using oto skills. For all other skills, use the Skill tool.\n\n${using_oto_escaped}\n</EXTREMELY_IMPORTANT>"
@@ -46,7 +41,7 @@ if [ -f .oto/config.json ]; then
   ENABLED=$(node -e "try{const c=require('./.oto/config.json');process.stdout.write(c.hooks?.session_state===true?'1':'0')}catch{process.stdout.write('0')}" 2>/dev/null)
   if [ "$ENABLED" = "1" ] && [ -f .oto/STATE.md ]; then
     state_head=$(head -20 .oto/STATE.md)
-    state_escaped=$(escape_for_json "$state_head")
+    state_escaped=$(printf '%s' "$state_head" | escape_for_json)
     session_context="${session_context}\n\n## Project State Reminder\n\n${state_escaped}"
   fi
 fi

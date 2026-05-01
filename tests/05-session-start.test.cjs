@@ -70,3 +70,16 @@ test('phase-05 session-start: opt-in project-state reminder via hooks.session_st
   assert.ok(ctx.includes('Project State Reminder'), 'D-07: opt-in ON appends reminder');
   assert.ok(ctx.includes('phase: 5'), 'D-07: STATE.md head appended after escape');
 });
+
+test('phase-05 session-start: project-state reminder escapes JSON control characters', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-ss-'));
+  fs.mkdirSync(path.join(cwd, '.oto'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.oto', 'config.json'), '{"hooks":{"session_state":true}}');
+  fs.writeFileSync(path.join(cwd, '.oto', 'STATE.md'), 'phase: 5\f\nstatus:\b in-progress\n');
+  const r = spawnHook({ CLAUDE_PLUGIN_ROOT: '/tmp/fake-claude', COPILOT_CLI: '' }, cwd);
+  assert.equal(r.status, 0, r.stderr);
+  const out = JSON.parse(r.stdout);
+  const ctx = out.hookSpecificOutput.additionalContext;
+  assert.ok(ctx.includes('\f'), 'form feed survives after JSON parse');
+  assert.ok(ctx.includes('\b'), 'backspace survives after JSON parse');
+});
