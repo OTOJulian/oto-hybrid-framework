@@ -56,6 +56,28 @@ if [[ "$CMD" =~ $COMMIT_RE ]]; then
       exit 2
     fi
   fi
+
+  if [ ! -f .oto/STATE.md ]; then
+    echo '{"decision":"block","reason":"Commit blocked: no active phase found in .oto/STATE.md."}'
+    exit 2
+  fi
+
+  PHASE_LINE=$(grep -m 1 '^Phase:' .oto/STATE.md 2>/dev/null || true)
+  PLAN_LINE=$(grep -m 1 '^Plan:' .oto/STATE.md 2>/dev/null || true)
+  PHASE_VALUE="${PHASE_LINE#Phase:}"
+  PLAN_VALUE="${PLAN_LINE#Plan:}"
+  PHASE_VALUE=$(echo "$PHASE_VALUE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  PLAN_VALUE=$(echo "$PLAN_VALUE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+  if [ -z "$PHASE_LINE" ] || [[ "$PHASE_VALUE" == *"Not started"* ]] || [[ "$PHASE_VALUE" == *"none active"* ]] || [[ "$PHASE_VALUE" == *"COMPLETE"* ]] || [[ "$PHASE_VALUE" == *"completed"* ]]; then
+    echo '{"decision":"block","reason":"Commit blocked: no active phase found in .oto/STATE.md."}'
+    exit 2
+  fi
+
+  if [ -z "$PLAN_LINE" ] || [ -z "$PLAN_VALUE" ] || [ "$PLAN_VALUE" = "—" ] || [ "$PLAN_VALUE" = "-" ] || [ "$PLAN_VALUE" = "N/A" ] || [ "$PLAN_VALUE" = "Not started" ]; then
+    echo '{"decision":"block","reason":"Commit blocked: no active plan found in .oto/STATE.md."}'
+    exit 2
+  fi
 fi
 
 exit 0
