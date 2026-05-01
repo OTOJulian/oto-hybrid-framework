@@ -79,6 +79,7 @@ test('INS-02: adapter exports lifecycle hooks renderInstructionBlock/transformCo
     'transformAgent',
     'transformSkill',
     'mergeSettings',
+    'unmergeSettings',
     'onPreInstall',
     'onPostInstall',
   ]) {
@@ -92,8 +93,22 @@ test('INS-02: transformCommand/Agent/Skill are identity for Claude (canonical)',
   assert.equal(adapter.transformSkill('foo', {}), 'foo');
 });
 
-test('INS-02: mergeSettings is identity at Phase 3 (no-op)', () => {
-  assert.equal(adapter.mergeSettings('original', 'block'), 'original');
+test('INS-02 / HK-02..06: mergeSettings registers Claude hook settings', () => {
+  const merged = JSON.parse(adapter.mergeSettings('', {
+    otoVersion: '0.1.0-alpha.1',
+    configDir: '/tmp/claude',
+    installedAt: '2026-01-01T00:00:00Z',
+  }));
+  assert.equal(merged._oto.version, '0.1.0-alpha.1');
+  assert.equal(merged._oto.hooks.length, 6);
+  assert.equal(merged.statusLine.type, 'command');
+  assert.ok(merged.hooks.PreToolUse.some((entry) =>
+    entry.matcher === 'Bash' && entry.hooks[0].command.includes('oto-validate-commit.sh')
+  ));
+  assert.ok(merged.hooks.PostToolUse.some((entry) =>
+    entry.matcher === 'Bash|Edit|Write|MultiEdit|Agent|Task' &&
+    entry.hooks[0].command.includes('oto-context-monitor.js')
+  ));
 });
 
 test('INS-02: renderInstructionBlock output is stable for fixed oto_version (snapshot)', () => {
