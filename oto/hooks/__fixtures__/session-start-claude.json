@@ -1,0 +1,6 @@
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "<EXTREMELY_IMPORTANT>\nYou are using oto.\n\nBelow is the full content of your 'oto:using-oto' skill — your introduction to using oto skills. For all other skills, use the Skill tool.\n\noto v{{OTO_VERSION}} is installed. The 'oto:using-oto' skill ships in Phase 6.\n</EXTREMELY_IMPORTANT>"
+  }
+}
