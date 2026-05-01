@@ -2,41 +2,41 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: planning
-stopped_at: Phase 6 context gathered
-last_updated: "2026-05-01T22:11:47.499Z"
-last_activity: 2026-05-01
+status: ready_to_plan
+stopped_at: Phase 7 ready to plan
+last_updated: "2026-05-01T23:02:39Z"
+last_activity: 2026-05-01 -- Phase 06 completed; Phase 7 ready to plan
 progress:
   total_phases: 10
-  completed_phases: 5
-  total_plans: 27
-  completed_plans: 27
-  percent: 100
+  completed_phases: 6
+  total_plans: 30
+  completed_plans: 30
+  percent: 60
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-27)
+See: .planning/PROJECT.md (updated 2026-05-01)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 06 — skills-port-&-cross-system-integration
+**Current focus:** Phase 07 — workstreams-&-workspaces-port
 
 ## Current Position
 
-Phase: 06 (skills-port-&-cross-system-integration) — READY_TO_PLAN
+Phase: 07 (workstreams-&-workspaces-port) — READY_TO_PLAN
 Plan: Not started
 Status: Ready to plan
 Last activity: 2026-05-01
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 27
+- Total plans completed: 30
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -49,6 +49,7 @@ Progress: [█████░░░░░] 50%
 | 03 | 7 | - | - |
 | 04 | 8 | - | - |
 | 05 | 6 | - | - |
+| 06 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -77,6 +78,9 @@ Progress: [█████░░░░░] 50%
 | Phase 05 P04 | 9 min | 4 tasks | 5 files |
 | Phase 05 P05 | 6 min | 2 tasks | 4 files |
 | Phase 05 P06 | 4 min | 2 tasks | 3 files |
+| Phase 06 P01 | 12 min | 3 tasks | 4 files |
+| Phase 06 P02 | 18 min | 2 tasks | 29 created, 1 modified |
+| Phase 06 P03 | 15 min | 2 tasks + 1 regression fix | 6 files |
 
 ## Accumulated Context
 
@@ -133,6 +137,10 @@ Recent decisions affecting current work:
 - 05-05: Capture the SessionStart fixture from the source hook so the literal {{OTO_VERSION}} token remains part of the locked baseline.
 - 05-05: Keep the fixture test isolated from the install pipeline by respawning oto/hooks/oto-session-start directly in a temp cwd.
 - 05-06: Keep validate-commit message parsing before active .oto/STATE.md phase/plan enforcement.
+- 06-02: Use the upstream repo root as the rebrand target so inventory `target_path` entries drive `skills/using-superpowers` to `skills/using-oto`.
+- 06-02: Keep hand edits isolated to `oto/skills/using-oto/SKILL.md`; the other six retained skills ship as rebrand-engine output.
+- 06-03: Keep SKL-08 wiring as inline prose `Skill('oto:<name>')` directives, not frontmatter or hooks.
+- 06-03: Strip nested `using-oto` identity tags during SessionStart injection so the runtime context preserves one outer identity block.
 
 ### Pending Todos
 

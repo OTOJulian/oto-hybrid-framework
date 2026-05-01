@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Installer Fork & Claude Adapter** - Trim `bin/install.js` to 3 runtimes; Claude install path is the v0.1.0 happy path
 - [x] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
 - [x] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
-- [ ] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
+- [x] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
 - [ ] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems)
 - [ ] **Phase 8: Codex & Gemini Runtime Parity** - Single-source-of-truth instruction template + per-runtime smoke tests; only after Claude is daily-use stable
 - [ ] **Phase 9: Upstream Sync Pipeline** - Pull GSD/Superpowers, apply rename map, surface conflicts; v1 scope = rename + conflict surfacing only
@@ -127,7 +127,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `oto-executor` agent's prompt invokes `oto:test-driven-development` before writing implementation code AND `oto:verification-before-completion` after writing implementation code, at canonical points
   4. `oto-debugger` agent's prompt invokes `oto:systematic-debugging` when starting a debugging session
   5. Outside of an active workflow, an ambient prompt like "fix this bug" auto-invokes `oto:systematic-debugging` (skill auto-load works as designed when not gated by STATE.md)
-**Plans**: TBD
+**Plans**: 3 plans
+  - [x] 06-01-PLAN.md — Wave 0: Three node:test scaffolds (skill structure + collision + agent invocations; installer copy fidelity; using-oto state-gating + Pitfall 15 defense) plus STATE-active fixture (SKL-01..08)
+  - [x] 06-02-PLAN.md — Wave 1: Engine apply on the 7 retained skill directories + hand-fix using-oto/SKILL.md (Phase 5 D-05 identity sentence + D-03 gating directive + Pitfall 15 banned-literal scrub) (SKL-01..07)
+  - [x] 06-03-PLAN.md — Wave 1: Wire SKL-08 canonical invocations into oto-executor (TDD before write + verification after), oto-verifier (verification at start), oto-debugger (systematic-debugging at start) (SKL-08)
 
 ### Phase 7: Workstreams & Workspaces Port
 **Goal**: Port the two large standalone GSD subsystems — parallel workstreams and isolated workspaces — that warrant their own phase because each manages a non-trivial state model orthogonal to the phase machine.
@@ -186,7 +189,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Installer Fork & Claude Adapter | 7/7 | Complete | 2026-04-28 |
 | 4. Core Workflows & Agents Port | 8/8 | Complete | 2026-04-30 |
 | 5. Hooks Port & Consolidation | 6/6 | Complete | 2026-05-01 |
-| 6. Skills Port & Cross-System Integration | 0/TBD | Not started | - |
+| 6. Skills Port & Cross-System Integration | 3/3 | Complete | 2026-05-01 |
 | 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |
 | 8. Codex & Gemini Runtime Parity | 0/TBD | Not started | - |
 | 9. Upstream Sync Pipeline | 0/TBD | Not started | - |

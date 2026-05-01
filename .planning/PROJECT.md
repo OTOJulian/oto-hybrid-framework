@@ -18,13 +18,13 @@
 - [x] Phase 2 shipped the Node package skeleton, public GitHub install target, rebrand engine, dry-run/apply reports, and round-trip verification.
 - [x] Phase 3 shipped the trimmed installer for exactly Claude Code, Codex, and Gemini CLI, with Claude as the v0.1.0 happy path and Codex/Gemini explicitly best-effort until parity work.
 - [x] Phase 4 shipped the GSD core workflow and retained agent spine for Claude Code, with MR-01 approved through a disposable end-to-end dogfood session.
+- [x] Phase 5 shipped the consolidated hook fleet: single SessionStart bootstrap, statusline, context monitor, prompt guard, read-injection scanner, validate-commit, and install-time hook version tagging.
+- [x] Phase 6 shipped the curated 7-skill subset under `oto:<skill>`, `oto:using-oto` workflow deference, installer skill-copy coverage, and canonical skill invocations in executor/verifier/debugger agents.
 
 ### Active
 
 <!-- Current scope. Building toward these. The hybrid architecture is research-driven; these requirements scope the framework, not the merge strategy. -->
 
-- [ ] Phase 5: Port and consolidate hooks with one SessionStart bootstrap and version-tagged hook sources.
-- [ ] Phase 6: Port the curated Superpowers skill subset under `oto:<skill>` and wire canonical agent skill calls.
 - [ ] Phase 7: Port workstreams and isolated workspace management.
 - [ ] Phase 8: Bring Codex and Gemini CLI to runtime parity after Claude Code is daily-use stable.
 - [ ] Phase 9: Build the upstream sync pipeline for renamed snapshots and conflict surfacing.
@@ -79,6 +79,7 @@
 | Clean-slate build, no carry-over of personal `~/.claude/` tweaks | User confirmed nothing currently customized that needs preserving | Resolved in Phase 1 scope |
 | Claude installer first, Codex/Gemini later parity | MR-01 requires Claude Code stability before spending effort on cross-runtime parity | Resolved in Phase 3; Phase 8 owns parity hardening |
 | MR-01 approved before parity work | The Phase 4 disposable Claude Code dogfood completed new-project, discuss, plan, execute, verify, progress, pause, clear, and resume without falling back to upstream GSD or Superpowers | Resolved in Phase 4; Phase 5 hooks can proceed before Phase 8 runtime parity |
+| Workflow wins over ambient skill auto-fire | During active `.oto/STATE.md` workflows, `oto:using-oto` suppresses suspicion-based skill auto-fire while preserving explicit/canonical `Skill()` calls | Resolved in Phase 6; Phase 10 owns live conversational regression coverage |
 
 ## Evolution
 
@@ -98,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-30 after Phase 04 closeout*
+*Last updated: 2026-05-01 after Phase 06 closeout*

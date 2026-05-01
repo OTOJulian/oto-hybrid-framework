@@ -85,14 +85,14 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Skills (Superpowers Subset — Ported & Rebranded)
 
-- [ ] **SKL-01**: `oto:test-driven-development` — TDD enforcement skill
-- [ ] **SKL-02**: `oto:systematic-debugging` — root-cause-tracing methodology
-- [ ] **SKL-03**: `oto:verification-before-completion` — per-claim verification skill
-- [ ] **SKL-04**: `oto:dispatching-parallel-agents` — parallel agent dispatch patterns
-- [ ] **SKL-05**: `oto:using-git-worktrees` — worktree workflow patterns
-- [ ] **SKL-06**: `oto:writing-skills` — meta-skill for authoring new oto skills
-- [ ] **SKL-07**: `oto:using-oto` — bootstrap skill loaded at SessionStart; defers to in-progress workflows (gates on `.oto/STATE.md`)
-- [ ] **SKL-08**: Cross-system integration — `oto-executor` agent invokes `oto:test-driven-development` and `oto:verification-before-completion` at canonical points; `oto-debugger` invokes `oto:systematic-debugging`
+- [x] **SKL-01**: `oto:test-driven-development` — TDD enforcement skill
+- [x] **SKL-02**: `oto:systematic-debugging` — root-cause-tracing methodology
+- [x] **SKL-03**: `oto:verification-before-completion` — per-claim verification skill
+- [x] **SKL-04**: `oto:dispatching-parallel-agents` — parallel agent dispatch patterns
+- [x] **SKL-05**: `oto:using-git-worktrees` — worktree workflow patterns
+- [x] **SKL-06**: `oto:writing-skills` — meta-skill for authoring new oto skills
+- [x] **SKL-07**: `oto:using-oto` — bootstrap skill loaded at SessionStart; defers to in-progress workflows (gates on `.oto/STATE.md`)
+- [x] **SKL-08**: Cross-system integration — `oto-executor` agent invokes `oto:test-driven-development` and `oto:verification-before-completion` at canonical points; `oto-debugger` invokes `oto:systematic-debugging`
 
 ### Hooks
 
@@ -252,14 +252,14 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | AGT-02 | Phase 4 | Complete |
 | AGT-03 | Phase 4 | Complete |
 | AGT-04 | Phase 4 | Complete |
-| SKL-01 | Phase 6 | Pending |
-| SKL-02 | Phase 6 | Pending |
-| SKL-03 | Phase 6 | Pending |
-| SKL-04 | Phase 6 | Pending |
-| SKL-05 | Phase 6 | Pending |
-| SKL-06 | Phase 6 | Pending |
-| SKL-07 | Phase 6 | Pending |
-| SKL-08 | Phase 6 | Pending |
+| SKL-01 | Phase 6 | Complete |
+| SKL-02 | Phase 6 | Complete |
+| SKL-03 | Phase 6 | Complete |
+| SKL-04 | Phase 6 | Complete |
+| SKL-05 | Phase 6 | Complete |
+| SKL-06 | Phase 6 | Complete |
+| SKL-07 | Phase 6 | Complete |
+| SKL-08 | Phase 6 | Complete |
 | HK-01 | Phase 5 | Complete |
 | HK-02 | Phase 5 | Complete |
 | HK-03 | Phase 5 | Complete |
