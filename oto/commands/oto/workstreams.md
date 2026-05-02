@@ -12,7 +12,7 @@ Manage parallel workstreams for concurrent milestone work.
 
 ## Usage
 
-`/oto-workstreams [subcommand] [args]`
+`/oto:workstreams [subcommand] [args]`
 
 ### Subcommands
 
@@ -38,9 +38,9 @@ Run: `oto-sdk query workstream.list --raw --cwd "$CWD"`
 Display the workstreams in a table format showing name, status, current phase, and progress.
 
 ### create
-Run: `oto-sdk query workstream.create <name> --raw --cwd "$CWD"`
+Run: `oto-sdk query workstream.create <name> --migrate-name <name> --raw --cwd "$CWD"`
 After creation, display the new workstream path and suggest next steps:
-- `/oto-new-milestone --ws <name>` to set up the milestone
+- `/oto:new-milestone --ws <name>` to set up the milestone
 
 ### status
 Run: `oto-sdk query workstream.status <name> --raw --cwd "$CWD"`

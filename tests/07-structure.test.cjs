@@ -74,6 +74,11 @@ test('phase 07 - structure smoke', { concurrency: false }, async (t) => {
     }
   });
 
+  await t.test('workstreams command migrates flat-mode files into the requested workstream', () => {
+    const command = read('oto/commands/oto/workstreams.md');
+    assert.match(command, /workstream\.create <name> --migrate-name <name>/);
+  });
+
   await t.test('using-git-worktrees SKILL.md has Workflow Deference section', () => {
     const skill = read('oto/skills/using-git-worktrees/SKILL.md');
     assert.match(skill, /^## Workflow Deference$/m);

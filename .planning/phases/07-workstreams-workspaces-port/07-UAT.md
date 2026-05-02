@@ -1,6 +1,6 @@
-# Phase 7 UAT — Workstreams & Workspaces
+# Phase 7 UAT - Workstreams & Workspaces
 
-**Created:** YYYY-MM-DD
+**Created:** 2026-05-02
 **Operator:** [your name / handle]
 **Phase:** 07-workstreams-workspaces-port
 **Requirements covered:** WF-26, WF-27
@@ -8,36 +8,66 @@
 ## Preconditions
 
 - [ ] Repo HEAD is on the branch where Phase 7 plans 01-04 are committed
-- [ ] `node --test tests/07-*.test.cjs` exits 0 (all 4 Phase 7 tests green)
-- [ ] `node --test tests/phase-04-frontmatter-schema.test.cjs tests/phase-04-planning-leak.test.cjs` exits 0 (no Phase 4 regression)
-- [ ] No active workstream in this repo (`ls .oto/workstreams 2>/dev/null` returns nothing or already-archived names)
-- [ ] `git status` is clean before the UAT begins (so any post-UAT diff isolates the UAT's effects)
+- [ ] `node --test tests/07-*.test.cjs` exits 0
+- [ ] `node --test tests/phase-04-frontmatter-schema.test.cjs tests/phase-04-planning-leak.test.cjs` exits 0
+- [ ] `npm link` has linked the local source package so `oto-sdk` is on PATH
+- [ ] `node bin/install.js install --claude --force` has copied the current slash-command files into `~/.claude`
+- [ ] `command -v oto-sdk` returns a path
 
 ## Run Mode
 
-Open a Claude Code session in this repo. Each step below is a single slash-command invocation. Capture the output (or relevant subset) under each step's "Result" block. Mark `[x]` for pass, `[!]` for fail, `[~]` for partial / needs investigation.
+Run this UAT from a disposable `.oto` project, not from this source repo. The
+source repo still uses legacy `.planning/` for its own GSD execution state, and
+the Phase 7 product surface intentionally requires `.oto/`.
 
-Rollback instructions for each step are inline. If any step fails, complete the documented rollback for that step before stopping the UAT.
+Do not run `/oto:new-project` in this source repo, do not migrate this source
+repo to `.oto/`, and do not use `/gsd-*` commands for this UAT.
+
+## Disposable Project Setup
+
+From a normal terminal:
+
+```bash
+cd /Users/Julian/Desktop/oto-hybrid-framework
+export OTO_PHASE7_UAT="$(mktemp -d /tmp/oto-phase7-uat-XXXXXX)"
+cd "$OTO_PHASE7_UAT"
+git init
+git config user.email phase7-uat@example.invalid
+git config user.name "Phase 7 UAT"
+printf '# OTO Phase 7 UAT\n' > README.md
+git add README.md
+git commit -m "init"
+mkdir -p .oto
+cp -R /Users/Julian/Desktop/oto-hybrid-framework/tests/fixtures/phase-07/flat-mode/. .oto/
+claude
+```
+
+In Claude Code, each step below is a single slash-command invocation. Capture
+the output, or the relevant subset, under each step's "Result" block. Mark
+`[x]` for pass, `[!]` for fail, `[~]` for partial / needs investigation.
+
+If any step fails, complete the documented rollback for that step before
+stopping the UAT.
 
 ## Checklist
 
 ### Step 1: Create a workstream
 
-- [ ] Run: `/oto-workstreams create demo`
-- [ ] **Expected:** New directory `.oto/workstreams/demo/` exists with at least `STATE.md`, `ROADMAP.md`, `REQUIREMENTS.md` migrated into it
+- [ ] Run: `/oto:workstreams create demo`
+- [ ] **Expected:** New directory `.oto/workstreams/demo/` exists with at least `STATE.md`, `ROADMAP.md`, `REQUIREMENTS.md`, and `phases/` migrated into it
 - [ ] **Verify:** `ls .oto/workstreams/demo/` lists the migrated files
 - [ ] **Result:**
       ```
       [paste output here]
       ```
 - [ ] **Pass / Fail:** [ ]
-- [ ] **Rollback if needed:** `rm -rf .oto/workstreams/demo` and restore the migrated files to repo root if migration was destructive (see step output to determine)
+- [ ] **Rollback if needed:** `rm -rf .oto/workstreams/demo .oto/workstreams` and restore the setup fixture if migration was destructive
 
 ### Step 2: Switch to the workstream
 
-- [ ] Run: `/oto-workstreams switch demo`
-- [ ] **Expected:** Active workstream pointer set to `demo`; subsequent oto commands route to the demo workstream's state
-- [ ] **Verify:** `node oto/bin/lib/oto-tools.cjs workstream get` returns demo
+- [ ] Run: `/oto:workstreams switch demo`
+- [ ] **Expected:** Active workstream pointer is set to `demo`
+- [ ] **Verify:** `oto-sdk query workstream.get --raw --cwd "$PWD"` returns `"active":"demo"`
 - [ ] **Result:**
       ```
       [paste output]
@@ -46,56 +76,57 @@ Rollback instructions for each step are inline. If any step fails, complete the 
 
 ### Step 3: List workstreams
 
-- [ ] Run: `/oto-workstreams list`
-- [ ] **Expected:** demo appears in the list with its status; no errors
+- [ ] Run: `/oto:workstreams list`
+- [ ] **Expected:** `demo` appears in the list with its status; no errors
 - [ ] **Result:**
       ```
       [paste output]
       ```
 - [ ] **Pass / Fail:** [ ]
 
-### Step 4: ${OTO_WS} chaining check (D-10)
+### Step 4: Active workstream chaining check
 
-> **This is the critical chaining check.** It verifies that after `workstream switch demo`, downstream workflows actually read the demo workstream's state, not the flat-mode files.
+This is the critical chaining check. It verifies that after `workstreams switch
+demo`, downstream workflows read the demo workstream's state instead of the
+flat `.oto/` files.
 
-- [ ] With demo still active from step 2, run: `/oto-progress`
-- [ ] **Expected:** Output reflects the demo workstream's state (likely "no roadmap yet" or similar minimal output, since the migrated demo's ROADMAP.md may be empty / stub-state). It should NOT report progress for the actual oto project (Phase 6 complete, etc.). If `/oto-progress` reports the actual oto project's progress, the routing flag did NOT thread → FAIL.
+- [ ] With `demo` still active from step 2, run: `/oto:progress`
+- [ ] **Expected:** Output reflects the disposable fixture workstream state. It must not report progress for `/Users/Julian/Desktop/oto-hybrid-framework`.
 - [ ] **Result:**
       ```
       [paste output]
       ```
 - [ ] **Pass / Fail:** [ ]
-- [ ] **If FAIL:** Open a hand-fixup plan to investigate `${OTO_WS}` propagation through `oto-tools.cjs` `planningPaths` / `planningRoot` resolution
+- [ ] **If FAIL:** Open a hand-fixup plan to investigate active workstream propagation through `oto-tools.cjs` `planningPaths` / `planningRoot` resolution
 
 ### Step 5: Complete the workstream
 
-- [ ] Run: `/oto-workstreams complete demo`
-- [ ] **Expected:** demo archived; active pointer cleared (or returned to the prior active state)
-- [ ] **Verify:** `node oto/bin/lib/oto-tools.cjs workstream get` returns null / empty / "no active workstream"
-- [ ] **Verify:** `.oto/workstreams/demo/` either removed or moved to an archive subdirectory (per upstream `complete` behavior — verify against `oto/bin/lib/workstream.cjs` `complete` function)
+- [ ] Run: `/oto:workstreams complete demo`
+- [ ] **Expected:** `demo` is archived under `.oto/milestones/`; active pointer is cleared
+- [ ] **Verify:** `oto-sdk query workstream.get --raw --cwd "$PWD"` returns a null or empty active workstream
 - [ ] **Result:**
       ```
       [paste output]
       ```
 - [ ] **Pass / Fail:** [ ]
-- [ ] **Rollback if needed:** `rm -rf .oto/workstreams/demo .oto/workstreams/.archived/demo 2>/dev/null` to clear any residual state
+- [ ] **Rollback if needed:** `rm -rf .oto/workstreams/demo .oto/milestones/ws-demo-* 2>/dev/null`
 
 ### Step 6: Create a new workspace
 
-- [ ] Run: `/oto-new-workspace --name uat-demo --repos . --strategy worktree`
-- [ ] **Expected:** A new workspace at the path the workflow chose (likely under `.worktrees/uat-demo` or similar — confirm via output). The target contains a `WORKSPACE.md` and an initialized `.oto/`
-- [ ] **Verify:** the workspace path printed in the output exists; `WORKSPACE.md` is present at it; `.oto/` is initialized at it
+- [ ] Run: `/oto:new-workspace --name uat-demo --repos . --strategy worktree --auto`
+- [ ] **Expected:** A new workspace is created under `~/oto-workspaces/uat-demo` unless the output says a different path. The target contains `WORKSPACE.md` and an initialized `.oto/`
+- [ ] **Verify:** the workspace path printed in the output exists; `WORKSPACE.md` is present at it; `.oto/` is present at it
 - [ ] **Result:**
       ```
       [paste output]
       ```
 - [ ] **Pass / Fail:** [ ]
-- [ ] **Rollback if needed:** `git worktree remove <workspace-path>` (if worktree strategy succeeded) or `rm -rf <workspace-path>` (if clone strategy)
+- [ ] **Rollback if needed:** `git worktree remove <workspace-repo-path>` if worktree strategy succeeded, then `rm -rf <workspace-path>`
 
 ### Step 7: List workspaces
 
-- [ ] Run: `/oto-list-workspaces`
-- [ ] **Expected:** uat-demo listed with its path and any metadata
+- [ ] Run: `/oto:list-workspaces`
+- [ ] **Expected:** `uat-demo` is listed with its path and metadata
 - [ ] **Result:**
       ```
       [paste output]
@@ -104,21 +135,29 @@ Rollback instructions for each step are inline. If any step fails, complete the 
 
 ### Step 8: Remove the workspace
 
-- [ ] Run: `/oto-remove-workspace --name uat-demo`
-- [ ] **Expected:** uat-demo removed cleanly; parent project's `.oto/` is unchanged; `git worktree list` no longer shows uat-demo
-- [ ] **Verify:** `git worktree list` does not include uat-demo
-- [ ] **Verify:** `git status` shows no unexpected modifications to the parent repo's `.oto/`
+- [ ] Run: `/oto:remove-workspace uat-demo`
+- [ ] **Expected:** `uat-demo` is removed cleanly; `git worktree list` no longer shows the workspace repo
+- [ ] **Verify:** `git worktree list` does not include `uat-demo`
 - [ ] **Result:**
       ```
       [paste output]
       ```
 - [ ] **Pass / Fail:** [ ]
 
+## Cleanup
+
+After the checklist, from the disposable project terminal:
+
+```bash
+cd /Users/Julian/Desktop/oto-hybrid-framework
+rm -rf "$OTO_PHASE7_UAT"
+```
+
 ## Outcome
 
-- [ ] All 8 steps pass → Phase 7 complete; commit `07-UAT.md` and proceed to Phase 8 readiness
-- [ ] One or more steps fail → Open a `07-NN-PLAN.md` hand-fixup plan; do NOT mark Phase 7 complete
+- [ ] All 8 steps pass: commit `07-UAT.md`, create `07-05-SUMMARY.md`, and proceed to Phase 8 readiness
+- [ ] One or more steps fail: open a `07-NN-PLAN.md` hand-fixup plan; do not mark Phase 7 complete
 
 ## Operator Notes
 
-[Free-form notes from the UAT run — anything observed that warrants follow-up but is not a blocker]
+[Free-form notes from the UAT run. Capture anything observed that warrants follow-up but is not a blocker.]
