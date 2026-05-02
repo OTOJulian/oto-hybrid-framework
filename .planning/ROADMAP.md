@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Core Workflows & Agents Port** - Bulk rebrand of GSD spine: 28 workflows + retained agents; `/oto-*` commands work end-to-end on Claude
 - [x] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
 - [x] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
-- [ ] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems)
+- [x] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems) (completed 2026-05-02)
 - [ ] **Phase 8: Codex & Gemini Runtime Parity** - Single-source-of-truth instruction template + per-runtime smoke tests; only after Claude is daily-use stable
 - [ ] **Phase 9: Upstream Sync Pipeline** - Pull GSD/Superpowers, apply rename map, surface conflicts; v1 scope = rename + conflict surfacing only
 - [ ] **Phase 10: Tests, CI, Docs & v0.1.0 Release** - Full CI matrix, coverage manifest, license check, README, attribution, tagged release
@@ -145,7 +145,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 07-02-PLAN.md — Add Workflow Deference section to oto/skills/using-git-worktrees/SKILL.md naming /oto-new-workspace (D-03, D-04)
   - [x] 07-03-PLAN.md — Smoke tests: tests/07-structure.test.cjs + tests/07-workspace-init.test.cjs (D-05, D-08)
   - [x] 07-04-PLAN.md — Behavior tests with .oto/ fixture: tests/07-workstream-crud.test.cjs + tests/07-session-pointer.test.cjs (D-06, D-07)
-  - [ ] 07-05-PLAN.md — Operator UAT dogfood: 8-step checklist incl. ${OTO_WS} chaining check (D-09, D-10)
+  - [x] 07-05-PLAN.md — Operator UAT dogfood: 8-step checklist incl. ${OTO_WS} chaining check (D-09, D-10)
 
 ### Phase 8: Codex & Gemini Runtime Parity
 **Goal**: Bring Codex and Gemini CLI runtimes up to parity (best-effort given subagent-support gaps in Gemini), gated on MR-01 having been satisfied at Phase 4 close.
@@ -195,7 +195,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Core Workflows & Agents Port | 8/8 | Complete | 2026-04-30 |
 | 5. Hooks Port & Consolidation | 6/6 | Complete | 2026-05-01 |
 | 6. Skills Port & Cross-System Integration | 3/3 | Complete | 2026-05-01 |
-| 7. Workstreams & Workspaces Port | 0/TBD | Not started | - |
+| 7. Workstreams & Workspaces Port | 5/5 | Complete    | 2026-05-02 |
 | 8. Codex & Gemini Runtime Parity | 0/TBD | Not started | - |
 | 9. Upstream Sync Pipeline | 0/TBD | Not started | - |
 | 10. Tests, CI, Docs & v0.1.0 Release | 0/TBD | Not started | - |

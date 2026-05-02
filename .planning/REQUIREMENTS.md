@@ -70,8 +70,8 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [x] **WF-23**: `/oto-map-codebase`, `/oto-scan` — brownfield exploration
 - [x] **WF-24**: `/oto-docs-update` — generate/update documentation verified against codebase
 - [x] **WF-25**: `/oto-review` — cross-AI peer review of phase plans
-- [ ] **WF-26**: `/oto-workstreams` — manage parallel workstreams (list, create, switch, status, complete)
-- [ ] **WF-27**: `/oto-list-workspaces`, `/oto-new-workspace`, `/oto-remove-workspace` — isolated workspace management
+- [x] **WF-26**: `/oto-workstreams` — manage parallel workstreams (list, create, switch, status, complete)
+- [x] **WF-27**: `/oto-list-workspaces`, `/oto-new-workspace`, `/oto-remove-workspace` — isolated workspace management
 - [x] **WF-28**: AI-integration phase scaffolding ported (eval-planner, AI-feature workflows)
 - [x] **WF-29**: `/oto-autonomous` — run remaining phases autonomously
 - [x] **WF-30**: `/oto-set-profile` — switch model profile (quality/balanced/budget/inherit)
@@ -243,8 +243,8 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | WF-23 | Phase 4 | Complete |
 | WF-24 | Phase 4 | Complete |
 | WF-25 | Phase 4 | Complete |
-| WF-26 | Phase 7 | Pending |
-| WF-27 | Phase 7 | Pending |
+| WF-26 | Phase 7 | Complete |
+| WF-27 | Phase 7 | Complete |
 | WF-28 | Phase 4 | Complete |
 | WF-29 | Phase 4 | Complete |
 | WF-30 | Phase 4 | Complete |

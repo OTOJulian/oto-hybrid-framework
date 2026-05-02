@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-status: waiting
-stopped_at: Awaiting Phase 7 operator UAT results
-last_updated: "2026-05-02T00:40:45Z"
-last_activity: 2026-05-02 -- Phase 07 UAT checklist created; awaiting operator run
+status: ready_to_plan
+stopped_at: Phase 8 ready to plan
+last_updated: "2026-05-02T17:27:17Z"
+last_activity: 2026-05-02 -- Phase 07 complete; Phase 08 ready to plan
 progress:
   total_phases: 10
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 35
-  completed_plans: 34
-  percent: 97
+  completed_plans: 35
+  percent: 70
 ---
 
 # Project State
@@ -21,22 +21,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-01)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 07 — workstreams-workspaces-port
+**Current focus:** Phase 08 — codex-&-gemini-runtime-parity
 
 ## Current Position
 
-Phase: 07 (workstreams-workspaces-port) — EXECUTING
-Plan: 5 of 5
-Status: Awaiting operator UAT
-Last activity: 2026-05-02 -- Phase 07 UAT checklist created; awaiting operator run
+**Current Phase:** 08
+**Current Phase Name:** Codex & Gemini Runtime Parity
+**Current Plan:** Not started
+**Total Plans in Phase:** 0
+**Status:** Ready to plan
+**Progress:** 70%
+**Last Activity:** 2026-05-02 -- Phase 07 complete; Phase 08 ready to plan
 
-Progress: [██████████] 97%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 30
+- Total plans completed: 35
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -50,6 +53,7 @@ Progress: [██████████] 97%
 | 04 | 8 | - | - |
 | 05 | 6 | - | - |
 | 06 | 3 | - | - |
+| 07 | 5 | 14 min | 5 min |
 
 **Recent Trend:**
 
@@ -157,6 +161,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-02T00:05:01.798Z
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-workstreams-workspaces-port/07-CONTEXT.md
+Last session: 2026-05-02T17:27:17Z
+Stopped at: Phase 8 ready to plan
+Resume file: None
