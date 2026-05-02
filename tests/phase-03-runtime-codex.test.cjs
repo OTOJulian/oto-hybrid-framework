@@ -42,27 +42,30 @@ test('INS-02: adapter descriptor has settingsFilename === "config.toml" and sett
   assert.equal(adapter.settingsFormat, 'toml');
 });
 
-test('INS-02: transformCommand/Agent/Skill are identity at Phase 3 (TODO Phase 8 parity comment present)', () => {
-  const source = fs.readFileSync('bin/lib/runtime-codex.cjs', 'utf8');
-  assert.equal(adapter.transformCommand('foo', {}), 'foo');
-  assert.equal(adapter.transformAgent('foo', {}), 'foo');
-  assert.equal(adapter.transformSkill('foo', {}), 'foo');
+test('INS-02: transformCommand/Agent/Skill use Codex parity transforms', () => {
+  assert.equal(adapter.transformCommand('@~/.claude/oto/workflows/x.md $ARGUMENTS', {}), '@~/.codex/oto/workflows/x.md {{GSD_ARGS}}');
+  assert.equal(adapter.transformSkill('@~/.claude/oto/references/x.md', {}), '@~/.codex/oto/references/x.md');
   assert.match(
-    source,
-    /\/\/ TODO Phase 8: Codex frontmatter parity \(convertClaudeAgentToCodexAgent equivalent\)\n\s*transformAgent:/
+    adapter.transformAgent('---\nname: oto-x\ndescription: Demo\ntools: Read\ncolor: red\n---\n@~/.claude/oto/x.md'),
+    /<codex_agent_role>\nrole: oto-x\n/
   );
 });
 
-test('INS-02: mergeSettings is identity at Phase 3 (TODO Phase 5 hooks comment present)', () => {
-  const source = fs.readFileSync('bin/lib/runtime-codex.cjs', 'utf8');
-  assert.equal(adapter.mergeSettings('original', 'block'), 'original');
-  assert.match(source, /\/\/ TODO Phase 5: real TOML manipulation via bin\/lib\/codex-toml\.cjs\n\s*mergeSettings:/);
+test('INS-02: mergeSettings injects managed Codex hook entries', () => {
+  const merged = adapter.mergeSettings('model = "gpt-5.3-codex"\n', {
+    configDir: '/tmp/oto-codex',
+    otoVersion: '0.1.0-alpha.1',
+  });
+  assert.match(merged, /# === BEGIN OTO HOOKS ===/);
+  assert.match(merged, /\[\[hooks\]\]/);
+  assert.match(merged, /oto-validate-commit\.sh/);
 });
 
-test('INS-05: --codex labeled best-effort until Phase 8 — adapter has // TODO Phase 8 marker in source', () => {
+test('INS-05: --codex instruction block uses the Codex runtime label', () => {
   const source = fs.readFileSync('bin/lib/runtime-codex.cjs', 'utf8');
   const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0-alpha.1' });
-  assert.match(result, /best-effort until Phase 8/);
-  assert.match(source, /TODO Phase 8/);
-  assert.match(source, /TODO Phase 5/);
+  assert.match(result, /## oto \(Codex\)/);
+  assert.match(result, /\/oto-help/);
+  assert.match(source, /codex-transform\.cjs/);
+  assert.match(source, /codex-toml\.cjs/);
 });

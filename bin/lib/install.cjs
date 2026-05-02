@@ -98,6 +98,18 @@ async function installRuntime(adapter, opts = {}) {
     }
   }
 
+  if (typeof adapter.emitDerivedFiles === 'function') {
+    const derivedEntries = await adapter.emitDerivedFiles({
+      configDir,
+      repoRoot,
+      otoVersion: OTO_VERSION,
+      projectRoot: opts.projectRoot || process.cwd(),
+    });
+    for (const entry of derivedEntries || []) {
+      fileEntries.push(entry);
+    }
+  }
+
   const newPaths = new Set(fileEntries.map((file) => file.path));
   for (const prior of (priorState?.files || [])) {
     if (!newPaths.has(prior.path)) {

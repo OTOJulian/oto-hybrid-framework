@@ -44,14 +44,18 @@ test('INS-05: install --codex injects marker block into AGENTS.md (not CLAUDE.md
   assert.equal(fs.existsSync(path.join(configDir, 'CLAUDE.md')), false);
 });
 
-test('INS-05: mergeSettings is identity — pre-existing config.toml is byte-identical after install', async (t) => {
+test('INS-05: mergeSettings preserves pre-existing config.toml content and appends managed hooks', async (t) => {
   const configDir = tmpDir(t);
   const settings = "[some_section]\nkey = 'value'\n";
   fs.writeFileSync(path.join(configDir, 'config.toml'), settings);
 
   await installRuntime(adapter, installOpts(configDir));
 
-  assert.equal(fs.readFileSync(path.join(configDir, 'config.toml'), 'utf8'), settings);
+  const merged = fs.readFileSync(path.join(configDir, 'config.toml'), 'utf8');
+  assert.match(merged, /^\[some_section\]\nkey = 'value'\n/);
+  assert.match(merged, /# === BEGIN OTO HOOKS ===/);
+  assert.match(merged, /\[\[hooks\]\]/);
+  assert.match(merged, /oto-validate-commit\.sh/);
 });
 
 test('INS-05: uninstall --codex round-trips clean (state file gone, AGENTS.md restored)', async (t) => {

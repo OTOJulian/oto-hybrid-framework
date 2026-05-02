@@ -1,6 +1,50 @@
 'use strict';
 
+const fs = require('node:fs');
+const fsp = require('node:fs/promises');
+const crypto = require('node:crypto');
 const path = require('node:path');
+const {
+  convertClaudeAgentToCodexAgent,
+  convertClaudeToCodexMarkdown,
+  generateCodexAgentToml,
+} = require('./codex-transform.cjs');
+const { mergeHooksBlock, unmergeHooksBlock } = require('./codex-toml.cjs');
+const { loadDefaults, resolveAgentModel } = require('./codex-profile.cjs');
+
+function shellQuote(value) {
+  return "'" + String(value).replace(/'/g, "'\\''") + "'";
+}
+
+function buildHookEntries(configDir) {
+  const cd = String(configDir || '').replace(/\\/g, '/');
+  const hookPath = (rel) => `${cd}/hooks/${rel}`;
+  const node = (rel) => `node ${shellQuote(hookPath(rel))}`;
+  const bash = (rel) => `bash ${shellQuote(hookPath(rel))}`;
+  return [
+    { type: 'SessionStart', command: bash('oto-session-start') },
+    { type: 'PreToolUse', matcher: 'Write|Edit', command: node('oto-prompt-guard.js'), timeout: 5 },
+    { type: 'PreToolUse', matcher: 'Bash', command: bash('oto-validate-commit.sh'), timeout: 5 },
+    { type: 'PostToolUse', matcher: 'Read', command: node('oto-read-injection-scanner.js'), timeout: 5 },
+    {
+      type: 'PostToolUse',
+      matcher: 'Bash|Edit|Write|MultiEdit|Agent|Task',
+      command: node('oto-context-monitor.js'),
+      timeout: 10,
+    },
+  ];
+}
+
+function readProjectConfig(projectRoot) {
+  if (!projectRoot) return {};
+  const configPath = path.join(projectRoot, '.oto', 'config.json');
+  if (!fs.existsSync(configPath)) return {};
+  return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+}
+
+async function sha256Text(text) {
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
 
 module.exports = {
   name: 'codex',
@@ -68,12 +112,58 @@ module.exports = {
       `Note: Codex runtime support is best-effort until Phase 8.\n` +
       `Repo: https://github.com/OTOJulian/oto-hybrid-framework`;
   },
-  transformCommand: (content, meta) => content,
-  // TODO Phase 8: Codex frontmatter parity (convertClaudeAgentToCodexAgent equivalent)
-  transformAgent: (content, meta) => content,
-  transformSkill: (content, meta) => content,
-  // TODO Phase 5: real TOML manipulation via bin/lib/codex-toml.cjs
-  mergeSettings: (existingText, otoBlock) => existingText,
+  transformCommand: (content, meta) => convertClaudeToCodexMarkdown(content),
+  transformAgent: (content, meta) => convertClaudeAgentToCodexAgent(content),
+  transformSkill: (content, meta) => convertClaudeToCodexMarkdown(content),
+  mergeSettings(existingText, ctx = {}) {
+    return mergeHooksBlock(existingText, buildHookEntries(ctx.configDir), ctx);
+  },
+  unmergeSettings(existingText) {
+    return unmergeHooksBlock(existingText);
+  },
+  async emitDerivedFiles(ctx) {
+    const configDir = ctx.configDir;
+    const repoRoot = ctx.repoRoot || path.join(__dirname, '..', '..');
+    const outDir = path.join(configDir, 'agents');
+    await fsp.mkdir(outDir, { recursive: true });
+
+    const globalDefaults = (() => {
+      try {
+        return loadDefaults();
+      } catch (error) {
+        process.stderr.write(`oto: warning — invalid ~/.oto/defaults.json: ${error.message}\n`);
+        return null;
+      }
+    })();
+    const projectConfig = readProjectConfig(ctx.projectRoot);
+    const runtimeResolver = {
+      resolve(agentName) {
+        return resolveAgentModel(agentName, projectConfig, globalDefaults, 'codex');
+      },
+    };
+
+    const entries = [];
+    for (const agentName of Object.keys(this.agentSandboxes).sort()) {
+      const src = path.join(repoRoot, 'oto', 'agents', `${agentName}.md`);
+      if (!fs.existsSync(src)) continue;
+      const agentContent = fs.readFileSync(src, 'utf8');
+      const toml = generateCodexAgentToml(
+        agentName,
+        agentContent,
+        this.agentSandboxes,
+        {
+          ...(globalDefaults?.model_overrides || {}),
+          ...(projectConfig?.model_overrides || {}),
+        },
+        runtimeResolver,
+        { otoVersion: ctx.otoVersion }
+      );
+      const target = path.join(outDir, `${agentName}.toml`);
+      await fsp.writeFile(target, toml);
+      entries.push({ path: path.relative(configDir, target), sha256: await sha256Text(toml) });
+    }
+    return entries;
+  },
   onPreInstall(ctx) {
     const { findUpstreamMarkers } = require('./marker.cjs');
     const found = findUpstreamMarkers(path.join(ctx.configDir, 'AGENTS.md'));
