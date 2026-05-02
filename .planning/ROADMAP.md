@@ -141,7 +141,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `/oto-list-workspaces`, `/oto-new-workspace`, `/oto-remove-workspace` work on Claude Code: user can create an isolated workspace, list it, and remove it without corrupting the parent project's `.oto/` state
   3. Workstream and workspace state lives entirely under `.oto/` (no leakage to alternate path schemes); the existing phase machine continues to function correctly while a workstream/workspace is active
 **Plans**: 5 plans
-  - [ ] 07-01-PLAN.md — Verify+hand-fixup the 8 in-scope files for leak literals; confirm oto-sdk handler resolution; pass Phase 4 frontmatter+leak tests (D-01, D-02)
+  - [x] 07-01-PLAN.md — Verify+hand-fixup the 8 in-scope files for leak literals; confirm oto-sdk handler resolution; pass Phase 4 frontmatter+leak tests (D-01, D-02)
   - [ ] 07-02-PLAN.md — Add Workflow Deference section to oto/skills/using-git-worktrees/SKILL.md naming /oto-new-workspace (D-03, D-04)
   - [ ] 07-03-PLAN.md — Smoke tests: tests/07-structure.test.cjs + tests/07-workspace-init.test.cjs (D-05, D-08)
   - [ ] 07-04-PLAN.md — Behavior tests with .oto/ fixture: tests/07-workstream-crud.test.cjs + tests/07-session-pointer.test.cjs (D-06, D-07)
