@@ -13,6 +13,14 @@ Git worktrees create isolated workspaces sharing the same repository, allowing w
 
 **Announce at start:** "I'm using the using-git-worktrees skill to set up an isolated workspace."
 
+## Workflow Deference
+
+<!-- oto:workflow-deference-directive -->
+For creating an isolated workspace with `.oto/` state isolation, prefer `/oto-new-workspace` over invoking `git worktree add` directly. The `/oto-new-workspace` workflow handles `.oto/` state initialization, repo selection, strategy resolution, and registration that raw `git worktree add` does not.
+
+The skill's standalone form remains valid for ad-hoc worktree work outside an oto workspace context — single-PR review, scratch worktree for debugging, or any worktree task that does not need `.oto/` state isolation.
+<!-- /oto:workflow-deference-directive -->
+
 ## Directory Selection Process
 
 Follow this priority order:
