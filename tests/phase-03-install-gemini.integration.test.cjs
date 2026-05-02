@@ -42,14 +42,19 @@ test('INS-05: install --gemini injects marker block into GEMINI.md', async (t) =
   assert.ok(content.includes(CLOSE_MARKER));
 });
 
-test('INS-05: mergeSettings is identity — pre-existing settings.json is byte-identical after install', async (t) => {
+test('INS-05: mergeSettings preserves pre-existing settings.json content and appends Gemini hooks', async (t) => {
   const configDir = tmpDir(t);
   const settings = '{"someKey":"value"}\n';
   fs.writeFileSync(path.join(configDir, 'settings.json'), settings);
 
   await installRuntime(adapter, installOpts(configDir));
 
-  assert.equal(fs.readFileSync(path.join(configDir, 'settings.json'), 'utf8'), settings);
+  const merged = JSON.parse(fs.readFileSync(path.join(configDir, 'settings.json'), 'utf8'));
+  assert.equal(merged.someKey, 'value');
+  assert.equal(merged.experimental.enableAgents, true);
+  assert.ok(merged.hooks.BeforeTool);
+  assert.ok(merged.hooks.AfterTool);
+  assert.equal(merged.statusLine, undefined);
 });
 
 test('INS-05: uninstall --gemini round-trips clean', async (t) => {

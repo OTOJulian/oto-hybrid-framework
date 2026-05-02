@@ -42,25 +42,27 @@ test('INS-02: adapter descriptor has settingsFilename === "settings.json" and se
   assert.equal(adapter.settingsFormat, 'json');
 });
 
-test('INS-02: transformCommand/Agent/Skill are identity at Phase 3 (TODO Phase 8 parity comment present)', () => {
-  const source = fs.readFileSync('bin/lib/runtime-gemini.cjs', 'utf8');
-  assert.equal(adapter.transformCommand('foo', {}), 'foo');
-  assert.equal(adapter.transformAgent('foo', {}), 'foo');
-  assert.equal(adapter.transformSkill('foo', {}), 'foo');
-  assert.equal(adapter.mergeSettings('original', 'block'), 'original');
-  assert.match(source, /\/\/ TODO Phase 8: Gemini command transform\n\s*transformCommand:/);
+test('INS-02: transformCommand/Agent use Gemini parity transforms while skills stay identity', () => {
+  const command = adapter.transformCommand('---\ndescription: D\n---\n@~/.claude/oto/x.md', {
+    srcKey: 'commands',
+    relPath: 'oto/x.md',
+  });
+  assert.match(command, /^description = "D"$/m);
+  assert.match(command, /@~\/\.gemini\/oto\/x\.md/);
   assert.match(
-    source,
-    /\/\/ TODO Phase 8: Gemini tool-name remap parity \(convertClaudeToGeminiTools equivalent\)\n\s*transformAgent:/
+    adapter.transformAgent('---\nname: t\ndescription: D\ntools: Read, Bash\ncolor: red\n---\nRead ./CLAUDE.md'),
+    /^tools:\n  - read_file\n  - run_shell_command$/m,
   );
-  assert.match(source, /\/\/ TODO Phase 5: Gemini settings\.json merge\n\s*mergeSettings:/);
+  assert.equal(adapter.transformSkill('foo', {}), 'foo');
 });
 
-test('INS-05: --gemini labeled best-effort until Phase 8 — adapter has // TODO Phase 8 marker in source', () => {
+test('INS-05: Gemini adapter wires settings merge and transform helpers', () => {
   const source = fs.readFileSync('bin/lib/runtime-gemini.cjs', 'utf8');
   const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0-alpha.1' });
-  assert.match(result, /best-effort until Phase 8/);
-  assert.match(source, /TODO Phase 8: Gemini command transform/);
-  assert.match(source, /TODO Phase 8: Gemini tool-name remap parity/);
-  assert.match(source, /TODO Phase 5: Gemini settings\.json merge/);
+  const merged = JSON.parse(adapter.mergeSettings('{}', { configDir: '/tmp/gemini', otoVersion: 'V' }));
+  assert.match(result, /## oto \(Gemini\)/);
+  assert.equal(merged.experimental.enableAgents, true);
+  assert.ok(merged.hooks.BeforeTool);
+  assert.ok(merged.hooks.AfterTool);
+  assert.match(source, /gemini-transform\.cjs/);
 });
