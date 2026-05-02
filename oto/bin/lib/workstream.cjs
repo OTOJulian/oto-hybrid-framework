@@ -365,7 +365,7 @@ function cmdWorkstreamSet(cwd, name, raw) {
 }
 
 function cmdWorkstreamGet(cwd, raw) {
-  const active = getActiveWorkstream(cwd);
+  const active = process.env.OTO_WORKSTREAM || getActiveWorkstream(cwd);
   const wsRoot = path.join(planningRoot(cwd), 'workstreams');
   output({ active, mode: fs.existsSync(wsRoot) ? 'workstream' : 'flat' }, raw, active || 'none');
 }
