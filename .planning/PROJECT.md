@@ -20,13 +20,13 @@
 - [x] Phase 4 shipped the GSD core workflow and retained agent spine for Claude Code, with MR-01 approved through a disposable end-to-end dogfood session.
 - [x] Phase 5 shipped the consolidated hook fleet: single SessionStart bootstrap, statusline, context monitor, prompt guard, read-injection scanner, validate-commit, and install-time hook version tagging.
 - [x] Phase 6 shipped the curated 7-skill subset under `oto:<skill>`, `oto:using-oto` workflow deference, installer skill-copy coverage, and canonical skill invocations in executor/verifier/debugger agents.
+- [x] Phase 7 shipped workstreams and isolated workspace management surfaces.
+- [x] Phase 8 shipped Codex and Gemini runtime parity: generated root instruction files, runtime transforms, generated runtime matrix, fixture goldens, and per-runtime smoke tests.
 
 ### Active
 
 <!-- Current scope. Building toward these. The hybrid architecture is research-driven; these requirements scope the framework, not the merge strategy. -->
 
-- [ ] Phase 7: Port workstreams and isolated workspace management.
-- [ ] Phase 8: Bring Codex and Gemini CLI to runtime parity after Claude Code is daily-use stable.
 - [ ] Phase 9: Build the upstream sync pipeline for renamed snapshots and conflict surfacing.
 - [ ] Phase 10: Harden tests, CI, docs, and the v0.1.0 tagged release.
 
@@ -77,9 +77,10 @@
 | Defer hybrid architecture to research phase | Pre-committing without an inventory would lock in a worse design; both frameworks deserve apples-to-apples comparison | Resolved in Phase 1 research: GSD spine plus Superpowers skills |
 | Drop OpenCode support | User doesn't use it; supporting it doubles rebrand and test surface for no personal benefit | Resolved in Phase 1 scope and enforced in Phase 3 installer |
 | Clean-slate build, no carry-over of personal `~/.claude/` tweaks | User confirmed nothing currently customized that needs preserving | Resolved in Phase 1 scope |
-| Claude installer first, Codex/Gemini later parity | MR-01 requires Claude Code stability before spending effort on cross-runtime parity | Resolved in Phase 3; Phase 8 owns parity hardening |
+| Claude installer first, Codex/Gemini later parity | MR-01 requires Claude Code stability before spending effort on cross-runtime parity | Resolved in Phase 8 with generated runtime files, transforms, fixture tests, matrix coverage, and smoke harnesses |
 | MR-01 approved before parity work | The Phase 4 disposable Claude Code dogfood completed new-project, discuss, plan, execute, verify, progress, pause, clear, and resume without falling back to upstream GSD or Superpowers | Resolved in Phase 4; Phase 5 hooks can proceed before Phase 8 runtime parity |
 | Workflow wins over ambient skill auto-fire | During active `.oto/STATE.md` workflows, `oto:using-oto` suppresses suspicion-based skill auto-fire while preserving explicit/canonical `Skill()` calls | Resolved in Phase 6; Phase 10 owns live conversational regression coverage |
+| Codex and Gemini are daily-peer runtime targets | User explicitly rejected best-effort parity for commands on Codex/Gemini; unsupported native surfaces are closed by transforms, generated docs, and smoke/fixture tests | Resolved in Phase 8; Phase 10 owns CI provisioning for unskipped external runtime binaries |
 
 ## Evolution
 
@@ -99,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-01 after Phase 06 closeout*
+*Last updated: 2026-05-02 after Phase 08 closeout*

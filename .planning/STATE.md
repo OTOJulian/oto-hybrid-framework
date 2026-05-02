@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-current_phase: 08
-current_phase_name: Codex & Gemini Runtime Parity
-current_plan: Not started
-status: planning
-stopped_at: Phase 8 context gathered
-last_updated: "2026-05-02T18:04:43.564Z"
-last_activity: 2026-05-02 -- Phase 07 complete; Phase 08 ready to plan
+current_phase: 09
+current_phase_name: upstream-sync-pipeline
+current_plan: null
+status: ready_to_plan
+stopped_at: Phase 8 complete; Phase 9 ready to plan
+last_updated: "2026-05-02T21:34:24.000Z"
+last_activity: 2026-05-02
 progress:
   total_phases: 10
-  completed_phases: 7
-  total_plans: 35
-  completed_plans: 35
+  completed_phases: 8
+  total_plans: 41
+  completed_plans: 41
   percent: 100
 ---
 
@@ -21,28 +21,30 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-01)
+See: .planning/PROJECT.md (updated 2026-05-02)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 08 — codex-&-gemini-runtime-parity
+**Current focus:** Phase 09 — upstream-sync-pipeline
 
 ## Current Position
 
-**Current Phase:** 08
-**Current Phase Name:** Codex & Gemini Runtime Parity
+Phase: 09 (upstream-sync-pipeline) — READY TO PLAN
+Plan: Not started
+**Current Phase:** 9
+**Current Phase Name:** upstream-sync-pipeline
 **Current Plan:** Not started
-**Total Plans in Phase:** 0
+**Total Plans in Phase:** TBD
 **Status:** Ready to plan
-**Progress:** 70%
-**Last Activity:** 2026-05-02 -- Phase 07 complete; Phase 08 ready to plan
+**Progress:** 80%
+**Last Activity:** 2026-05-02
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 35
+- Total plans completed: 41
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -57,6 +59,7 @@ Progress: [███████░░░] 70%
 | 05 | 6 | - | - |
 | 06 | 3 | - | - |
 | 07 | 5 | 14 min | 5 min |
+| 08 | 6 | - | - |
 
 **Recent Trend:**
 

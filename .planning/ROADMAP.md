@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Hooks Port & Consolidation** - Single SessionStart bootstrap, statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
 - [x] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
 - [x] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems) (completed 2026-05-02)
-- [ ] **Phase 8: Codex & Gemini Runtime Parity** - Single-source-of-truth instruction template + per-runtime smoke tests; only after Claude is daily-use stable
+- [x] **Phase 8: Codex & Gemini Runtime Parity** - Single-source-of-truth instruction template + per-runtime smoke tests; only after Claude is daily-use stable (completed 2026-05-02)
 - [ ] **Phase 9: Upstream Sync Pipeline** - Pull GSD/Superpowers, apply rename map, surface conflicts; v1 scope = rename + conflict surfacing only
 - [ ] **Phase 10: Tests, CI, Docs & v0.1.0 Release** - Full CI matrix, coverage manifest, license check, README, attribution, tagged release
 
@@ -155,7 +155,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` are generated from a single source-of-truth template plus per-runtime transformations — no hand-edits to the runtime files; drift is impossible by construction
   2. Runtime-specific instruction-file divergences (e.g., Codex `sandbox:` frontmatter, Gemini's lack of subagent support requiring inline-equivalent fallbacks) are documented in `runtime-tool-matrix.md` and verified by per-runtime fixture tests
   3. Per-runtime smoke test passes on each: install → run a representative `/oto-*` command → state file written to the runtime's expected `.oto/` location → no "tool not found" errors
-**Plans**: TBD
+**Plans**: 6 plans
+  - [x] 08-01-PLAN.md — Wave 0: Test stubs (11 phase-08-*.test.cjs files) + fixture skeleton dirs (MR-02, MR-03, MR-04)
+  - [x] 08-02-PLAN.md — Wave 1: SoT instruction-file pipeline (template + renderer + script + 3 generated files + regen-diff test); rewrite stale gemini-tools.md (MR-02 / D-01..D-04)
+  - [x] 08-03-PLAN.md — Wave 2: Codex parity port (codex-transform.cjs + codex-toml.cjs + codex-profile.cjs + per-agent .toml emit + install.cjs hook + fixtures + 3 tests) (MR-02, MR-03 / D-10, D-11)
+  - [x] 08-04-PLAN.md — Wave 2: Gemini parity port (gemini-transform.cjs verbatim + Task() rewrite + mergeSettings with experimental.enableAgents guard + fixtures + 3 tests) (MR-02, MR-03 / D-12..D-16)
+  - [x] 08-05-PLAN.md — Wave 3: Auto-generated runtime-tool-matrix (runtime-matrix.cjs + script + decisions/runtime-tool-matrix.md + matrix-vs-code consistency test + Codex/Gemini 100%-green coverage assertion) (MR-03 / D-05..D-09)
+  - [x] 08-06-PLAN.md — Wave 4: Spine smoke tests (Codex + Gemini tmpdir installs with binary-version skip) + Claude identity sanity baseline (Pitfall 5) + Claude fixture goldens (MR-04 / D-17, D-18)
 
 ### Phase 9: Upstream Sync Pipeline
 **Goal**: Build the v1 upstream sync pipeline — pull rebranded snapshots, apply rename map, surface conflicts and deletions for manual resolution. Three-way merge UX is intentionally deferred to v2.
@@ -196,6 +202,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Hooks Port & Consolidation | 6/6 | Complete | 2026-05-01 |
 | 6. Skills Port & Cross-System Integration | 3/3 | Complete | 2026-05-01 |
 | 7. Workstreams & Workspaces Port | 5/5 | Complete    | 2026-05-02 |
-| 8. Codex & Gemini Runtime Parity | 0/TBD | Not started | - |
+| 8. Codex & Gemini Runtime Parity | 6/6 | Complete | 2026-05-02 |
 | 9. Upstream Sync Pipeline | 0/TBD | Not started | - |
 | 10. Tests, CI, Docs & v0.1.0 Release | 0/TBD | Not started | - |

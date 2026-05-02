@@ -117,9 +117,9 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 ### Multi-Runtime
 
 - [x] **MR-01**: Claude Code runtime is daily-use stable before Codex/Gemini parity is pursued
-- [ ] **MR-02**: `CLAUDE.md` (Claude), `AGENTS.md` (Codex), `GEMINI.md` (Gemini) generated from a single source-of-truth template, then runtime-specific transformations applied
-- [ ] **MR-03**: Runtime-specific instruction file divergences (e.g., Codex needs `sandbox:` frontmatter) documented and tested
-- [ ] **MR-04**: Smoke test per runtime: install → run a representative `/oto-*` command → state file written correctly
+- [x] **MR-02**: `CLAUDE.md` (Claude), `AGENTS.md` (Codex), `GEMINI.md` (Gemini) generated from a single source-of-truth template, then runtime-specific transformations applied
+- [x] **MR-03**: Runtime-specific instruction file divergences (e.g., Codex needs `sandbox:` frontmatter) documented and tested
+- [x] **MR-04**: Smoke test per runtime: install → run a representative `/oto-*` command → state file written correctly
 
 ### Tests & CI
 
@@ -275,9 +275,9 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | SYN-06 | Phase 9 | Pending |
 | SYN-07 | Phase 9 | Pending |
 | MR-01 | Phase 4 | Complete |
-| MR-02 | Phase 8 | Pending |
-| MR-03 | Phase 8 | Pending |
-| MR-04 | Phase 8 | Pending |
+| MR-02 | Phase 8 | Complete |
+| MR-03 | Phase 8 | Complete |
+| MR-04 | Phase 8 | Complete |
 | CI-01 | Phase 10 | Pending |
 | CI-02 | Phase 10 | Pending |
 | CI-03 | Phase 10 | Pending |
