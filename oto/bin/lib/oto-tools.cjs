@@ -166,7 +166,7 @@
  *
  * OTO-2 Migration:
  *   from-oto2 [--path <dir>] [--force] [--dry-run]
- *             Import a OTO-2 (.oto/) project back to OTO v1 (.planning/) format
+ *             Import a OTO-2 (.oto/) project back to OTO v1 (.oto/) format
  */
 
 const fs = require('fs');
