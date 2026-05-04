@@ -176,6 +176,7 @@ function scanCommands(repoRoot) {
   const commandsRoot = path.join(root, 'oto', 'commands');
   const agentSandboxes = codexAdapter.agentSandboxes || {};
   return walkMarkdownFiles(commandsRoot)
+    .filter((filePath) => path.basename(filePath) !== 'INDEX.md')
     .map((filePath) => {
       const content = fs.readFileSync(filePath, 'utf8');
       const frontmatter = extractFrontmatter(content);
