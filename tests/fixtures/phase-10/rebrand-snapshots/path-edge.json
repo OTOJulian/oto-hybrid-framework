@@ -1,0 +1,53 @@
+{
+  "file": "path-edge.txt",
+  "classifications": [
+    {
+      "rule": "path",
+      "before": ".planning",
+      "after": ".oto",
+      "line": 1
+    },
+    {
+      "rule": "path",
+      "before": ".planning",
+      "after": ".oto",
+      "line": 2
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 3
+    },
+    {
+      "rule": "path",
+      "before": "get-shit-done/",
+      "after": "oto/",
+      "line": 3
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 4
+    },
+    {
+      "rule": "path",
+      "before": "agents/gsd-",
+      "after": "agents/oto-",
+      "line": 4
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 5
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done-cc",
+      "after": "oto",
+      "line": 5
+    }
+  ]
+}

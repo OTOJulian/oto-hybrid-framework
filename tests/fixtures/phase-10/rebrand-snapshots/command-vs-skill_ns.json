@@ -1,0 +1,47 @@
+{
+  "file": "command-vs-skill_ns.md",
+  "classifications": [
+    {
+      "rule": "command",
+      "before": "/gsd-do",
+      "after": "/oto-do",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 2
+    },
+    {
+      "rule": "identifier",
+      "before": "superpowers",
+      "after": "oto",
+      "line": 3
+    },
+    {
+      "rule": "identifier",
+      "before": "superpowers",
+      "after": "oto",
+      "line": 3
+    },
+    {
+      "rule": "skill_ns",
+      "before": "superpowers:test-driven-development",
+      "after": "oto:test-driven-development",
+      "line": 3
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 4
+    }
+  ]
+}

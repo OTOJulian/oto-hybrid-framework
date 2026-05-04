@@ -1,0 +1,53 @@
+{
+  "file": "hook-version-token.js",
+  "classifications": [
+    {
+      "rule": "env_var",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd-hook-version",
+      "after": "oto-hook-version",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 1
+    },
+    {
+      "rule": "env_var",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 2
+    },
+    {
+      "rule": "identifier",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 2
+    },
+    {
+      "rule": "env_var",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 3
+    },
+    {
+      "rule": "identifier",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 3
+    }
+  ]
+}

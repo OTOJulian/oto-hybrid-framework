@@ -1,0 +1,53 @@
+{
+  "file": "url-attribution.md",
+  "classifications": [
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "url",
+      "before": "github.com/gsd-build/get-shit-done",
+      "after": "github.com/OTOJulian/oto-hybrid-framework",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "superpowers",
+      "after": "oto",
+      "line": 2
+    },
+    {
+      "rule": "url",
+      "before": "github.com/obra/superpowers",
+      "after": "github.com/OTOJulian/oto-hybrid-framework",
+      "line": 2
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 4
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 4
+    },
+    {
+      "rule": "url",
+      "before": "github.com/gsd-build/get-shit-done",
+      "after": "github.com/OTOJulian/oto-hybrid-framework",
+      "line": 4
+    }
+  ]
+}

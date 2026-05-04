@@ -1,0 +1,89 @@
+{
+  "file": "identifier-edge.txt",
+  "classifications": [
+    {
+      "rule": "env_var",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "GSD",
+      "after": "OTO",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "Gsd",
+      "after": "Oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done-cc",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd_state_version",
+      "after": "oto_state_version",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd-hook-version",
+      "after": "oto-hook-version",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "superpowers",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "Superpowers",
+      "after": "Oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "Superpowers",
+      "after": "Oto",
+      "line": 3
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "file": "multi-rule-line.md",
+  "classifications": [
+    {
+      "rule": "command",
+      "before": "/gsd-plan-phase",
+      "after": "/oto-plan-phase",
+      "line": 1
+    },
+    {
+      "rule": "env_var",
+      "before": "GSD_RUNTIME",
+      "after": "OTO_RUNTIME",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "gsd",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "get-shit-done",
+      "after": "oto",
+      "line": 1
+    },
+    {
+      "rule": "path",
+      "before": ".planning",
+      "after": ".oto",
+      "line": 1
+    },
+    {
+      "rule": "url",
+      "before": "github.com/gsd-build/get-shit-done",
+      "after": "github.com/OTOJulian/oto-hybrid-framework",
+      "line": 1
+    }
+  ]
+}

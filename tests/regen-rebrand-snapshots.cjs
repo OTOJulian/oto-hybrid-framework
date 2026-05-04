@@ -1,7 +1,9 @@
+#!/usr/bin/env node
 'use strict';
-// Projection shape locked by D-10-07 in 10-RESEARCH.md. Cross-plan contract
-// with tests/regen-rebrand-snapshots.cjs (Plan 02 Task 1b).
-const { test } = require('node:test');
+// D-10-07: Emits the LOCKED rebrand-snapshot projection shape.
+// Cross-plan contract with tests/phase-10-rebrand-snapshot.test.cjs.
+// Shape: { file, classifications: [{ rule, before, after, line }, ...] }
+// Sort: file ASC, then line ASC. NO abs paths, NO temp-dir refs, NO SHAs.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -9,8 +11,9 @@ const path = require('node:path');
 const engine = require('../scripts/rebrand/lib/engine.cjs');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SNAPSHOTS_DIR = path.join(REPO_ROOT, 'tests/fixtures/phase-10/rebrand-snapshots');
-const FIXTURES_DIR = path.join(REPO_ROOT, 'tests/fixtures/rebrand');
+const FIXTURES = path.join(REPO_ROOT, 'tests/fixtures/rebrand');
+const SNAPSHOTS = path.join(REPO_ROOT, 'tests/fixtures/phase-10/rebrand-snapshots');
+const MAP_PATH = path.join(REPO_ROOT, 'rename-map.json');
 const REPORT_PATHS = [
   path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.json'),
   path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.md'),
@@ -73,31 +76,53 @@ async function preserveReports(fn) {
   }
 }
 
-const fixtures = fs.readdirSync(FIXTURES_DIR).filter((entry) => fs.statSync(path.join(FIXTURES_DIR, entry)).isFile()).sort();
-
-for (const fixture of fixtures) {
-  const snapshotPath = path.join(SNAPSHOTS_DIR, fixture.replace(/\.[^.]+$/, '.json'));
-  if (!fs.existsSync(snapshotPath)) {
-    test.todo(`snapshot for ${fixture} not yet seeded - Plan 02 Task 1b will run regen-rebrand-snapshots.cjs`);
-    continue;
-  }
-
-  test(`CI-04: rebrand projection snapshot matches ${fixture}`, { timeout: 30000 }, async (t) => {
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-rebrand-snapshot-'));
-    t.after(() => fs.rmSync(tmpRoot, { recursive: true, force: true }));
-    const inputDir = path.join(tmpRoot, 'input');
+async function captureFixture(fname) {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-snap-'));
+  try {
+    const inputDir = path.join(tmp, 'in');
+    const outDir = path.join(tmp, 'out');
     fs.mkdirSync(inputDir, { recursive: true });
-    fs.copyFileSync(path.join(FIXTURES_DIR, fixture), path.join(inputDir, fixture));
+    fs.copyFileSync(path.join(FIXTURES, fname), path.join(inputDir, fname));
 
-    const { result, report } = await preserveReports(async () => {
-      const runResult = await engine.run({ mode: 'dry-run', target: inputDir, owner: 'OTOJulian' });
-      const reportBody = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.json'), 'utf8'));
-      return { result: runResult, report: reportBody };
+    const reportBody = await preserveReports(async () => {
+      const result = await engine.run({
+        mode: 'dry-run',
+        target: inputDir,
+        out: outDir,
+        owner: 'OTOJulian',
+        mapPath: MAP_PATH,
+      });
+      assert.equal(result.exitCode, 0);
+      return JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.json'), 'utf8'));
     });
 
-    assert.equal(result.exitCode, 0);
-    const actual = buildProjection({ report }, inputDir);
-    const expected = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
-    assert.deepEqual(actual, expected);
-  });
+    const projection = buildProjection({ report: reportBody }, inputDir);
+    const snapPath = path.join(SNAPSHOTS, fname.replace(/\.[^.]+$/, '.json'));
+    fs.writeFileSync(snapPath, `${JSON.stringify(projection, null, 2)}\n`);
+    console.log(`captured ${path.relative(REPO_ROOT, snapPath)}`);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 }
+
+function assertNoLeaks() {
+  for (const fname of fs.readdirSync(SNAPSHOTS)) {
+    if (!fname.endsWith('.json')) continue;
+    const body = fs.readFileSync(path.join(SNAPSHOTS, fname), 'utf8');
+    if (/\/var\/folders\/|\/tmp\/|\/Users\/|[a-f0-9]{40}/.test(body)) {
+      throw new Error(`LEAK in ${fname}: contains abs path, temp-dir ref, or SHA`);
+    }
+  }
+}
+
+(async () => {
+  fs.mkdirSync(SNAPSHOTS, { recursive: true });
+  for (const fname of fs.readdirSync(FIXTURES).sort()) {
+    if (!/\.(md|txt|js|json)$/.test(fname)) continue;
+    await captureFixture(fname);
+  }
+  assertNoLeaks();
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

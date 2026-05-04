@@ -1,0 +1,29 @@
+{
+  "file": "env-var-edge.txt",
+  "classifications": [
+    {
+      "rule": "env_var",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 1
+    },
+    {
+      "rule": "env_var",
+      "before": "GSD_RUNTIME",
+      "after": "OTO_RUNTIME",
+      "line": 1
+    },
+    {
+      "rule": "env_var",
+      "before": "GSD_FOO_BAR",
+      "after": "OTO_FOO_BAR",
+      "line": 1
+    },
+    {
+      "rule": "identifier",
+      "before": "GSD_VERSION",
+      "after": "OTO_VERSION",
+      "line": 1
+    }
+  ]
+}
