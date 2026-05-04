@@ -894,7 +894,7 @@ Eight test files MUST be created in Wave 0 with `t.todo()` scaffolds (per Phase 
 - **Concurrent sync invocations** — no lock file in v1; user is expected not to run two `oto sync` in parallel. Document in DOC-03; consider lock file in v2 if user reports issues.
 - **Partial-clone resumption** — `git clone` is atomic-ish; if interrupted, the destination dir is half-populated. Production code MUST `fsp.rm(destDir, {recursive: true, force: true})` on caught error before retry. Tested by deliberately interrupting `pullUpstream` in `phase-09-pull-puller.test.cjs` (advanced, optional).
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`bin/lib/sync/` subdirectory vs flat under `bin/lib/`?** (Claude's-discretion #2)
    - **What we know:** Existing `bin/lib/` has 15 modules, including 5 codex/gemini-prefixed (`codex-toml.cjs`, `codex-transform.cjs`, `codex-profile.cjs`, `gemini-transform.cjs`) and one `runtime-matrix.cjs`. The flat structure is the established convention.
