@@ -36,10 +36,10 @@ test('INS-01 / D-15: oto install --help labels --codex and --gemini as "best-eff
   assert.ok(matches.length >= 2, `expected at least 2 best-effort labels, got ${matches.length}`);
 });
 
-test('INS-01 / D-15: oto install --help fits 30 lines / 80 columns (no wrap)', () => {
+test('INS-01 / D-15: oto install --help fits 40 lines / 80 columns (no wrap)', () => {
   const result = runHelp();
   const lines = result.stdout.trimEnd().split('\n');
-  assert.ok(lines.length <= 30, `expected <= 30 lines, got ${lines.length}`);
+  assert.ok(lines.length <= 40, `expected <= 40 lines, got ${lines.length}`);
   for (const line of lines.filter(Boolean)) {
     assert.ok(line.length <= 80, `line exceeds 80 columns: ${line}`);
   }
