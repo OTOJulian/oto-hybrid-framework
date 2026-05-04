@@ -1,0 +1,5 @@
+{
+  "version": "1",
+  "oto_owned_globs": ["oto/templates/**", "decisions/**", ".oto/**"],
+  "oto_diverged_paths": []
+}

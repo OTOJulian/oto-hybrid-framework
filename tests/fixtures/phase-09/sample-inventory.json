@@ -1,0 +1,47 @@
+{
+  "version": "1",
+  "generated_at": "2026-05-04T00:00:00.000Z",
+  "entries": [
+    {
+      "path": "README.md",
+      "upstream": "gsd",
+      "verdict": "keep",
+      "target_path": "README.md",
+      "reason": "test fixture",
+      "rebrand_required": true,
+      "phase_owner": 9,
+      "category": "doc"
+    },
+    {
+      "path": "oto/workflows/sample.md",
+      "upstream": "gsd",
+      "verdict": "keep",
+      "target_path": "oto/workflows/sample.md",
+      "reason": "test fixture; will be deleted upstream at v1.2.0",
+      "rebrand_required": true,
+      "phase_owner": 9,
+      "category": "workflow"
+    },
+    {
+      "path": "oto/workflows/conflict.md",
+      "upstream": "gsd",
+      "verdict": "merge",
+      "target_path": "oto/workflows/conflict.md",
+      "reason": "test fixture; same-line conflict",
+      "rebrand_required": true,
+      "merge_source_files": ["oto/workflows/conflict.md"],
+      "phase_owner": 9,
+      "category": "workflow"
+    },
+    {
+      "path": "oto/workflows/clean-merge.md",
+      "upstream": "gsd",
+      "verdict": "keep",
+      "target_path": "oto/workflows/clean-merge.md",
+      "reason": "test fixture; non-overlapping merge",
+      "rebrand_required": true,
+      "phase_owner": 9,
+      "category": "workflow"
+    }
+  ]
+}
