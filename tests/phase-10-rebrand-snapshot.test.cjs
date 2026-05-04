@@ -16,6 +16,10 @@ const REPORT_PATHS = [
   path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.md'),
 ];
 
+function snapshotName(fname) {
+  return `${path.parse(fname).name}.json`;
+}
+
 function toPosix(value) {
   return value.split(path.sep).join('/');
 }
@@ -76,7 +80,7 @@ async function preserveReports(fn) {
 const fixtures = fs.readdirSync(FIXTURES_DIR).filter((entry) => fs.statSync(path.join(FIXTURES_DIR, entry)).isFile()).sort();
 
 for (const fixture of fixtures) {
-  const snapshotPath = path.join(SNAPSHOTS_DIR, fixture.replace(/\.[^.]+$/, '.json'));
+  const snapshotPath = path.join(SNAPSHOTS_DIR, snapshotName(fixture));
   if (!fs.existsSync(snapshotPath)) {
     test.todo(`snapshot for ${fixture} not yet seeded - Plan 02 Task 1b will run regen-rebrand-snapshots.cjs`);
     continue;

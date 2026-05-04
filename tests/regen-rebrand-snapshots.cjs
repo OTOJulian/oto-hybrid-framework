@@ -19,6 +19,10 @@ const REPORT_PATHS = [
   path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.md'),
 ];
 
+function snapshotName(fname) {
+  return `${path.parse(fname).name}.json`;
+}
+
 function toPosix(value) {
   return value.split(path.sep).join('/');
 }
@@ -97,7 +101,7 @@ async function captureFixture(fname) {
     });
 
     const projection = buildProjection({ report: reportBody }, inputDir);
-    const snapPath = path.join(SNAPSHOTS, fname.replace(/\.[^.]+$/, '.json'));
+    const snapPath = path.join(SNAPSHOTS, snapshotName(fname));
     fs.writeFileSync(snapPath, `${JSON.stringify(projection, null, 2)}\n`);
     console.log(`captured ${path.relative(REPO_ROOT, snapPath)}`);
   } finally {
