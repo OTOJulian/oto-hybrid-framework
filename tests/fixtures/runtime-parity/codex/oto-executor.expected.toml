@@ -1,4 +1,4 @@
-# managed by oto v0.1.0-alpha.1
+# managed by oto v0.1.0
 name = "oto-executor"
 description = "Executes OTO plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command."
 sandbox_mode = "workspace-write"

@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const adapter = require('../bin/lib/runtime-gemini.cjs');
 
-const ctx = { configDir: '/tmp/gemini', otoVersion: '0.1.0-alpha.1', installedAt: 'fixed' };
+const ctx = { configDir: '/tmp/gemini', otoVersion: '0.1.0', installedAt: 'fixed' };
 
 test('D-16 mergeSettings: PreToolUse becomes BeforeTool and PostToolUse becomes AfterTool', () => {
   const out = JSON.parse(adapter.mergeSettings('', ctx));

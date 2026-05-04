@@ -11,7 +11,7 @@ const { mergeSettings, unmergeSettings } = require(path.join(REPO_ROOT, 'bin/lib
 const FIX_EXISTING = fs.readFileSync(path.join(REPO_ROOT, 'tests/fixtures/phase-05/settings-existing.json'), 'utf8');
 const FIX_EMPTY = fs.readFileSync(path.join(REPO_ROOT, 'tests/fixtures/phase-05/settings-empty.json'), 'utf8');
 const CTX = {
-  otoVersion: '0.1.0-alpha.1',
+  otoVersion: '0.1.0',
   configDir: '/Users/julian/.claude',
   runtime: 'claude',
   installedAt: '2026-04-30T12:00:00Z',
@@ -20,7 +20,7 @@ const CTX = {
 test('phase-05 merge-settings: bare merge produces 6 marker entries with correct events/matchers', () => {
   const merged = JSON.parse(mergeSettings(FIX_EMPTY, CTX));
   const m = merged._oto;
-  assert.equal(m.version, '0.1.0-alpha.1');
+  assert.equal(m.version, '0.1.0');
   assert.equal(m.hooks.length, 6, 'expected exactly 6 oto hooks (5 events + statusLine)');
 
   const v = m.hooks.find((h) => h.command_contains === 'oto-validate-commit.sh');

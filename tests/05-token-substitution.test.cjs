@@ -10,16 +10,16 @@ const pkg = require(path.join(REPO_ROOT, 'package.json'));
 
 test('phase-05 token-substitution: {{OTO_VERSION}} substitutes to package version', () => {
   assert.equal(
-    tokenReplace('# oto-hook-version: {{OTO_VERSION}}', { OTO_VERSION: '0.1.0-alpha.1' }),
-    '# oto-hook-version: 0.1.0-alpha.1',
+    tokenReplace('# oto-hook-version: {{OTO_VERSION}}', { OTO_VERSION: '0.1.0' }),
+    '# oto-hook-version: 0.1.0',
   );
   assert.equal(tokenReplace('no tokens here', { OTO_VERSION: 'x' }), 'no tokens here');
   assert.equal(tokenReplace('{{OTO_VERSION}} {{OTO_VERSION}}', { OTO_VERSION: '1.2.3' }), '1.2.3 1.2.3');
   assert.equal(tokenReplace('{{OTHER}}', { OTO_VERSION: 'x' }), '{{OTHER}}');
 
   const original = '# oto-hook-version: {{OTO_VERSION}}\nbody';
-  const substituted = tokenReplace(original, { OTO_VERSION: '0.1.0-alpha.1' });
-  const reversed = substituted.split('0.1.0-alpha.1').join('{{OTO_VERSION}}');
+  const substituted = tokenReplace(original, { OTO_VERSION: '0.1.0' });
+  const reversed = substituted.split('0.1.0').join('{{OTO_VERSION}}');
   assert.equal(reversed, original);
 
   const withPackageVersion = tokenReplace('{{OTO_VERSION}}', { OTO_VERSION: pkg.version });

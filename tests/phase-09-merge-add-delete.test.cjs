@@ -63,7 +63,7 @@ async function runMerge(paths) {
     priorSha: 'a'.repeat(40),
     currentTag: 'v2',
     currentSha: 'b'.repeat(40),
-    otoVersion: '0.1.0-alpha.1',
+    otoVersion: '0.1.0',
     apply: false,
   });
 }

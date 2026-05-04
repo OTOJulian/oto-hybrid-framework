@@ -54,7 +54,7 @@ test('INS-02: transformCommand/Agent/Skill use Codex parity transforms', () => {
 test('INS-02: mergeSettings injects managed Codex hook entries', () => {
   const merged = adapter.mergeSettings('model = "gpt-5.3-codex"\n', {
     configDir: '/tmp/oto-codex',
-    otoVersion: '0.1.0-alpha.1',
+    otoVersion: '0.1.0',
   });
   assert.match(merged, /# === BEGIN OTO HOOKS ===/);
   assert.match(merged, /\[\[hooks\]\]/);
@@ -63,7 +63,7 @@ test('INS-02: mergeSettings injects managed Codex hook entries', () => {
 
 test('INS-05: --codex instruction block uses the Codex runtime label', () => {
   const source = fs.readFileSync('bin/lib/runtime-codex.cjs', 'utf8');
-  const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0-alpha.1' });
+  const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0' });
   assert.match(result, /## oto \(Codex\)/);
   assert.match(result, /\/oto-help/);
   assert.match(source, /codex-transform\.cjs/);

@@ -2,7 +2,7 @@
 
 This is `AGENTS.md` - read by Codex at session start. Settings live at `~/.codex/config.toml`.
 Per-agent sandbox modes are declared in `~/.codex/agents/<agent>.toml` and inherited by Codex agent routing.
-oto version: 0.1.0-alpha.1. Repo: https://github.com/OTOJulian/oto-hybrid-framework
+oto version: 0.1.0. Repo: https://github.com/OTOJulian/oto-hybrid-framework
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 

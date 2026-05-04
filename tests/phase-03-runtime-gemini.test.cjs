@@ -58,7 +58,7 @@ test('INS-02: transformCommand/Agent use Gemini parity transforms while skills s
 
 test('INS-05: Gemini adapter wires settings merge and transform helpers', () => {
   const source = fs.readFileSync('bin/lib/runtime-gemini.cjs', 'utf8');
-  const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0-alpha.1' });
+  const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0' });
   const merged = JSON.parse(adapter.mergeSettings('{}', { configDir: '/tmp/gemini', otoVersion: 'V' }));
   assert.match(result, /## oto \(Gemini\)/);
   assert.equal(merged.experimental.enableAgents, true);

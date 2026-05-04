@@ -26,7 +26,7 @@ function tmpDir(t) {
 function validState(overrides = {}) {
   return {
     version: CURRENT_SCHEMA_VERSION,
-    oto_version: '0.1.0-alpha.0',
+    oto_version: '0.1.0',
     installed_at: '2026-04-28T00:00:00.000Z',
     runtime: 'claude',
     config_dir: '/tmp/claude',

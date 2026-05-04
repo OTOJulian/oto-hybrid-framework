@@ -1,6 +1,6 @@
 {
   "name": "oto",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0",
   "description": "Hybrid AI-CLI framework: GSD planning + Superpowers skills under /oto-* across Claude/Codex/Gemini",
   "engines": { "node": ">=22.0.0" },
   "bin": {

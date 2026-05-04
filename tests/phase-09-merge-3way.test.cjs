@@ -96,7 +96,7 @@ test('SYN-04 / D-12: conflict-file YAML header contains kind, upstream, prior_ta
     target_path: 'oto/workflows/x.md',
     inventory_entry: { verdict: 'keep' },
     timestamp: '2026-05-04T00:00:00.000Z',
-    oto_version: '0.1.0-alpha.1',
+    oto_version: '0.1.0',
   });
   const lines = header.split('\n');
   const keys = ['kind', 'upstream', 'prior_tag', 'prior_sha', 'current_tag', 'current_sha', 'target_path', 'inventory_entry', 'timestamp', 'oto_version'];
@@ -108,5 +108,5 @@ test('SYN-04 / D-12: conflict-file YAML header contains kind, upstream, prior_ta
   }
   assert.equal(keys.length, 10);
   assert.match(header, /inventory_entry: {"verdict":"keep"}/);
-  assert.match(header, /oto_version: 0.1.0-alpha.1/);
+  assert.match(header, /oto_version: 0.1.0/);
 });

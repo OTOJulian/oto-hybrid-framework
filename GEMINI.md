@@ -3,7 +3,7 @@
 This is `GEMINI.md` - read by Gemini CLI at session start. Settings live at `~/.gemini/settings.json`.
 Custom subagents in `~/.gemini/agents/*.md` are auto-discovered; each agent name becomes a tool exposed to the main agent.
 Note: agent bodies use `$VAR` syntax, not dollar-brace variable syntax, because Gemini templateString rejects unresolved brace patterns.
-oto version: 0.1.0-alpha.1. Repo: https://github.com/OTOJulian/oto-hybrid-framework
+oto version: 0.1.0. Repo: https://github.com/OTOJulian/oto-hybrid-framework
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 

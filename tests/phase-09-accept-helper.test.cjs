@@ -39,7 +39,7 @@ function header(relPath, kind = 'modified') {
     target_path: relPath,
     inventory_entry: { target_path: relPath, verdict: 'keep' },
     timestamp: '2026-05-04T00:00:00.000Z',
-    oto_version: '0.1.0-alpha.1',
+    oto_version: '0.1.0',
   });
 }
 

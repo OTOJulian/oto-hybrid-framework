@@ -2,7 +2,7 @@
 
 # Runtime Tool Matrix
 
-_oto v0.1.0-alpha.1 - generated_
+_oto v0.1.0 - generated_
 
 ## 1. Tool Name Map (Claude -> Codex -> Gemini)
 | Claude | Codex | Gemini |

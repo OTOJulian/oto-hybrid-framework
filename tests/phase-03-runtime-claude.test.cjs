@@ -95,11 +95,11 @@ test('INS-02: transformCommand/Agent/Skill are identity for Claude (canonical)',
 
 test('INS-02 / HK-02..06: mergeSettings registers Claude hook settings', () => {
   const merged = JSON.parse(adapter.mergeSettings('', {
-    otoVersion: '0.1.0-alpha.1',
+    otoVersion: '0.1.0',
     configDir: '/tmp/claude',
     installedAt: '2026-01-01T00:00:00Z',
   }));
-  assert.equal(merged._oto.version, '0.1.0-alpha.1');
+  assert.equal(merged._oto.version, '0.1.0');
   assert.equal(merged._oto.hooks.length, 6);
   assert.equal(merged.statusLine.type, 'command');
   assert.ok(merged.hooks.PreToolUse.some((entry) =>
@@ -112,14 +112,14 @@ test('INS-02 / HK-02..06: mergeSettings registers Claude hook settings', () => {
 });
 
 test('INS-02: renderInstructionBlock output is stable for fixed oto_version (snapshot)', () => {
-  const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0-alpha.1' });
-  assert.match(result, /oto v0\.1\.0-alpha\.1/);
+  const result = adapter.renderInstructionBlock({ otoVersion: '0.1.0' });
+  assert.match(result, /oto v0\.1\.0/);
   assert.match(result, /\/oto-help/);
   assert.equal(
     result,
-    '<!-- managed by oto v0.1.0-alpha.1 — do not edit between markers -->\n' +
+    '<!-- managed by oto v0.1.0 — do not edit between markers -->\n' +
       '## oto\n\n' +
-      'oto v0.1.0-alpha.1 is installed for Claude Code. Run `/oto-help` for the command list.\n' +
+      'oto v0.1.0 is installed for Claude Code. Run `/oto-help` for the command list.\n' +
       'Repo: https://github.com/OTOJulian/oto-hybrid-framework'
   );
 });
