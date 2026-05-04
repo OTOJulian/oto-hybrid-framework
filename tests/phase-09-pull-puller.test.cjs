@@ -92,6 +92,18 @@ test('SYN-05: writes last-synced-commit.json with both ref and 40-char SHA', asy
   assert.match(record.sha, /^[0-9a-f]{40}$/);
 });
 
+test('SYN-05: snapshot rotation preserves previous pin as prior-last-synced-commit.json', async (t) => {
+  const { root, fixture } = await makeFixture(t);
+  const destDir = path.join(root, 'sync', 'gsd');
+  await pullUpstream({ name: 'gsd', url: fixture.bareUrl, ref: 'v1.0.0', destDir });
+  await pullUpstream({ name: 'gsd', url: fixture.bareUrl, ref: 'v1.1.0', destDir });
+
+  const prior = JSON.parse(await fsp.readFile(path.join(destDir, 'prior-last-synced-commit.json'), 'utf8'));
+  const current = JSON.parse(await fsp.readFile(path.join(destDir, 'last-synced-commit.json'), 'utf8'));
+  assert.equal(prior.ref, 'v1.0.0');
+  assert.equal(current.ref, 'v1.1.0');
+});
+
 test('SYN-05: last-synced-commit.json validates against schema/last-synced-commit.json', async (t) => {
   const { root, fixture } = await makeFixture(t);
   const destDir = path.join(root, 'sync', 'gsd');

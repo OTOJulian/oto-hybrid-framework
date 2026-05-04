@@ -51,6 +51,7 @@ test('files allowlist includes only the intended package surface', () => {
     'oto/',
     'hooks/',
     'scripts/rebrand/',
+    'scripts/sync-upstream/',
     'scripts/build-hooks.js',
     'rename-map.json',
     'schema/',
