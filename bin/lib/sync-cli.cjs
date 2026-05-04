@@ -95,11 +95,10 @@ async function rotateRebrandedSnapshot(upstream) {
   const syncDir = path.resolve(`.oto-sync/rebranded/${upstream}`);
   const current = path.join(syncDir, 'current');
   const prior = path.join(syncDir, 'prior');
+  if (!await pathExists(current)) return;
   if (await pathExists(prior)) await fsp.rm(prior, { recursive: true, force: true });
-  if (await pathExists(current)) {
-    await fsp.mkdir(syncDir, { recursive: true });
-    await fsp.rename(current, prior);
-  }
+  await fsp.mkdir(syncDir, { recursive: true });
+  await fsp.rename(current, prior);
 }
 
 async function runOneFullSync(upstream, parsed) {
