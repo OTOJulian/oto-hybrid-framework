@@ -20,8 +20,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Skills Port & Cross-System Integration** - 7 Superpowers skills ported as `oto:<skill>`; agents invoke skills at canonical points
 - [x] **Phase 7: Workstreams & Workspaces Port** - Parallel-workstream and workspace-isolation surfaces (large standalone subsystems) (completed 2026-05-02)
 - [x] **Phase 8: Codex & Gemini Runtime Parity** - Single-source-of-truth instruction template + per-runtime smoke tests; only after Claude is daily-use stable (completed 2026-05-02)
-- [ ] **Phase 9: Upstream Sync Pipeline** - Pull GSD/Superpowers, apply rename map, surface conflicts; v1 scope = rename + conflict surfacing only
-- [ ] **Phase 10: Tests, CI, Docs & v0.1.0 Release** - Full CI matrix, coverage manifest, license check, README, attribution, tagged release
+- [x] **Phase 9: Upstream Sync Pipeline** - Pull GSD/Superpowers, apply rename map, surface conflicts; v1 scope = rename + conflict surfacing only
+- [x] **Phase 10: Tests, CI, Docs & v0.1.0 Release** - Full CI matrix, coverage manifest, license check, README, attribution, tagged release
 
 ## Phase Details
 
@@ -195,7 +195,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
   - [x] 10-01-PLAN.md — Wave 0: 8 phase-10-*.test.cjs files + tests/fixtures/phase-10/rebrand-snapshots dir + scripts/gen-commands-index.cjs (CI-04, CI-06, CI-07, CI-10, DOC-01, DOC-04, DOC-06)
   - [x] 10-02-PLAN.md — Wave 1: 3 .github/workflows/*.yml + README.md rewrite + docs/upstream-sync.md + docs/rebrand-engine.md + drop bin/oto-sdk.js + capture 9 rebrand snapshots (CI-01, CI-02, CI-03, CI-05, CI-08, CI-09, DOC-02, DOC-03, DOC-04, DOC-06)
-  - [ ] 10-03-PLAN.md — Wave 2: package.json bump to 0.1.0 + git tag v0.1.0 + push + manual UAT clean-machine install (FND-05)
+  - [x] 10-03-PLAN.md — Wave 2: package.json bump to 0.1.0 + git tag v0.1.0 + push + manual UAT clean-machine install (FND-05)
 
 ## Progress
 
@@ -213,4 +213,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Workstreams & Workspaces Port | 5/5 | Complete    | 2026-05-02 |
 | 8. Codex & Gemini Runtime Parity | 6/6 | Complete | 2026-05-02 |
 | 9. Upstream Sync Pipeline | 6/6 | Complete | 2026-05-04 |
-| 10. Tests, CI, Docs & v0.1.0 Release | 2/3 | In Progress | - |
+| 10. Tests, CI, Docs & v0.1.0 Release | 3/3 | Complete | 2026-05-04 |

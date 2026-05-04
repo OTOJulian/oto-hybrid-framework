@@ -13,7 +13,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [x] **FND-02**: `package.json` declares `"bin": { "oto": "bin/install.js" }` and an explicit `"files"` allowlist
 - [x] **FND-03**: Hooks-build script (`scripts/build-hooks.js`) runs in `postinstall` lifecycle — validates JS hook source with `vm.Script`, copies to `hooks/dist/`
 - [x] **FND-04**: Repository hosted on public GitHub, installable via `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`
-- [ ] **FND-05**: First tagged release (`v0.1.0`) creates a clean install for at least one runtime (Claude Code)
+- [x] **FND-05**: First tagged release (`v0.1.0`) creates a clean install for at least one runtime (Claude Code)
 - [x] **FND-06**: License attribution for both upstreams preserved in repo (`LICENSE` for oto's added work; `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses)
 
 ### Architecture Decisions
@@ -198,7 +198,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | FND-02 | Phase 2 | Complete |
 | FND-03 | Phase 2 | Complete |
 | FND-04 | Phase 2 | Complete |
-| FND-05 | Phase 10 | Pending |
+| FND-05 | Phase 10 | Complete |
 | FND-06 | Phase 1 | Complete |
 | ARCH-01 | Phase 1 | Complete |
 | ARCH-02 | Phase 1 | Complete |
