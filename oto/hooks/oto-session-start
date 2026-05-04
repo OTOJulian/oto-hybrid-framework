@@ -17,9 +17,39 @@ else
   PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 fi
 
+# If a project-local oto workflow is already active, do not inject the full
+# using-oto skill body. That body is the ambient skill auto-fire trigger; active
+# GSD/oto workflows own their own canonical skill and agent routing.
+ACTIVE_OTO_WORKFLOW=0
+if [ -f .oto/STATE.md ]; then
+  STATE_STATUS=$(awk '
+    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
+    in_frontmatter && $0 == "---" { exit }
+    in_frontmatter && /^status:[[:space:]]*/ {
+      sub(/^status:[[:space:]]*/, "");
+      gsub(/["'\''"]/, "");
+      print;
+      exit;
+    }
+    !in_frontmatter && /^status:[[:space:]]*/ {
+      sub(/^status:[[:space:]]*/, "");
+      gsub(/["'\''"]/, "");
+      print;
+      exit;
+    }
+  ' .oto/STATE.md 2>/dev/null || true)
+  case "$STATE_STATUS" in
+    execute_phase|plan_phase|debug|verify)
+      ACTIVE_OTO_WORKFLOW=1
+      ;;
+  esac
+fi
+
 # Identity-block content (D-05). Defensively read SKILL.md (D-06).
 SKILL_PATH="${PLUGIN_ROOT}/skills/using-oto/SKILL.md"
-if [ -f "$SKILL_PATH" ]; then
+if [ "$ACTIVE_OTO_WORKFLOW" = "1" ]; then
+  using_oto_content="An oto workflow is active in .oto/STATE.md. Ambient skill auto-fire is suppressed; only canonical workflow agent invocations and explicit user Skill() calls should fire."
+elif [ -f "$SKILL_PATH" ]; then
   using_oto_content=$(cat "$SKILL_PATH")
   using_oto_content="${using_oto_content//<EXTREMELY_IMPORTANT>/}"
   using_oto_content="${using_oto_content//<\/EXTREMELY_IMPORTANT>/}"
@@ -36,7 +66,11 @@ escape_for_json() {
 using_oto_escaped=$(printf '%s' "$using_oto_content" | escape_for_json)
 
 # D-05 literal identity block. Keep this hand-authored; do not run rebrand tooling here.
-session_context="<EXTREMELY_IMPORTANT>\nYou are using oto.\n\nBelow is the full content of your 'oto:using-oto' skill — your introduction to using oto skills. For all other skills, use the Skill tool.\n\n${using_oto_escaped}\n</EXTREMELY_IMPORTANT>"
+if [ "$ACTIVE_OTO_WORKFLOW" = "1" ]; then
+  session_context="<EXTREMELY_IMPORTANT>\nYou are using oto.\n\n${using_oto_escaped}\n</EXTREMELY_IMPORTANT>"
+else
+  session_context="<EXTREMELY_IMPORTANT>\nYou are using oto.\n\nBelow is the full content of your 'oto:using-oto' skill — your introduction to using oto skills. For all other skills, use the Skill tool.\n\n${using_oto_escaped}\n</EXTREMELY_IMPORTANT>"
+fi
 
 # Optional project-state reminder (D-07). Default is off.
 if [ -f .oto/config.json ]; then
