@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: Release
-current_phase: 09
-current_phase_name: upstream-sync-pipeline
-current_plan: 1
-status: executing
-stopped_at: Phase 9 context gathered
-last_updated: "2026-05-04T17:41:20.381Z"
+current_phase: 10
+current_phase_name: tests-ci-docs-v0.1.0-release
+current_plan: null
+status: ready_to_plan
+stopped_at: Phase 9 complete; Phase 10 ready to plan
+last_updated: "2026-05-04T18:26:09.000Z"
 last_activity: 2026-05-04
 progress:
   total_phases: 10
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 47
-  completed_plans: 41
-  percent: 87
+  completed_plans: 47
+  percent: 90
 ---
 
 # Project State
@@ -24,27 +24,27 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-02)
 
 **Core value:** Stop framework-switching — one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
-**Current focus:** Phase 09 — upstream-sync-pipeline
+**Current focus:** Phase 10 — Tests, CI, Docs & v0.1.0 Release
 
 ## Current Position
 
-Phase: 09 (upstream-sync-pipeline) — EXECUTING
-Plan: 1 of 6
-**Current Phase:** 09
-**Current Phase Name:** upstream-sync-pipeline
-**Current Plan:** 1
-**Total Plans in Phase:** 6
-**Status:** Executing Phase 09
-**Progress:** 80%
+Phase: 10 (Tests, CI, Docs & v0.1.0 Release) — READY TO PLAN
+Plan: Not started
+**Current Phase:** 10
+**Current Phase Name:** Tests, CI, Docs & v0.1.0 Release
+**Current Plan:** Not started
+**Total Plans in Phase:** TBD
+**Status:** Ready to plan
+**Progress:** 90%
 **Last Activity:** 2026-05-04
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 41
+- Total plans completed: 47
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -60,6 +60,7 @@ Progress: [████████░░] 80%
 | 06 | 3 | - | - |
 | 07 | 5 | 14 min | 5 min |
 | 08 | 6 | - | - |
+| 09 | 6 | - | - |
 
 **Recent Trend:**
 
@@ -167,6 +168,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-04T16:50:35.629Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-upstream-sync-pipeline/09-CONTEXT.md
+Last session: 2026-05-04T18:26:09.000Z
+Stopped at: Phase 9 complete; Phase 10 ready to plan
+Resume file: .planning/ROADMAP.md

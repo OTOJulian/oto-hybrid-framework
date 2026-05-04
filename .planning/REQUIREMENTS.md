@@ -106,13 +106,13 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Upstream Sync
 
-- [ ] **SYN-01**: `scripts/sync-upstream/pull-gsd.cjs` — fetch latest GSD `main`, snapshot to `.oto-sync/upstream/gsd/`
-- [ ] **SYN-02**: `scripts/sync-upstream/pull-superpowers.cjs` — fetch latest Superpowers `main`, snapshot to `.oto-sync/upstream/superpowers/`
-- [ ] **SYN-03**: `scripts/sync-upstream/rebrand.cjs` — apply rename map to upstream snapshot, output rebranded tree
-- [ ] **SYN-04**: `scripts/sync-upstream/merge.cjs` — diff rebranded snapshot against current `oto/` tree, surface conflicts in `.oto-sync-conflicts/` for manual resolution
-- [ ] **SYN-05**: Per-upstream `last-synced-commit.json` tracks last applied upstream SHA
-- [ ] **SYN-06**: Per-upstream `BREAKING-CHANGES.md` log captures upstream removals/renames that need oto-side action
-- [ ] **SYN-07**: Sync v1 is rename + conflict surfacing only; three-way merge UX deferred to v2
+- [x] **SYN-01**: `scripts/sync-upstream/pull-gsd.cjs` — fetch latest GSD `main`, snapshot to `.oto-sync/upstream/gsd/`
+- [x] **SYN-02**: `scripts/sync-upstream/pull-superpowers.cjs` — fetch latest Superpowers `main`, snapshot to `.oto-sync/upstream/superpowers/`
+- [x] **SYN-03**: `scripts/sync-upstream/rebrand.cjs` — apply rename map to upstream snapshot, output rebranded tree
+- [x] **SYN-04**: `scripts/sync-upstream/merge.cjs` — diff rebranded snapshot against current `oto/` tree, surface conflicts in `.oto-sync-conflicts/` for manual resolution
+- [x] **SYN-05**: Per-upstream `last-synced-commit.json` tracks last applied upstream SHA
+- [x] **SYN-06**: Per-upstream `BREAKING-CHANGES.md` log captures upstream removals/renames that need oto-side action
+- [x] **SYN-07**: Sync v1 is rename + conflict surfacing only; three-way merge UX deferred to v2
 
 ### Multi-Runtime
 
@@ -267,13 +267,13 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | HK-05 | Phase 5 | Complete |
 | HK-06 | Phase 5 | Complete |
 | HK-07 | Phase 5 | Complete |
-| SYN-01 | Phase 9 | Pending |
-| SYN-02 | Phase 9 | Pending |
-| SYN-03 | Phase 9 | Pending |
-| SYN-04 | Phase 9 | Pending |
-| SYN-05 | Phase 9 | Pending |
-| SYN-06 | Phase 9 | Pending |
-| SYN-07 | Phase 9 | Pending |
+| SYN-01 | Phase 9 | Complete |
+| SYN-02 | Phase 9 | Complete |
+| SYN-03 | Phase 9 | Complete |
+| SYN-04 | Phase 9 | Complete |
+| SYN-05 | Phase 9 | Complete |
+| SYN-06 | Phase 9 | Complete |
+| SYN-07 | Phase 9 | Complete |
 | MR-01 | Phase 4 | Complete |
 | MR-02 | Phase 8 | Complete |
 | MR-03 | Phase 8 | Complete |

@@ -174,12 +174,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Per-upstream `last-synced-commit.json` records the last applied upstream SHA; per-upstream `BREAKING-CHANGES.md` log captures upstream removals/renames that needed oto-side action during the sync
   5. Running the sync against a known upstream commit produces clean output (no false-positive conflicts) and tests still pass on the resulting tree
 **Plans**: 6 plans
-  - [ ] 09-01-PLAN.md — Wave 0: Test scaffolds (8 files), fixtures, schemas, allowlist, .gitignore (SYN-01..07)
-  - [ ] 09-02-PLAN.md — Wave 1: bin/lib/sync-pull.cjs + pull-puller test bodies (SYN-01, SYN-02, SYN-05)
-  - [ ] 09-03-PLAN.md — Wave 1: bin/lib/sync-merge.cjs + merge-3way/add-delete/allowlist test bodies (SYN-04, SYN-06, SYN-07)
-  - [ ] 09-04-PLAN.md — Wave 1: bin/lib/sync-accept.cjs + accept-helper test bodies (SYN-04, SYN-07)
-  - [ ] 09-05-PLAN.md — Wave 2: scripts/sync-upstream/{pull-gsd,pull-superpowers,rebrand,merge}.cjs + sync-pull prior-pin amendment + rebrand-sync/report tests (SYN-01..04, SYN-06)
-  - [ ] 09-06-PLAN.md — Wave 3: bin/lib/sync-cli.cjs + bin/install.js sync dispatch + cli.integration test (SYN-01..07)
+  - [x] 09-01-PLAN.md — Wave 0: Test scaffolds (8 files), fixtures, schemas, allowlist, .gitignore (SYN-01..07)
+  - [x] 09-02-PLAN.md — Wave 1: bin/lib/sync-pull.cjs + pull-puller test bodies (SYN-01, SYN-02, SYN-05)
+  - [x] 09-03-PLAN.md — Wave 1: bin/lib/sync-merge.cjs + merge-3way/add-delete/allowlist test bodies (SYN-04, SYN-06, SYN-07)
+  - [x] 09-04-PLAN.md — Wave 1: bin/lib/sync-accept.cjs + accept-helper test bodies (SYN-04, SYN-07)
+  - [x] 09-05-PLAN.md — Wave 2: scripts/sync-upstream/{pull-gsd,pull-superpowers,rebrand,merge}.cjs + sync-pull prior-pin amendment + rebrand-sync/report tests (SYN-01..04, SYN-06)
+  - [x] 09-06-PLAN.md — Wave 3: bin/lib/sync-cli.cjs + bin/install.js sync dispatch + cli.integration test (SYN-01..07)
 
 ### Phase 10: Tests, CI, Docs & v0.1.0 Release
 **Goal**: Lock the test surface, harden CI, write the public docs, and tag v0.1.0 — the first installable release that creates a clean install for Claude Code.
@@ -209,5 +209,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Skills Port & Cross-System Integration | 3/3 | Complete | 2026-05-01 |
 | 7. Workstreams & Workspaces Port | 5/5 | Complete    | 2026-05-02 |
 | 8. Codex & Gemini Runtime Parity | 6/6 | Complete | 2026-05-02 |
-| 9. Upstream Sync Pipeline | 0/6 | Planned | - |
+| 9. Upstream Sync Pipeline | 6/6 | Complete | 2026-05-04 |
 | 10. Tests, CI, Docs & v0.1.0 Release | 0/TBD | Not started | - |
