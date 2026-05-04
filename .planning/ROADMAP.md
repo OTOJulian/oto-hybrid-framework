@@ -193,7 +193,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Public docs are present: `README.md` (what oto is, install instruction with tagged ref, upstream attribution, command index), `docs/upstream-sync.md`, `docs/rebrand-engine.md`, auto-generated `commands/INDEX.md` listing every `/oto-*` command with a one-line description
   6. **v0.1.0 tagged release**: `git tag v0.1.0` triggers `release.yml`, GitHub Release is created, and `npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/v0.1.0.tar.gz` on a clean machine produces a working Claude Code install
 **Plans**: 3 plans
-  - [ ] 10-01-PLAN.md — Wave 0: 8 phase-10-*.test.cjs files + tests/fixtures/phase-10/rebrand-snapshots dir + scripts/gen-commands-index.cjs (CI-04, CI-06, CI-07, CI-10, DOC-01, DOC-04, DOC-06)
+  - [x] 10-01-PLAN.md — Wave 0: 8 phase-10-*.test.cjs files + tests/fixtures/phase-10/rebrand-snapshots dir + scripts/gen-commands-index.cjs (CI-04, CI-06, CI-07, CI-10, DOC-01, DOC-04, DOC-06)
   - [ ] 10-02-PLAN.md — Wave 1: 3 .github/workflows/*.yml + README.md rewrite + docs/upstream-sync.md + docs/rebrand-engine.md + drop bin/oto-sdk.js + capture 9 rebrand snapshots (CI-01, CI-02, CI-03, CI-05, CI-08, CI-09, DOC-02, DOC-03, DOC-04, DOC-06)
   - [ ] 10-03-PLAN.md — Wave 2: package.json bump to 0.1.0 + git tag v0.1.0 + push + manual UAT clean-machine install (FND-05)
 
@@ -213,4 +213,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Workstreams & Workspaces Port | 5/5 | Complete    | 2026-05-02 |
 | 8. Codex & Gemini Runtime Parity | 6/6 | Complete | 2026-05-02 |
 | 9. Upstream Sync Pipeline | 6/6 | Complete | 2026-05-04 |
-| 10. Tests, CI, Docs & v0.1.0 Release | 0/3 | Planned | - |
+| 10. Tests, CI, Docs & v0.1.0 Release | 1/3 | In Progress | - |

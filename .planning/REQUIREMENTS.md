@@ -128,8 +128,8 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **CI-03**: GitHub Actions `release.yml` — tag-triggered, creates GitHub Release; no npm publish
 - [ ] **CI-04**: Rebrand-engine snapshot tests — golden-file output for representative source files
 - [ ] **CI-05**: Coverage-manifest CI check — fails if any non-allowlisted `gsd`/`superpowers` occurrence appears in rebranded source
-- [ ] **CI-06**: License-attribution CI check — `THIRD-PARTY-LICENSES.md` exists and contains both upstreams' MIT text verbatim
-- [ ] **CI-07**: Skill-auto-trigger regression test — verifies `oto:using-oto` defers when `.oto/STATE.md` shows in-progress phase
+- [x] **CI-06**: License-attribution CI check — `THIRD-PARTY-LICENSES.md` exists and contains both upstreams' MIT text verbatim
+- [x] **CI-07**: Skill-auto-trigger regression test — verifies `oto:using-oto` defers when `.oto/STATE.md` shows in-progress phase
 - [ ] **CI-08**: SessionStart-output snapshot fixture — locks the bootstrap injection content
 - [ ] **CI-09**: State-leak detection test — verifies no upstream `.planning/` references remain in rebranded code
 - [ ] **CI-10**: Pin GitHub Actions by SHA, not major tag
@@ -141,7 +141,7 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 - [ ] **DOC-03**: `docs/upstream-sync.md` — how to pull and apply upstream changes
 - [ ] **DOC-04**: `docs/rebrand-engine.md` — how the rename engine works, how to add rules
 - [x] **DOC-05**: `decisions/` directory containing architecture decisions (skill-vs-command routing, agent audit, state directory choice)
-- [ ] **DOC-06**: Auto-generated `commands/INDEX.md` listing all `/oto-*` commands with one-line descriptions
+- [x] **DOC-06**: Auto-generated `commands/INDEX.md` listing all `/oto-*` commands with one-line descriptions
 
 ## v2 Requirements
 
@@ -283,8 +283,8 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | CI-03 | Phase 10 | Pending |
 | CI-04 | Phase 10 | Pending |
 | CI-05 | Phase 10 | Pending |
-| CI-06 | Phase 10 | Pending |
-| CI-07 | Phase 10 | Pending |
+| CI-06 | Phase 10 | Complete |
+| CI-07 | Phase 10 | Complete |
 | CI-08 | Phase 10 | Pending |
 | CI-09 | Phase 10 | Pending |
 | CI-10 | Phase 10 | Pending |
@@ -293,7 +293,7 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | DOC-03 | Phase 10 | Pending |
 | DOC-04 | Phase 10 | Pending |
 | DOC-05 | Phase 1 | Complete |
-| DOC-06 | Phase 10 | Pending |
+| DOC-06 | Phase 10 | Complete |
 
 **Coverage:**
 - v1 requirements: 100 total
