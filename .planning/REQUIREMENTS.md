@@ -123,23 +123,23 @@ Requirements for v0.1.0 release. Each maps to a roadmap phase. Requirements are 
 
 ### Tests & CI
 
-- [ ] **CI-01**: GitHub Actions `test.yml` — Node 22 + 24 matrix on Ubuntu, plus one macOS runner on Node 24
-- [ ] **CI-02**: GitHub Actions `install-smoke.yml` — real `npm pack` + `npm install -g <tarball>` AND unpacked-dir install (catches mode-644 trap)
-- [ ] **CI-03**: GitHub Actions `release.yml` — tag-triggered, creates GitHub Release; no npm publish
-- [ ] **CI-04**: Rebrand-engine snapshot tests — golden-file output for representative source files
-- [ ] **CI-05**: Coverage-manifest CI check — fails if any non-allowlisted `gsd`/`superpowers` occurrence appears in rebranded source
+- [x] **CI-01**: GitHub Actions `test.yml` — Node 22 + 24 matrix on Ubuntu, plus one macOS runner on Node 24
+- [x] **CI-02**: GitHub Actions `install-smoke.yml` — real `npm pack` + `npm install -g <tarball>` AND unpacked-dir install (catches mode-644 trap)
+- [x] **CI-03**: GitHub Actions `release.yml` — tag-triggered, creates GitHub Release; no npm publish
+- [x] **CI-04**: Rebrand-engine snapshot tests — golden-file output for representative source files
+- [x] **CI-05**: Coverage-manifest CI check — fails if any non-allowlisted `gsd`/`superpowers` occurrence appears in rebranded source
 - [x] **CI-06**: License-attribution CI check — `THIRD-PARTY-LICENSES.md` exists and contains both upstreams' MIT text verbatim
 - [x] **CI-07**: Skill-auto-trigger regression test — verifies `oto:using-oto` defers when `.oto/STATE.md` shows in-progress phase
-- [ ] **CI-08**: SessionStart-output snapshot fixture — locks the bootstrap injection content
-- [ ] **CI-09**: State-leak detection test — verifies no upstream `.planning/` references remain in rebranded code
-- [ ] **CI-10**: Pin GitHub Actions by SHA, not major tag
+- [x] **CI-08**: SessionStart-output snapshot fixture — locks the bootstrap injection content
+- [x] **CI-09**: State-leak detection test — verifies no upstream `.planning/` references remain in rebranded code
+- [x] **CI-10**: Pin GitHub Actions by SHA, not major tag
 
 ### Documentation
 
-- [ ] **DOC-01**: `README.md` with: what oto is, install instructions (`npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`), upstream attribution, command index
-- [ ] **DOC-02**: `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses
-- [ ] **DOC-03**: `docs/upstream-sync.md` — how to pull and apply upstream changes
-- [ ] **DOC-04**: `docs/rebrand-engine.md` — how the rename engine works, how to add rules
+- [x] **DOC-01**: `README.md` with: what oto is, install instructions (`npm install -g https://github.com/<owner>/oto-hybrid-framework/archive/vX.Y.Z.tar.gz`), upstream attribution, command index
+- [x] **DOC-02**: `THIRD-PARTY-LICENSES.md` with verbatim GSD and Superpowers MIT licenses
+- [x] **DOC-03**: `docs/upstream-sync.md` — how to pull and apply upstream changes
+- [x] **DOC-04**: `docs/rebrand-engine.md` — how the rename engine works, how to add rules
 - [x] **DOC-05**: `decisions/` directory containing architecture decisions (skill-vs-command routing, agent audit, state directory choice)
 - [x] **DOC-06**: Auto-generated `commands/INDEX.md` listing all `/oto-*` commands with one-line descriptions
 
@@ -278,20 +278,20 @@ Populated by roadmap creation (`/gsd-roadmapper`) on 2026-04-27.
 | MR-02 | Phase 8 | Complete |
 | MR-03 | Phase 8 | Complete |
 | MR-04 | Phase 8 | Complete |
-| CI-01 | Phase 10 | Pending |
-| CI-02 | Phase 10 | Pending |
-| CI-03 | Phase 10 | Pending |
-| CI-04 | Phase 10 | Pending |
-| CI-05 | Phase 10 | Pending |
+| CI-01 | Phase 10 | Complete |
+| CI-02 | Phase 10 | Complete |
+| CI-03 | Phase 10 | Complete |
+| CI-04 | Phase 10 | Complete |
+| CI-05 | Phase 10 | Complete |
 | CI-06 | Phase 10 | Complete |
 | CI-07 | Phase 10 | Complete |
-| CI-08 | Phase 10 | Pending |
-| CI-09 | Phase 10 | Pending |
-| CI-10 | Phase 10 | Pending |
-| DOC-01 | Phase 10 | Pending |
-| DOC-02 | Phase 10 | Pending |
-| DOC-03 | Phase 10 | Pending |
-| DOC-04 | Phase 10 | Pending |
+| CI-08 | Phase 10 | Complete |
+| CI-09 | Phase 10 | Complete |
+| CI-10 | Phase 10 | Complete |
+| DOC-01 | Phase 10 | Complete |
+| DOC-02 | Phase 10 | Complete |
+| DOC-03 | Phase 10 | Complete |
+| DOC-04 | Phase 10 | Complete |
 | DOC-05 | Phase 1 | Complete |
 | DOC-06 | Phase 10 | Complete |
 
