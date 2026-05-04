@@ -265,7 +265,13 @@ async function mergeAll({
     } else if (result.kind === 'added') {
       counts.added += 1;
       lists.added.push(targetPath);
-      await writeSidecar({ conflictsDir, targetPath, suffix: '.added.md', meta: makeMeta({ ...metaBase, kind: 'added' }), content: result.content });
+      if (apply) {
+        const outPath = otoPathFor(otoDir, targetPath);
+        await ensureParent(outPath);
+        await fsp.writeFile(outPath, result.content);
+      } else {
+        await writeSidecar({ conflictsDir, targetPath, suffix: '.added.md', meta: makeMeta({ ...metaBase, kind: 'added' }), content: result.content });
+      }
     } else if (result.kind === 'deleted') {
       counts.deleted += 1;
       lists.deleted.push(targetPath);

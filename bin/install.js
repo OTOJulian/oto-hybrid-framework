@@ -28,6 +28,13 @@ USAGE
   oto install --all                           install to all detected runtimes
   oto uninstall --claude|--codex|--gemini     uninstall a runtime
   oto uninstall --all [--purge]               remove all; purge stale files
+  oto sync --upstream <name|all> --to <ref>   dry-run upstream sync
+  oto sync --upstream <name|all> --to <ref> --apply
+      apply auto-merged upstream changes
+  oto sync --accept <path>                    accept resolved conflict
+  oto sync --accept-deletion <path>           accept upstream deletion
+  oto sync --keep-deleted <path>              keep local copy after delete
+  oto sync --status                           show sync pins and conflicts
 
 FLAGS
   --config-dir <dir>   target a config dir (single-runtime only)
@@ -50,6 +57,12 @@ REPO  https://github.com/OTOJulian/oto-hybrid-framework
 `;
 
 async function main(argv) {
+  if (argv[0] === 'sync') {
+    const { runSync } = require('./lib/sync-cli.cjs');
+    const code = await runSync(argv.slice(1));
+    process.exit(code);
+  }
+
   let parsed;
   try {
     parsed = parseCliArgs(argv);

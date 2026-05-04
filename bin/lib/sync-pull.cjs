@@ -22,8 +22,8 @@ function classifyRef(ref) {
   return 'tag-or-branch';
 }
 
-function assertGitVersion() {
-  const result = spawnSync('git', ['--version'], { encoding: 'utf8' });
+function assertGitVersion(runner = spawnSync) {
+  const result = runner('git', ['--version'], { encoding: 'utf8' });
   const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
   const match = /git version (\d+)\.(\d+)/.exec(output);
   if (!match || Number(match[1]) < 2) {

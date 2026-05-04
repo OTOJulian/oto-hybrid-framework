@@ -81,7 +81,18 @@ function resolveOut(outPath) {
   const root = repoRoot();
   const resolvedOut = path.resolve(outPath || path.join(root, '.oto-rebrand-out'));
   const tmp = os.tmpdir();
-  if (!resolvedOut.startsWith(root) && !resolvedOut.startsWith(tmp)) {
+  const allowedRoots = [root, tmp];
+  try {
+    allowedRoots.push(fs.realpathSync(root));
+  } catch {
+    // best effort; path.resolve(root) remains the canonical guard
+  }
+  try {
+    allowedRoots.push(fs.realpathSync(tmp));
+  } catch {
+    // best effort; os.tmpdir() remains the canonical guard
+  }
+  if (!allowedRoots.some((allowedRoot) => resolvedOut.startsWith(allowedRoot))) {
     throw new Error('Refusing to write outside repo root or os.tmpdir()');
   }
   return resolvedOut;
