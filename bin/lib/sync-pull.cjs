@@ -131,6 +131,10 @@ async function pullUpstream({ name, url, ref, destDir }) {
   };
 
   validatePinRecord(record);
+  const priorPinPath = path.join(destDir, 'prior-last-synced-commit.json');
+  if (await pathExists(pinFile)) {
+    await fsp.copyFile(pinFile, priorPinPath);
+  }
   await fsp.writeFile(pinFile, `${JSON.stringify(record, null, 2)}\n`);
   return record;
 }

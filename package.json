@@ -12,6 +12,7 @@
     "oto/",
     "hooks/",
     "scripts/rebrand/",
+    "scripts/sync-upstream/",
     "scripts/build-hooks.js",
     "rename-map.json",
     "schema/",
