@@ -2,102 +2,105 @@
 
 ## What This Is
 
-`oto` is a personal, production-grade hybrid AI-CLI framework that combines the best of [Get Shit Done (GSD)](https://github.com/gsd-build/get-shit-done) and [Superpowers](https://github.com/obra/superpowers) under a unified `/oto-*` command surface. Built for a single developer who likes GSD's spec-driven workflow but doesn't want to switch frameworks to access the capabilities Superpowers offers.
+`oto` is a personal, production-grade hybrid AI-CLI framework that combines the best of [Get Shit Done (GSD)](https://github.com/gsd-build/get-shit-done) and [Superpowers](https://github.com/obra/superpowers) under a unified `/oto-*` command surface.
+
+It is built for a single developer who likes GSD's spec-driven workflow but does not want to switch frameworks to access the capabilities Superpowers offers.
 
 ## Core Value
 
-**Stop framework-switching.** One installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface — across Claude Code, Codex, and Gemini CLI.
+**Stop framework-switching.** One installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
+
+## Current State
+
+**v0.1.0 shipped on 2026-05-04.**
+
+The release is tagged and archived. The active milestone is complete, and the next project action is to run `$gsd-new-milestone` to define fresh requirements.
+
+Shipped in v0.1.0:
+- Public GitHub archive install path for the `oto` package.
+- Architecture decisions, agent audit, file inventory, rename map, and license attribution.
+- Typed rebrand engine with dry-run/apply/round-trip modes and coverage manifest checks.
+- Installer adapters for Claude Code, Codex, and Gemini.
+- Ported `/oto-*` workflow spine, retained agents, hook fleet, seven skills, workstreams, and workspaces.
+- Generated runtime instruction files, runtime matrix, Codex/Gemini transforms, and per-runtime smoke coverage.
+- Upstream sync pipeline, CI workflows, docs, command index, release tag, GitHub Release, and clean install UAT.
+
+Archive:
+- `.planning/milestones/v0.1.0-ROADMAP.md`
+- `.planning/milestones/v0.1.0-REQUIREMENTS.md`
+- `.planning/milestones/v0.1.0-MILESTONE-AUDIT.md`
 
 ## Requirements
 
 ### Validated
 
-<!-- Shipped and confirmed valuable. -->
-
-- [x] Phase 1 locked the architecture decisions, agent audit, file inventory, rename map, and license attribution.
-- [x] Phase 2 shipped the Node package skeleton, public GitHub install target, rebrand engine, dry-run/apply reports, and round-trip verification.
-- [x] Phase 3 shipped the trimmed installer for exactly Claude Code, Codex, and Gemini CLI, with Claude as the v0.1.0 happy path and Codex/Gemini explicitly best-effort until parity work.
-- [x] Phase 4 shipped the GSD core workflow and retained agent spine for Claude Code, with MR-01 approved through a disposable end-to-end dogfood session.
-- [x] Phase 5 shipped the consolidated hook fleet: single SessionStart bootstrap, statusline, context monitor, prompt guard, read-injection scanner, validate-commit, and install-time hook version tagging.
-- [x] Phase 6 shipped the curated 7-skill subset under `oto:<skill>`, `oto:using-oto` workflow deference, installer skill-copy coverage, and canonical skill invocations in executor/verifier/debugger agents.
-- [x] Phase 7 shipped workstreams and isolated workspace management surfaces.
-- [x] Phase 8 shipped Codex and Gemini runtime parity: generated root instruction files, runtime transforms, generated runtime matrix, fixture goldens, and per-runtime smoke tests.
+- v0.1.0 Release - 100/100 v1 requirements complete and audited.
+- Claude Code happy path - approved through MR-01 end-to-end dogfood.
+- Codex and Gemini runtime parity - instruction generation, transforms, matrix, and smoke tests shipped.
+- Clean install release gate - `v0.1.0` tag, GitHub Release, archive install smoke, and human clean-install UAT passed.
 
 ### Active
 
-<!-- Current scope. Building toward these. The hybrid architecture is research-driven; these requirements scope the framework, not the merge strategy. -->
+- None. Fresh requirements should be created by `$gsd-new-milestone`.
 
-- [ ] Phase 9: Build the upstream sync pipeline for renamed snapshots and conflict surfacing.
-- [ ] Phase 10: Harden tests, CI, docs, and the v0.1.0 tagged release.
+### Next Milestone Goals
+
+To be defined through `$gsd-new-milestone`. Likely candidates from deferred v2 scope:
+- Runtime parity hardening beyond install-shape smoke.
+- Upstream sync UX improvements.
+- Optional SDK/programmatic API work.
+- Niche command restoration only when it clears the personal-use cost ceiling.
 
 ### Out of Scope
 
-<!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
-
-- OpenCode runtime support — user does not use it; carrying it would inflate scope and rebrand surface
-- npm registry publishing — overhead unjustified for personal use; GitHub install covers cross-machine portability
-- Multi-user/team features (sharing config, central registries, etc.) — personal-use scope; revisit if anyone else adopts it
-- Carrying over local `~/.claude/` customizations — clean-slate build; no migration step needed
-- Backwards compatibility with users running raw GSD or Superpowers — this is a fork, not a wrapper; users install oto fresh
+- OpenCode runtime support - user does not use it; carrying it inflates scope and test surface.
+- npm registry publishing - GitHub archive install is enough for personal cross-machine use.
+- Multi-user/team/shared-config features - personal-use scope.
+- Carrying over local `~/.claude/` customizations - clean-slate build.
+- Backwards compatibility with raw GSD or Superpowers commands - this is a fork, not a wrapper.
+- Windows support - Mac is primary for this project.
+- Marketplace/community/Discord features - not aligned with the personal-use ceiling.
 
 ## Context
 
-**Source frameworks (reference only, not extended):**
-- `foundation-frameworks/get-shit-done-main/` — GSD v1.38.5 source. npm-distributed (`get-shit-done-cc`), bin installer, multi-runtime (Claude/Codex/Gemini/OpenCode), command/agent/workflow architecture with `.planning/` state directory.
-- `foundation-frameworks/superpowers-main/` — Superpowers v5.0.7 source. OpenCode-plugin shaped but ships skills/agents/commands for Claude/Codex/Gemini too. 14 skills + 3 commands.
+**Source frameworks:**
+- `foundation-frameworks/get-shit-done-main/` - GSD v1.38.5 source.
+- `foundation-frameworks/superpowers-main/` - Superpowers v5.0.7 source.
 
 **User profile:**
-- Solo developer; "production-grade" means the framework should be reliable enough for daily personal use, with tests, docs, CI, and multi-runtime parity — not a weekend hack.
-- Currently switches between GSD and Superpowers; oto exists to eliminate that switch.
-- Has not committed yet to which Superpowers features matter most — research phase will surface this.
-
-**Hybrid strategy is research-driven:**
-- Both the *scope of merge* (which features survive the cut) and the *architecture of merge* (whether GSD's spine hosts Superpowers, or vice versa, or a new shape emerges) are deferred to the research phase. This is intentional — pre-committing to an architecture before inventorying the two frameworks would lock in a worse design.
-
-**Upstream tracking:**
-- GSD and Superpowers will continue evolving. oto needs an automated rebrand pipeline so upstream improvements aren't stranded by the rename. Manual diff-and-port was rejected as too high-toil for a multi-month build.
+- Solo developer.
+- "Production-grade" means reliable enough for daily personal use: tests, docs, CI, release tags, and runtime-specific behavior where it matters.
+- The project succeeds if it improves the user's daily flow, not if it maximizes community surface area.
 
 ## Constraints
 
-- **Tech stack**: Node.js — both upstreams are Node-based (npm packages with `.cjs`/`.js` binaries and JSON tooling). Diverging would require rewriting both ecosystems.
-- **Runtime targets**: Claude Code (primary), Codex, Gemini CLI. Each has its own instruction file (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md`) and command/skill conventions to honor.
-- **Distribution**: Installable via `npm install -g github:<owner>/oto-hybrid-framework`. No npm registry publish. Versioning via git tags.
-- **Licensing**: Both upstreams are MIT-licensed. oto must preserve attribution and license notices for ported code.
-- **Personal-use cost ceiling**: Decisions that add significant ongoing maintenance burden (e.g., OpenCode support, plugin marketplaces) need to clear a high bar — the project succeeds if it makes the user's daily flow better, not if it serves a community.
+- **Tech stack:** Node.js, CommonJS tooling, no top-level TypeScript.
+- **Runtime targets:** Claude Code, Codex, Gemini CLI.
+- **Distribution:** GitHub archive installs and semver git tags. No npm registry publish.
+- **Licensing:** Preserve MIT attribution for both upstream frameworks.
+- **Cost ceiling:** Avoid ongoing maintenance burden unless it directly improves daily personal use.
 
 ## Key Decisions
 
-<!-- Decisions that constrain future work. Add throughout project lifecycle. -->
-
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Command prefix `/oto-*` (full rebrand depth) | User wants a unified, recognizable surface; partial rebrand leaks upstream identities into daily UX | Resolved in Phase 1 ADRs |
-| Distribute via public GitHub, install via `npm install -g github:...` | Personal use doesn't justify npm registry overhead; GitHub gives cross-machine portability and free public hosting | Resolved in Phase 2 as `https://github.com/OTOJulian/oto-hybrid-framework/archive/<ref>.tar.gz` |
-| Track upstream via automated rebrand tool, not manual diff | Full rebrand makes manual porting too costly across a multi-month build; tooling pays back the upfront effort | Resolved in Phase 2 rebrand engine |
-| Defer hybrid architecture to research phase | Pre-committing without an inventory would lock in a worse design; both frameworks deserve apples-to-apples comparison | Resolved in Phase 1 research: GSD spine plus Superpowers skills |
-| Drop OpenCode support | User doesn't use it; supporting it doubles rebrand and test surface for no personal benefit | Resolved in Phase 1 scope and enforced in Phase 3 installer |
-| Clean-slate build, no carry-over of personal `~/.claude/` tweaks | User confirmed nothing currently customized that needs preserving | Resolved in Phase 1 scope |
-| Claude installer first, Codex/Gemini later parity | MR-01 requires Claude Code stability before spending effort on cross-runtime parity | Resolved in Phase 8 with generated runtime files, transforms, fixture tests, matrix coverage, and smoke harnesses |
-| MR-01 approved before parity work | The Phase 4 disposable Claude Code dogfood completed new-project, discuss, plan, execute, verify, progress, pause, clear, and resume without falling back to upstream GSD or Superpowers | Resolved in Phase 4; Phase 5 hooks can proceed before Phase 8 runtime parity |
-| Workflow wins over ambient skill auto-fire | During active `.oto/STATE.md` workflows, `oto:using-oto` suppresses suspicion-based skill auto-fire while preserving explicit/canonical `Skill()` calls | Resolved in Phase 6; Phase 10 owns live conversational regression coverage |
-| Codex and Gemini are daily-peer runtime targets | User explicitly rejected best-effort parity for commands on Codex/Gemini; unsupported native surfaces are closed by transforms, generated docs, and smoke/fixture tests | Resolved in Phase 8; Phase 10 owns CI provisioning for unskipped external runtime binaries |
+| Command prefix `/oto-*` | Unified recognizable surface; partial rebrand leaks upstream UX | Resolved in Phase 1 |
+| State directory `.oto/` for shipped runtime payloads | Avoid inheriting GSD's `.planning/` user-facing identity | Resolved in Phase 1 |
+| GitHub archive install path | npm `github:` shorthand was unreliable for lifecycle-bearing global installs; archive tarball smoke passed | Resolved in Phase 2 |
+| GSD spine plus Superpowers skills | GSD provides the workflow machine; curated Superpowers skills add capability without framework switching | Resolved in Phase 1/6 |
+| Drop unsupported runtimes outside Claude/Codex/Gemini | Personal-use ceiling and test-surface control | Resolved in Phase 3 |
+| MR-01 before broad parity | Claude Code had to be daily-use stable before spending effort on other runtimes | Resolved in Phase 4 |
+| Workflow wins over ambient skill auto-fire | Active workflow state should prevent unrelated suspicion-based skill loading | Resolved in Phase 6 |
+| Codex and Gemini are daily-peer runtime targets | Parity gaps should be closed with transforms/tests, not documented as best-effort | Resolved in Phase 8 |
+| Upstream sync is rename plus conflict surfacing for v0.1.0 | Three-way UX can wait; conflict visibility is the valuable first step | Resolved in Phase 9 |
 
 ## Evolution
 
-This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
+After each milestone:
+1. Move shipped requirements to Validated.
+2. Clear Active requirements before defining the next milestone.
+3. Re-check the personal-use cost ceiling.
+4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-02 after Phase 08 closeout*
+*Last updated: 2026-05-04 after v0.1.0 milestone closeout*
