@@ -45,5 +45,4 @@ No remaining critical, warning, or info findings.
 ## Verification
 
 - `node --test --test-concurrency=4 tests/phase-09-cli.integration.test.cjs` passed after the review fix.
-- `npm test` passed before the review fix: 393 pass, 1 skipped, 0 fail, 0 todo.
-
+- `npm test` passed after the review fix: 393 pass, 1 skipped, 0 fail, 0 todo.
