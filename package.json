@@ -4,8 +4,7 @@
   "description": "Hybrid AI-CLI framework: GSD planning + Superpowers skills under /oto-* across Claude/Codex/Gemini",
   "engines": { "node": ">=22.0.0" },
   "bin": {
-    "oto": "bin/install.js",
-    "oto-sdk": "bin/oto-sdk.js"
+    "oto": "bin/install.js"
   },
   "files": [
     "bin/",

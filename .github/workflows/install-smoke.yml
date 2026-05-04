@@ -1,0 +1,105 @@
+# Byte-cloned from foundation-frameworks/get-shit-done-main/.github/workflows/install-smoke.yml
+# (smoke-tarball + smoke-unpacked job pattern). Adjustments from upstream:
+#  - binary name: gsd-sdk -> oto (oto ships raw .js, no SDK build step)
+#  - removed upstream `chmod 644 sdk/dist/cli.js` step: oto has no tsc-fresh
+#    artifacts; bin/install.js is checked in at mode 755 in the repo. Per
+#    W-2 fix and T-INST-01 mitigation update, npm preserves source mode on
+#    unpacked installs, so the smoke validates "fresh clone install works",
+#    which is the actual user-facing scenario.
+name: Install Smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'bin/**'
+      - 'package.json'
+      - 'scripts/install-smoke.cjs'
+      - '.github/workflows/install-smoke.yml'
+      - '.github/workflows/release.yml'
+  workflow_call:
+  workflow_dispatch:
+
+concurrency:
+  group: install-smoke-${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  smoke-tarball:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node-version: 22
+          - os: ubuntu-latest
+            node-version: 24
+          - os: macos-latest
+            node-version: 24
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Ensure npm global bin is on PATH
+        shell: bash
+        run: |
+          NPM_BIN="$(npm config get prefix)/bin"
+          echo "$NPM_BIN" >> "$GITHUB_PATH"
+          echo "npm global bin: $NPM_BIN"
+      - name: Pack and install tarball
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARBALL=$(npm pack --silent)
+          TMPDIR_ROOT=$(mktemp -d)
+          cd "$TMPDIR_ROOT"
+          npm install -g "$GITHUB_WORKSPACE/$TARBALL"
+          command -v oto
+          oto --help || oto
+      - name: Assert oto is executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          OTO_PATH="$(command -v oto)"
+          test -x "$OTO_PATH"
+          echo "OK: oto resolves at $OTO_PATH and is executable"
+
+  # Mirrors upstream smoke-unpacked job: install from $GITHUB_WORKSPACE
+  # without npm pack. Catches the failure class where source files in the
+  # repo would lose execute bits (mode-644 trap, npm/cli #2453). Source
+  # bin/install.js is mode 755 in the repo; this job proves npm preserves it.
+  smoke-unpacked:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
+        with:
+          node-version: 22
+      - name: Ensure npm global bin is on PATH
+        shell: bash
+        run: |
+          NPM_BIN="$(npm config get prefix)/bin"
+          echo "$NPM_BIN" >> "$GITHUB_PATH"
+          echo "npm global bin: $NPM_BIN"
+      - name: Install from unpacked workspace (no npm pack)
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMPDIR_ROOT=$(mktemp -d)
+          cd "$TMPDIR_ROOT"
+          npm install -g "$GITHUB_WORKSPACE"
+          command -v oto
+          oto --help || oto
+      - name: Assert oto is executable after unpacked install (#2453 regression check)
+        shell: bash
+        run: |
+          set -euo pipefail
+          OTO_PATH="$(command -v oto)"
+          test -x "$OTO_PATH"
+          echo "OK: oto is executable after unpacked install: $OTO_PATH"
