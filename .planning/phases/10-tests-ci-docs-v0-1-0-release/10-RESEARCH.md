@@ -565,37 +565,37 @@ Verified: `scripts/install-smoke.cjs` already asserts `(mode & 0o111) !== 0` on 
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Resolved 2026-05-04 by orchestrator + planner consensus during plan-phase. Recommendations adopted as locked decisions; rationale below per question. No CONTEXT.md was authored — this section serves as the decision log for Phase 10.
 
 1. **Does `tests/phase-01-licenses.test.cjs` already cover CI-06's byte-equality requirement, or only file existence + copyright-line presence?**
-   - What we know: file exists, 1813 bytes; named "phase-01-licenses".
-   - What's unclear: does it diff the MIT body against `foundation-frameworks/.../LICENSE`?
-   - Recommendation: planner should READ this file in Wave 0 and either extend it in place OR add `tests/phase-10-license-attribution.test.cjs` (cheap; reuses pattern). Recommend the latter so the Phase 1 test stays scoped to its phase.
+   - **RESOLVED:** Author a NEW `tests/phase-10-license-attribution.test.cjs` (do NOT extend the Phase 1 test). Verified by planner: Phase 1 test only checks substrings, not byte-equality of full MIT bodies. Rationale: keeps phase-scoped test ownership; Phase 1 test stays a narrow existence check.
 
 2. **Should the v0.1.0 release ship `docs/` in the npm tarball?** (R-3)
-   - What we know: `package.json` `files` allowlist excludes `docs/`.
-   - What's unclear: does the user want install-time access to docs (`~/.npm/.../oto/docs/`)?
-   - Recommendation: NO — docs live on GitHub for users to read; install footprint stays minimal. Lock as D-XX in CONTEXT.md.
+   - **RESOLVED: NO.** Keep `package.json` `files` allowlist as-is (no `docs/`). Plan 02 Task 2 explicitly verifies `docs/` is NOT in the allowlist. Rationale: lean install footprint; docs live on GitHub for users to read.
 
 3. **Is `bin/oto-sdk.js` shipping in v0.1.0?** (R-1)
-   - What we know: it's in the `bin` map; ADR-12 says SDK is v2.
-   - What's unclear: was the stub kept intentionally or as accidental carry-over from Phase 2?
-   - Recommendation: drop from `bin` map (or fence its publish). Lock as D-XX.
+   - **RESOLVED: NO.** Plan 02 Task 1 deletes `bin/oto-sdk.js` and removes the bin map entry. Rationale: ADR-12 defers SDK to v0.2; mode-644 risk if unused bin target ships.
 
 4. **Does `c8` enter v0.1.0 dev deps?** (R-2)
-   - What we know: Phase 2 D-18 deferred c8 to Phase 10. Phase 10 description does not mention coverage gates.
-   - What's unclear: user appetite for a coverage badge / dev dep.
-   - Recommendation: defer to v0.2 — keeps zero-dep posture; coverage gates are gold-plating for personal use. Lock as D-XX.
+   - **RESOLVED: NO.** Defer to v0.2. Rationale: preserves zero-dep posture; coverage gates are gold-plating for personal-use v0.1.0 ship.
 
 5. **Is the `tests/phase-10-readme-shape.test.cjs` content-presence check in scope?**
-   - What we know: README will be written by hand (not auto-generated).
-   - What's unclear: do we want a CI gate against README drift (e.g., install URL still references `vX.Y.Z` placeholder)?
-   - Recommendation: YES — a 30-line content-presence test catches the "we shipped v0.1.0 with `vX.Y.Z` in the README" failure class. Cheap. Lock as D-XX.
+   - **RESOLVED: YES.** Plan 01 Task 2 ships the test. It MUST reject literal `vX.Y.Z` placeholder. Rationale: catches the "shipped v0.1.0 with `vX.Y.Z` in README" failure class for ~30 lines of test code. (Implementation note: per check-in feedback, the test must NOT silently bypass via README-stub detection — Wave 0 may run against the stub README and is expected to fail loud until Plan 02 Task 2's README rewrite lands. Use per-assertion `t.todo` only if individually justified.)
 
 6. **Skill-auto-trigger runtime test mechanism: hook spawn vs simulated load?**
-   - What we know: `tests/06-using-oto-state-gating.test.cjs` proves the directive exists in `SKILL.md`. The hook (`oto/hooks/oto-session-start`) emits SessionStart context that includes/excludes skill bodies.
-   - What's unclear: does the hook itself decide skill loading (in which case spawning the hook is the right test), or does Claude Code's runtime decide based on the directive (in which case the test must simulate Claude Code's behavior, which is brittle)?
-   - Recommendation: spawn the hook. If the hook is responsible for emitting the using-oto body in SessionStart context, the test becomes "spawn with active STATE → assert no using-oto body in `additionalContext`." This is the same shape as the existing fixture test. If the hook always emits and Claude Code is the gate, downgrade CI-07 to a structural-only test (`tests/06-using-oto-state-gating.test.cjs` is sufficient) and document the runtime behavior as untestable in `node:test`. Surface in discuss-phase for the user to confirm.
+   - **RESOLVED: spawn the hook.** Mirror `tests/05-session-start-fixture.test.cjs` pattern. If the existing `tests/06-using-oto-state-gating.test.cjs` already provides this coverage by spawning the hook, no new test is needed; the planner's test inventory should not duplicate it. Rationale: hook-spawn is the same shape as our existing SessionStart fixture; runtime-simulation would be brittle.
+
+### Locked Decisions (planner SHALL treat as constraints)
+
+- **D-10-01:** New file `tests/phase-10-license-attribution.test.cjs` (NOT an extension of Phase 1 test).
+- **D-10-02:** `docs/` is NOT in the `package.json` `files` allowlist for v0.1.0.
+- **D-10-03:** `bin/oto-sdk.js` is deleted; bin map drops the entry. Single bin target = `oto`.
+- **D-10-04:** No `c8` dev dep in v0.1.0. Coverage deferred to v0.2.
+- **D-10-05:** `tests/phase-10-readme-shape.test.cjs` ships and asserts no `vX.Y.Z` placeholder. No whole-suite stub-bypass.
+- **D-10-06:** Skill-auto-trigger CI-07 test = hook-spawn pattern. If `tests/06-using-oto-state-gating.test.cjs` already covers it, that's sufficient — do not duplicate.
+- **D-10-07** (added during revision): Rebrand-snapshot projection shape is locked to `{ file: <relative-path>, classifications: [{ rule, before, after, line }, ...] }` — sorted by `file` ASC, `line` ASC, deterministic across runs. Both `tests/phase-10-rebrand-snapshot.test.cjs` (Plan 01) and `tests/regen-rebrand-snapshots.cjs` (Plan 02) MUST emit this exact shape. No abs paths, no SHAs, no temp-dir refs.
 
 ---
 
