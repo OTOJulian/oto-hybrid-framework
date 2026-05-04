@@ -5,3 +5,8 @@ oto/hooks/dist/
 node_modules/
 *.log
 /tmp-*
+
+# Phase 9 - upstream sync working state (metadata files exempted by negation)
+.oto-sync/upstream/
+.oto-sync/rebranded/
+.oto-sync-conflicts/

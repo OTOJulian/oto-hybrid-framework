@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OTOJulian/oto-hybrid-framework/schema/last-synced-commit.json",
+  "type": "object",
+  "required": ["upstream", "ref_kind", "ref", "sha", "timestamp"],
+  "additionalProperties": false,
+  "properties": {
+    "upstream": { "type": "string", "enum": ["gsd", "superpowers"] },
+    "ref_kind": { "type": "string", "enum": ["tag", "branch", "sha", "tag-or-branch"] },
+    "ref": { "type": "string", "minLength": 1 },
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "timestamp": { "type": "string", "minLength": 1 }
+  }
+}
