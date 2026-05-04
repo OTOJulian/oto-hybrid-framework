@@ -44,14 +44,12 @@ test('phase-04 mr01-install-smoke: tarball install populates commands, agents, a
     assert.equal(installResult.status, 0, `npm install failed: ${installResult.stderr}\n${installResult.stdout}`);
 
     const otoBin = path.join(prefix, 'bin', 'oto');
-    const otoSdkBin = path.join(prefix, 'bin', 'oto-sdk');
     assert.ok(fs.existsSync(otoBin), `oto binary missing at ${otoBin}`);
-    assert.ok(fs.existsSync(otoSdkBin), `oto-sdk binary missing at ${otoSdkBin}`);
-
-    const sdkResult = spawnSync(otoSdkBin, ['query', 'init.new-project', '--cwd', configDir], { encoding: 'utf8' });
-    assert.equal(sdkResult.status, 0, `oto-sdk query failed: ${sdkResult.stderr}\n${sdkResult.stdout}`);
-    const sdkInit = JSON.parse(sdkResult.stdout);
-    assert.equal(sdkInit.project_exists, false);
+    assert.equal(
+      fs.existsSync(path.join(prefix, 'bin', 'oto-sdk')),
+      false,
+      'oto-sdk binary should not ship in v0.1.0',
+    );
 
     const otoResult = spawnSync(otoBin, ['install', '--claude', '--config-dir', configDir], { encoding: 'utf8' });
     assert.equal(otoResult.status, 0, `oto install failed: ${otoResult.stderr}\n${otoResult.stdout}`);
@@ -101,23 +99,9 @@ test('phase-04 mr01-install-smoke: tarball install populates commands, agents, a
     assert.ok(manifestPaths.has('oto/templates/project.md'), 'manifest missing oto/templates/project.md');
     assert.ok(manifestPaths.has('oto/contexts/dev.md'), 'manifest missing oto/contexts/dev.md');
 
-    const installedSdkResult = spawnSync(
-      otoSdkBin,
-      ['query', 'init.new-project'],
-      {
-        cwd: configDir,
-        encoding: 'utf8',
-        env: { ...npmEnv, CLAUDE_CONFIG_DIR: configDir },
-      },
-    );
-    assert.equal(
-      installedSdkResult.status,
-      0,
-      `oto-sdk post-install query failed: ${installedSdkResult.stderr}\n${installedSdkResult.stdout}`,
-    );
-    const installedSdkInit = JSON.parse(installedSdkResult.stdout);
-    assert.equal(installedSdkInit.agents_installed, true);
-    assert.deepEqual(installedSdkInit.missing_agents, []);
+    for (const agent of EXPECTED_AGENTS) {
+      assert.ok(manifestPaths.has(`agents/${agent}.md`), `manifest missing agents/${agent}.md`);
+    }
   } finally {
     if (tarball) fs.rmSync(tarball, { force: true });
     if (packDir) fs.rmSync(packDir, { recursive: true, force: true });
