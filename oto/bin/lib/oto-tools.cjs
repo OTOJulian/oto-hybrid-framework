@@ -167,6 +167,8 @@
  * OTO-2 Migration:
  *   from-oto2 [--path <dir>] [--force] [--dry-run]
  *             Import a OTO-2 (.oto/) project back to OTO v1 (.oto/) format
+ *   migrate [--apply] [--rename-state-dir]
+ *             Convert a GSD-era project to the oto surface
  */
 
 const fs = require('fs');
@@ -1269,6 +1271,13 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
     case 'from-oto2': {
       const oto2Import = require('./gsd2-import.cjs');
       oto2Import.cmdFromGsd2(args.slice(1), cwd, raw);
+      break;
+    }
+
+    case 'migrate': {
+      const migrate = require('./migrate.cjs');
+      const exitCode = await migrate.main(args.slice(1), cwd);
+      process.exit(typeof exitCode === 'number' ? exitCode : 0);
       break;
     }
 

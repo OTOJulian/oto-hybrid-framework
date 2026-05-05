@@ -392,7 +392,8 @@ async function main(args = [], cwd = process.cwd()) {
     const result = mode === 'apply'
       ? await apply(projectDir, opts)
       : await dryRun(projectDir, opts);
-    if (result.reason === 'no GSD signals' && !values['dry-run'] && !values.apply) {
+    const noSignals = result.reason === 'no GSD signals' || result.summary?.reason === 'no GSD signals';
+    if (noSignals && !values['dry-run'] && !values.apply) {
       process.stderr.write(`migrate: not a GSD-era project: ${projectDir}\n`);
       return 1;
     }
