@@ -1,20 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v0.1.0
-milestone_name: Release
-current_phase: null
-current_phase_name: null
-current_plan: null
-status: milestone_complete_pending_new_milestone
-stopped_at: v0.1.0 milestone archived; next command is $gsd-new-milestone
-last_updated: "2026-05-05T14:50:00.000Z"
-last_activity: 2026-05-05
+milestone_name: milestone
+status: executing
+last_updated: "2026-05-05T22:47:36.478Z"
 progress:
-  total_phases: 10
-  completed_phases: 10
-  total_plans: 50
-  completed_plans: 50
-  percent: 100
+  total_phases: 2
+  completed_phases: 1
+  total_plans: 6
+  completed_plans: 3
+  percent: 50
 ---
 
 # Project State
@@ -28,10 +23,11 @@ See: .planning/PROJECT.md
 ## Current Position
 
 Milestone: v0.1.0 Release - SHIPPED 2026-05-04
-Status: milestone complete, archive created, ready for next milestone setup
+Status: Ready to execute
 Progress: 10/10 phases, 50/50 plans, 100/100 v1 requirements
 
 Archive:
+
 - `.planning/milestones/v0.1.0-ROADMAP.md`
 - `.planning/milestones/v0.1.0-REQUIREMENTS.md`
 - `.planning/milestones/v0.1.0-MILESTONE-AUDIT.md`
@@ -50,6 +46,12 @@ $gsd-new-milestone
 ```
 
 The next milestone should define fresh requirements before new roadmap phases are planned.
+
+## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 1 added: Add /oto:migrate — a command that converts a GSD-era project's planning artifacts to oto's command surface.
 
 ### Quick Tasks Completed
 
