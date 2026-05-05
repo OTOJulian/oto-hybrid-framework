@@ -108,9 +108,79 @@ function generateCodexAgentToml(agentName, agentContent, sandboxMap = {}, modelO
   return lines.join('\n') + '\n';
 }
 
+function getCodexSkillAdapterHeader(skillName) {
+  const invocation = `$${skillName}`;
+  return `<codex_skill_adapter>
+## A. Skill Invocation
+- This skill is invoked by mentioning \`${invocation}\`.
+- Treat all user text after \`${invocation}\` as \`{{GSD_ARGS}}\`.
+- If no arguments are present, treat \`{{GSD_ARGS}}\` as empty.
+
+## B. AskUserQuestion → request_user_input Mapping
+oto workflows use \`AskUserQuestion\` (Claude Code syntax). Translate to Codex \`request_user_input\`:
+
+Parameter mapping:
+- \`header\` → \`header\`
+- \`question\` → \`question\`
+- Options formatted as \`"Label" — description\` → \`{label: "Label", description: "description"}\`
+- Generate \`id\` from header: lowercase, replace spaces with underscores
+
+Batched calls:
+- \`AskUserQuestion([q1, q2])\` → single \`request_user_input\` with multiple entries in \`questions[]\`
+
+Multi-select workaround:
+- Codex has no \`multiSelect\`. Use sequential single-selects, or present a numbered freeform list asking the user to enter comma-separated numbers.
+
+Execute mode fallback:
+- When \`request_user_input\` is rejected (Execute mode), present a plain-text numbered list and pick a reasonable default.
+
+## C. Task() → spawn_agent Mapping
+oto workflows use \`Task(...)\` (Claude Code syntax). Translate to Codex collaboration tools:
+
+Direct mapping:
+- \`Task(subagent_type="X", prompt="Y")\` → \`spawn_agent(agent_type="X", message="Y")\`
+- \`Task(model="...")\` → omit. \`spawn_agent\` has no inline \`model\` parameter;
+  oto embeds the resolved per-agent model directly into each agent's \`.toml\`
+  at install time so \`model_overrides\` from \`.planning/config.json\` and
+  \`~/.oto/defaults.json\` are honored automatically by Codex's agent router.
+- \`fork_context: false\` by default — oto agents load their own context via \`<files_to_read>\` blocks
+
+Spawn restriction:
+- Codex restricts \`spawn_agent\` to cases where the user has explicitly
+  requested sub-agents. When automatic spawning is not permitted, do the
+  work inline in the current agent rather than attempting to force a spawn.
+
+Parallel fan-out:
+- Spawn multiple agents → collect agent IDs → \`wait(ids)\` for all to complete
+
+Result parsing:
+- Look for structured markers in agent output: \`CHECKPOINT\`, \`PLAN COMPLETE\`, \`SUMMARY\`, etc.
+- \`close_agent(id)\` after collecting results from each agent
+</codex_skill_adapter>`;
+}
+
+function convertClaudeCommandToCodexSkill(content, skillName) {
+  const converted = convertClaudeToCodexMarkdown(content);
+  const { frontmatter, body } = extractFrontmatterAndBody(converted);
+  let description = `Run oto workflow ${skillName}.`;
+  if (frontmatter) {
+    const maybeDescription = extractFrontmatterField(frontmatter, 'description');
+    if (maybeDescription) {
+      description = maybeDescription;
+    }
+  }
+  description = toSingleLine(description);
+  const shortDescription = description.length > 180 ? `${description.slice(0, 177)}...` : description;
+  const adapter = getCodexSkillAdapterHeader(skillName);
+
+  return `---\nname: ${yamlQuote(skillName)}\ndescription: ${yamlQuote(description)}\nmetadata:\n  short-description: ${yamlQuote(shortDescription)}\n---\n\n${adapter}\n\n${body.trimStart()}`;
+}
+
 module.exports = {
   convertClaudeAgentToCodexAgent,
+  convertClaudeCommandToCodexSkill,
   generateCodexAgentToml,
+  getCodexSkillAdapterHeader,
   extractFrontmatterAndBody,
   extractFrontmatterField,
   toSingleLine,
