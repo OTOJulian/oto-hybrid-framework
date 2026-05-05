@@ -21,7 +21,12 @@ function getTomlLineRecords(text) {
 }
 
 function hasMixedLegacyHooks(text) {
-  return /^\s*\[hooks\.[^\]]+\]/m.test(text) && /^\s*\[\[hooks\]\]/m.test(text);
+  // Detect coexistence of pre-Codex-0.125.0 formats outside the OTO-managed block:
+  //   - flat `[[hooks]]` array-of-tables (rejected by Codex 0.125.0+)
+  //   - very old `[hooks.X]` map (rejected since 0.124.0)
+  // These cannot be auto-migrated safely, so refuse to merge and ask the user to clean up.
+  const outsideOto = stripBlock(text);
+  return /^\s*\[hooks\.[^\]]+\]\s*$/m.test(outsideOto) && /^\s*\[\[hooks\]\]\s*$/m.test(outsideOto);
 }
 
 function stripBlock(text) {
@@ -58,10 +63,23 @@ function stripCodexHooksFeatureAssignments(text) {
   return out.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
+// Codex 0.125.0+ schema:
+//   [[hooks.<EventName>]]
+//   matcher = "<regex>"           # omitted for events without matcher (e.g. SessionStart)
+//   [[hooks.<EventName>.hooks]]
+//   type = "command"
+//   command = "..."
+//   timeout = <seconds>
+//
+// Each (event, matcher) tuple becomes one outer block plus one nested handler block.
+// `entry.type` from buildHookEntries is the EVENT NAME (e.g. "PreToolUse"), which here
+// becomes the dotted table key. The handler-level `type` field is always `"command"`.
 function emitHookEntry(entry) {
-  const lines = ['[[hooks]]'];
-  lines.push(`type = ${JSON.stringify(entry.type)}`);
+  const event = entry.type;
+  const lines = [`[[hooks.${event}]]`];
   if (entry.matcher) lines.push(`matcher = ${JSON.stringify(entry.matcher)}`);
+  lines.push(`[[hooks.${event}.hooks]]`);
+  lines.push('type = "command"');
   lines.push(`command = ${JSON.stringify(entry.command)}`);
   if (entry.timeout !== undefined) lines.push(`timeout = ${Number(entry.timeout)}`);
   return lines.join('\n');

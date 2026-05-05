@@ -44,7 +44,7 @@ test('INS-05: install --codex injects marker block into AGENTS.md (not CLAUDE.md
   assert.equal(fs.existsSync(path.join(configDir, 'CLAUDE.md')), false);
 });
 
-test('INS-05: mergeSettings preserves pre-existing config.toml content and appends managed hooks', async (t) => {
+test('INS-05: mergeSettings preserves pre-existing config.toml content and appends managed hooks (Codex 0.125.0+ schema)', async (t) => {
   const configDir = tmpDir(t);
   const settings = "[some_section]\nkey = 'value'\n";
   fs.writeFileSync(path.join(configDir, 'config.toml'), settings);
@@ -54,7 +54,10 @@ test('INS-05: mergeSettings preserves pre-existing config.toml content and appen
   const merged = fs.readFileSync(path.join(configDir, 'config.toml'), 'utf8');
   assert.match(merged, /^\[some_section\]\nkey = 'value'\n/);
   assert.match(merged, /# === BEGIN OTO HOOKS ===/);
-  assert.match(merged, /\[\[hooks\]\]/);
+  // Nested-table schema; the obsolete flat `[[hooks]]` shape must NOT appear.
+  assert.match(merged, /^\[\[hooks\.PreToolUse\]\]$/m);
+  assert.match(merged, /^\[\[hooks\.PreToolUse\.hooks\]\]$/m);
+  assert.equal(/^\[\[hooks\]\]$/m.test(merged), false);
   assert.match(merged, /oto-validate-commit\.sh/);
 });
 

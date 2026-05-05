@@ -51,13 +51,18 @@ test('INS-02: transformCommand/Agent/Skill use Codex parity transforms', () => {
   );
 });
 
-test('INS-02: mergeSettings injects managed Codex hook entries', () => {
+test('INS-02: mergeSettings injects managed Codex hook entries (Codex 0.125.0+ schema)', () => {
   const merged = adapter.mergeSettings('model = "gpt-5.3-codex"\n', {
     configDir: '/tmp/oto-codex',
     otoVersion: '0.1.0',
   });
   assert.match(merged, /# === BEGIN OTO HOOKS ===/);
-  assert.match(merged, /\[\[hooks\]\]/);
+  // Nested matcher-group + handler-array shape per https://developers.openai.com/codex/hooks
+  assert.match(merged, /^\[\[hooks\.PreToolUse\]\]$/m);
+  assert.match(merged, /^\[\[hooks\.PreToolUse\.hooks\]\]$/m);
+  assert.match(merged, /^type = "command"$/m);
+  // Obsolete flat format must NOT appear.
+  assert.equal(/^\[\[hooks\]\]$/m.test(merged), false);
   assert.match(merged, /oto-validate-commit\.sh/);
 });
 
