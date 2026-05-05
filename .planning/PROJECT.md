@@ -14,7 +14,7 @@ It is built for a single developer who likes GSD's spec-driven workflow but does
 
 **v0.1.0 shipped on 2026-05-04.**
 
-The release is tagged and archived. The active milestone is complete, and the next project action is to run `$gsd-new-milestone` to define fresh requirements.
+The release is tagged and archived. Post-release Phase 1 is complete: `/oto-migrate` now converts GSD-era project planning artifacts and instruction files to the oto command surface. There are no further active phases, and the next project action is to run `$gsd-new-milestone` to define fresh requirements.
 
 Shipped in v0.1.0:
 - Public GitHub archive install path for the `oto` package.
@@ -38,6 +38,7 @@ Archive:
 - Claude Code happy path - approved through MR-01 end-to-end dogfood.
 - Codex and Gemini runtime parity - instruction generation, transforms, matrix, and smoke tests shipped.
 - Clean install release gate - `v0.1.0` tag, GitHub Release, archive install smoke, and human clean-install UAT passed.
+- `/oto-migrate` post-release phase - dry-run/apply migration engine, CLI dispatch, command markdown, fixture-backed coverage, and generated runtime matrix entry shipped.
 
 ### Active
 
@@ -103,4 +104,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-04 after v0.1.0 milestone closeout*
+*Last updated: 2026-05-05 after Phase 01 /oto-migrate closeout*
