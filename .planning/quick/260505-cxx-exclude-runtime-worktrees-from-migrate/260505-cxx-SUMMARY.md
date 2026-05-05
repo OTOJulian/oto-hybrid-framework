@@ -13,6 +13,7 @@ key-files:
     - tests/migrate-dry-run.test.cjs
     - tests/migrate-apply.test.cjs
     - tests/phase-02-walker.test.cjs
+    - oto/commands/oto/migrate.md
 commits:
   - 69f8969  # fix(migrate): skip runtime worktrees
 metrics:
@@ -36,4 +37,5 @@ The exclusion lives in the shared rebrand walker, so dry-run reports no longer c
 
 - `node --test tests/migrate-dry-run.test.cjs tests/migrate-apply.test.cjs` reproduced the bug before implementation.
 - `node --test tests/phase-02-walker.test.cjs tests/migrate-dry-run.test.cjs tests/migrate-apply.test.cjs`
+- `node --test tests/migrate-command-md.test.cjs`
 - `npm test`
