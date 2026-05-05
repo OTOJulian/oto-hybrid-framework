@@ -154,8 +154,11 @@ function isoTimestamp() {
 
 function rewriteMarkers(text) {
   return text.replace(
-    /<!-- GSD:([a-z-]+-(?:start|end))( source:[^ ]+)? -->/g,
+    /<!-- GSD:([a-z-]+-(?:start|end))([^>]*) -->/g,
     '<!-- OTO:$1$2 -->'
+  ).replace(
+    /(<!-- OTO:[a-z-]+-start source:)oto defaults( -->)/gi,
+    '$1GSD defaults$2'
   );
 }
 
@@ -164,6 +167,10 @@ function rewriteFrontmatterKey(text) {
   if (!match) return text;
   const frontmatter = match[1].replace(/^gsd_state_version:/m, 'oto_state_version:');
   return text.replace(match[0], `---\n${frontmatter}\n---\n`);
+}
+
+function rewriteInstructionBody(text) {
+  return rewriteMarkers(text).replace(/\/gsd-/g, '/oto-');
 }
 
 async function writeFileAtomic(filePath, content) {
@@ -236,6 +243,116 @@ async function _applyToStaging(projectDir, opts = {}) {
   }
 }
 
+function shouldSkipRelPath(relPath, skipPatterns) {
+  return relPath.split(path.sep).some((segment) => skipPatterns.includes(segment));
+}
+
+function listFiles(root, skipPatterns = []) {
+  if (!fs.existsSync(root)) return [];
+  return fs.readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => {
+      const parent = entry.parentPath || entry.path || root;
+      return path.relative(root, path.join(parent, entry.name));
+    })
+    .filter((relPath) => !shouldSkipRelPath(relPath, skipPatterns))
+    .sort();
+}
+
+function listFilesToBackup(projectDir, scope = 'planning') {
+  const rels = new Set();
+  for (const name of INSTRUCTION_FILES) {
+    if (fs.existsSync(safeJoin(projectDir, name))) rels.add(name);
+  }
+  const statePath = '.planning/STATE.md';
+  if (fs.existsSync(safeJoin(projectDir, statePath))) rels.add(statePath);
+
+  if (scope === 'planning' || scope === 'all') {
+    for (const relPath of listFiles(safeJoin(projectDir, '.planning'), ['.oto-migrate-backup'])) {
+      if (/\.(md|json)$/.test(relPath)) rels.add(path.join('.planning', relPath));
+    }
+  }
+
+  if (scope === 'all') {
+    for (const relPath of listFiles(projectDir, ['.oto-migrate-backup', '.git', 'node_modules'])) {
+      if (!relPath.includes(path.sep) && relPath.endsWith('.md')) rels.add(relPath);
+    }
+  }
+
+  return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, ['.oto-migrate-backup'])).sort();
+}
+
+async function copyTreeAtomic(src, dst, skipPatterns = []) {
+  for (const relPath of listFiles(src, skipPatterns)) {
+    const absSrc = path.join(src, relPath);
+    const absDst = path.join(dst, relPath);
+    await fsp.mkdir(path.dirname(absDst), { recursive: true });
+    await writeFileAtomic(absDst, await fsp.readFile(absSrc));
+  }
+}
+
+async function apply(projectDir, opts = {}) {
+  const abs = path.resolve(projectDir);
+  const staged = await _applyToStaging(abs, opts);
+  if (staged.skipped) {
+    return { mode: 'apply', filesChanged: [], reason: staged.reason, exitCode: 0 };
+  }
+
+  const { stagingOut, stagingReportsDir, cleanupMap } = staged;
+  let backupDir = null;
+  try {
+    if (!opts.noBackup) {
+      backupDir = path.join(abs, '.oto-migrate-backup', isoTimestamp());
+      for (const relPath of listFilesToBackup(abs, opts.scope || 'planning')) {
+        const src = safeJoin(abs, relPath);
+        if (!fs.existsSync(src)) continue;
+        const dst = path.join(backupDir, relPath);
+        await fsp.mkdir(path.dirname(dst), { recursive: true });
+        await fsp.copyFile(src, dst);
+      }
+    }
+
+    const filesChanged = listFiles(stagingOut, ['.oto-migrate-backup', '.git', 'node_modules']);
+    await copyTreeAtomic(stagingOut, abs, ['.oto-migrate-backup', '.git', 'node_modules']);
+
+    for (const name of INSTRUCTION_FILES) {
+      const filePath = safeJoin(abs, name);
+      if (!fs.existsSync(filePath)) continue;
+      const text = await fsp.readFile(filePath, 'utf8');
+      const rewritten = rewriteInstructionBody(text);
+      if (rewritten !== text) {
+        await writeFileAtomic(filePath, rewritten);
+        if (!filesChanged.includes(name)) filesChanged.push(name);
+      }
+    }
+
+    if (opts.renameStateDir) {
+      const planning = path.join(abs, '.planning');
+      const oto = path.join(abs, '.oto');
+      if (fs.existsSync(planning) && !fs.existsSync(oto)) await fsp.rename(planning, oto);
+      const gitignore = path.join(abs, '.gitignore');
+      if (fs.existsSync(gitignore)) {
+        const text = await fsp.readFile(gitignore, 'utf8');
+        const rewritten = text.replace(/^\.planning\//gm, '.oto/');
+        if (rewritten !== text) await writeFileAtomic(gitignore, rewritten);
+      }
+    }
+
+    const post = detectGsdProject(abs);
+    if (post.signals.length > 0) {
+      const error = new Error('apply did not eliminate all GSD signals: ' + post.signals.join(','));
+      error.exitCode = 6;
+      throw error;
+    }
+
+    return { mode: 'apply', filesChanged, backupDir, exitCode: 0 };
+  } finally {
+    await fsp.rm(stagingOut, { recursive: true, force: true });
+    await fsp.rm(stagingReportsDir, { recursive: true, force: true });
+    cleanupMap();
+  }
+}
+
 async function dryRun(projectDir, opts = {}) {
   const abs = path.resolve(projectDir);
   const detection = detectGsdProject(abs);
@@ -280,4 +397,4 @@ async function dryRun(projectDir, opts = {}) {
   }
 }
 
-module.exports = { detectGsdProject, dryRun, rewriteMarkers, rewriteFrontmatterKey, _applyToStaging };
+module.exports = { detectGsdProject, dryRun, apply, rewriteMarkers, rewriteFrontmatterKey, _applyToStaging };
