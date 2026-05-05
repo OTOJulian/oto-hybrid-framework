@@ -61,3 +61,31 @@ test('apply rewrites planning artifacts while preserving source fixture and .pla
   assert.equal(fs.existsSync(path.join(fixture, '.planning')), true);
   assert.equal(fs.existsSync(path.join(fixture, '.oto')), false);
 });
+
+test('apply with renameStateDir backs up and rewrites gitignore planning entry', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const sourceFixture = path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(sourceFixture, fixture, { recursive: true });
+  fs.writeFileSync(path.join(fixture, '.gitignore'), '.planning/\nnode_modules/\n');
+
+  const result = await migrate.apply(fixture, { renameStateDir: true });
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(fs.existsSync(path.join(fixture, '.planning')), false);
+  assert.equal(fs.existsSync(path.join(fixture, '.oto')), true);
+  assert.equal(fs.readFileSync(path.join(fixture, '.gitignore'), 'utf8'), '.oto/\nnode_modules/\n');
+  assert.ok(result.backupDir, 'backupDir should be reported');
+  assert.equal(
+    fs.readFileSync(path.join(result.backupDir, '.gitignore'), 'utf8'),
+    '.planning/\nnode_modules/\n'
+  );
+});

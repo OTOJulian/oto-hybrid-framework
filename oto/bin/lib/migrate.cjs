@@ -264,6 +264,7 @@ function listFilesToBackup(projectDir, scope = 'planning') {
   for (const name of INSTRUCTION_FILES) {
     if (fs.existsSync(safeJoin(projectDir, name))) rels.add(name);
   }
+  if (fs.existsSync(safeJoin(projectDir, '.gitignore'))) rels.add('.gitignore');
   const statePath = '.planning/STATE.md';
   if (fs.existsSync(safeJoin(projectDir, statePath))) rels.add(statePath);
 
