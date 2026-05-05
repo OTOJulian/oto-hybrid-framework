@@ -141,7 +141,7 @@ Direct mapping:
 - \`Task(subagent_type="X", prompt="Y")\` → \`spawn_agent(agent_type="X", message="Y")\`
 - \`Task(model="...")\` → omit. \`spawn_agent\` has no inline \`model\` parameter;
   oto embeds the resolved per-agent model directly into each agent's \`.toml\`
-  at install time so \`model_overrides\` from \`.planning/config.json\` and
+  at install time so \`model_overrides\` from per-project \`.oto/config.json\` and
   \`~/.oto/defaults.json\` are honored automatically by Codex's agent router.
 - \`fork_context: false\` by default — oto agents load their own context via \`<files_to_read>\` blocks
 

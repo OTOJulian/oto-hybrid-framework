@@ -56,13 +56,22 @@ test('D-17 codex spine: install writes command surface, state file, config.toml,
   const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
   assert.equal(state.runtime, 'codex');
 
+  // QUICK-260505-bxx: Codex install emits commands as skills/oto-<name>/SKILL.md,
+  // not commands/oto/<name>.md (Codex 0.128.0 reads skills/, not commands/).
   for (const relPath of [
-    'commands/oto/help.md',
-    'commands/oto/progress.md',
-    'commands/oto/new-project.md',
+    'skills/oto-help/SKILL.md',
+    'skills/oto-progress/SKILL.md',
+    'skills/oto-new-project/SKILL.md',
   ]) {
     assert.ok(fs.existsSync(path.join(tmp, relPath)), `${relPath} must be installed`);
   }
+  // The override replaces the default per-file commands copy; the legacy commands/oto/
+  // tree must NOT be produced by a fresh Codex install.
+  assert.equal(
+    fs.existsSync(path.join(tmp, 'commands', 'oto')),
+    false,
+    'commands/oto/ must not be produced by --codex install (use skills/oto-*/SKILL.md)'
+  );
 
   const configToml = path.join(tmp, 'config.toml');
   assert.ok(fs.existsSync(configToml), 'config.toml must exist');

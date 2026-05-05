@@ -6,6 +6,7 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 const {
   convertClaudeAgentToCodexAgent,
+  convertClaudeCommandToCodexSkill,
   convertClaudeToCodexMarkdown,
   generateCodexAgentToml,
 } = require('./codex-transform.cjs');
@@ -163,6 +164,80 @@ module.exports = {
       entries.push({ path: path.relative(configDir, target), sha256: await sha256Text(toml) });
     }
     return entries;
+  },
+  // QUICK-260505-bxx-01: install commands as Codex skills under skills/oto-<name>/SKILL.md.
+  // Codex 0.128.0 no longer reads commands/; it reads skills/. We wrap each command body
+  // in a <codex_skill_adapter> header so $oto-<name> invocation works inside Codex.
+  // Ports foundation-frameworks/get-shit-done-main/bin/install.js:4051 (copyCommandsAsCodexSkills).
+  async installCommandsOverride(ctx) {
+    const repoRoot = ctx.repoRoot;
+    const configDir = ctx.configDir;
+    // Hardcode the source dir at oto/commands/oto/ so the inner "oto" namespace IS the
+    // skill prefix — `progress.md` → `oto-progress` (matches upstream gsd-progress shape).
+    const srcDir = path.join(repoRoot, 'oto', 'commands', 'oto');
+    const skillsDir = path.join(configDir, 'skills');
+    const prefix = 'oto';
+
+    if (!fs.existsSync(srcDir)) return [];
+    await fsp.mkdir(skillsDir, { recursive: true });
+
+    // Wipe prior oto-* skill dirs to avoid stale leftovers (mirrors upstream lines 4058-4064).
+    const existing = fs.existsSync(skillsDir)
+      ? await fsp.readdir(skillsDir, { withFileTypes: true })
+      : [];
+    for (const entry of existing) {
+      if (entry.isDirectory() && entry.name.startsWith(`${prefix}-`)) {
+        await fsp.rm(path.join(skillsDir, entry.name), { recursive: true, force: true });
+      }
+    }
+
+    const entries = [];
+    async function recurse(currentSrcDir, currentPrefix) {
+      const dirEntries = await fsp.readdir(currentSrcDir, { withFileTypes: true });
+      dirEntries.sort((a, b) => a.name.localeCompare(b.name));
+      for (const entry of dirEntries) {
+        const srcPath = path.join(currentSrcDir, entry.name);
+        if (entry.isDirectory()) {
+          await recurse(srcPath, `${currentPrefix}-${entry.name}`);
+          continue;
+        }
+        if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+
+        const baseName = entry.name.slice(0, -3); // strip ".md"
+        const skillName = `${currentPrefix}-${baseName}`;
+        const skillDir = path.join(skillsDir, skillName);
+        await fsp.mkdir(skillDir, { recursive: true });
+
+        const content = await fsp.readFile(srcPath, 'utf8');
+        const transformed = convertClaudeCommandToCodexSkill(content, skillName);
+        const target = path.join(skillDir, 'SKILL.md');
+        await fsp.writeFile(target, transformed);
+        entries.push({
+          path: path.relative(configDir, target),
+          sha256: await sha256Text(transformed),
+        });
+      }
+    }
+
+    await recurse(srcDir, prefix);
+    return entries;
+  },
+  // QUICK-260505-bxx-03: remove (a) pre-fix legacy commands/oto/ leftover that's not in
+  // state.files, and (b) any oto-* skill DIRECTORIES under skills/ — state-driven removal
+  // unlinks the SKILL.md files but leaves the now-empty parent dirs behind.
+  async uninstallCommandsOverride(ctx) {
+    const legacyPath = path.join(ctx.configDir, 'commands', 'oto');
+    await fsp.rm(legacyPath, { recursive: true, force: true });
+
+    const skillsDir = path.join(ctx.configDir, 'skills');
+    if (fs.existsSync(skillsDir)) {
+      const entries = await fsp.readdir(skillsDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory() && entry.name.startsWith('oto-')) {
+          await fsp.rm(path.join(skillsDir, entry.name), { recursive: true, force: true });
+        }
+      }
+    }
   },
   onPreInstall(ctx) {
     const { findUpstreamMarkers } = require('./marker.cjs');

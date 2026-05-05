@@ -66,6 +66,18 @@ async function installRuntime(adapter, opts = {}) {
 
   const fileEntries = [];
   for (const srcKey of SRC_KEYS) {
+    // QUICK-260505-bxx-01: adapter-level override for the commands install branch.
+    // Codex emits skills/oto-<name>/SKILL.md instead of commands/oto/<name>.md.
+    if (srcKey === 'commands' && typeof adapter.installCommandsOverride === 'function') {
+      const overrideEntries = await adapter.installCommandsOverride({
+        repoRoot,
+        configDir,
+        otoVersion: OTO_VERSION,
+      });
+      for (const entry of overrideEntries || []) fileEntries.push(entry);
+      continue;
+    }
+
     const srcAbs = path.join(repoRoot, adapter.sourceDirs[srcKey]);
     const dstAbs = path.join(configDir, adapter.targetSubdirs[srcKey]);
     const sourceRelPaths = new Set((await walkTree(srcAbs)).map((absPath) => path.relative(srcAbs, absPath)));
@@ -208,6 +220,12 @@ async function uninstallRuntime(adapter, opts = {}) {
         await fsp.writeFile(settingsPath, unmerged);
       }
     }
+  }
+
+  // QUICK-260505-bxx-03: adapter-level legacy cleanup hook (e.g. Codex commands/oto/ leftovers
+  // from pre-skill-adapter installs that were never tracked in state.files).
+  if (typeof adapter.uninstallCommandsOverride === 'function') {
+    await adapter.uninstallCommandsOverride({ configDir });
   }
 
   await removeTree(path.join(configDir, 'oto'));
