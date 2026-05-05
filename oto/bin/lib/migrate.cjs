@@ -353,6 +353,57 @@ async function apply(projectDir, opts = {}) {
   }
 }
 
+async function main(args = [], cwd = process.cwd()) {
+  // Supported flags: --dry-run --apply --rename-state-dir --no-backup --force --scope --project-dir
+  let values;
+  try {
+    const parsed = require('node:util').parseArgs({
+      args,
+      options: {
+        'dry-run': { type: 'boolean', default: false },
+        apply: { type: 'boolean', default: false },
+        'rename-state-dir': { type: 'boolean', default: false },
+        'no-backup': { type: 'boolean', default: false },
+        force: { type: 'boolean', default: false },
+        scope: { type: 'string', default: 'planning' },
+        owner: { type: 'string', default: 'OTOJulian' },
+        'project-dir': { type: 'string' }
+      },
+      strict: true,
+      allowPositionals: false
+    });
+    values = parsed.values;
+  } catch (error) {
+    process.stderr.write(`migrate: error: ${error.message}\n`);
+    return 1;
+  }
+
+  const projectDir = path.resolve(values['project-dir'] || cwd || process.cwd());
+  const mode = values.apply ? 'apply' : 'dry-run';
+  const opts = {
+    renameStateDir: values['rename-state-dir'],
+    noBackup: values['no-backup'],
+    force: values.force,
+    scope: values.scope,
+    owner: values.owner
+  };
+
+  try {
+    const result = mode === 'apply'
+      ? await apply(projectDir, opts)
+      : await dryRun(projectDir, opts);
+    if (result.reason === 'no GSD signals' && !values['dry-run'] && !values.apply) {
+      process.stderr.write(`migrate: not a GSD-era project: ${projectDir}\n`);
+      return 1;
+    }
+    process.stdout.write(`migrate: ${mode} - files=${(result.filesChanged || result.files || []).length}, exit=${result.exitCode}\n`);
+    return result.exitCode || 0;
+  } catch (error) {
+    process.stderr.write(`migrate: error: ${error.message}\n`);
+    return error.exitCode || 5;
+  }
+}
+
 async function dryRun(projectDir, opts = {}) {
   const abs = path.resolve(projectDir);
   const detection = detectGsdProject(abs);
@@ -397,4 +448,4 @@ async function dryRun(projectDir, opts = {}) {
   }
 }
 
-module.exports = { detectGsdProject, dryRun, apply, rewriteMarkers, rewriteFrontmatterKey, _applyToStaging };
+module.exports = { detectGsdProject, dryRun, apply, main, rewriteMarkers, rewriteFrontmatterKey, _applyToStaging };
