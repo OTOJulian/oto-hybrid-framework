@@ -7,8 +7,8 @@ current_phase_name: null
 current_plan: null
 status: milestone_complete_pending_new_milestone
 stopped_at: v0.1.0 milestone archived; next command is $gsd-new-milestone
-last_updated: "2026-05-04T22:30:35.967Z"
-last_activity: 2026-05-04
+last_updated: "2026-05-05T14:50:00.000Z"
+last_activity: 2026-05-05
 progress:
   total_phases: 10
   completed_phases: 10
@@ -50,3 +50,9 @@ $gsd-new-milestone
 ```
 
 The next milestone should define fresh requirements before new roadmap phases are planned.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260505-bxx | Port GSD's Codex command-to-skill adapter into oto's installer (Codex `$oto-*` invocation parity) | 2026-05-05 | f56522c | [260505-bxx-port-gsds-codex-command-to-skill-adapter](./quick/260505-bxx-port-gsds-codex-command-to-skill-adapter/) |
