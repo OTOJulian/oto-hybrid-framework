@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SCRATCH_DIRS = new Set(['node_modules', '.git', '.oto-rebrand-out', 'reports']);
+const SCRATCH_PATH_PREFIXES = ['.claude/worktrees', '.codex/worktrees', '.gemini/worktrees'];
 const BINARY_EXTENSION_RE = /\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|otf|pdf|zip|tar|gz|bin)$/i;
 const PATH_ALLOWLIST_BASENAMES = new Set(['LICENSE', 'LICENSE.md', 'THIRD-PARTY-LICENSES.md']);
 
@@ -57,17 +58,23 @@ function hasNulByte(buffer) {
   return buffer.includes(0);
 }
 
+function normalizeRelPath(relPath) {
+  return relPath.split(path.sep).join('/');
+}
+
 function isScratchPath(relPath) {
-  return relPath.split(path.sep).some((part) => SCRATCH_DIRS.has(part));
+  if (relPath.split(path.sep).some((part) => SCRATCH_DIRS.has(part))) return true;
+  const normalized = normalizeRelPath(relPath);
+  return SCRATCH_PATH_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`));
 }
 
 function matchesPathGlob(relPath, pathGlobs) {
-  const normalized = relPath.split(path.sep).join('/');
+  const normalized = normalizeRelPath(relPath);
   return pathGlobs.some((entry) => entry.regex.test(normalized));
 }
 
 function lookupFileClass(relPath, inventoryByPath = new Map()) {
-  const normalized = relPath.split(path.sep).join('/');
+  const normalized = normalizeRelPath(relPath);
   const entry = inventoryByPath.get(normalized) || inventoryByPath.get(relPath);
   return entry && entry.category ? entry.category : 'other';
 }
@@ -100,6 +107,7 @@ module.exports = {
   compileAllowlist,
   globToRegExp,
   isBinaryByExtension,
+  isScratchPath,
   lookupFileClass,
   walk
 };

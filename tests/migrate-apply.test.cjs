@@ -11,6 +11,21 @@ const { spawnSync } = require('node:child_process');
 const REPO_ROOT = path.resolve(__dirname, '..');
 const MIGRATE_PATH = path.join(REPO_ROOT, 'oto/bin/lib/migrate.cjs');
 
+function addRuntimeWorktree(root) {
+  const relPath = path.join('.claude', 'worktrees', 'agent-1', '.planning', 'STATE.md');
+  const filePath = path.join(root, relPath);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, [
+    '---',
+    'gsd_state_version: 1',
+    '---',
+    '',
+    'Archived agent copy with /gsd-execute-phase references.',
+    ''
+  ].join('\n'));
+  return relPath;
+}
+
 function fileManifest(root) {
   const entries = [];
   function walk(dir) {
@@ -88,4 +103,30 @@ test('apply with renameStateDir backs up and rewrites gitignore planning entry',
     fs.readFileSync(path.join(result.backupDir, '.gitignore'), 'utf8'),
     '.planning/\nnode_modules/\n'
   );
+});
+
+test('apply leaves runtime agent worktrees untouched', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const sourceFixture = path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(sourceFixture, fixture, { recursive: true });
+  const worktreeRelPath = addRuntimeWorktree(fixture);
+  const before = fs.readFileSync(path.join(fixture, worktreeRelPath), 'utf8');
+
+  const result = await migrate.apply(fixture, {});
+  const after = fs.readFileSync(path.join(fixture, worktreeRelPath), 'utf8');
+  const state = fs.readFileSync(path.join(fixture, '.planning/STATE.md'), 'utf8');
+
+  assert.equal(result.exitCode, 0);
+  assert.ok(state.includes('oto_state_version'));
+  assert.equal(after, before);
+  assert.equal(result.filesChanged.some((relPath) => relPath.startsWith(path.join('.claude', 'worktrees'))), false);
 });

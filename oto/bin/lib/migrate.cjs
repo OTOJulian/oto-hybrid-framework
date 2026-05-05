@@ -30,6 +30,8 @@ function resolveRenameMapPath() {
 }
 
 const RENAME_MAP_PATH = resolveRenameMapPath();
+const RUNTIME_WORKTREE_DIRS = RUNTIME_CONFIG_DIRS.map((dir) => path.join(dir, 'worktrees'));
+const MIGRATE_SKIP_PATTERNS = ['.oto-migrate-backup', '.git', 'node_modules', ...RUNTIME_WORKTREE_DIRS];
 
 function assertNotRuntimeConfigDir(projectDir) {
   const abs = path.resolve(projectDir);
@@ -243,8 +245,19 @@ async function _applyToStaging(projectDir, opts = {}) {
   }
 }
 
+function normalizeRelPath(relPath) {
+  return relPath.split(path.sep).join('/');
+}
+
 function shouldSkipRelPath(relPath, skipPatterns) {
-  return relPath.split(path.sep).some((segment) => skipPatterns.includes(segment));
+  const normalized = normalizeRelPath(relPath);
+  const segments = normalized.split('/');
+  return skipPatterns.some((pattern) => {
+    const normalizedPattern = normalizeRelPath(pattern);
+    if (!normalizedPattern) return false;
+    if (!normalizedPattern.includes('/')) return segments.includes(normalizedPattern);
+    return normalized === normalizedPattern || normalized.startsWith(`${normalizedPattern}/`);
+  });
 }
 
 function listFiles(root, skipPatterns = []) {
@@ -269,18 +282,18 @@ function listFilesToBackup(projectDir, scope = 'planning') {
   if (fs.existsSync(safeJoin(projectDir, statePath))) rels.add(statePath);
 
   if (scope === 'planning' || scope === 'all') {
-    for (const relPath of listFiles(safeJoin(projectDir, '.planning'), ['.oto-migrate-backup'])) {
+    for (const relPath of listFiles(safeJoin(projectDir, '.planning'), MIGRATE_SKIP_PATTERNS)) {
       if (/\.(md|json)$/.test(relPath)) rels.add(path.join('.planning', relPath));
     }
   }
 
   if (scope === 'all') {
-    for (const relPath of listFiles(projectDir, ['.oto-migrate-backup', '.git', 'node_modules'])) {
+    for (const relPath of listFiles(projectDir, MIGRATE_SKIP_PATTERNS)) {
       if (!relPath.includes(path.sep) && relPath.endsWith('.md')) rels.add(relPath);
     }
   }
 
-  return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, ['.oto-migrate-backup'])).sort();
+  return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, MIGRATE_SKIP_PATTERNS)).sort();
 }
 
 async function copyTreeAtomic(src, dst, skipPatterns = []) {
@@ -313,8 +326,8 @@ async function apply(projectDir, opts = {}) {
       }
     }
 
-    const filesChanged = listFiles(stagingOut, ['.oto-migrate-backup', '.git', 'node_modules']);
-    await copyTreeAtomic(stagingOut, abs, ['.oto-migrate-backup', '.git', 'node_modules']);
+    const filesChanged = listFiles(stagingOut, MIGRATE_SKIP_PATTERNS);
+    await copyTreeAtomic(stagingOut, abs, MIGRATE_SKIP_PATTERNS);
 
     for (const name of INSTRUCTION_FILES) {
       const filePath = safeJoin(abs, name);
