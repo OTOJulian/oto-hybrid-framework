@@ -148,6 +148,94 @@ function countStateFrontmatterKeys(projectDir) {
   return { totalCount: count, files: count ? [{ path: '.planning/STATE.md', count }] : [] };
 }
 
+function isoTimestamp() {
+  return new Date().toISOString().replace(/[:.]/g, '-');
+}
+
+function rewriteMarkers(text) {
+  return text.replace(
+    /<!-- GSD:([a-z-]+-(?:start|end))( source:[^ ]+)? -->/g,
+    '<!-- OTO:$1$2 -->'
+  );
+}
+
+function rewriteFrontmatterKey(text) {
+  const match = text.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (!match) return text;
+  const frontmatter = match[1].replace(/^gsd_state_version:/m, 'oto_state_version:');
+  return text.replace(match[0], `---\n${frontmatter}\n---\n`);
+}
+
+async function writeFileAtomic(filePath, content) {
+  const tmpPath = path.join(
+    path.dirname(filePath),
+    `.${path.basename(filePath)}.${process.pid}.${Date.now()}.${crypto.randomUUID()}.tmp`
+  );
+  try {
+    await fsp.writeFile(tmpPath, content);
+    await fsp.rename(tmpPath, filePath);
+  } catch (error) {
+    await fsp.rm(tmpPath, { force: true });
+    throw error;
+  }
+}
+
+async function _applyToStaging(projectDir, opts = {}) {
+  const abs = path.resolve(projectDir);
+  assertNotRuntimeConfigDir(abs);
+
+  const detection = detectGsdProject(abs);
+  if (!detection.isGsdEra) return { skipped: true, reason: 'no GSD signals' };
+  if (detection.conflicts.length > 0 && !opts.force) {
+    const error = new Error('half-migrated state detected: ' + detection.conflicts.join(','));
+    error.exitCode = 2;
+    throw error;
+  }
+
+  const { mapPath, cleanup } = buildMigrateMapPath();
+  const stagingOut = await fsp.mkdtemp(path.join(os.tmpdir(), 'oto-migrate-out-'));
+  const stagingReportsDir = path.join(os.tmpdir(), `oto-migrate-reports-${process.pid}-${Date.now()}-${crypto.randomUUID()}`);
+
+  try {
+    const engineResult = await engine.run({
+      mode: 'apply',
+      target: abs,
+      out: stagingOut,
+      force: true,
+      owner: opts.owner || 'OTOJulian',
+      mapPath,
+      reportsDir: stagingReportsDir
+    });
+    if (engineResult.exitCode !== 0) {
+      const error = new Error('engine apply failed: exitCode=' + engineResult.exitCode);
+      error.exitCode = engineResult.exitCode;
+      throw error;
+    }
+
+    for (const name of INSTRUCTION_FILES) {
+      const filePath = path.join(stagingOut, name);
+      if (!fs.existsSync(filePath)) continue;
+      const text = await fsp.readFile(filePath, 'utf8');
+      const rewritten = rewriteMarkers(text);
+      if (rewritten !== text) await writeFileAtomic(filePath, rewritten);
+    }
+
+    const statePath = path.join(stagingOut, '.planning', 'STATE.md');
+    if (fs.existsSync(statePath)) {
+      const text = await fsp.readFile(statePath, 'utf8');
+      const rewritten = rewriteFrontmatterKey(text);
+      if (rewritten !== text) await writeFileAtomic(statePath, rewritten);
+    }
+
+    return { skipped: false, stagingOut, stagingReportsDir, cleanupMap: cleanup, detection };
+  } catch (error) {
+    await fsp.rm(stagingOut, { recursive: true, force: true });
+    await fsp.rm(stagingReportsDir, { recursive: true, force: true });
+    cleanup();
+    throw error;
+  }
+}
+
 async function dryRun(projectDir, opts = {}) {
   const abs = path.resolve(projectDir);
   const detection = detectGsdProject(abs);
@@ -192,4 +280,4 @@ async function dryRun(projectDir, opts = {}) {
   }
 }
 
-module.exports = { detectGsdProject, dryRun };
+module.exports = { detectGsdProject, dryRun, rewriteMarkers, rewriteFrontmatterKey, _applyToStaging };
