@@ -1,0 +1,6 @@
+{
+  "git": {
+    "phase_branch_template": "gsd/phase-{phase}-{slug}"
+  },
+  "gsd-hook-version": "1.0"
+}
