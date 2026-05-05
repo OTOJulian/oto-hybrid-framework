@@ -256,13 +256,15 @@ function shouldSkipInventoryEntry(relPath, inventoryByPath) {
   return inventoryEntry && inventoryEntry.verdict === 'drop';
 }
 
-async function writeJsonAndMarkdownReports(dryrun) {
-  const reportsDir = ensureReportsDir();
-  await writeFileAtomic(path.join(reportsDir, 'rebrand-dryrun.json'), `${JSON.stringify(dryrun, null, 2)}\n`);
-  await writeFileAtomic(path.join(reportsDir, 'rebrand-dryrun.md'), report.renderDryrunMarkdown(dryrun));
+async function writeJsonAndMarkdownReports(dryrun, reportsDir) {
+  const dir = reportsDir
+    ? (fs.mkdirSync(reportsDir, { recursive: true }), reportsDir)
+    : ensureReportsDir();
+  await writeFileAtomic(path.join(dir, 'rebrand-dryrun.json'), `${JSON.stringify(dryrun, null, 2)}\n`);
+  await writeFileAtomic(path.join(dir, 'rebrand-dryrun.md'), report.renderDryrunMarkdown(dryrun));
 }
 
-async function runDryRun(target, map, allowlist, inventoryByPath, owner) {
+async function runDryRun(target, map, allowlist, inventoryByPath, owner, options = {}) {
   const files = [];
   const summaryByRule = Object.fromEntries(DRYRUN_RULE_ORDER.map((ruleType) => [ruleType, 0]));
   let matchTotal = 0;
@@ -289,7 +291,7 @@ async function runDryRun(target, map, allowlist, inventoryByPath, owner) {
     match_total: matchTotal,
     unclassified_total: 0
   };
-  await writeJsonAndMarkdownReports(dryrun);
+  await writeJsonAndMarkdownReports(dryrun, options.reportsDir);
   return { files: files.length, matches: matchTotal, unclassified: 0, exitCode: 0 };
 }
 
@@ -318,7 +320,9 @@ async function applyTree(target, out, map, allowlist, inventoryByPath, owner, fo
     await fsp.writeFile(outPath, text.content);
   }
   if (!options.skipReports) {
-    const reportsDir = ensureReportsDir();
+    const reportsDir = options.reportsDir
+      ? (fs.mkdirSync(options.reportsDir, { recursive: true }), options.reportsDir)
+      : ensureReportsDir();
     const pre = await manifest.buildPre(target, allowlist, inventoryByPath);
     const post = await manifest.buildPost(out, allowlist, inventoryByPath);
     await writeFileAtomic(path.join(reportsDir, 'coverage-manifest.pre.json'), `${JSON.stringify(pre, null, 2)}\n`);
@@ -399,9 +403,18 @@ async function run(opts = {}) {
     const allowlist = walker.compileAllowlist(map.do_not_rename);
     let result;
     if (mode === 'dry-run') {
-      result = await runDryRun(target, map, allowlist, inventoryByPath, owner);
+      result = await runDryRun(target, map, allowlist, inventoryByPath, owner, { reportsDir: opts.reportsDir || null });
     } else if (mode === 'apply') {
-      result = await applyTree(target, resolveOut(opts.out), map, allowlist, inventoryByPath, owner, Boolean(opts.force));
+      result = await applyTree(
+        target,
+        resolveOut(opts.out),
+        map,
+        allowlist,
+        inventoryByPath,
+        owner,
+        Boolean(opts.force),
+        { skipReports: Boolean(opts.skipReports), reportsDir: opts.reportsDir || null }
+      );
     } else if (mode === 'verify-roundtrip') {
       result = await runRoundtrip(target, map, allowlist, inventoryByPath, owner);
     } else {
