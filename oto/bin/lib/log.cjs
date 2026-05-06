@@ -560,10 +560,17 @@ async function promoteLog({ slug, target, cwd } = {}) {
   const planningRoot = planningDir(projectDir);
   const source = await showLog({ slug, cwd: projectDir });
 
+  if (source.frontmatter.promoted === true) {
+    throw new Error(`log already promoted: ${source.frontmatter.slug}`);
+  }
+
   if (target === 'quick') {
     const dateCompact = String(source.frontmatter.date || '').slice(0, 10).replace(/-/g, '');
     const quickDir = path.join(planningRoot, 'quick', `${dateCompact}-${source.frontmatter.slug}`);
     const planPath = path.join(quickDir, 'PLAN.md');
+    if (fs.existsSync(planPath)) {
+      throw new Error(`quick plan already exists: ${path.relative(planningRoot, planPath)}`);
+    }
     const planFrontmatter = {
       type: 'quick',
       slug: source.frontmatter.slug,

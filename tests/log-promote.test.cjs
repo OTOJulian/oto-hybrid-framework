@@ -49,6 +49,58 @@ test('D-20 promoteLog --to quick flips source promoted to true', async (t) => {
   assert.match(source, /promoted: true/, 'D-20 source log is marked promoted');
 });
 
+test('D-20 promoteLog --to quick rejects re-promotion and preserves edited PLAN.md', async (t) => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  const tmp = seedLogs(t);
+  await log.promoteLog({ slug: 'fix-the-thing', target: 'quick', cwd: tmp });
+  const planPath = path.join(tmp, '.oto/quick/20260501-fix-the-thing/PLAN.md');
+  const editedPlan = [
+    '---',
+    'type: quick',
+    'slug: fix-the-thing',
+    '---',
+    '',
+    '## Goal',
+    '',
+    'Human-edited plan body.',
+    '',
+  ].join('\n');
+  fs.writeFileSync(planPath, editedPlan);
+
+  await assert.rejects(
+    () => log.promoteLog({ slug: 'fix-the-thing', target: 'quick', cwd: tmp }),
+    /log already promoted/,
+    'D-20 repeated quick promotion is rejected'
+  );
+  assert.equal(fs.readFileSync(planPath, 'utf8'), editedPlan, 'D-20 edited quick PLAN.md is preserved');
+});
+
+test('D-20 promoteLog --to quick rejects an existing deterministic PLAN.md', async (t) => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  const tmp = seedLogs(t);
+  const quickDir = path.join(tmp, '.oto/quick/20260501-fix-the-thing');
+  const planPath = path.join(quickDir, 'PLAN.md');
+  fs.mkdirSync(quickDir, { recursive: true });
+  fs.writeFileSync(planPath, 'existing plan\n');
+
+  await assert.rejects(
+    () => log.promoteLog({ slug: 'fix-the-thing', target: 'quick', cwd: tmp }),
+    /quick plan already exists/,
+    'D-20 pre-existing quick PLAN.md is rejected'
+  );
+  assert.equal(fs.readFileSync(planPath, 'utf8'), 'existing plan\n', 'D-20 existing quick PLAN.md is not overwritten');
+});
+
 test('D-20 promoteLog --to todo creates one todo per Open Question', async (t) => {
   let log;
   try {
@@ -108,4 +160,3 @@ test('D-20 promoteLog skips entries with no open questions when target=todo', as
   assert.deepEqual(result.created, [], 'D-20 no open questions creates no todos');
   assert.equal(fs.existsSync(path.join(tmp, '.oto/todos/pending')), false, 'D-20 empty todo promotion writes no files');
 });
-
