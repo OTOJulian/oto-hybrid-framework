@@ -38,3 +38,15 @@ Plans:
 - [x] 01-01-PLAN.md — Wave 0: 10 migrate-*.test.cjs scaffolds + 2 fixture trees (RED for Wave 1 to close)
 - [x] 01-02-PLAN.md — Wave 1: oto/bin/lib/migrate.cjs (detectGsdProject, dryRun, apply, main) — closes REQ-MIG-02..08
 - [x] 01-03-PLAN.md — Wave 2: oto-tools dispatch case + oto/commands/oto/migrate.md — closes REQ-MIG-01, 09, 10
+
+### Phase 2: Build /oto-log command for capturing freeform/ad-hoc work sessions as first-class tracked artifacts surfaced by /oto-progress and /oto-resume-work
+
+**Goal:** Ship `/oto-log` (Claude command + per-runtime equivalents + `oto-tools log` CLI + public `oto log` alias) that captures ad-hoc work sessions as durable, listable, immutable artifacts in `.oto/logs/`. Hybrid capture model — fire-and-forget by default (`/oto-log <title>`) and bookmarked sessions (`/oto-log start` / `/oto-log end`). Body drafted from observable evidence (recent transcript + `git diff` + `git log` over a bounded ref) with DATA_START/DATA_END prompt-injection guardrails. Surfaces in `/oto-progress` Recent Activity and `/oto-resume-work` status panel. Supports `list`, `show <slug>`, and `promote <slug> --to quick|todo`. Entries are immutable.
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14, D-15, D-16, D-17, D-18, D-19, D-20, D-21, D-22 (CONTEXT.md decisions act as the requirement set; no REQ-LOG-* IDs in REQUIREMENTS.md for this post-v0.1.0 milestone)
+**Depends on:** Phase 1
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Wave 0: 12 log-*.test.cjs scaffolds + 4 fixture trees (RED for Wave 1+2 to close)
+- [ ] 02-02-PLAN.md — Wave 1: oto/bin/lib/log.cjs library (deriveLogSlug, routeSubcommand, captureEvidence, writeLogEntry, startSession, endSession, listLogs, showLog, promoteLog, main) — closes D-01, D-02, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-18, D-19, D-20, D-21
+- [ ] 02-03-PLAN.md — Wave 2: oto-tools log dispatch + public oto log dispatch + oto/commands/oto/log.md + progress.md Recent Activity edit + resume-project.md active-session.json check + .gitignore entry — closes D-03, D-04, D-05, D-13, D-14, D-15, D-16, D-17, D-22
