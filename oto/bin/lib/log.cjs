@@ -645,7 +645,11 @@ async function main(args = [], cwd = process.cwd()) {
     }
 
     if (sub === 'end') {
-      const result = await endSession({ closingNotes: rest.join(' '), cwd });
+      const result = await endSession({
+        closingNotes: positionals.join(' '),
+        body: values.body,
+        cwd,
+      });
       process.stdout.write(`Wrote ${result.logPath}\n`);
       return 0;
     }

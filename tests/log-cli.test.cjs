@@ -164,6 +164,35 @@ test('D-03 D-18 oto-tools log --body substitutes verbatim body bytes', (t) => {
   assert.ok(fs.readFileSync(path.join(tmp, '.oto/logs', file), 'utf8').includes(body), 'D-03 --body skips drafting and preserves body bytes');
 });
 
+test('D-03 D-18 oto-tools log end --body writes drafted session body verbatim', (t) => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  assert.equal(typeof log.endSession, 'function', 'D-18 session body override reaches endSession');
+  const frontmatter = require(path.join(REPO_ROOT, 'oto/bin/lib/frontmatter.cjs'));
+  const tmp = seedGitFixture(t);
+  const body = [
+    '## Summary',
+    '',
+    'Drafted closeout.',
+    '',
+    '## What changed',
+    '',
+    'Exact body.',
+    '',
+  ].join('\n');
+  const start = spawnSync(process.execPath, [OTO_TOOLS, 'log', 'start', 'drafted session'], { cwd: tmp, encoding: 'utf8' });
+  assert.equal(start.status, 0, `${start.stderr}\n${start.stdout}`);
+  const result = spawnSync(process.execPath, [OTO_TOOLS, 'log', 'end', '--body', body], { cwd: tmp, encoding: 'utf8' });
+  assert.equal(result.status, 0, `${result.stderr}\n${result.stdout}`);
+  const file = fs.readdirSync(path.join(tmp, '.oto/logs')).find((name) => name.endsWith('.md'));
+  const parsed = frontmatter.extractFrontmatter(fs.readFileSync(path.join(tmp, '.oto/logs', file), 'utf8'));
+  assert.equal(parsed.body.trim(), body.trim(), 'D-18 end --body preserves drafted markdown body');
+});
+
 test('D-18 oto-tools log --phase 02 writes phase to frontmatter', (t) => {
   let log;
   try {
