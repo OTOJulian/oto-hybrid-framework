@@ -14,7 +14,7 @@ It is built for a single developer who likes GSD's spec-driven workflow but does
 
 **v0.1.0 shipped on 2026-05-04.**
 
-The release is tagged and archived. The active milestone is complete, and the next project action is to run `$gsd-new-milestone` to define fresh requirements.
+The release is tagged and archived. Post-release Phase 1 is complete: `/oto-migrate` now converts GSD-era project planning artifacts and instruction files to the oto command surface. Post-release Phase 2 is complete: `/oto-log` now captures ad-hoc work sessions as durable `.oto/logs/` artifacts surfaced by `/oto-progress` and `/oto-resume-work`. The next project action is to run `$gsd-secure-phase 02`, then `$gsd-new-milestone` to define fresh requirements.
 
 Shipped in v0.1.0:
 - Public GitHub archive install path for the `oto` package.
@@ -38,10 +38,12 @@ Archive:
 - Claude Code happy path - approved through MR-01 end-to-end dogfood.
 - Codex and Gemini runtime parity - instruction generation, transforms, matrix, and smoke tests shipped.
 - Clean install release gate - `v0.1.0` tag, GitHub Release, archive install smoke, and human clean-install UAT passed.
+- `/oto-migrate` post-release phase - dry-run/apply migration engine, CLI dispatch, command markdown, fixture-backed coverage, and generated runtime matrix entry shipped.
+- `/oto-log` post-release phase - fire-and-forget and session-based ad-hoc logs, evidence-bounded bodies, list/show/promote, progress/resume surfaces, CLI dispatch, and fixture-backed coverage shipped.
 
 ### Active
 
-- None. Fresh requirements should be created by `$gsd-new-milestone`.
+- Phase 02 security audit gate - run `$gsd-secure-phase 02` before advancing.
 
 ### Next Milestone Goals
 
@@ -103,4 +105,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-04 after v0.1.0 milestone closeout*
+*Last updated: 2026-05-06 after Phase 02 /oto-log closeout*

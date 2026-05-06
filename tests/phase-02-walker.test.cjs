@@ -76,6 +76,22 @@ test('walk skips scratch directories and nul-byte files', async (t) => {
   assert.deepEqual(rows.map((row) => row.relPath), ['keep.txt']);
 });
 
+test('walk skips runtime agent worktrees without skipping runtime config files', async (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-walker-test-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(root, '.claude', 'worktrees', 'agent-1'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.claude', 'worktrees', 'agent-1', 'skip.md'), 'skip');
+  fs.writeFileSync(path.join(root, '.claude', 'settings.md'), 'keep config');
+  fs.writeFileSync(path.join(root, 'keep.txt'), 'keep root');
+
+  const rows = await collect(walk(root, compileAllowlist(), new Map()));
+
+  assert.deepEqual(rows.map((row) => row.relPath).sort(), [
+    path.join('.claude', 'settings.md'),
+    'keep.txt'
+  ].sort());
+});
+
 test('walker implementation uses sync recursive readdir primitive', () => {
   const source = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'rebrand', 'lib', 'walker.cjs'), 'utf8');
   assert.equal(source.includes('fs.promises.glob'), false);

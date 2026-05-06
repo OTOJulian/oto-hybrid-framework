@@ -27,9 +27,9 @@ function countTokens(content) {
   return counts;
 }
 
-async function build(root, allowlist, inventoryByPath) {
+async function build(root, allowlist, inventoryByPath, options = {}) {
   const result = { version: '1', root, files: {} };
-  for await (const { relPath, content, file_class, allowlisted } of walker.walk(root, allowlist, inventoryByPath)) {
+  for await (const { relPath, content, file_class, allowlisted } of walker.walk(root, allowlist, inventoryByPath, options)) {
     const countable = allowlisted ? '' : stripAllowlistedContent(content, allowlist);
     result.files[relPath] = {
       file_class,
@@ -57,12 +57,12 @@ function assertZeroOutsideAllowlist(postManifest, allowlist) {
   return failures;
 }
 
-function buildPre(targetRoot, allowlist, inventoryByPath) {
-  return build(targetRoot, allowlist, inventoryByPath);
+function buildPre(targetRoot, allowlist, inventoryByPath, options = {}) {
+  return build(targetRoot, allowlist, inventoryByPath, options);
 }
 
-function buildPost(outRoot, allowlist, inventoryByPath) {
-  return build(outRoot, allowlist, inventoryByPath);
+function buildPost(outRoot, allowlist, inventoryByPath, options = {}) {
+  return build(outRoot, allowlist, inventoryByPath, options);
 }
 
 module.exports = { build, buildPre, buildPost, assertZeroOutsideAllowlist, TOKENS };

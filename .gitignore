@@ -1,5 +1,7 @@
 .oto-rebrand-out/
 reports/
+# /oto-log ephemeral session state (D-12)
+.oto/logs/.active-session.json
 hooks/dist/
 oto/hooks/dist/
 node_modules/

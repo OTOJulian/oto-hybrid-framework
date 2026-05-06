@@ -167,6 +167,8 @@
  * OTO-2 Migration:
  *   from-oto2 [--path <dir>] [--force] [--dry-run]
  *             Import a OTO-2 (.oto/) project back to OTO v1 (.oto/) format
+ *   migrate [--apply] [--rename-state-dir]
+ *             Convert a GSD-era project to the oto surface
  */
 
 const fs = require('fs');
@@ -255,11 +257,11 @@ async function main() {
     error(`Invalid --cwd: ${cwd}`);
   }
 
-  // Resolve worktree root: in a linked worktree, .oto/ lives in the main worktree.
-  // However, in monorepo worktrees where the subdirectory itself owns .oto/,
+  // Resolve worktree root: in a linked worktree, planning state lives in the main worktree.
+  // However, in monorepo worktrees where the subdirectory itself owns planning state,
   // skip worktree resolution — the CWD is already the correct project root.
-  const { resolveWorktreeRoot } = require('./core.cjs');
-  if (!fs.existsSync(path.join(cwd, '.oto'))) {
+  const { resolveWorktreeRoot, planningRoot } = require('./core.cjs');
+  if (!fs.existsSync(planningRoot(cwd))) {
     const worktreeRoot = resolveWorktreeRoot(cwd);
     if (worktreeRoot !== cwd) {
       cwd = worktreeRoot;
@@ -330,6 +332,7 @@ async function main() {
   // ignoring them can cause destructive operations to proceed unchecked.
   const NEVER_VALID_FLAGS = new Set(['-h', '--help', '-?', '--h', '--version', '-v', '--usage']);
   for (const arg of args) {
+    if (command === 'log' && (arg === '--help' || arg === '-h')) continue;
     if (NEVER_VALID_FLAGS.has(arg)) {
       error(`Unknown flag: ${arg}\noto-tools does not accept help or version flags. Run "oto-tools" with no arguments for usage.`);
     }
@@ -1269,6 +1272,20 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
     case 'from-oto2': {
       const oto2Import = require('./gsd2-import.cjs');
       oto2Import.cmdFromGsd2(args.slice(1), cwd, raw);
+      break;
+    }
+
+    case 'migrate': {
+      const migrate = require('./migrate.cjs');
+      const exitCode = await migrate.main(args.slice(1), cwd);
+      process.exit(typeof exitCode === 'number' ? exitCode : 0);
+      break;
+    }
+
+    case 'log': {
+      const log = require('./log.cjs');
+      const exitCode = await log.main(args.slice(1), cwd);
+      process.exit(typeof exitCode === 'number' ? exitCode : 0);
       break;
     }
 

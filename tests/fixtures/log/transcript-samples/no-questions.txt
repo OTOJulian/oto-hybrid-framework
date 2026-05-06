@@ -1,0 +1,6 @@
+The renderer investigation started with a clean fixture copy.
+The cache key was traced through the request boundary.
+The branch contains a small markdown-only data change.
+The observed behavior matches the fixture setup.
+The next step is to compare the captured file list.
+The work ended with no unresolved prompts in the transcript.

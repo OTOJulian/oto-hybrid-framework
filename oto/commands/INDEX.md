@@ -36,8 +36,10 @@ _Auto-generated from `oto/commands/oto/*.md` frontmatter. Re-run `node scripts/g
 | `/oto-insert-phase` | Insert urgent work as decimal phase (e.g., 72.1) between existing phases |
 | `/oto-list-phase-assumptions` | Surface Claude's assumptions about a phase approach before planning |
 | `/oto-list-workspaces` | List active OTO workspaces and their status |
+| `/oto-log` | Capture an ad-hoc work session as a durable log entry surfaced by /oto-progress and /oto-resume-work. Hybrid model: fire-and-forget by default; `start`/`end` for bookmarked sessions. |
 | `/oto-manager` | Interactive command center for managing multiple phases from one terminal |
 | `/oto-map-codebase` | Analyze codebase with parallel mapper agents to produce .oto/codebase/ documents |
+| `/oto-migrate` | Convert a GSD-era project's planning artifacts to oto's command surface. Dry-run by default; pass --apply to write. |
 | `/oto-milestone-summary` | Generate a comprehensive project summary from milestone artifacts for team onboarding and review |
 | `/oto-new-milestone` | Start a new milestone cycle — update PROJECT.md and route to requirements |
 | `/oto-new-project` | Initialize a new project with deep context gathering and PROJECT.md |

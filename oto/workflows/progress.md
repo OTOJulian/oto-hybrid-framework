@@ -18,11 +18,17 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Extract from init JSON: `project_exists`, `roadmap_exists`, `state_exists`, `phases`, `current_phase`, `next_phase`, `milestone_version`, `completed_count`, `phase_count`, `paused_at`, `state_path`, `roadmap_path`, `project_path`, `config_path`.
 
+`state_path`, `roadmap_path`, and `project_path` are authoritative. They may
+point at the canonical OTO root for new projects or the legacy state root for
+projects migrated with `/oto-migrate` without `--rename-state-dir`. A `STATE.md`
+file with `oto_state_version` is already migrated and must not be described as
+GSD-era.
+
 ```bash
 DISCUSS_MODE=$(oto-sdk query config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
 ```
 
-If `project_exists` is false (no `.oto/` directory):
+If `project_exists` is false (no OTO planning root):
 
 ```
 No planning structure found.
@@ -39,6 +45,13 @@ If missing STATE.md: suggest `/oto-new-project`.
 This means a milestone was completed and archived. Go to **Route F** (between milestones).
 
 If missing both ROADMAP.md and PROJECT.md: suggest `/oto-new-project`.
+
+If falling back to direct artifact reads because `oto-sdk query` is unavailable:
+- Prefer the canonical OTO state root when present.
+- Otherwise, if the legacy state root's `STATE.md` contains `oto_state_version`,
+  read from that root and treat it as a valid migrated OTO project.
+- Only suggest `/oto-migrate --dry-run` when artifacts still contain GSD-era
+  markers such as `gsd_state_version`, `<!-- GSD:... -->`, or `/gsd-...`.
 </step>
 
 <step name="load">
@@ -69,14 +82,49 @@ Use this instead of manually reading/parsing ROADMAP.md.
 </step>
 
 <step name="recent">
-**Gather recent work context:**
+**Gather Recent Activity (interleaved logs + summaries, newest 5):**
 
-- Find the 2-3 most recent SUMMARY.md files
-- Use `summary-extract` for efficient parsing:
-  ```bash
-  oto-sdk query summary-extract <path> --fields one_liner
-  ```
-- This shows "what we've been working on"
+Two extraction paths feed one chronological list. Logs come from the resolved planning root's `logs/*.md`; summaries from its `phases/*/*-SUMMARY.md`. Both are decorated with a leading timestamp and kind tag, sorted descending, and sliced to the top 5.
+
+```bash
+PLANNING_ROOT=$(dirname "$state_path")
+LOG_GLOB="$PLANNING_ROOT/logs/*.md"
+SUMMARY_GLOB="$PLANNING_ROOT/phases/*/*-SUMMARY.md"
+
+LOG_LINES=()
+if compgen -G "$LOG_GLOB" > /dev/null 2>&1; then
+  for f in $LOG_GLOB; do
+    bn=$(basename "$f")
+    case "$bn" in .*) continue ;; esac
+    date=$(oto-sdk query frontmatter.get "$f" date --raw 2>/dev/null || echo "")
+    title=$(oto-sdk query frontmatter.get "$f" title --raw 2>/dev/null || echo "")
+    phase=$(oto-sdk query frontmatter.get "$f" phase --raw 2>/dev/null || echo "null")
+    suffix=""
+    [ "$phase" != "null" ] && [ -n "$phase" ] && suffix=" (phase $phase)"
+    [ -n "$date" ] && LOG_LINES+=("${date}\t[${date}] [log] ${title}${suffix}")
+  done
+fi
+
+SUM_LINES=()
+if compgen -G "$SUMMARY_GLOB" > /dev/null 2>&1; then
+  for f in $SUMMARY_GLOB; do
+    one_liner=$(oto-sdk query summary-extract "$f" --fields one_liner 2>/dev/null || echo "")
+    completed=$(oto-sdk query frontmatter.get "$f" completed --raw 2>/dev/null || echo "")
+    phase=$(oto-sdk query frontmatter.get "$f" phase --raw 2>/dev/null || echo "")
+    [ -n "$completed" ] && SUM_LINES+=("${completed}\t[${completed}] [summary] ${one_liner} (phase ${phase})")
+  done
+fi
+
+RECENT_ACTIVITY=$(
+  { printf '%s\n' "${LOG_LINES[@]}"; printf '%s\n' "${SUM_LINES[@]}"; } \
+  | grep -v '^$' \
+  | sort -r \
+  | head -5 \
+  | cut -f2-
+)
+```
+
+`$RECENT_ACTIVITY` is consumed by step `report` and rendered as the "Recent Activity" panel. Format per item: `[YYYY-MM-DD HH:mm] [log|summary] <title> [(phase NN)]`.
   </step>
 
 <step name="position">
@@ -105,9 +153,9 @@ Present:
 **Profile:** [quality/balanced/budget/inherit]
 **Discuss mode:** {DISCUSS_MODE}
 
-## Recent Work
-- [Phase X, Plan Y]: [what was accomplished - 1 line from summary-extract]
-- [Phase X, Plan Z]: [what was accomplished - 1 line from summary-extract]
+## Recent Activity
+- [YYYY-MM-DD HH:mm] [log|summary] [title or one-line summary] [(phase NN)]
+- [YYYY-MM-DD HH:mm] [log|summary] [title or one-line summary] [(phase NN)]
 
 ## Current Position
 Phase [N] of [total]: [phase-name]
