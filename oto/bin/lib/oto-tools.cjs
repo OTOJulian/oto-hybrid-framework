@@ -257,11 +257,11 @@ async function main() {
     error(`Invalid --cwd: ${cwd}`);
   }
 
-  // Resolve worktree root: in a linked worktree, .oto/ lives in the main worktree.
-  // However, in monorepo worktrees where the subdirectory itself owns .oto/,
+  // Resolve worktree root: in a linked worktree, planning state lives in the main worktree.
+  // However, in monorepo worktrees where the subdirectory itself owns planning state,
   // skip worktree resolution — the CWD is already the correct project root.
-  const { resolveWorktreeRoot } = require('./core.cjs');
-  if (!fs.existsSync(path.join(cwd, '.oto'))) {
+  const { resolveWorktreeRoot, planningRoot } = require('./core.cjs');
+  if (!fs.existsSync(planningRoot(cwd))) {
     const worktreeRoot = resolveWorktreeRoot(cwd);
     if (worktreeRoot !== cwd) {
       cwd = worktreeRoot;

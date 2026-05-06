@@ -18,11 +18,17 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Extract from init JSON: `project_exists`, `roadmap_exists`, `state_exists`, `phases`, `current_phase`, `next_phase`, `milestone_version`, `completed_count`, `phase_count`, `paused_at`, `state_path`, `roadmap_path`, `project_path`, `config_path`.
 
+`state_path`, `roadmap_path`, and `project_path` are authoritative. They may
+point at the canonical OTO root for new projects or the legacy state root for
+projects migrated with `/oto-migrate` without `--rename-state-dir`. A `STATE.md`
+file with `oto_state_version` is already migrated and must not be described as
+GSD-era.
+
 ```bash
 DISCUSS_MODE=$(oto-sdk query config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
 ```
 
-If `project_exists` is false (no `.oto/` directory):
+If `project_exists` is false (no OTO planning root):
 
 ```
 No planning structure found.
@@ -39,6 +45,13 @@ If missing STATE.md: suggest `/oto-new-project`.
 This means a milestone was completed and archived. Go to **Route F** (between milestones).
 
 If missing both ROADMAP.md and PROJECT.md: suggest `/oto-new-project`.
+
+If falling back to direct artifact reads because `oto-sdk query` is unavailable:
+- Prefer the canonical OTO state root when present.
+- Otherwise, if the legacy state root's `STATE.md` contains `oto_state_version`,
+  read from that root and treat it as a valid migrated OTO project.
+- Only suggest `/oto-migrate --dry-run` when artifacts still contain GSD-era
+  markers such as `gsd_state_version`, `<!-- GSD:... -->`, or `/gsd-...`.
 </step>
 
 <step name="load">

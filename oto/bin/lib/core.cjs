@@ -44,6 +44,34 @@ function toPosixPath(p) {
   return p.split(path.sep).join('/');
 }
 
+function isDirectory(p) {
+  try {
+    return fs.existsSync(p) && fs.statSync(p).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function hasMigratedPlanningRoot(cwd) {
+  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  try {
+    const state = fs.readFileSync(statePath, 'utf-8');
+    return /^oto_state_version\s*:/m.test(state);
+  } catch {
+    return false;
+  }
+}
+
+function planningRootName(cwd) {
+  if (isDirectory(path.join(cwd, '.oto'))) return '.oto';
+  if (isDirectory(path.join(cwd, '.planning')) && hasMigratedPlanningRoot(cwd)) return '.planning';
+  return '.oto';
+}
+
+function hasPlanningRoot(cwd) {
+  return isDirectory(path.join(cwd, '.oto')) || hasMigratedPlanningRoot(cwd);
+}
+
 /**
  * Scan immediate child directories for separate git repos.
  * Returns a sorted array of directory names that have their own `.git`.
@@ -68,19 +96,19 @@ function detectSubRepos(cwd) {
 }
 
 /**
- * Walk up from `startDir` to find the project root that owns `.planning/`.
+ * Walk up from `startDir` to find the project root that owns OTO planning state.
  *
  * In multi-repo workspaces, Claude may open inside a sub-repo (e.g. `backend/`)
- * instead of the project root. This function prevents `.planning/` from being
+ * instead of the project root. This function prevents planning state from being
  * created inside the sub-repo by locating the nearest ancestor that already has
- * a `.planning/` directory.
+ * an OTO planning directory.
  *
  * Detection strategy (checked in order for each ancestor):
- * 1. Parent has `.planning/config.json` with `sub_repos` listing this directory
- * 2. Parent has `.planning/config.json` with `multiRepo: true` (legacy format)
- * 3. Parent has `.planning/` and current dir has its own `.git` (heuristic)
+ * 1. Parent has planning config with `sub_repos` listing this directory
+ * 2. Parent has planning config with `multiRepo: true` (legacy format)
+ * 3. Parent has planning state and current dir has its own `.git` (heuristic)
  *
- * Returns `startDir` unchanged when no ancestor `.planning/` is found (first-run
+ * Returns `startDir` unchanged when no ancestor planning state is found (first-run
  * or single-repo projects).
  */
 function findProjectRoot(startDir) {
@@ -88,10 +116,9 @@ function findProjectRoot(startDir) {
   const root = path.parse(resolved).root;
   const homedir = require('os').homedir();
 
-  // If startDir already contains .oto/, it IS the project root.
-  // Do not walk up to a parent workspace that also has .oto/ (#1362).
-  const ownPlanning = path.join(resolved, '.oto');
-  if (fs.existsSync(ownPlanning) && fs.statSync(ownPlanning).isDirectory()) {
+  // If startDir already contains OTO planning state, it IS the project root.
+  // Do not walk up to a parent workspace that also has planning state (#1362).
+  if (hasPlanningRoot(resolved)) {
     return startDir;
   }
 
@@ -115,8 +142,8 @@ function findProjectRoot(startDir) {
     if (parent === dir) break; // filesystem root
     if (parent === homedir) break; // never go above home
 
-    const parentPlanning = path.join(parent, '.oto');
-    if (fs.existsSync(parentPlanning) && fs.statSync(parentPlanning).isDirectory()) {
+    if (hasPlanningRoot(parent)) {
+      const parentPlanning = path.join(parent, planningRootName(parent));
       const configPath = path.join(parentPlanning, 'config.json');
       try {
         const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
@@ -139,7 +166,7 @@ function findProjectRoot(startDir) {
         // config.json missing or malformed — fall back to .git heuristic
       }
 
-      // Heuristic: parent has .oto/ and we're inside a git repo
+      // Heuristic: parent has OTO planning state and we're inside a git repo
       if (isInsideGitRepo(parent)) {
         return parent;
       }
@@ -686,9 +713,9 @@ function execGit(cwd, args) {
  * Returns the main worktree path, or cwd if not in a worktree.
  */
 function resolveWorktreeRoot(cwd) {
-  // If the current directory already has its own .oto/, respect it.
+  // If the current directory already has its own planning state, respect it.
   // This handles linked worktrees with independent planning state (e.g., Conductor workspaces).
-  if (fs.existsSync(path.join(cwd, '.oto'))) {
+  if (hasPlanningRoot(cwd)) {
     return cwd;
   }
 
@@ -892,15 +919,15 @@ function planningDir(cwd, ws, project) {
     throw new Error(`OTO_WORKSTREAM contains invalid path characters: ${ws}`);
   }
 
-  let base = path.join(cwd, '.oto');
+  let base = path.join(cwd, planningRootName(cwd));
   if (project) base = path.join(base, project);
   if (ws) base = path.join(base, 'workstreams', ws);
   return base;
 }
 
-/** Always returns the root .oto/ path, ignoring workstreams and projects. For shared resources. */
+/** Always returns the root planning path, ignoring workstreams and projects. For shared resources. */
 function planningRoot(cwd) {
-  return path.join(cwd, '.oto');
+  return path.join(cwd, planningRootName(cwd));
 }
 
 /**

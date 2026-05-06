@@ -1273,11 +1273,12 @@ function cmdInitProgress(cwd, raw) {
     const { pruneOrphanedWorktrees } = require('./core.cjs');
     pruneOrphanedWorktrees(cwd);
   } catch (_) {}
+  const paths = planningPaths(cwd);
   const config = loadConfig(cwd);
   const milestone = getMilestoneInfo(cwd);
 
   // Analyze phases — filter to current milestone and include ROADMAP-only phases
-  const phasesDir = path.join(planningDir(cwd), 'phases');
+  const phasesDir = paths.phases;
   const phases = [];
   let currentPhase = null;
   let nextPhase = null;
@@ -1287,9 +1288,7 @@ function cmdInitProgress(cwd, raw) {
   const roadmapPhaseNames = new Map();
   const roadmapCheckboxStates = new Map();
   try {
-    const roadmapContent = extractCurrentMilestone(
-      fs.readFileSync(path.join(planningDir(cwd), 'ROADMAP.md'), 'utf-8'), cwd
-    );
+    const roadmapContent = extractCurrentMilestone(fs.readFileSync(paths.roadmap, 'utf-8'), cwd);
     const headingPattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)*)\s*:\s*([^\n]+)/gi;
     let hm;
     while ((hm = headingPattern.exec(roadmapContent)) !== null) {
@@ -1339,7 +1338,7 @@ function cmdInitProgress(cwd, raw) {
       const phaseInfo = {
         number: phaseNumber,
         name: phaseName,
-        directory: toPosixPath(path.relative(cwd, path.join(planningDir(cwd), 'phases', dir))),
+        directory: toPosixPath(path.relative(cwd, path.join(paths.phases, dir))),
         status,
         plan_count: plans.length,
         summary_count: summaries.length,
@@ -1390,7 +1389,7 @@ function cmdInitProgress(cwd, raw) {
   // Check for paused work
   let pausedAt = null;
   try {
-    const state = fs.readFileSync(path.join(planningDir(cwd), 'STATE.md'), 'utf-8');
+    const state = fs.readFileSync(paths.state, 'utf-8');
     const pauseMatch = state.match(/\*\*Paused At:\*\*\s*(.+)/);
     if (pauseMatch) pausedAt = pauseMatch[1].trim();
   } catch { /* intentionally empty */ }
@@ -1420,14 +1419,14 @@ function cmdInitProgress(cwd, raw) {
     has_work_in_progress: !!currentPhase,
 
     // File existence
-    project_exists: pathExistsInternal(cwd, '.oto/PROJECT.md'),
-    roadmap_exists: fs.existsSync(path.join(planningDir(cwd), 'ROADMAP.md')),
-    state_exists: fs.existsSync(path.join(planningDir(cwd), 'STATE.md')),
+    project_exists: fs.existsSync(paths.project),
+    roadmap_exists: fs.existsSync(paths.roadmap),
+    state_exists: fs.existsSync(paths.state),
     // File paths
-    state_path: toPosixPath(path.relative(cwd, path.join(planningDir(cwd), 'STATE.md'))),
-    roadmap_path: toPosixPath(path.relative(cwd, path.join(planningDir(cwd), 'ROADMAP.md'))),
-    project_path: '.oto/PROJECT.md',
-    config_path: toPosixPath(path.relative(cwd, path.join(planningDir(cwd), 'config.json'))),
+    state_path: toPosixPath(path.relative(cwd, paths.state)),
+    roadmap_path: toPosixPath(path.relative(cwd, paths.roadmap)),
+    project_path: toPosixPath(path.relative(cwd, paths.project)),
+    config_path: toPosixPath(path.relative(cwd, paths.config)),
   };
 
   output(withProjectRoot(cwd, result), raw);
