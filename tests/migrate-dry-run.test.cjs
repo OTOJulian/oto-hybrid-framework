@@ -42,6 +42,28 @@ function addGitignoredResult(root) {
   return relPath;
 }
 
+function addProjectLocalRuntimeCommandAndAgent(root) {
+  const commandRelPath = path.join('.claude', 'commands', 'gsd', 'add-phase.md');
+  const agentRelPath = path.join('.claude', 'agents', 'gsd-planner.md');
+  fs.mkdirSync(path.dirname(path.join(root, commandRelPath)), { recursive: true });
+  fs.mkdirSync(path.dirname(path.join(root, agentRelPath)), { recursive: true });
+  fs.writeFileSync(path.join(root, commandRelPath), [
+    '# Add phase',
+    '',
+    'Run /oto-add-phase from commands/oto/add-phase.md.',
+    ''
+  ].join('\n'));
+  fs.writeFileSync(path.join(root, agentRelPath), [
+    '---',
+    'name: oto-planner',
+    '---',
+    '',
+    'Use /oto-plan-phase.',
+    ''
+  ].join('\n'));
+  return { commandRelPath, agentRelPath };
+}
+
 function fileManifest(root) {
   const entries = [];
   function walk(dir) {
@@ -129,4 +151,29 @@ test('dryRun excludes untracked gitignored generated artifacts from report scope
   assert.equal(result.exitCode, 0);
   assert.equal(result.files.some((file) => file.path === ignoredRelPath), false);
   assert.ok(fs.readFileSync(path.join(fixture, ignoredRelPath), 'utf8').includes('/gsd-execute-phase'));
+});
+
+test('dryRun reports path-only runtime GSD leftovers after contents are already migrated', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal'), fixture, { recursive: true });
+  await migrate.apply(fixture, {});
+  const { commandRelPath, agentRelPath } = addProjectLocalRuntimeCommandAndAgent(fixture);
+
+  const result = await migrate.dryRun(fixture);
+
+  assert.equal(result.mode, 'dry-run');
+  assert.equal(result.exitCode, 0);
+  assert.ok(result.summary.rule_types.includes('path'));
+  assert.ok(result.files.some((file) => file.path === commandRelPath));
+  assert.ok(result.files.some((file) => file.path === agentRelPath));
+  assert.equal(result.files.some((file) => file.path.startsWith('.oto-migrate-backup')), false);
 });

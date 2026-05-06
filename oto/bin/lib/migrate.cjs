@@ -24,6 +24,11 @@ const INSTRUCTION_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md'];
 const RUNTIME_CONFIG_DIRS = ['.claude', '.codex', '.gemini'];
 const LEGACY_RUNTIME_SUPPORT_DIR = 'get-shit-done';
 const OTO_RUNTIME_SUPPORT_DIR = 'oto';
+const LEGACY_RUNTIME_COMMAND_DIR = 'gsd';
+const OTO_RUNTIME_COMMAND_DIR = 'oto';
+const LEGACY_RUNTIME_PREFIX = 'gsd-';
+const OTO_RUNTIME_PREFIX = 'oto-';
+const RUNTIME_PREFIXED_SURFACE_DIRS = ['agents', 'commands', 'skills'];
 
 function resolveRenameMapPath() {
   for (const candidate of RENAME_MAP_CANDIDATES) {
@@ -84,6 +89,77 @@ function markdownFilesUnder(root) {
     });
 }
 
+function listDirectEntries(root) {
+  if (!fs.existsSync(root)) return [];
+  return fs.readdirSync(root, { withFileTypes: true });
+}
+
+function listLegacyRuntimeSurfacePaths(projectDir) {
+  const rels = new Set();
+  for (const runtimeDir of RUNTIME_CONFIG_DIRS) {
+    const supportRoot = path.join(runtimeDir, LEGACY_RUNTIME_SUPPORT_DIR);
+    if (fs.existsSync(safeJoin(projectDir, supportRoot))) rels.add(supportRoot);
+
+    const commandRoot = path.join(runtimeDir, 'commands', LEGACY_RUNTIME_COMMAND_DIR);
+    if (fs.existsSync(safeJoin(projectDir, commandRoot))) rels.add(commandRoot);
+
+    for (const surfaceDir of RUNTIME_PREFIXED_SURFACE_DIRS) {
+      const surfaceRootRel = path.join(runtimeDir, surfaceDir);
+      const surfaceRoot = safeJoin(projectDir, surfaceRootRel);
+      for (const entry of listDirectEntries(surfaceRoot)) {
+        if (entry.name.startsWith(LEGACY_RUNTIME_PREFIX)) {
+          rels.add(path.join(surfaceRootRel, entry.name));
+        }
+      }
+    }
+  }
+  return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, MIGRATE_SKIP_PATTERNS)).sort();
+}
+
+function listLegacyRuntimeSurfaceFiles(projectDir) {
+  const rels = new Set();
+  for (const relPath of listLegacyRuntimeSurfacePaths(projectDir)) {
+    const abs = safeJoin(projectDir, relPath);
+    if (!fs.existsSync(abs)) continue;
+    const stat = fs.statSync(abs);
+    if (stat.isFile()) {
+      rels.add(relPath);
+    } else if (stat.isDirectory()) {
+      for (const nested of listFiles(abs, MIGRATE_SKIP_PATTERNS)) {
+        rels.add(path.join(relPath, nested));
+      }
+    }
+  }
+  return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, MIGRATE_SKIP_PATTERNS)).sort();
+}
+
+function denormalizeRelPath(relPath) {
+  return relPath.split('/').join(path.sep);
+}
+
+function targetForLegacyRuntimeSurfacePath(relPath) {
+  const normalized = normalizeRelPath(relPath);
+  for (const runtimeDir of RUNTIME_CONFIG_DIRS.map((dir) => normalizeRelPath(dir))) {
+    const supportRoot = `${runtimeDir}/${LEGACY_RUNTIME_SUPPORT_DIR}`;
+    if (normalized === supportRoot || normalized.startsWith(`${supportRoot}/`)) {
+      return denormalizeRelPath(`${runtimeDir}/${OTO_RUNTIME_SUPPORT_DIR}${normalized.slice(supportRoot.length)}`);
+    }
+
+    const commandRoot = `${runtimeDir}/commands/${LEGACY_RUNTIME_COMMAND_DIR}`;
+    if (normalized === commandRoot || normalized.startsWith(`${commandRoot}/`)) {
+      return denormalizeRelPath(`${runtimeDir}/commands/${OTO_RUNTIME_COMMAND_DIR}${normalized.slice(commandRoot.length)}`);
+    }
+
+    for (const surfaceDir of RUNTIME_PREFIXED_SURFACE_DIRS) {
+      const prefixedRoot = `${runtimeDir}/${surfaceDir}/${LEGACY_RUNTIME_PREFIX}`;
+      if (normalized.startsWith(prefixedRoot)) {
+        return denormalizeRelPath(`${runtimeDir}/${surfaceDir}/${OTO_RUNTIME_PREFIX}${normalized.slice(prefixedRoot.length)}`);
+      }
+    }
+  }
+  return null;
+}
+
 function buildMigrateMapPath() {
   const map = JSON.parse(fs.readFileSync(RENAME_MAP_PATH, 'utf8'));
   const rules = { ...(map.rules || {}) };
@@ -120,6 +196,10 @@ function listIgnoredUntrackedPaths(projectDir) {
     .filter((relPath) => !relPath.startsWith('../') && !path.isAbsolute(relPath));
 }
 
+function listEngineSkipRelPaths(projectDir) {
+  return Array.from(new Set([...MIGRATE_SKIP_PATTERNS, ...listIgnoredUntrackedPaths(projectDir)])).sort();
+}
+
 function detectGsdProject(projectDir) {
   const abs = path.resolve(projectDir);
   assertNotRuntimeConfigDir(abs);
@@ -143,16 +223,29 @@ function detectGsdProject(projectDir) {
     if (hasOtoMarker(text)) hasOtoInstructionMarkers = true;
   }
   if (hasGsdInstructionMarkers) signals.push('gsd-instruction-markers');
-  if (hasOtoInstructionMarkers) conflicts.push('oto-markers-present');
 
   const planningDir = safeJoin(abs, '.planning');
   if (markdownFilesUnder(planningDir).some((filePath) => /\/gsd-\w/.test(readIfExists(filePath)))) {
     signals.push('gsd-command-refs');
   }
 
+  const runtimeSurfacePaths = listLegacyRuntimeSurfacePaths(abs);
+  if (runtimeSurfacePaths.length > 0) {
+    signals.push('gsd-runtime-paths');
+  }
+
   if (fs.existsSync(safeJoin(abs, '.planning')) && fs.existsSync(safeJoin(abs, '.oto'))) {
     conflicts.push('both-state-dirs');
   }
+
+  const runtimePathCollision = listLegacyRuntimeSurfaceFiles(abs).some((relPath) => {
+    const target = targetForLegacyRuntimeSurfacePath(relPath);
+    return target && fs.existsSync(safeJoin(abs, target));
+  });
+  if (runtimePathCollision) conflicts.push('runtime-path-collision');
+
+  const hasContentGsdSignals = signals.some((signal) => signal !== 'gsd-runtime-paths');
+  if (hasOtoInstructionMarkers && hasContentGsdSignals) conflicts.push('oto-markers-present');
 
   return { isGsdEra: signals.length > 0, signals, conflicts };
 }
@@ -239,7 +332,7 @@ async function _applyToStaging(projectDir, opts = {}) {
       owner: opts.owner || 'OTOJulian',
       mapPath,
       reportsDir: stagingReportsDir,
-      skipRelPaths: listIgnoredUntrackedPaths(abs)
+      skipRelPaths: listEngineSkipRelPaths(abs)
     });
     if (engineResult.exitCode !== 0) {
       const error = new Error('engine apply failed: exitCode=' + engineResult.exitCode);
@@ -326,6 +419,10 @@ function listFilesToBackup(projectDir, scope = 'planning') {
     }
   }
 
+  for (const relPath of listLegacyRuntimeSurfaceFiles(projectDir)) {
+    rels.add(relPath);
+  }
+
   return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, MIGRATE_SKIP_PATTERNS)).sort();
 }
 
@@ -338,14 +435,101 @@ async function copyTreeAtomic(src, dst, skipPatterns = []) {
   }
 }
 
-async function removeRenamedRuntimeSupportDirs(projectDir) {
+async function filesEqual(left, right) {
+  const [leftContent, rightContent] = await Promise.all([fsp.readFile(left), fsp.readFile(right)]);
+  return Buffer.compare(leftContent, rightContent) === 0;
+}
+
+async function moveFileIfSafe(fromAbs, toAbs, fromRel, toRel, opts = {}) {
+  if (fs.existsSync(toAbs)) {
+    if (opts.preferDestination) {
+      await fsp.unlink(fromAbs);
+      return [toRel];
+    }
+    const fromStat = fs.statSync(fromAbs);
+    const toStat = fs.statSync(toAbs);
+    if (!fromStat.isFile() || !toStat.isFile() || !(await filesEqual(fromAbs, toAbs))) {
+      const error = new Error(`runtime path collision: ${fromRel} -> ${toRel}`);
+      error.exitCode = 2;
+      throw error;
+    }
+    await fsp.unlink(fromAbs);
+    return [toRel];
+  }
+  await fsp.mkdir(path.dirname(toAbs), { recursive: true });
+  await fsp.rename(fromAbs, toAbs);
+  return [toRel];
+}
+
+async function moveDirectoryIfSafe(projectDir, fromRel, toRel, opts = {}) {
+  const fromAbs = safeJoin(projectDir, fromRel);
+  if (!fs.existsSync(fromAbs)) return [];
+  const fromStat = fs.statSync(fromAbs);
+  if (!fromStat.isDirectory()) {
+    return moveFileIfSafe(fromAbs, safeJoin(projectDir, toRel), fromRel, toRel, opts);
+  }
+
+  const toAbs = safeJoin(projectDir, toRel);
+  const changed = [];
+  if (!fs.existsSync(toAbs)) {
+    const nestedFiles = listFiles(fromAbs, MIGRATE_SKIP_PATTERNS);
+    await fsp.mkdir(path.dirname(toAbs), { recursive: true });
+    await fsp.rename(fromAbs, toAbs);
+    return nestedFiles.map((nested) => path.join(toRel, nested));
+  }
+
+  for (const nested of listFiles(fromAbs, MIGRATE_SKIP_PATTERNS)) {
+    const nestedFromRel = path.join(fromRel, nested);
+    const nestedToRel = path.join(toRel, nested);
+    changed.push(...await moveFileIfSafe(
+      safeJoin(projectDir, nestedFromRel),
+      safeJoin(projectDir, nestedToRel),
+      nestedFromRel,
+      nestedToRel,
+      opts
+    ));
+  }
+  await fsp.rm(fromAbs, { recursive: true, force: true });
+  return changed;
+}
+
+async function renamePrefixedRuntimeEntries(projectDir, runtimeDir, surfaceDir) {
+  const surfaceRootRel = path.join(runtimeDir, surfaceDir);
+  const surfaceRoot = safeJoin(projectDir, surfaceRootRel);
+  const changed = [];
+  for (const entry of listDirectEntries(surfaceRoot)) {
+    if (!entry.name.startsWith(LEGACY_RUNTIME_PREFIX)) continue;
+    const renamed = `${OTO_RUNTIME_PREFIX}${entry.name.slice(LEGACY_RUNTIME_PREFIX.length)}`;
+    changed.push(...await moveDirectoryIfSafe(
+      projectDir,
+      path.join(surfaceRootRel, entry.name),
+      path.join(surfaceRootRel, renamed),
+      { preferDestination: true }
+    ));
+  }
+  return changed;
+}
+
+async function renameProjectRuntimeSurfacePaths(projectDir) {
+  const changed = [];
   for (const runtimeDir of RUNTIME_CONFIG_DIRS) {
-    const legacy = safeJoin(projectDir, path.join(runtimeDir, LEGACY_RUNTIME_SUPPORT_DIR));
-    const renamed = safeJoin(projectDir, path.join(runtimeDir, OTO_RUNTIME_SUPPORT_DIR));
-    if (fs.existsSync(legacy) && fs.existsSync(renamed)) {
-      await fsp.rm(legacy, { recursive: true, force: true });
+    changed.push(...await moveDirectoryIfSafe(
+      projectDir,
+      path.join(runtimeDir, LEGACY_RUNTIME_SUPPORT_DIR),
+      path.join(runtimeDir, OTO_RUNTIME_SUPPORT_DIR),
+      { preferDestination: true }
+    ));
+    changed.push(...await moveDirectoryIfSafe(
+      projectDir,
+      path.join(runtimeDir, 'commands', LEGACY_RUNTIME_COMMAND_DIR),
+      path.join(runtimeDir, 'commands', OTO_RUNTIME_COMMAND_DIR),
+      { preferDestination: true }
+    ));
+    for (const surfaceDir of RUNTIME_PREFIXED_SURFACE_DIRS) {
+      changed.push(...await renamePrefixedRuntimeEntries(projectDir, runtimeDir, surfaceDir));
     }
   }
+  return Array.from(new Set(changed)).sort();
 }
 
 async function apply(projectDir, opts = {}) {
@@ -371,7 +555,9 @@ async function apply(projectDir, opts = {}) {
 
     const filesChanged = listFiles(stagingOut, MIGRATE_SKIP_PATTERNS);
     await copyTreeAtomic(stagingOut, abs, MIGRATE_SKIP_PATTERNS);
-    await removeRenamedRuntimeSupportDirs(abs);
+    for (const relPath of await renameProjectRuntimeSurfacePaths(abs)) {
+      if (!filesChanged.includes(relPath)) filesChanged.push(relPath);
+    }
 
     for (const name of INSTRUCTION_FILES) {
       const filePath = safeJoin(abs, name);
@@ -403,7 +589,7 @@ async function apply(projectDir, opts = {}) {
       throw error;
     }
 
-    return { mode: 'apply', filesChanged, backupDir, exitCode: 0 };
+    return { mode: 'apply', filesChanged: filesChanged.sort(), backupDir, exitCode: 0 };
   } finally {
     await fsp.rm(stagingOut, { recursive: true, force: true });
     await fsp.rm(stagingReportsDir, { recursive: true, force: true });
@@ -479,21 +665,28 @@ async function dryRun(projectDir, opts = {}) {
       owner: opts.owner || 'OTOJulian',
       mapPath,
       reportsDir,
-      skipRelPaths: listIgnoredUntrackedPaths(abs)
+      skipRelPaths: listEngineSkipRelPaths(abs)
     });
     const reportPath = path.join(reportsDir, 'rebrand-dryrun.json');
     const report = fs.existsSync(reportPath) ? JSON.parse(fs.readFileSync(reportPath, 'utf8')) : { files: [], summary_by_rule_type: {} };
     const markerReport = countInstructionMarkers(abs);
     const frontmatterReport = countStateFrontmatterKeys(abs);
+    const runtimeSurfaceFiles = listLegacyRuntimeSurfaceFiles(abs);
+    const files = Array.isArray(report.files) ? [...report.files] : [];
+    const reportedPaths = new Set(files.map((file) => file.path));
+    for (const relPath of runtimeSurfaceFiles) {
+      if (!reportedPaths.has(relPath)) files.push({ path: relPath, matches: [], rule_type: 'path' });
+    }
     const ruleTypes = Object.entries(report.summary_by_rule_type || {})
       .filter(([, count]) => count > 0)
       .map(([ruleType]) => ruleType);
     if (markerReport.totalCount > 0) ruleTypes.push('marker');
     if (frontmatterReport.totalCount > 0) ruleTypes.push('frontmatter');
+    if (listLegacyRuntimeSurfacePaths(abs).length > 0) ruleTypes.push('path');
 
     return {
       mode: 'dry-run',
-      files: report.files || [],
+      files,
       summary: {
         engine_invocation: { mode: 'dry-run', target: abs, mapPath },
         marker_blocks: markerReport.totalCount,

@@ -55,6 +55,30 @@ function addProjectLocalRuntimeSupport(root) {
   return relPath;
 }
 
+function addProjectLocalRuntimeCommandAndAgent(root, { alreadyMigrated = false } = {}) {
+  const commandRelPath = path.join('.claude', 'commands', 'gsd', 'add-phase.md');
+  const agentRelPath = path.join('.claude', 'agents', 'gsd-planner.md');
+  fs.mkdirSync(path.dirname(path.join(root, commandRelPath)), { recursive: true });
+  fs.mkdirSync(path.dirname(path.join(root, agentRelPath)), { recursive: true });
+  fs.writeFileSync(path.join(root, commandRelPath), [
+    '# Add phase',
+    '',
+    alreadyMigrated
+      ? 'Run /oto-add-phase from commands/oto/add-phase.md.'
+      : 'Run /gsd-add-phase from commands/gsd/add-phase.md.',
+    ''
+  ].join('\n'));
+  fs.writeFileSync(path.join(root, agentRelPath), [
+    '---',
+    alreadyMigrated ? 'name: oto-planner' : 'name: gsd-planner',
+    '---',
+    '',
+    alreadyMigrated ? 'Use /oto-plan-phase.' : 'Use /gsd-plan-phase.',
+    ''
+  ].join('\n'));
+  return { commandRelPath, agentRelPath };
+}
+
 function fileManifest(root) {
   const entries = [];
   function walk(dir) {
@@ -215,4 +239,77 @@ test('apply renames project-local get-shit-done runtime support directory to oto
     fs.readFileSync(path.join(result.backupDir, legacyRelPath), 'utf8'),
     legacyBefore
   );
+});
+
+test('apply renames project-local runtime command directory and agent filenames to oto', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const sourceFixture = path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(sourceFixture, fixture, { recursive: true });
+  const { commandRelPath, agentRelPath } = addProjectLocalRuntimeCommandAndAgent(fixture);
+  const commandBefore = fs.readFileSync(path.join(fixture, commandRelPath), 'utf8');
+  const agentBefore = fs.readFileSync(path.join(fixture, agentRelPath), 'utf8');
+
+  const result = await migrate.apply(fixture, {});
+  const otoCommandRelPath = path.join('.claude', 'commands', 'oto', 'add-phase.md');
+  const otoAgentRelPath = path.join('.claude', 'agents', 'oto-planner.md');
+  const commandText = fs.readFileSync(path.join(fixture, otoCommandRelPath), 'utf8');
+  const agentText = fs.readFileSync(path.join(fixture, otoAgentRelPath), 'utf8');
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(fs.existsSync(path.join(fixture, commandRelPath)), false);
+  assert.equal(fs.existsSync(path.join(fixture, path.dirname(commandRelPath))), false);
+  assert.equal(fs.existsSync(path.join(fixture, agentRelPath)), false);
+  assert.ok(commandText.includes('/oto-add-phase'));
+  assert.equal(commandText.includes('/gsd-add-phase'), false);
+  assert.ok(commandText.includes('commands/oto/add-phase.md'));
+  assert.ok(agentText.includes('name: oto-planner'));
+  assert.ok(agentText.includes('/oto-plan-phase'));
+  assert.equal(agentText.includes('gsd-planner'), false);
+  assert.equal(
+    fs.readFileSync(path.join(result.backupDir, commandRelPath), 'utf8'),
+    commandBefore
+  );
+  assert.equal(
+    fs.readFileSync(path.join(result.backupDir, agentRelPath), 'utf8'),
+    agentBefore
+  );
+});
+
+test('apply cleans path-only runtime GSD leftovers after contents are already migrated', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const sourceFixture = path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(sourceFixture, fixture, { recursive: true });
+  await migrate.apply(fixture, {});
+  const { commandRelPath, agentRelPath } = addProjectLocalRuntimeCommandAndAgent(fixture, { alreadyMigrated: true });
+
+  const result = await migrate.apply(fixture, {});
+  const otoCommandRelPath = path.join('.claude', 'commands', 'oto', 'add-phase.md');
+  const otoAgentRelPath = path.join('.claude', 'agents', 'oto-planner.md');
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(result.reason, undefined);
+  assert.equal(fs.existsSync(path.join(fixture, commandRelPath)), false);
+  assert.equal(fs.existsSync(path.join(fixture, agentRelPath)), false);
+  assert.equal(fs.existsSync(path.join(fixture, otoCommandRelPath)), true);
+  assert.equal(fs.existsSync(path.join(fixture, otoAgentRelPath)), true);
+  assert.equal(fs.readFileSync(path.join(fixture, otoCommandRelPath), 'utf8').includes('/gsd-'), false);
+  assert.equal(fs.readFileSync(path.join(fixture, otoAgentRelPath), 'utf8').includes('gsd-'), false);
 });
