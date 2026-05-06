@@ -29,6 +29,8 @@ test('oto migrate command markdown declares command metadata and execution conte
   assert.match(body, /allowed-tools:[\s\S]*Read[\s\S]*Write[\s\S]*Edit[\s\S]*Bash/);
   assert.ok(body.includes('<objective>'));
   assert.ok(body.includes('<execution_context>'));
+  assert.ok(body.includes('oto migrate'));
+  assert.equal(body.includes('oto-tools migrate'), false);
   assert.ok(body.includes('Claude Code, Codex, and Gemini runtime agent worktrees'));
   assert.equal(body.includes('.claude/worktrees/'), false);
 });

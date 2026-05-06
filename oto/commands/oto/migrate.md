@@ -23,7 +23,7 @@ Migrate is idempotent: running `--apply` on an already migrated project is a zer
 </objective>
 
 <execution_context>
-No dedicated workflow file is required for this command surface; call the local `oto-tools migrate` implementation directly.
+No dedicated workflow file is required for this command surface; call the installed `oto migrate` CLI implementation directly.
 </execution_context>
 
 <context>
@@ -32,9 +32,9 @@ $ARGUMENTS
 
 <process>
 1. Resolve the project directory from `$ARGUMENTS`; default to the current project root when `--project-dir` is not supplied.
-2. Run `oto-tools migrate --dry-run` first unless the user explicitly supplied `--apply`.
+2. Run `oto migrate --dry-run` first unless the user explicitly supplied `--apply`.
 3. Present the dry-run summary, including changed file count, detected GSD-era signals, conflicts, and whether the legacy planning state directory will remain in place.
-4. Ask for explicit user approval before running `oto-tools migrate --apply` unless the original arguments already included `--apply`.
+4. Ask for explicit user approval before running `oto migrate --apply` unless the original arguments already included `--apply`.
 5. When applying, pass through `--rename-state-dir`, `--scope`, `--no-backup`, `--force`, and `--project-dir` exactly as supplied.
 6. Report the final exit status and backup directory, then recommend reviewing the project diff before continuing with other workflow commands.
 </process>

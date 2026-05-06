@@ -35,6 +35,7 @@ USAGE
   oto sync --accept-deletion <path>           accept upstream deletion
   oto sync --keep-deleted <path>              keep local copy after delete
   oto sync --status                           show sync pins and conflicts
+  oto migrate [--dry-run | --apply]           convert GSD-era project artifacts
 
 FLAGS
   --config-dir <dir>   target a config dir (single-runtime only)
@@ -60,6 +61,12 @@ async function main(argv) {
   if (argv[0] === 'sync') {
     const { runSync } = require('./lib/sync-cli.cjs');
     const code = await runSync(argv.slice(1));
+    process.exit(code);
+  }
+
+  if (argv[0] === 'migrate') {
+    const migrate = require('../oto/bin/lib/migrate.cjs');
+    const code = await migrate.main(argv.slice(1), process.cwd());
     process.exit(code);
   }
 

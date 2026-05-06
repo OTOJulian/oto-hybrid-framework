@@ -10,7 +10,7 @@ const { spawnSync } = require('node:child_process');
 const REPO_ROOT = path.resolve(__dirname, '..');
 const MIGRATE_PATH = path.join(REPO_ROOT, 'oto/bin/lib/migrate.cjs');
 
-test('oto-tools migrate dispatch supports dry-run, apply, and non-GSD failure', async (t) => {
+test('public oto migrate dispatch supports dry-run, apply, and non-GSD failure', async (t) => {
   let migrate;
   try {
     migrate = require(MIGRATE_PATH);
@@ -30,6 +30,14 @@ test('oto-tools migrate dispatch supports dry-run, apply, and non-GSD failure', 
   fs.writeFileSync(path.join(plainProject, 'README.md'), '# Plain\n');
 
   const tools = path.join(REPO_ROOT, 'oto/bin/lib/oto-tools.cjs');
+  const oto = path.join(REPO_ROOT, 'bin/install.js');
+  const publicDryRun = spawnSync(process.execPath, [oto, 'migrate', '--dry-run'], {
+    cwd: dryFixture,
+    encoding: 'utf8',
+  });
+  assert.equal(publicDryRun.status, 0, `${publicDryRun.stderr}\n${publicDryRun.stdout}`);
+  assert.match(publicDryRun.stdout, /dry-run|files|migrate/i);
+
   const dryRun = spawnSync(process.execPath, [tools, 'migrate', '--dry-run'], {
     cwd: dryFixture,
     encoding: 'utf8',
