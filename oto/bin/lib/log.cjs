@@ -348,10 +348,14 @@ async function writeLogEntry({
   };
   const content = normalizeMd(spliceFrontmatter(body || '', serializedFrontmatter(frontmatter)));
   const result = writeWithCollisionSuffix(logsDir, `${filenameStamp}-${slug}`, '.md', content);
+  if (result.suffix > 1) {
+    frontmatter.slug = deriveLogSlug(normalizedTitle, { collisionSuffix: result.suffix });
+    atomicWriteFileSync(result.path, normalizeMd(spliceFrontmatter(body || '', serializedFrontmatter(frontmatter))));
+  }
 
   return {
     path: result.path,
-    slug,
+    slug: frontmatter.slug,
     suffix: result.suffix,
     frontmatter,
   };

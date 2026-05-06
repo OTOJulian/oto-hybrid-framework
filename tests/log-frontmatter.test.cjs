@@ -78,6 +78,7 @@ test('D-09 writeLogEntry appends -2 and -3 collision suffixes on same-minute dup
   }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-log-'));
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const frontmatter = require(path.join(REPO_ROOT, 'oto/bin/lib/frontmatter.cjs'));
   const date = new Date('2026-05-06T14:30:00Z');
   const args = {
     title: 'Fix the thing',
@@ -91,12 +92,19 @@ test('D-09 writeLogEntry appends -2 and -3 collision suffixes on same-minute dup
     cwd: tmp,
     date,
   };
-  await log.writeLogEntry(args);
-  await log.writeLogEntry(args);
-  await log.writeLogEntry(args);
+  const first = await log.writeLogEntry(args);
+  const second = await log.writeLogEntry(args);
+  const third = await log.writeLogEntry(args);
   assert.equal(fs.existsSync(path.join(tmp, '.oto/logs/20260506-1430-fix-the-thing.md')), true);
   assert.equal(fs.existsSync(path.join(tmp, '.oto/logs/20260506-1430-fix-the-thing-2.md')), true);
   assert.equal(fs.existsSync(path.join(tmp, '.oto/logs/20260506-1430-fix-the-thing-3.md')), true);
+  assert.equal(first.slug, 'fix-the-thing');
+  assert.equal(second.slug, 'fix-the-thing-2');
+  assert.equal(third.slug, 'fix-the-thing-3');
+  assert.equal(frontmatter.extractFrontmatter(fs.readFileSync(second.path, 'utf8')).frontmatter.slug, 'fix-the-thing-2');
+  assert.equal(frontmatter.extractFrontmatter(fs.readFileSync(third.path, 'utf8')).frontmatter.slug, 'fix-the-thing-3');
+  const shown = await log.showLog({ slug: 'fix-the-thing-2', cwd: tmp });
+  assert.equal(shown.path, second.path, 'D-09 suffixed collision slug is addressable');
 });
 
 test('D-11 writeLogEntry frontmatter contains all required keys with correct types', async (t) => {
