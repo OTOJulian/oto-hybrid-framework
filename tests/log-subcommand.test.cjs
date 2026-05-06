@@ -20,6 +20,17 @@ test('D-06 routeSubcommand empty args returns help', () => {
   assert.deepEqual(log.routeSubcommand([]), { sub: 'help', rest: [] }, 'D-06 empty input routes to help');
 });
 
+test('D-06 routeSubcommand routes help flags to help', () => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  assert.deepEqual(log.routeSubcommand(['--help']), { sub: 'help', rest: [] }, 'D-06 --help routes to help');
+  assert.deepEqual(log.routeSubcommand(['-h']), { sub: 'help', rest: [] }, 'D-06 -h routes to help');
+});
+
 test('D-06 routeSubcommand treats reserved words inside a title as oneshot input', () => {
   let log;
   try {
@@ -46,4 +57,3 @@ test('D-08 main rejects empty oneshot title with one-line hint', async (t) => {
   assert.notEqual(exitCode, 0, 'D-08 empty title exits non-zero');
   assert.equal(fs.existsSync(path.join(tmp, '.oto/logs')), false, 'D-08 empty title writes no log');
 });
-

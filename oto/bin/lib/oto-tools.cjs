@@ -332,6 +332,7 @@ async function main() {
   // ignoring them can cause destructive operations to proceed unchecked.
   const NEVER_VALID_FLAGS = new Set(['-h', '--help', '-?', '--h', '--version', '-v', '--usage']);
   for (const arg of args) {
+    if (command === 'log' && (arg === '--help' || arg === '-h')) continue;
     if (NEVER_VALID_FLAGS.has(arg)) {
       error(`Unknown flag: ${arg}\noto-tools does not accept help or version flags. Run "oto-tools" with no arguments for usage.`);
     }

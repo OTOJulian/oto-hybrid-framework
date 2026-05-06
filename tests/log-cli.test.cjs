@@ -48,6 +48,29 @@ test('D-08 D-22 oto-tools log empty title exits non-zero with hint', (t) => {
   assert.ok(result.stderr.includes('/oto-log requires a title'), 'D-08 empty title hint is written to stderr');
 });
 
+test('D-06 D-22 oto log help exits zero and lists subcommands', (t) => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  assert.equal(typeof log.main, 'function', 'D-22 log help is handled by log.main');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-log-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+
+  for (const command of [
+    [OTO_TOOLS, 'log', '--help'],
+    [INSTALL_JS, 'log', '--help'],
+  ]) {
+    const result = spawnSync(process.execPath, command, { cwd: tmp, encoding: 'utf8' });
+    assert.equal(result.status, 0, `${result.stderr}\n${result.stdout}`);
+    for (const word of ['start', 'end', 'list', 'show', 'promote']) {
+      assert.ok(result.stdout.includes(word), `D-06 help lists ${word}`);
+    }
+  }
+});
+
 test('D-17 D-22 oto-tools log title writes a oneshot log', (t) => {
   let log;
   try {

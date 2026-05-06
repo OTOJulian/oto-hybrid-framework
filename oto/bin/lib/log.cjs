@@ -152,6 +152,7 @@ function deriveLogSlug(title, { collisionSuffix } = {}) {
 function routeSubcommand(args) {
   if (!args || args.length === 0) return { sub: 'help', rest: [] };
   const first = args[0];
+  if (first === '--help' || first === '-h') return { sub: 'help', rest: args.slice(1) };
   if (SUBCOMMANDS.has(first)) return { sub: first, rest: args.slice(1) };
   return { sub: 'oneshot', rest: args };
 }
