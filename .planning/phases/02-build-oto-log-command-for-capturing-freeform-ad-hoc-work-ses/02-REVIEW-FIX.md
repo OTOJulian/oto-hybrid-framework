@@ -1,24 +1,25 @@
 ---
 phase: 02-build-oto-log-command-for-capturing-freeform-ad-hoc-work-ses
-fixed_at: 2026-05-06T20:06:07Z
+fixed_at: 2026-05-06T20:16:15Z
 review_path: .planning/phases/02-build-oto-log-command-for-capturing-freeform-ad-hoc-work-ses/02-REVIEW.md
-iteration: 1
-findings_in_scope: 7
-fixed: 7
+iteration: 2
+findings_in_scope: 8
+fixed: 8
 skipped: 0
 status: all_fixed
 ---
 
 # Phase 02: Code Review Fix Report
 
-**Fixed at:** 2026-05-06T20:06:07Z
+**Fixed at:** 2026-05-06T20:16:15Z
 **Source review:** .planning/phases/02-build-oto-log-command-for-capturing-freeform-ad-hoc-work-ses/02-REVIEW.md
-**Iteration:** 1
+**Iteration:** 2
 
 **Summary:**
-- Findings in scope: 7
-- Fixed: 7
+- Findings in scope: 8
+- Fixed: 8
 - Skipped: 0
+- Cumulative status: all in-scope iteration 1 and iteration 2 findings fixed
 
 ## Fixed Issues
 
@@ -71,6 +72,13 @@ status: all_fixed
 **Status:** fixed
 **Applied fix:** Added the public `oto log <title>|start|end|list|show|promote` help row and top-level help coverage.
 
+### CR-01 (iteration 2): Re-promoting a log can overwrite an edited quick plan
+
+**Files modified:** `oto/bin/lib/log.cjs`, `tests/log-promote.test.cjs`
+**Commit:** 6dc54a5
+**Status:** fixed: requires human verification
+**Applied fix:** Added promotion guards that reject logs whose frontmatter is already `promoted: true` and reject deterministic quick `PLAN.md` collisions before writing. Added regression coverage proving repeated quick promotion fails and preserves an edited plan, plus coverage for an unpromoted log colliding with an existing quick plan.
+
 ## Skipped Issues
 
 None -- all in-scope findings were fixed.
@@ -105,23 +113,45 @@ Full log suite:
 $ node --test tests/log-*.test.cjs
 TAP version 13
 ...
-1..69
-# tests 69
+1..71
+# tests 71
 # suites 0
-# pass 69
+# pass 71
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 2129.278708
+# duration_ms 2865.733292
+```
+
+Iteration 2 targeted checks:
+- Re-read modified sections in `oto/bin/lib/log.cjs` and `tests/log-promote.test.cjs`.
+- Ran `node -c oto/bin/lib/log.cjs`.
+- Ran `node -c tests/log-promote.test.cjs`.
+- Ran `node --test tests/log-promote.test.cjs` before the production fix and confirmed the new regression tests failed because repeated promotion and plan collisions were not rejected.
+
+```text
+$ node --test tests/log-promote.test.cjs
+1..8
+# tests 8
+# pass 8
+# fail 0
+```
+
+```text
+$ node --test tests/log-cli.test.cjs
+1..14
+# tests 14
+# pass 14
+# fail 0
 ```
 
 ## Residual Risks
 
-WR-03 and WR-05 changed behavior rather than only syntax or static structure. They are covered by targeted regression tests, but remain marked `fixed: requires human verification` per review-fix logic-bug policy.
+WR-03, WR-05, and the iteration 2 CR-01 changed behavior rather than only syntax or static structure. They are covered by targeted regression tests, but remain marked `fixed: requires human verification` per review-fix logic-bug policy.
 
 ---
 
-_Fixed: 2026-05-06T20:06:07Z_
+_Fixed: 2026-05-06T20:16:15Z_
 _Fixer: Claude (gsd-code-fixer)_
-_Iteration: 1_
+_Iteration: 2_
