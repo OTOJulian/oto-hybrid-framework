@@ -24,7 +24,11 @@ INIT=$(oto-sdk query init.resume)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Parse JSON for: `state_exists`, `roadmap_exists`, `project_exists`, `planning_exists`, `has_interrupted_agent`, `interrupted_agent_id`, `commit_docs`.
+Parse JSON for: `state_exists`, `roadmap_exists`, `project_exists`, `planning_exists`, `state_path`, `project_path`, `has_interrupted_agent`, `interrupted_agent_id`, `commit_docs`.
+
+```bash
+PLANNING_ROOT=$(dirname "$state_path")
+```
 
 **If `state_exists` is true:** Proceed to load_state
 **If `state_exists` is false but `roadmap_exists` or `project_exists` is true:** Offer to reconstruct STATE.md
@@ -36,8 +40,8 @@ Parse JSON for: `state_exists`, `roadmap_exists`, `project_exists`, `planning_ex
 Read and parse STATE.md, then PROJECT.md:
 
 ```bash
-cat .oto/STATE.md
-cat .oto/PROJECT.md
+cat "$state_path"
+cat "$project_path"
 ```
 
 **From STATE.md extract:**
@@ -67,10 +71,10 @@ Look for incomplete work that needs attention:
 cat .oto/HANDOFF.json 2>/dev/null || true
 
 # Check for continue-here files (mid-plan resumption)
-ls .oto/phases/*/.continue-here*.md 2>/dev/null || true
+ls "$PLANNING_ROOT"/phases/*/.continue-here*.md 2>/dev/null || true
 
 # Check for open log session (D-16)
-ACTIVE_SESSION=".oto/logs/.active-session.json"
+ACTIVE_SESSION="$PLANNING_ROOT/logs/.active-session.json"
 if [ -f "$ACTIVE_SESSION" ]; then
   ACTIVE_TITLE=$(node -e "try { console.log(JSON.parse(require('fs').readFileSync('$ACTIVE_SESSION','utf8')).title || ''); } catch (_) {}")
   ACTIVE_START=$(node -e "try { console.log(JSON.parse(require('fs').readFileSync('$ACTIVE_SESSION','utf8')).start_time || ''); } catch (_) {}")
@@ -78,7 +82,7 @@ if [ -f "$ACTIVE_SESSION" ]; then
 fi
 
 # Check for plans without summaries (incomplete execution)
-for plan in .oto/phases/*/*-PLAN.md; do
+for plan in "$PLANNING_ROOT"/phases/*/*-PLAN.md; do
   [ -e "$plan" ] || continue
   summary="${plan/PLAN/SUMMARY}"
   [ ! -f "$summary" ] && echo "Incomplete: $plan"
@@ -107,7 +111,7 @@ fi
 - Read the file for specific resumption context
 - Flag: "Found mid-plan checkpoint"
 
-**If `.oto/logs/.active-session.json` exists (D-16):**
+**If `$PLANNING_ROOT/logs/.active-session.json` exists (D-16):**
 
 - An ad-hoc `/oto-log` session was started but never ended
 - Surface as: `Found open log session: <title> started at <time>. Run /oto-log end to close it, or continue working.`
@@ -131,8 +135,9 @@ Present complete project status to user:
 ```bash
 # Latest log Summary as "where were we?" hint (D-15)
 LATEST_LOG=""
-if compgen -G ".oto/logs/*.md" > /dev/null 2>&1; then
-  LATEST_LOG=$(ls -1 .oto/logs/*.md 2>/dev/null | grep -v '/\.' | sort -r | head -1)
+LOG_GLOB="$PLANNING_ROOT/logs/*.md"
+if compgen -G "$LOG_GLOB" > /dev/null 2>&1; then
+  LATEST_LOG=$(ls -1 $LOG_GLOB 2>/dev/null | grep -v '/\.' | sort -r | head -1)
 fi
 LATEST_LOG_SUMMARY=""
 if [ -n "$LATEST_LOG" ]; then

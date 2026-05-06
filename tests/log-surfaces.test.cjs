@@ -27,7 +27,9 @@ test('D-13 progress.md Recent Activity step interleaves logs and summaries chron
   assert.equal(typeof log.listLogs, 'function', 'D-13 log list API exists for Recent Activity');
   const body = fs.readFileSync(PROGRESS_PATH, 'utf8');
   assert.ok(body.includes('Recent Activity'), 'D-13 progress surface is named Recent Activity');
-  assert.match(body, /\.oto\/logs\/|logs\//, 'D-13 Recent Activity reads log entries');
+  assert.match(body, /PLANNING_ROOT=.*state_path/, 'D-13 Recent Activity derives planning root from state_path');
+  assert.match(body, /LOG_GLOB=.*logs\/\*\.md/, 'D-13 Recent Activity reads log entries from planning root');
+  assert.match(body, /SUMMARY_GLOB=.*phases\/\*\/\*-SUMMARY\.md/, 'D-13 Recent Activity reads summaries from planning root');
   assert.match(body, /\*-SUMMARY\.md|-SUMMARY\.md/, 'D-13 Recent Activity reads phase summaries');
 });
 
@@ -43,7 +45,7 @@ test('D-13 progress.md does not contain literal Recent Work heading anymore', ()
   assert.equal(/#{1,2}\s+Recent Work/.test(body), false, 'D-13 Recent Work heading is replaced');
 });
 
-test('D-16 resume-project.md checks .oto/logs/.active-session.json in check_incomplete_work', () => {
+test('D-16 resume-project.md checks planning-root active-session.json in check_incomplete_work', () => {
   let log;
   try {
     log = require(LOG_PATH);
@@ -53,6 +55,8 @@ test('D-16 resume-project.md checks .oto/logs/.active-session.json in check_inco
   assert.equal(typeof log.startSession, 'function', 'D-16 session API exists for resume surface');
   const body = fs.readFileSync(RESUME_PATH, 'utf8');
   assert.ok(body.includes('.active-session.json'), 'D-16 resume checks active log session file');
+  assert.match(body, /PLANNING_ROOT=.*state_path/, 'D-16 resume derives planning root from state_path');
+  assert.match(body, /ACTIVE_SESSION="\$PLANNING_ROOT\/logs\/\.active-session\.json"/, 'D-16 resume checks active session under planning root');
   assert.match(body, /check_incomplete_work[\s\S]*open log session/i, 'D-16 resume surfaces open log session hint');
 });
 
@@ -65,7 +69,7 @@ test('D-15 resume-project.md surfaces latest log Summary line in present_status'
   }
   assert.equal(typeof log.showLog, 'function', 'D-15 show API exists for latest-log summary');
   const body = fs.readFileSync(RESUME_PATH, 'utf8');
-  assert.match(body, /present_status[\s\S]*\.oto\/logs\/[\s\S]*## Summary/s, 'D-15 resume reads latest log Summary section');
+  assert.match(body, /present_status[\s\S]*LOG_GLOB="\$PLANNING_ROOT\/logs\/\*\.md"[\s\S]*## Summary/s, 'D-15 resume reads latest log Summary section from planning root');
 });
 
 test('D-14 STATE.md md5 unchanged after running /oto-log oneshot', (t) => {
@@ -110,4 +114,3 @@ test('D-13 Recent Activity golden render sorts summaries and logs chronologicall
     'D-13 summaries and logs render in descending chronology'
   );
 });
-

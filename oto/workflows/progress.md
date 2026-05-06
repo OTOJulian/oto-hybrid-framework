@@ -84,12 +84,16 @@ Use this instead of manually reading/parsing ROADMAP.md.
 <step name="recent">
 **Gather Recent Activity (interleaved logs + summaries, newest 5):**
 
-Two extraction paths feed one chronological list. Logs come from `.oto/logs/*.md`; summaries from `.oto/phases/*/*-SUMMARY.md`. Both are decorated with a leading timestamp and kind tag, sorted descending, and sliced to the top 5.
+Two extraction paths feed one chronological list. Logs come from the resolved planning root's `logs/*.md`; summaries from its `phases/*/*-SUMMARY.md`. Both are decorated with a leading timestamp and kind tag, sorted descending, and sliced to the top 5.
 
 ```bash
+PLANNING_ROOT=$(dirname "$state_path")
+LOG_GLOB="$PLANNING_ROOT/logs/*.md"
+SUMMARY_GLOB="$PLANNING_ROOT/phases/*/*-SUMMARY.md"
+
 LOG_LINES=()
-if compgen -G ".oto/logs/*.md" > /dev/null 2>&1; then
-  for f in .oto/logs/*.md; do
+if compgen -G "$LOG_GLOB" > /dev/null 2>&1; then
+  for f in $LOG_GLOB; do
     bn=$(basename "$f")
     case "$bn" in .*) continue ;; esac
     date=$(oto-sdk query frontmatter.get "$f" date --raw 2>/dev/null || echo "")
@@ -102,8 +106,8 @@ if compgen -G ".oto/logs/*.md" > /dev/null 2>&1; then
 fi
 
 SUM_LINES=()
-if compgen -G ".oto/phases/*/*-SUMMARY.md" > /dev/null 2>&1; then
-  for f in .oto/phases/*/*-SUMMARY.md; do
+if compgen -G "$SUMMARY_GLOB" > /dev/null 2>&1; then
+  for f in $SUMMARY_GLOB; do
     one_liner=$(oto-sdk query summary-extract "$f" --fields one_liner 2>/dev/null || echo "")
     completed=$(oto-sdk query frontmatter.get "$f" completed --raw 2>/dev/null || echo "")
     phase=$(oto-sdk query frontmatter.get "$f" phase --raw 2>/dev/null || echo "")
