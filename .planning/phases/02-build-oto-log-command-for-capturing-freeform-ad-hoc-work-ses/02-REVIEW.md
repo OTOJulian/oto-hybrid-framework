@@ -1,6 +1,6 @@
 ---
 phase: 02-build-oto-log-command-for-capturing-freeform-ad-hoc-work-ses
-reviewed: 2026-05-06T20:11:42Z
+reviewed: 2026-05-06T20:20:50Z
 depth: standard
 files_reviewed: 21
 files_reviewed_list:
@@ -26,73 +26,39 @@ files_reviewed_list:
   - tests/log-surfaces.test.cjs
   - tests/log-write.test.cjs
 findings:
-  critical: 1
+  critical: 0
   warning: 0
   info: 0
-  total: 1
-status: issues_found
+  total: 0
+status: clean
 ---
 
 # Phase 02: Code Review Report
 
-**Reviewed:** 2026-05-06T20:11:42Z
+**Reviewed:** 2026-05-06T20:20:50Z
 **Depth:** standard
 **Files Reviewed:** 21
-**Status:** issues_found
+**Status:** clean
 
 ## Summary
 
-Re-reviewed the Phase 02 `/oto-log` implementation, command markdown, progress/resume surfaces, command indexes, runtime matrix, and log test suite after `02-REVIEW-FIX.md`.
+Final standard re-review after fixes through commit `6dc54a5` and the updated `02-REVIEW-FIX.md`.
 
-The previous CR-01 and WR-01..WR-06 are resolved:
-- Prior CR-01: diff DATA markers are escaped before wrapping.
-- Prior WR-01: `oto log --help` and `oto-tools log --help` exit 0 and list subcommands.
-- Prior WR-02: `oto log end --body` passes the parsed body into `endSession()`.
-- Prior WR-03: collision suffixes are persisted into returned and frontmatter slugs.
-- Prior WR-04: log-related progress/resume surfaces derive log/session paths from `state_path`'s planning root.
-- Prior WR-05: oneshot capture uses the latest concrete prior log boundary and persists concrete `HEAD` as `diff_to`.
-- Prior WR-06: top-level `oto --help` lists `oto log`.
+The iteration 2 quick-promotion overwrite issue is resolved. `promoteLog()` now rejects logs whose frontmatter is already `promoted: true` before writing, and it rejects deterministic quick `PLAN.md` collisions before creating a quick plan. The regression coverage verifies repeated quick promotion fails without overwriting an edited plan, and verifies an unpromoted log cannot overwrite an existing quick plan.
 
-Verification run:
+All reviewed files meet quality standards. No issues found.
 
-```bash
-node --test tests/log-*.test.cjs
-node --test tests/phase-08-runtime-matrix-render.test.cjs
-```
+## Verification
 
-Both commands passed.
-
-## Critical Issues
-
-### CR-01: Re-promoting a log can overwrite an edited quick plan
-
-**File:** `oto/bin/lib/log.cjs:585`
-
-**Issue:** `promoteLog({ target: 'quick' })` writes a deterministic `.oto/quick/{YYYYMMDD}-{slug}/PLAN.md` path with `atomicWriteFileSync()` and does not check whether the source log is already promoted or whether the target plan already exists. If a user promotes a log, edits the seeded quick `PLAN.md`, and accidentally runs the same promote command again, the edited plan is overwritten.
-
-**Fix:**
-
-```js
-const source = await showLog({ slug, cwd: projectDir });
-if (source.frontmatter.promoted === true) {
-  throw new Error(`log already promoted: ${source.frontmatter.slug}`);
-}
-
-if (target === 'quick') {
-  const dateCompact = String(source.frontmatter.date || '').slice(0, 10).replace(/-/g, '');
-  const quickDir = path.join(planningRoot, 'quick', `${dateCompact}-${source.frontmatter.slug}`);
-  const planPath = path.join(quickDir, 'PLAN.md');
-  if (fs.existsSync(planPath)) {
-    throw new Error(`quick plan already exists: ${path.relative(planningRoot, planPath)}`);
-  }
-  // existing write follows
-}
-```
-
-Add a regression test that promotes a log to quick, edits the generated `PLAN.md`, runs the same promotion again, and asserts the second command fails without changing the edited file.
+- `node -c oto/bin/lib/log.cjs` passed.
+- `node -c oto/bin/lib/oto-tools.cjs` passed.
+- `node -c bin/install.js` passed.
+- `node --test tests/log-promote.test.cjs` passed: 8 tests, 8 pass.
+- `node --test tests/log-*.test.cjs` passed: 71 tests, 71 pass.
+- `git diff --check -- <review scope>` passed with no whitespace errors.
 
 ---
 
-_Reviewed: 2026-05-06T20:11:42Z_
+_Reviewed: 2026-05-06T20:20:50Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
