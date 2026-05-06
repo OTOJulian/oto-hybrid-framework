@@ -234,6 +234,37 @@ function capDiff(text) {
   return `${text.slice(0, DIFF_CAP)}\n... <truncated>`;
 }
 
+function isConcreteDiffBoundary(value) {
+  return typeof value === 'string' && /^[0-9a-f]{7,40}$/i.test(value);
+}
+
+function readLatestConcreteLogBoundary(projectDir) {
+  const logsDir = path.join(planningDir(projectDir), 'logs');
+  if (!fs.existsSync(logsDir)) return null;
+
+  const entries = [];
+  for (const name of fs.readdirSync(logsDir)) {
+    if (!name.endsWith('.md') || name.startsWith('.')) continue;
+    try {
+      const filePath = path.join(logsDir, name);
+      const parsed = extractFrontmatter(fs.readFileSync(filePath, 'utf8'));
+      const diffTo = parsed.frontmatter.diff_to;
+      if (isConcreteDiffBoundary(diffTo)) {
+        entries.push({
+          date: parsed.frontmatter.date || '',
+          name,
+          diffTo,
+        });
+      }
+    } catch {
+      // Ignore malformed logs; capture should still fall back to HEAD.
+    }
+  }
+
+  entries.sort((a, b) => b.date.localeCompare(a.date) || b.name.localeCompare(a.name));
+  return entries.length ? entries[0].diffTo : null;
+}
+
 function normalizeQuestion(question) {
   return String(question || '')
     .replace(/^\s*-\s*/, '')
@@ -270,7 +301,8 @@ async function captureEvidence({ since, mode, cwd } = {}) {
     };
   }
 
-  const resolvedSince = since || head;
+  const priorBoundary = since ? null : readLatestConcreteLogBoundary(projectDir);
+  const resolvedSince = since || priorBoundary || head;
   let rawDiff = '';
   let filesTouched = [];
   let statusText = '';
@@ -305,7 +337,7 @@ async function captureEvidence({ since, mode, cwd } = {}) {
 
   return {
     diff_from: resolvedSince,
-    diff_to: 'HEAD',
+    diff_to: head,
     diff_text: wrapData(capDiff(rawDiff)),
     files_touched: filesTouched,
     status_text: statusText,
@@ -428,7 +460,7 @@ async function endSession({
     body: composedBody,
     mode: 'session',
     diff_from: session.start_ref,
-    diff_to: 'HEAD',
+    diff_to: evidence.diff_to,
     files_touched: evidence.files_touched,
     open_questions: [],
     cwd: projectDir,

@@ -58,6 +58,39 @@ test('D-01 captureEvidence in oneshot mode defaults since to last commit when no
   assert.equal(result.diff_from, head, 'D-01 oneshot capture defaults to HEAD when no prior log exists');
 });
 
+test('D-01 captureEvidence in oneshot mode defaults since to latest concrete log boundary', async (t) => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  const tmp = seedGitFixture(t);
+  const firstSha = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).stdout.trim();
+  await log.writeLogEntry({
+    title: 'Prior captured work',
+    body: '## Summary\n\nPrior.\n',
+    mode: 'oneshot',
+    diff_from: firstSha,
+    diff_to: firstSha,
+    cwd: tmp,
+    date: new Date('2026-05-06T14:30:00Z'),
+  });
+
+  fs.appendFileSync(path.join(tmp, 'seed.md'), '\nCommitted line after log\n');
+  spawnSync('git', ['add', 'seed.md'], { cwd: tmp, encoding: 'utf8' });
+  spawnSync('git', ['-c', 'user.email=t@t.t', '-c', 'user.name=T', 'commit', '-m', 'after-log'], {
+    cwd: tmp,
+    encoding: 'utf8',
+  });
+  const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).stdout.trim();
+  fs.appendFileSync(path.join(tmp, 'seed.md'), '\nUncommitted line after log\n');
+
+  const result = await log.captureEvidence({ mode: 'oneshot', cwd: tmp });
+  assert.equal(result.diff_from, firstSha, 'D-01 oneshot capture uses prior log diff_to before current HEAD');
+  assert.equal(result.diff_to, head, 'D-01 oneshot capture persists concrete HEAD SHA as diff_to');
+});
+
 test('D-02 captureEvidence degrades gracefully when git is unavailable', async (t) => {
   let log;
   try {
@@ -89,4 +122,3 @@ test('D-02 captureEvidence files_touched is extracted as relative clean paths', 
     assert.equal(file.includes('"'), false, 'D-02 files_touched is not quoted');
   }
 });
-
