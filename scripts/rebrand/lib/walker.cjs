@@ -59,13 +59,25 @@ function hasNulByte(buffer) {
 }
 
 function normalizeRelPath(relPath) {
-  return relPath.split(path.sep).join('/');
+  return relPath.split(path.sep).join('/').replace(/\/+$/g, '');
 }
 
-function isScratchPath(relPath) {
+function normalizeSkipRelPaths(skipRelPaths = []) {
+  return skipRelPaths
+    .map((relPath) => normalizeRelPath(String(relPath || '')))
+    .filter(Boolean);
+}
+
+function isSkippedByRelPath(relPath, skipRelPaths = []) {
+  const normalized = normalizeRelPath(relPath);
+  return skipRelPaths.some((skipRelPath) => normalized === skipRelPath || normalized.startsWith(`${skipRelPath}/`));
+}
+
+function isScratchPath(relPath, skipRelPaths = []) {
   if (relPath.split(path.sep).some((part) => SCRATCH_DIRS.has(part))) return true;
   const normalized = normalizeRelPath(relPath);
-  return SCRATCH_PATH_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`));
+  if (SCRATCH_PATH_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`))) return true;
+  return isSkippedByRelPath(normalized, skipRelPaths);
 }
 
 function matchesPathGlob(relPath, pathGlobs) {
@@ -87,11 +99,12 @@ function collectEntries(root) {
   });
 }
 
-async function* walk(root, allowlist = compileAllowlist(), inventoryByPath = new Map()) {
+async function* walk(root, allowlist = compileAllowlist(), inventoryByPath = new Map(), options = {}) {
+  const skipRelPaths = normalizeSkipRelPaths(options.skipRelPaths || []);
   const entries = collectEntries(root);
   for (const { entry, absPath } of entries) {
     const relPath = path.relative(root, absPath);
-    if (!relPath || isScratchPath(relPath) || !entry.isFile() || isBinaryByExtension(relPath)) continue;
+    if (!relPath || isScratchPath(relPath, skipRelPaths) || !entry.isFile() || isBinaryByExtension(relPath)) continue;
 
     const buffer = fs.readFileSync(absPath);
     if (hasNulByte(buffer)) continue;
@@ -108,6 +121,7 @@ module.exports = {
   globToRegExp,
   isBinaryByExtension,
   isScratchPath,
+  isSkippedByRelPath,
   lookupFileClass,
   walk
 };

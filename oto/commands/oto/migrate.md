@@ -15,7 +15,7 @@ allowed-tools:
 <objective>
 Migrate a project that was previously set up by Get Shit Done (GSD) so its planning artifacts and instruction files speak oto's command surface.
 
-Migrate is a project-level converter, not an installer. It operates on the user's project tree, including planning state, roadmap, project docs, phase directories, and root-level `CLAUDE.md` / `AGENTS.md` / `GEMINI.md`. It skips archived Claude Code, Codex, and Gemini runtime agent worktrees inside the project. It does not touch the user's runtime config dirs in their home directory; those remain owned by `oto install`.
+Migrate is a project-level converter, not an installer. It operates on the user's project tree, including planning state, roadmap, project docs, phase directories, and root-level `CLAUDE.md` / `AGENTS.md` / `GEMINI.md`. It skips archived Claude Code, Codex, and Gemini runtime agent worktrees inside the project, plus untracked files ignored by the target project's gitignore rules. It does not touch the user's runtime config dirs in their home directory; those remain owned by `oto install`.
 
 Default behavior is dry-run: produce a classified report and write nothing. The user must pass `--apply` for migrate to make changes. A timestamped backup is created at `.oto-migrate-backup/<timestamp>/` unless `--no-backup` is given.
 

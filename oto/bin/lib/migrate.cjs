@@ -13,6 +13,7 @@ const fsp = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 const crypto = require('node:crypto');
+const { spawnSync } = require('node:child_process');
 const engine = require('../../../scripts/rebrand/lib/engine.cjs');
 
 const RENAME_MAP_CANDIDATES = [
@@ -93,6 +94,27 @@ function buildMigrateMapPath() {
     mapPath,
     cleanup: () => fs.rmSync(mapPath, { force: true })
   };
+}
+
+function listIgnoredUntrackedPaths(projectDir) {
+  const result = spawnSync('git', [
+    '-C',
+    projectDir,
+    'ls-files',
+    '--others',
+    '--ignored',
+    '--exclude-standard',
+    '--directory'
+  ], {
+    encoding: 'utf8',
+    maxBuffer: 50 * 1024 * 1024
+  });
+  if (result.status !== 0) return [];
+  return result.stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/\/+$/g, ''))
+    .filter(Boolean)
+    .filter((relPath) => !relPath.startsWith('../') && !path.isAbsolute(relPath));
 }
 
 function detectGsdProject(projectDir) {
@@ -213,7 +235,8 @@ async function _applyToStaging(projectDir, opts = {}) {
       force: true,
       owner: opts.owner || 'OTOJulian',
       mapPath,
-      reportsDir: stagingReportsDir
+      reportsDir: stagingReportsDir,
+      skipRelPaths: listIgnoredUntrackedPaths(abs)
     });
     if (engineResult.exitCode !== 0) {
       const error = new Error('engine apply failed: exitCode=' + engineResult.exitCode);
@@ -434,7 +457,8 @@ async function dryRun(projectDir, opts = {}) {
       target: abs,
       owner: opts.owner || 'OTOJulian',
       mapPath,
-      reportsDir
+      reportsDir,
+      skipRelPaths: listIgnoredUntrackedPaths(abs)
     });
     const reportPath = path.join(reportsDir, 'rebrand-dryrun.json');
     const report = fs.existsSync(reportPath) ? JSON.parse(fs.readFileSync(reportPath, 'utf8')) : { files: [], summary_by_rule_type: {} };

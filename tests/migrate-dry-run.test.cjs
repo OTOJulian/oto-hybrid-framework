@@ -26,6 +26,22 @@ function addRuntimeWorktree(root) {
   return relPath;
 }
 
+function addGitignoredResult(root) {
+  const relPath = path.join('docs', 'results', 'phase-11-ab.html');
+  const filePath = path.join(root, relPath);
+  fs.writeFileSync(path.join(root, '.gitignore'), 'docs/results/\n');
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, [
+    '<html>',
+    '<body>Local generated result with GSD, gsd, and /gsd-execute-phase tokens.</body>',
+    '</html>',
+    ''
+  ].join('\n'));
+  const init = spawnSync('git', ['init'], { cwd: root, encoding: 'utf8' });
+  assert.equal(init.status, 0, `${init.stderr}\n${init.stdout}`);
+  return relPath;
+}
+
 function fileManifest(root) {
   const entries = [];
   function walk(dir) {
@@ -91,4 +107,26 @@ test('dryRun excludes runtime agent worktrees from report scope', async (t) => {
   assert.equal(result.files.some((file) => file.path === worktreeRelPath), false);
   assert.equal(result.files.some((file) => file.path.startsWith(path.join('.claude', 'worktrees'))), false);
   assert.ok(fs.readFileSync(path.join(fixture, worktreeRelPath), 'utf8').includes('/gsd-execute-phase'));
+});
+
+test('dryRun excludes untracked gitignored generated artifacts from report scope', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal'), fixture, { recursive: true });
+  const ignoredRelPath = addGitignoredResult(fixture);
+
+  const result = await migrate.dryRun(fixture);
+
+  assert.equal(result.mode, 'dry-run');
+  assert.equal(result.exitCode, 0);
+  assert.equal(result.files.some((file) => file.path === ignoredRelPath), false);
+  assert.ok(fs.readFileSync(path.join(fixture, ignoredRelPath), 'utf8').includes('/gsd-execute-phase'));
 });

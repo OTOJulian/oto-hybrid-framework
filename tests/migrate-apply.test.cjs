@@ -26,6 +26,22 @@ function addRuntimeWorktree(root) {
   return relPath;
 }
 
+function addGitignoredResult(root) {
+  const relPath = path.join('docs', 'results', 'phase-11-ab.html');
+  const filePath = path.join(root, relPath);
+  fs.writeFileSync(path.join(root, '.gitignore'), 'docs/results/\n');
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, [
+    '<html>',
+    '<body>Local generated result with GSD, gsd, and /gsd-execute-phase tokens.</body>',
+    '</html>',
+    ''
+  ].join('\n'));
+  const init = spawnSync('git', ['init'], { cwd: root, encoding: 'utf8' });
+  assert.equal(init.status, 0, `${init.stderr}\n${init.stdout}`);
+  return relPath;
+}
+
 function fileManifest(root) {
   const entries = [];
   function walk(dir) {
@@ -129,4 +145,30 @@ test('apply leaves runtime agent worktrees untouched', async (t) => {
   assert.ok(state.includes('oto_state_version'));
   assert.equal(after, before);
   assert.equal(result.filesChanged.some((relPath) => relPath.startsWith(path.join('.claude', 'worktrees'))), false);
+});
+
+test('apply leaves untracked gitignored generated artifacts untouched', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const sourceFixture = path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(sourceFixture, fixture, { recursive: true });
+  const ignoredRelPath = addGitignoredResult(fixture);
+  const before = fs.readFileSync(path.join(fixture, ignoredRelPath), 'utf8');
+
+  const result = await migrate.apply(fixture, {});
+  const after = fs.readFileSync(path.join(fixture, ignoredRelPath), 'utf8');
+  const state = fs.readFileSync(path.join(fixture, '.planning/STATE.md'), 'utf8');
+
+  assert.equal(result.exitCode, 0);
+  assert.ok(state.includes('oto_state_version'));
+  assert.equal(after, before);
+  assert.equal(result.filesChanged.includes(ignoredRelPath), false);
 });

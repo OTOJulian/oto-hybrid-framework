@@ -32,5 +32,6 @@ test('oto migrate command markdown declares command metadata and execution conte
   assert.ok(body.includes('oto migrate'));
   assert.equal(body.includes('oto-tools migrate'), false);
   assert.ok(body.includes('Claude Code, Codex, and Gemini runtime agent worktrees'));
+  assert.ok(body.includes('untracked files ignored by the target project'));
   assert.equal(body.includes('.claude/worktrees/'), false);
 });
