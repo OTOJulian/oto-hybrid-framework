@@ -49,4 +49,4 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Wave 0: 12 log-*.test.cjs scaffolds + 4 fixture trees (RED for Wave 1+2 to close)
 - [x] 02-02-PLAN.md — Wave 1: oto/bin/lib/log.cjs library (deriveLogSlug, routeSubcommand, captureEvidence, writeLogEntry, startSession, endSession, listLogs, showLog, promoteLog, main) — closes D-01, D-02, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-18, D-19, D-20, D-21
-- [ ] 02-03-PLAN.md — Wave 2: oto-tools log dispatch + public oto log dispatch + oto/commands/oto/log.md + progress.md Recent Activity edit + resume-project.md active-session.json check + .gitignore entry — closes D-03, D-04, D-05, D-13, D-14, D-15, D-16, D-17, D-22
+- [x] 02-03-PLAN.md — Wave 2: oto-tools log dispatch + public oto log dispatch + oto/commands/oto/log.md + progress.md Recent Activity edit + resume-project.md active-session.json check + .gitignore entry — closes D-03, D-04, D-05, D-13, D-14, D-15, D-16, D-17, D-22
