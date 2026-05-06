@@ -55,6 +55,7 @@ The next milestone should define fresh requirements before new roadmap phases ar
 ### Roadmap Evolution
 
 - Phase 1 added: Add /oto:migrate — a command that converts a GSD-era project's planning artifacts to oto's command surface.
+- Phase 2 added: Build /oto-log command for capturing freeform/ad-hoc work sessions as first-class tracked artifacts surfaced by /oto-progress and /oto-resume-work
 
 ### Quick Tasks Completed
 
