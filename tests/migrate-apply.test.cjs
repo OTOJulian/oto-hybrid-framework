@@ -42,6 +42,19 @@ function addGitignoredResult(root) {
   return relPath;
 }
 
+function addProjectLocalRuntimeSupport(root) {
+  const relPath = path.join('.claude', 'get-shit-done', 'workflows', 'add-phase.md');
+  const filePath = path.join(root, relPath);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, [
+    '# Add phase',
+    '',
+    'Support file under .claude/get-shit-done with /gsd-add-phase.',
+    ''
+  ].join('\n'));
+  return relPath;
+}
+
 function fileManifest(root) {
   const entries = [];
   function walk(dir) {
@@ -171,4 +184,35 @@ test('apply leaves untracked gitignored generated artifacts untouched', async (t
   assert.ok(state.includes('oto_state_version'));
   assert.equal(after, before);
   assert.equal(result.filesChanged.includes(ignoredRelPath), false);
+});
+
+test('apply renames project-local get-shit-done runtime support directory to oto', async (t) => {
+  let migrate;
+  try {
+    migrate = require(MIGRATE_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load migrate.cjs from ${MIGRATE_PATH}: ${error.message}`);
+  }
+
+  const sourceFixture = path.join(REPO_ROOT, 'tests/fixtures/gsd-project-minimal');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-migrate-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const fixture = path.join(tmp, 'fixture');
+  fs.cpSync(sourceFixture, fixture, { recursive: true });
+  const legacyRelPath = addProjectLocalRuntimeSupport(fixture);
+  const legacyBefore = fs.readFileSync(path.join(fixture, legacyRelPath), 'utf8');
+
+  const result = await migrate.apply(fixture, {});
+  const otoRelPath = path.join('.claude', 'oto', 'workflows', 'add-phase.md');
+  const otoText = fs.readFileSync(path.join(fixture, otoRelPath), 'utf8');
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(fs.existsSync(path.join(fixture, legacyRelPath)), false);
+  assert.equal(fs.existsSync(path.join(fixture, '.claude', 'get-shit-done')), false);
+  assert.ok(otoText.includes('/oto-add-phase'));
+  assert.equal(otoText.includes('/gsd-add-phase'), false);
+  assert.equal(
+    fs.readFileSync(path.join(result.backupDir, legacyRelPath), 'utf8'),
+    legacyBefore
+  );
 });

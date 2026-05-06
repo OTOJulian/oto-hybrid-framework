@@ -22,6 +22,8 @@ const RENAME_MAP_CANDIDATES = [
 ];
 const INSTRUCTION_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md'];
 const RUNTIME_CONFIG_DIRS = ['.claude', '.codex', '.gemini'];
+const LEGACY_RUNTIME_SUPPORT_DIR = 'get-shit-done';
+const OTO_RUNTIME_SUPPORT_DIR = 'oto';
 
 function resolveRenameMapPath() {
   for (const candidate of RENAME_MAP_CANDIDATES) {
@@ -87,6 +89,7 @@ function buildMigrateMapPath() {
   const rules = { ...(map.rules || {}) };
   // B-01: .planning -> .oto is opt-in for migrate and not an engine path rule.
   rules.path = (rules.path || []).filter((rule) => rule.from !== '.planning');
+  rules.path.push({ from: LEGACY_RUNTIME_SUPPORT_DIR, to: OTO_RUNTIME_SUPPORT_DIR, match: 'segment' });
   const derived = { ...map, rules };
   const mapPath = path.join(os.tmpdir(), `oto-migrate-map-${process.pid}-${Date.now()}-${crypto.randomUUID()}.json`);
   fs.writeFileSync(mapPath, `${JSON.stringify(derived, null, 2)}\n`);
@@ -316,6 +319,13 @@ function listFilesToBackup(projectDir, scope = 'planning') {
     }
   }
 
+  for (const runtimeDir of RUNTIME_CONFIG_DIRS) {
+    const supportRoot = path.join(runtimeDir, LEGACY_RUNTIME_SUPPORT_DIR);
+    for (const relPath of listFiles(safeJoin(projectDir, supportRoot), MIGRATE_SKIP_PATTERNS)) {
+      rels.add(path.join(supportRoot, relPath));
+    }
+  }
+
   return Array.from(rels).filter((relPath) => !shouldSkipRelPath(relPath, MIGRATE_SKIP_PATTERNS)).sort();
 }
 
@@ -325,6 +335,16 @@ async function copyTreeAtomic(src, dst, skipPatterns = []) {
     const absDst = path.join(dst, relPath);
     await fsp.mkdir(path.dirname(absDst), { recursive: true });
     await writeFileAtomic(absDst, await fsp.readFile(absSrc));
+  }
+}
+
+async function removeRenamedRuntimeSupportDirs(projectDir) {
+  for (const runtimeDir of RUNTIME_CONFIG_DIRS) {
+    const legacy = safeJoin(projectDir, path.join(runtimeDir, LEGACY_RUNTIME_SUPPORT_DIR));
+    const renamed = safeJoin(projectDir, path.join(runtimeDir, OTO_RUNTIME_SUPPORT_DIR));
+    if (fs.existsSync(legacy) && fs.existsSync(renamed)) {
+      await fsp.rm(legacy, { recursive: true, force: true });
+    }
   }
 }
 
@@ -351,6 +371,7 @@ async function apply(projectDir, opts = {}) {
 
     const filesChanged = listFiles(stagingOut, MIGRATE_SKIP_PATTERNS);
     await copyTreeAtomic(stagingOut, abs, MIGRATE_SKIP_PATTERNS);
+    await removeRenamedRuntimeSupportDirs(abs);
 
     for (const name of INSTRUCTION_FILES) {
       const filePath = safeJoin(abs, name);
