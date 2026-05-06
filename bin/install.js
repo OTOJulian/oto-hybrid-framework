@@ -36,6 +36,8 @@ USAGE
   oto sync --keep-deleted <path>              keep local copy after delete
   oto sync --status                           show sync pins and conflicts
   oto migrate [--dry-run | --apply]           convert GSD-era project artifacts
+  oto log <title>|start|end|list|show|promote
+      capture and manage ad-hoc work logs
 
 FLAGS
   --config-dir <dir>   target a config dir (single-runtime only)

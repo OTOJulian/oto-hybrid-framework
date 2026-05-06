@@ -71,6 +71,13 @@ test('D-06 D-22 oto log help exits zero and lists subcommands', (t) => {
   }
 });
 
+test('D-22 public oto help lists log command surface', () => {
+  const result = spawnSync(process.execPath, [INSTALL_JS, '--help'], { encoding: 'utf8' });
+  assert.equal(result.status, 0, `${result.stderr}\n${result.stdout}`);
+  assert.ok(result.stdout.includes('oto log <title>|start|end|list|show|promote'), 'D-22 top-level help lists oto log');
+  assert.ok(result.stdout.includes('capture and manage ad-hoc work logs'), 'D-22 top-level help describes oto log');
+});
+
 test('D-17 D-22 oto-tools log title writes a oneshot log', (t) => {
   let log;
   try {
