@@ -116,7 +116,13 @@ function resolveCwd(cwd) {
 function serializedFrontmatter(frontmatter) {
   const serialized = {};
   for (const [key, value] of Object.entries(frontmatter)) {
-    serialized[key] = value === null ? 'null' : value;
+    if (value === null) {
+      serialized[key] = 'null';
+    } else if (['phase', 'diff_from', 'diff_to'].includes(key) && typeof value === 'string') {
+      serialized[key] = `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+    } else {
+      serialized[key] = value;
+    }
   }
   return serialized;
 }

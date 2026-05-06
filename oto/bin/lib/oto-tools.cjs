@@ -1281,6 +1281,13 @@ async function runCommand(command, args, cwd, raw, defaultValue) {
       break;
     }
 
+    case 'log': {
+      const log = require('./log.cjs');
+      const exitCode = await log.main(args.slice(1), cwd);
+      process.exit(typeof exitCode === 'number' ? exitCode : 0);
+      break;
+    }
+
     default:
       error(`Unknown command: ${command}`);
   }

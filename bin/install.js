@@ -70,6 +70,12 @@ async function main(argv) {
     process.exit(code);
   }
 
+  if (argv[0] === 'log') {
+    const log = require('../oto/bin/lib/log.cjs');
+    const code = await log.main(argv.slice(1), process.cwd());
+    process.exit(code);
+  }
+
   let parsed;
   try {
     parsed = parseCliArgs(argv);
