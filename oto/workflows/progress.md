@@ -82,14 +82,45 @@ Use this instead of manually reading/parsing ROADMAP.md.
 </step>
 
 <step name="recent">
-**Gather recent work context:**
+**Gather Recent Activity (interleaved logs + summaries, newest 5):**
 
-- Find the 2-3 most recent SUMMARY.md files
-- Use `summary-extract` for efficient parsing:
-  ```bash
-  oto-sdk query summary-extract <path> --fields one_liner
-  ```
-- This shows "what we've been working on"
+Two extraction paths feed one chronological list. Logs come from `.oto/logs/*.md`; summaries from `.oto/phases/*/*-SUMMARY.md`. Both are decorated with a leading timestamp and kind tag, sorted descending, and sliced to the top 5.
+
+```bash
+LOG_LINES=()
+if compgen -G ".oto/logs/*.md" > /dev/null 2>&1; then
+  for f in .oto/logs/*.md; do
+    bn=$(basename "$f")
+    case "$bn" in .*) continue ;; esac
+    date=$(oto-sdk query frontmatter.get "$f" date --raw 2>/dev/null || echo "")
+    title=$(oto-sdk query frontmatter.get "$f" title --raw 2>/dev/null || echo "")
+    phase=$(oto-sdk query frontmatter.get "$f" phase --raw 2>/dev/null || echo "null")
+    suffix=""
+    [ "$phase" != "null" ] && [ -n "$phase" ] && suffix=" (phase $phase)"
+    [ -n "$date" ] && LOG_LINES+=("${date}\t[${date}] [log] ${title}${suffix}")
+  done
+fi
+
+SUM_LINES=()
+if compgen -G ".oto/phases/*/*-SUMMARY.md" > /dev/null 2>&1; then
+  for f in .oto/phases/*/*-SUMMARY.md; do
+    one_liner=$(oto-sdk query summary-extract "$f" --fields one_liner 2>/dev/null || echo "")
+    completed=$(oto-sdk query frontmatter.get "$f" completed --raw 2>/dev/null || echo "")
+    phase=$(oto-sdk query frontmatter.get "$f" phase --raw 2>/dev/null || echo "")
+    [ -n "$completed" ] && SUM_LINES+=("${completed}\t[${completed}] [summary] ${one_liner} (phase ${phase})")
+  done
+fi
+
+RECENT_ACTIVITY=$(
+  { printf '%s\n' "${LOG_LINES[@]}"; printf '%s\n' "${SUM_LINES[@]}"; } \
+  | grep -v '^$' \
+  | sort -r \
+  | head -5 \
+  | cut -f2-
+)
+```
+
+`$RECENT_ACTIVITY` is consumed by step `report` and rendered as the "Recent Activity" panel. Format per item: `[YYYY-MM-DD HH:mm] [log|summary] <title> [(phase NN)]`.
   </step>
 
 <step name="position">
@@ -118,9 +149,9 @@ Present:
 **Profile:** [quality/balanced/budget/inherit]
 **Discuss mode:** {DISCUSS_MODE}
 
-## Recent Work
-- [Phase X, Plan Y]: [what was accomplished - 1 line from summary-extract]
-- [Phase X, Plan Z]: [what was accomplished - 1 line from summary-extract]
+## Recent Activity
+- [YYYY-MM-DD HH:mm] [log|summary] [title or one-line summary] [(phase NN)]
+- [YYYY-MM-DD HH:mm] [log|summary] [title or one-line summary] [(phase NN)]
 
 ## Current Position
 Phase [N] of [total]: [phase-name]
