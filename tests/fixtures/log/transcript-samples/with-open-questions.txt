@@ -1,0 +1,8 @@
+We investigated the cache miss behavior after the renderer changed.
+The first pass confirmed that the fixture data loads consistently.
+I'm not sure how to handle the empty case here.
+The current branch has enough signal for a focused follow-up.
+Should we add a retry loop, or is one attempt enough?
+TODO: revisit the timeout default.
+The remaining behavior can be validated once the RED tests are green.
+Follow up on whether the cache eviction policy needs tuning.
