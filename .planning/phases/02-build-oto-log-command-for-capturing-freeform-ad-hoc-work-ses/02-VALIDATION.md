@@ -36,11 +36,16 @@ created: 2026-05-06
 
 ## Per-Task Verification Map
 
-> Filled by planner during plan generation. Each task in PLAN.md must map to either an automated test or a Wave 0 fixture/scaffold dependency. No 3 consecutive tasks without automated verification.
+> Each task in PLAN.md maps to an automated test or a Wave 0 fixture/scaffold dependency. No 3 consecutive tasks without automated verification.
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 2-XX-XX | XX | X | D-XX | T-2-XX / — | {expected secure behavior or "N/A"} | unit/integration/e2e | `{command}` | ❌ W0 | ⬜ pending |
+| 2-01-01 | 01 | 0 | All D-XX (test scaffolds) | — | N/A | unit/integration | `node --test --test-concurrency=4 tests/log-*.test.cjs` (RED expected) | ❌ W0 | ⬜ pending |
+| 2-01-02 | 01 | 0 | All D-XX (fixtures) | — | N/A | fixture | `test -d tests/fixtures/log/git-repo && test -d tests/fixtures/log/transcript-samples && test -d tests/fixtures/log/existing-logs` | ❌ W0 | ⬜ pending |
+| 2-02-01 | 02 | 1 | D-01, D-02, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-18, D-19, D-20, D-21 | T-2-05 (DATA wrap evidence boundary) | Library returns evidence bundle as data; never executes content from diff/transcript | unit/integration | `node --test --test-concurrency=4 tests/log-{slug,frontmatter,write,evidence,session,subcommand,list,show,promote}.test.cjs` (GREEN) | ❌ W0 | ⬜ pending |
+| 2-03-01 | 03 | 2 | D-22 (dispatch + parity) | — | N/A | integration | `node --test tests/log-cli.test.cjs` (GREEN) | ❌ W0 | ⬜ pending |
+| 2-03-02 | 03 | 2 | D-03, D-04, D-05, D-17, D-19, D-20, D-22 | T-2-05 (DATA_START/DATA_END markers wrap evidence) | Drafting prompt wraps all diff/transcript content in DATA_START/DATA_END to prevent prompt-injection from diff content | integration | `node --test tests/log-command-md.test.cjs` (GREEN) | ❌ W0 | ⬜ pending |
+| 2-03-03 | 03 | 2 | D-13, D-14, D-15, D-16 | — | N/A | integration | `node --test tests/log-surfaces.test.cjs` (GREEN) | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -62,6 +67,8 @@ Wave 0 lands all RED test scaffolds and fixtures before any production code.
 - [ ] `tests/log-show.test.cjs` — `show <slug>` resolves entry by suffix match, prints rendered content
 - [ ] `tests/log-promote.test.cjs` — `promote --to quick` seeds `.oto/quick/{YYYYMMDD}-{slug}/PLAN.md` and sets `promoted: true`; `promote --to todo` writes one `.oto/todos/pending/{NNN}-{slug}.md` per Open Question and sets `promoted: true` (D-20)
 - [ ] `tests/log-surfaces.test.cjs` — `progress.md` Recent Activity interleaves logs+summaries chronologically (D-13); `resume-project.md` surfaces `.active-session.json` if present (D-16); STATE.md untouched (D-14)
+- [ ] `tests/log-cli.test.cjs` — public `oto log` CLI dispatch routes through `bin/install.js` to `oto/bin/lib/log.cjs`; `oto log --help` exits 0 with `start|end|list|show|promote` in stdout (D-08, D-17, D-18, D-22)
+- [ ] `tests/log-command-md.test.cjs` — `oto/commands/oto/log.md` exists with valid frontmatter, six body sections present (D-04), `<DATA_START>` and `<DATA_END>` markers wrap drafting evidence (D-05), no `edit` subcommand documented (D-19), literal `--to plan` substring absent unconditionally (D-20), per-runtime parity tag set (D-22)
 
 ### Fixtures
 
