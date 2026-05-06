@@ -115,6 +115,7 @@ _oto v0.1.0 - generated_
 | /oto-insert-phase | PASS | PASS | PASS | tools:2 |
 | /oto-list-phase-assumptions | PASS | PASS | PASS | tools:4 |
 | /oto-list-workspaces | PASS | PASS | PASS | tools:2 |
+| /oto-log | PASS | PASS | PASS | tools:7 |
 | /oto-manager | PASS | PASS | PASS | tools:8 |
 | /oto-map-codebase | PASS | PASS | PASS | tools:6 |
 | /oto-migrate | PASS | PASS | PASS | tools:7 |
