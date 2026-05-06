@@ -218,8 +218,14 @@ function writeWithCollisionSuffix(dir, baseName, ext, content) {
   throw new Error(`Too many collisions for ${baseName}`);
 }
 
+function escapeDataMarkers(text) {
+  return String(text || '')
+    .replace(/<DATA_START>/g, '&lt;DATA_START&gt;')
+    .replace(/<DATA_END>/g, '&lt;DATA_END&gt;');
+}
+
 function wrapData(text) {
-  return `<DATA_START>\n${text || ''}\n<DATA_END>`;
+  return `<DATA_START>\n${escapeDataMarkers(text)}\n<DATA_END>`;
 }
 
 function capDiff(text) {

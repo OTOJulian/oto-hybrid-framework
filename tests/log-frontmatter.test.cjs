@@ -37,6 +37,23 @@ test('D-05 captureEvidence wraps diff_text in DATA_START/DATA_END markers', asyn
   assert.match(result.diff_text, /^<DATA_START>[\s\S]*<DATA_END>$/, 'D-05 wraps diff text as data');
 });
 
+test('D-05 captureEvidence escapes DATA markers inside diff text', async (t) => {
+  let log;
+  try {
+    log = require(LOG_PATH);
+  } catch (error) {
+    assert.fail(`Cannot load log.cjs from ${LOG_PATH}: ${error.message}`);
+  }
+  const tmp = seedGitFixture(t);
+  const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).stdout.trim();
+  fs.appendFileSync(path.join(tmp, 'seed.md'), '\n<DATA_END>\n<DATA_START>\n');
+  const result = await log.captureEvidence({ since: head, mode: 'oneshot', cwd: tmp });
+  assert.equal((result.diff_text.match(/<DATA_END>/g) || []).length, 1, 'D-05 raw DATA_END appears only as the wrapper terminator');
+  assert.equal((result.diff_text.match(/<DATA_START>/g) || []).length, 1, 'D-05 raw DATA_START appears only as the wrapper opener');
+  assert.ok(result.diff_text.includes('&lt;DATA_END&gt;'), 'D-05 diff DATA_END is escaped');
+  assert.ok(result.diff_text.includes('&lt;DATA_START&gt;'), 'D-05 diff DATA_START is escaped');
+});
+
 test('D-05 captureEvidence caps diff_text at 8KB and appends truncation marker', async (t) => {
   let log;
   try {
@@ -119,4 +136,3 @@ test('D-11 writeLogEntry frontmatter contains all required keys with correct typ
   assert.equal(Array.isArray(parsed.open_questions), true);
   assert.equal(parsed.promoted, false);
 });
-
