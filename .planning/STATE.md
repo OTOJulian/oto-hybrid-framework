@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.1.0
+milestone: v0.2.0
 milestone_name: milestone
 status: milestone_complete
-last_updated: "2026-05-06T20:26:28Z"
+last_updated: "2026-05-07T22:50:00Z"
 progress:
   total_phases: 2
   completed_phases: 2
@@ -22,36 +22,35 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: 02 (build-oto-log-command-for-capturing-freeform-ad-hoc-work-ses) — COMPLETE
-Plan: 3 of 3
-Milestone: post-v0.1.0 extension
-Status: Phase 02 verified complete; security audit gate remains before advancing
+Milestone: v0.2.0 — SHIPPED 2026-05-07
+Status: Archived. Awaiting `$gsd-new-milestone` to start the next cycle.
 Progress: [██████████] 100%
 
 Archive:
 
+- `.planning/milestones/v0.2.0-ROADMAP.md`
+- `.planning/milestones/v0.2.0-REQUIREMENTS.md`
+- `.planning/milestones/v0.2.0-MILESTONE-AUDIT.md`
 - `.planning/milestones/v0.1.0-ROADMAP.md`
 - `.planning/milestones/v0.1.0-REQUIREMENTS.md`
 - `.planning/milestones/v0.1.0-MILESTONE-AUDIT.md`
 
 ## Last Verified
 
-- `audit-open`: clear, 0 open artifacts.
-- `npm test`: 418 pass, 1 expected skip, 0 failures.
-- Milestone audit: `status: passed`.
-- Local git tag `v0.1.0` exists.
-- Phase 01 `/oto-migrate`: verified 2026-05-05; `npm test -- --test-reporter=dot` passed with 453 tests, 452 pass, 1 skip, 0 failures.
-- Phase 02 Plan 01 `/oto-log` RED scaffold: verified 2026-05-06; `node --test --test-concurrency=4 tests/log-*.test.cjs` failed as expected with 63 structured assertion failures, and `node --test tests/migrate-*.test.cjs` passed 26/26.
-- Phase 02 Plan 02 `/oto-log` library: verified 2026-05-06; behavioral library slice passed 34/34, full requested 9-file slice passed 37/38 with only the Plan 03-owned `.gitignore` active-session assertion remaining, and migrate regression passed 26/26.
-- Phase 02 `/oto-log`: verified 2026-05-06; `node --test --test-concurrency=4 tests/log-*.test.cjs` passed 71/71, `npm test` passed 533/534 with 1 expected skip and 0 failures, schema drift was clean, and code review status is clean.
+- v0.2.0 milestone audit: `status: passed`, 32/32 requirements covered.
+- Phase 01 `/oto-migrate`: VERIFICATION passed (2026-05-05), SECURITY verified 2026-05-07 (20/20 threats closed, ASVS L1).
+- Phase 02 `/oto-log`: VERIFICATION passed (2026-05-06), SECURITY verified 2026-05-07 (18/18 threats closed, ASVS L1).
+- `npm test`: 533 pass, 1 expected skip, 0 failures (run 2026-05-07).
+- Test hygiene: relocated `foundation-frameworks/goose-main/` to `~/Desktop/goose-main/` to silence rebrand-engine false-positive matches against random base64 substrings; no code changes required.
+- Local git tag `v0.2.0` to be created at the archive commit.
 
 ## Next Command
 
 ```bash
-$gsd-secure-phase 02
+$gsd-new-milestone
 ```
 
-Run the security audit gate for Phase 02 before starting the next milestone. After that, use `$gsd-new-milestone` to define fresh requirements.
+Start the next milestone cycle. Use `$gsd-new-milestone` to define fresh requirements and roadmap.
 
 ## Accumulated Context
 
