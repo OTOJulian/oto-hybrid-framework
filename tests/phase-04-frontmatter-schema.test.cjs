@@ -25,7 +25,7 @@ function parseFrontmatter(text) {
 test('phase-04 frontmatter-schema: every retained agent has required keys and matching name', () => {
   const dir = path.join(REPO_ROOT, 'oto/agents');
   const files = fs.readdirSync(dir).filter((f) => f.startsWith('oto-') && f.endsWith('.md')).sort();
-  assert.equal(files.length, 23, `expected 23 retained agents, got ${files.length}`);
+  assert.equal(files.length, 26, `expected 26 retained agents, got ${files.length}`);
   for (const f of files) {
     const full = path.join(dir, f);
     const fm = parseFrontmatter(fs.readFileSync(full, 'utf8'));

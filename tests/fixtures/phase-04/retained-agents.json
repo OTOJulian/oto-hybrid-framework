@@ -1,6 +1,6 @@
 {
   "source": "decisions/agent-audit.md (KEEP rows)",
-  "count": 23,
+  "count": 26,
   "agents": [
     "oto-advisor-researcher",
     "oto-assumptions-analyzer",
@@ -8,10 +8,13 @@
     "oto-code-reviewer",
     "oto-codebase-mapper",
     "oto-debugger",
+    "oto-doc-classifier",
+    "oto-doc-synthesizer",
     "oto-doc-verifier",
     "oto-doc-writer",
     "oto-domain-researcher",
     "oto-executor",
+    "oto-eval-auditor",
     "oto-integration-checker",
     "oto-nyquist-auditor",
     "oto-phase-researcher",
@@ -28,11 +31,8 @@
   ],
   "dropped_agents_for_leak_test": [
     "oto-pattern-mapper",
-    "oto-doc-classifier",
-    "oto-doc-synthesizer",
     "oto-debug-session-manager",
     "oto-ai-researcher",
-    "oto-eval-auditor",
     "oto-eval-planner",
     "oto-framework-selector",
     "oto-intel-updater",

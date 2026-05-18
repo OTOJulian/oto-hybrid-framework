@@ -50,7 +50,7 @@ test('agent-audit.md exists and references all 33 GSD agents', () => {
   }
 });
 
-test('agent-audit.md verdict counts: KEEP=23, DROP=10', () => {
+test('agent-audit.md verdict counts: KEEP=26, DROP=7', () => {
   const content = fs.readFileSync(AUDIT_FILE, 'utf8');
   const lines = content.split(/\r?\n/);
   let keep = 0;
@@ -64,6 +64,6 @@ test('agent-audit.md verdict counts: KEEP=23, DROP=10', () => {
       else if (v === 'DROP') drop++;
     }
   }
-  assert.equal(keep, 23, `Expected 23 KEEP rows, got ${keep}`);
-  assert.equal(drop, 10, `Expected 10 DROP rows, got ${drop}`);
+  assert.equal(keep, 26, `Expected 26 KEEP rows, got ${keep}`);
+  assert.equal(drop, 7, `Expected 7 DROP rows, got ${drop}`);
 });

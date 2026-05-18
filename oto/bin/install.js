@@ -33,8 +33,11 @@ const CODEX_AGENT_SANDBOX = {
   'oto-codebase-mapper': 'workspace-write',
   'oto-roadmapper': 'workspace-write',
   'oto-debugger': 'workspace-write',
+  'oto-doc-synthesizer': 'workspace-write',
   'oto-plan-checker': 'read-only',
   'oto-integration-checker': 'read-only',
+  'oto-doc-classifier': 'read-only',
+  'oto-eval-auditor': 'read-only',
 };
 
 // Copilot tool name mapping — Claude Code tools to GitHub Copilot tools

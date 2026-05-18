@@ -12,8 +12,8 @@
 
 ## Verdict counts
 
-- KEEP: 23
-- DROP: 10
+- KEEP: 26
+- DROP: 7
 - MERGE: 0
 - Total: 33
 
@@ -29,12 +29,12 @@
 | `gsd-codebase-mapper` | KEEP | phase spine | Brownfield exploration support for `/oto-map-codebase` and `/oto-scan`. |
 | `gsd-debug-session-manager` | DROP | niche/v2 | Consolidated into `oto-debugger` per ADR-07. |
 | `gsd-debugger` | KEEP | phase spine | `/oto-debug` workflow agent; absorbs debug-session-manager responsibilities. |
-| `gsd-doc-classifier` | DROP | redundant doc | Consolidated into `oto-doc-writer` per ADR-07. |
-| `gsd-doc-synthesizer` | DROP | redundant doc | Consolidated into `oto-doc-writer` per ADR-07. |
+| `gsd-doc-classifier` | KEEP | phase spine | Restored in v0.3.0 Phase 1 — powers /oto-ingest-docs classification arm (partial ADR-07 reversal). Rebrands to oto-doc-classifier. |
+| `gsd-doc-synthesizer` | KEEP | phase spine | Restored in v0.3.0 Phase 1 — powers /oto-ingest-docs synthesis arm (partial ADR-07 reversal). Rebrands to oto-doc-synthesizer. |
 | `gsd-doc-verifier` | KEEP | phase spine | Verifies docs against codebase claims; pairs with `oto-doc-writer`. |
 | `gsd-doc-writer` | KEEP | phase spine | `/oto-docs-update` workflow agent. |
 | `gsd-domain-researcher` | KEEP | researcher | Domain-specific research; complements project/phase researchers. |
-| `gsd-eval-auditor` | DROP | AI/eval | AI/eval workflow deferred. |
+| `gsd-eval-auditor` | KEEP | phase spine | Restored in v0.3.0 Phase 1 — powers /oto-eval-review (partial ADR-07 reversal). Rebrands to oto-eval-auditor. |
 | `gsd-eval-planner` | DROP | AI/eval | AI/eval workflow deferred. |
 | `gsd-executor` | KEEP | phase spine | Core execution agent; invokes TDD and verification skills. |
 | `gsd-framework-selector` | DROP | AI/eval | AI/eval framework selection deferred. |

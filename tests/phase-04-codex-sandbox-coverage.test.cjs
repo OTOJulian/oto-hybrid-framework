@@ -12,7 +12,7 @@ test('phase-04 codex-sandbox-coverage: agentSandboxes covers exactly the retaine
   const keys = Object.keys(adapter.agentSandboxes).sort();
   const expected = [...retainedAgents.agents].sort();
   assert.deepEqual(keys, expected, 'agentSandboxes keys must equal retained-agents fixture');
-  assert.equal(keys.length, 23);
+  assert.equal(keys.length, retainedAgents.count);
   for (const [k, v] of Object.entries(adapter.agentSandboxes)) {
     assert.ok(v === 'workspace-write' || v === 'read-only', `${k}: invalid sandbox mode "${v}"`);
   }

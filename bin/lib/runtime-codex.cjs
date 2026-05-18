@@ -74,7 +74,7 @@ module.exports = {
     templates: 'oto/templates',
     contexts: 'oto/contexts',
   },
-  // AGT-04: Codex sandbox mode per retained agent.
+  // AGT-04/INST-02: Codex sandbox mode per retained agent.
   // 11 entries pass through from upstream foundation-frameworks/get-shit-done-main/bin/install.js:26-38
   // (gsd-* renamed to oto-* per Phase 1 ADR-07). 12 additional entries inferred from
   // per-agent `tools:` field: agents with Write/Edit/Bash get workspace-write, pure-read agents
@@ -87,6 +87,9 @@ module.exports = {
     'oto-code-reviewer': 'workspace-write',
     'oto-codebase-mapper': 'workspace-write',
     'oto-debugger': 'workspace-write',
+    'oto-doc-classifier': 'read-only',
+    'oto-doc-synthesizer': 'workspace-write',
+    'oto-eval-auditor': 'read-only',
     'oto-doc-verifier': 'workspace-write',
     'oto-doc-writer': 'workspace-write',
     'oto-domain-researcher': 'workspace-write',

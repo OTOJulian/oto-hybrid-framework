@@ -1,7 +1,7 @@
 ---
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
-status: planning
+status: executing
 phases: [1, 2, 3]
 plans_total: 2
 requirements_total: 20
@@ -10,7 +10,7 @@ predecessor: v0.2.0
 
 # Milestone v0.3.0: Restore doc-intake and eval-review agents
 
-**Status:** planning
+**Status:** executing
 **Phases:** 1–3
 **Total Requirements:** 20 (AGNT-01..03, WF-ING-01..04, WF-EVAL-01..02, CMD-01..03, INST-01..03, TEST-01..03, ADR-01, PRTY-01)
 **Granularity:** fine
@@ -32,7 +32,7 @@ Three ports + de-deferral of two existing commands → MINOR semver bump per CLA
 
 ## Phases
 
-- [ ] **Phase 1: Agent ports + installer wiring** — Port `oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor` agents and wire them into the per-runtime installer with correct Codex sandboxes.
+- [x] **Phase 1: Agent ports + installer wiring** — Port `oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor` agents and wire them into the per-runtime installer with correct Codex sandboxes.
 - [ ] **Phase 2: Workflow rebrand-ports + command de-deferral** — Rebrand-port `ingest-docs.md` and `eval-review.md` workflows; strip deferral framing from `/oto-ingest-docs`, `/oto-eval-review`, and `/oto-help`.
 - [ ] **Phase 3: Tests, install-smoke, parity, ADR-15** — Port `ingest-docs.test.cjs`, add `eval-review.test.cjs`, extend install-smoke for new agents, run per-runtime parity check, write ADR-15.
 
@@ -52,8 +52,8 @@ Three ports + de-deferral of two existing commands → MINOR semver bump per CLA
   5. The rebrand engine's coverage manifest accepts the three new agents (no orphan upstream paths, no orphan target paths).
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Agent file ports: flip three inventory rows from drop to keep, run rebrand engine, reconcile classifier+auditor tool lists per D-04, regenerate coverage manifest.
-- [ ] 01-02-PLAN.md — Installer wiring: extend CODEX_AGENT_SANDBOX with three entries (D-04 locks), per-runtime install smoke against isolated --config-dir for Claude / Codex / Gemini.
+- [x] 01-01-PLAN.md — Agent file ports: flip three inventory rows from drop to keep, run rebrand engine, reconcile classifier+auditor tool lists per D-04, regenerate coverage manifest.
+- [x] 01-02-PLAN.md — Installer wiring: extend CODEX_AGENT_SANDBOX with three entries (D-04 locks), per-runtime install smoke against isolated --config-dir for Claude / Codex / Gemini.
 **UI hint:** no
 
 ### Phase 2: Workflow rebrand-ports + command de-deferral
@@ -91,8 +91,8 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Agent ports + installer wiring | 0/2 | Planned | — |
-| 2. Workflow rebrand-ports + command de-deferral | 0/0 | Not started | — |
+| 1. Agent ports + installer wiring | 2/2 | Complete | 2026-05-18 |
+| 2. Workflow rebrand-ports + command de-deferral | 0/0 | Ready to plan | — |
 | 3. Tests, install-smoke, parity, ADR-15 | 0/0 | Not started | — |
 
 ## Traceability

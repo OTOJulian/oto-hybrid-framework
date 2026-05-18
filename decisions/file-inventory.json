@@ -470,18 +470,20 @@
     {
       "path": "agents/gsd-doc-classifier.md",
       "upstream": "gsd",
-      "verdict": "drop",
-      "reason": "Agent dropped per ADR-07 trim; see decisions/agent-audit.md",
-      "rebrand_required": false,
+      "verdict": "keep",
+      "reason": "v0.3.0 Phase 1 agent port — partial ADR-07 reversal",
+      "target_path": "agents/oto-doc-classifier.md",
+      "rebrand_required": true,
       "phase_owner": 1,
       "category": "agent"
     },
     {
       "path": "agents/gsd-doc-synthesizer.md",
       "upstream": "gsd",
-      "verdict": "drop",
-      "reason": "Agent dropped per ADR-07 trim; see decisions/agent-audit.md",
-      "rebrand_required": false,
+      "verdict": "keep",
+      "reason": "v0.3.0 Phase 1 agent port — partial ADR-07 reversal",
+      "target_path": "agents/oto-doc-synthesizer.md",
+      "rebrand_required": true,
       "phase_owner": 1,
       "category": "agent"
     },
@@ -518,9 +520,10 @@
     {
       "path": "agents/gsd-eval-auditor.md",
       "upstream": "gsd",
-      "verdict": "drop",
-      "reason": "Agent dropped per ADR-07 trim; see decisions/agent-audit.md",
-      "rebrand_required": false,
+      "verdict": "keep",
+      "reason": "v0.3.0 Phase 1 agent port — partial ADR-07 reversal",
+      "target_path": "agents/oto-eval-auditor.md",
+      "rebrand_required": true,
       "phase_owner": 1,
       "category": "agent"
     },

@@ -10,9 +10,9 @@
 
 ### Agents
 
-- [ ] **AGNT-01**: `oto-doc-classifier` agent installed under each runtime's agents dir and dispatchable via `Task(subagent_type="oto-doc-classifier")`. Rebrand-ported from `gsd-doc-classifier.md` (168 LOC). Classifies a single doc as ADR / PRD / SPEC / RFC / DOC and emits the canonical classification record.
-- [ ] **AGNT-02**: `oto-doc-synthesizer` agent installed under each runtime's agents dir and dispatchable via `Task(subagent_type="oto-doc-synthesizer")`. Rebrand-ported from `gsd-doc-synthesizer.md` (204 LOC). Consumes classified docs, applies the `ADR > SPEC > PRD > DOC` precedence rule, emits synthesized context plus `.oto/INGEST-CONFLICTS.md` with three buckets (auto-resolved, competing-variants, unresolved-blockers).
-- [ ] **AGNT-03**: `oto-eval-auditor` agent installed under each runtime's agents dir and dispatchable via `Task(subagent_type="oto-eval-auditor")`. Rebrand-ported from `gsd-eval-auditor.md` (191 LOC). Scores each eval dimension of a completed AI phase as COVERED / PARTIAL / MISSING with actionable remediation.
+- [x] **AGNT-01**: `oto-doc-classifier` agent installed under each runtime's agents dir and dispatchable via `Task(subagent_type="oto-doc-classifier")`. Rebrand-ported from `gsd-doc-classifier.md` (168 LOC). Classifies a single doc as ADR / PRD / SPEC / RFC / DOC and emits the canonical classification record.
+- [x] **AGNT-02**: `oto-doc-synthesizer` agent installed under each runtime's agents dir and dispatchable via `Task(subagent_type="oto-doc-synthesizer")`. Rebrand-ported from `gsd-doc-synthesizer.md` (204 LOC). Consumes classified docs, applies the `ADR > SPEC > PRD > DOC` precedence rule, emits synthesized context plus `.oto/INGEST-CONFLICTS.md` with three buckets (auto-resolved, competing-variants, unresolved-blockers).
+- [x] **AGNT-03**: `oto-eval-auditor` agent installed under each runtime's agents dir and dispatchable via `Task(subagent_type="oto-eval-auditor")`. Rebrand-ported from `gsd-eval-auditor.md` (191 LOC). Scores each eval dimension of a completed AI phase as COVERED / PARTIAL / MISSING with actionable remediation.
 
 ### Workflows
 
@@ -31,8 +31,8 @@
 
 ### Installer
 
-- [ ] **INST-01**: `oto install --claude` / `--codex` / `--gemini` / `--all` copies the three new agent files into the target runtime's agents directory, alongside the existing 23 retained agents.
-- [ ] **INST-02**: Codex adapter assigns each new agent the correct `sandbox:` declaration in its installed `.toml`: `oto-doc-classifier` and `oto-eval-auditor` get `read-only`; `oto-doc-synthesizer` gets `workspace-write` (it writes `.oto/INGEST-CONFLICTS.md` and synthesized context).
+- [x] **INST-01**: `oto install --claude` / `--codex` / `--gemini` / `--all` copies the three new agent files into the target runtime's agents directory, alongside the existing 23 retained agents.
+- [x] **INST-02**: Codex adapter assigns each new agent the correct `sandbox:` declaration in its installed `.toml`: `oto-doc-classifier` and `oto-eval-auditor` get `read-only`; `oto-doc-synthesizer` gets `workspace-write` (it writes `.oto/INGEST-CONFLICTS.md` and synthesized context).
 - [ ] **INST-03**: `install-smoke.yml` CI asserts each of the three new agent files is present in each runtime's agents dir after install (tarball install + unpacked-dir install paths).
 
 ### Tests
@@ -79,9 +79,9 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AGNT-01 | 1 | Pending |
-| AGNT-02 | 1 | Pending |
-| AGNT-03 | 1 | Pending |
+| AGNT-01 | 1 | Complete |
+| AGNT-02 | 1 | Complete |
+| AGNT-03 | 1 | Complete |
 | WF-ING-01 | 2 | Pending |
 | WF-ING-02 | 2 | Pending |
 | WF-ING-03 | 2 | Pending |
@@ -91,8 +91,8 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 | CMD-01 | 2 | Pending |
 | CMD-02 | 2 | Pending |
 | CMD-03 | 2 | Pending |
-| INST-01 | 1 | Pending |
-| INST-02 | 1 | Pending |
+| INST-01 | 1 | Complete |
+| INST-02 | 1 | Complete |
 | INST-03 | 3 | Pending |
 | TEST-01 | 3 | Pending |
 | TEST-02 | 3 | Pending |
@@ -108,4 +108,4 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after roadmap creation (traceability filled)*
+*Last updated: 2026-05-18 after Phase 1 execution (AGNT-01..03, INST-01..02 complete)*

@@ -62,9 +62,12 @@ _oto v0.1.0 - generated_
 | oto-code-reviewer | workspace-write |
 | oto-codebase-mapper | workspace-write |
 | oto-debugger | workspace-write |
+| oto-doc-classifier | read-only |
+| oto-doc-synthesizer | workspace-write |
 | oto-doc-verifier | workspace-write |
 | oto-doc-writer | workspace-write |
 | oto-domain-researcher | workspace-write |
+| oto-eval-auditor | read-only |
 | oto-executor | workspace-write |
 | oto-integration-checker | read-only |
 | oto-nyquist-auditor | workspace-write |

@@ -6,10 +6,10 @@ status: planning
 last_updated: "2026-05-18T00:00:00Z"
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 33
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: 1 — Agent ports + installer wiring
-Plan: — (2 plans created, 0 executed)
-Status: Ready to execute (`/oto-execute-phase 1`)
-Last activity: 2026-05-18 — Phase 1 planned: 01-01 (agent file ports, wave 1), 01-02 (installer wiring, wave 2). All 5 requirements (AGNT-01/02/03, INST-01, INST-02) covered. Plan-checker: PASSED with 3 warnings addressed in revision pass.
+Phase: 2 — Workflow rebrand-ports + command de-deferral
+Plan: — (not planned)
+Status: Ready to plan (`/oto-plan-phase 2`)
+Last activity: 2026-05-18 — Phase 1 completed. Restored `oto-doc-classifier`, `oto-doc-synthesizer`, and `oto-eval-auditor`; wired Claude/Codex/Gemini install paths; verified Codex sandbox modes and regenerated runtime matrix/rebrand coverage reports. `oto-sdk` was unavailable in this Codex environment, so execution used on-disk planning artifacts as the authoritative workflow fallback.
 
 Archive (prior milestones):
 
@@ -39,25 +39,29 @@ Archive (prior milestones):
 ## Last Verified
 
 - v0.2.0 milestone audit: `status: passed`, 32/32 requirements covered.
-- `npm test` last green at v0.2.0 archive (2026-05-07): 533 pass, 1 expected skip, 0 failures.
+- Phase 1 verification passed on 2026-05-18: `01-VERIFICATION.md` status `passed`, `01-REVIEW.md` status `clean`, `01-SECURITY.md` status `passed`.
+- `npm test` passed on 2026-05-18: 533 pass, 1 expected skip, 0 failures.
+- Focused Phase 1 and runtime-matrix tests also passed on 2026-05-18.
 
 ## Next Command
 
 ```bash
-/oto-execute-phase 1
+/oto-plan-phase 2
 ```
 
-Phase 1 planned (2 plans, 2 waves). Execute to port the three agents + wire the installer.
+Phase 1 is complete. Plan Phase 2 to restore the executable `/oto-ingest-docs` and `/oto-eval-review` workflows and remove their deferral framing.
 
 ## Accumulated Context
 
 ### Roadmap Evolution
 
 - 2026-05-18: v0.3.0 roadmap created. Phases derived from natural dependency chain: agents (foundation) → workflows + commands (consumer) → tests + parity + ADR-15 (closure). 20/20 requirements mapped.
+- 2026-05-18: Phase 1 completed. The retained agent set is now 26 agents; Phase 2 is ready to plan.
 
 ### Decisions
 
-(Populated as phases execute.)
+- Phase 1 partially reverses ADR-07 only for `oto-doc-classifier`, `oto-doc-synthesizer`, and `oto-eval-auditor`; the rest of the ADR-07 dropped-agent set remains deferred until a future milestone.
+- Codex sandbox locks for restored agents: classifier and eval auditor are `read-only`; doc synthesizer is `workspace-write`.
 
 ### Quick Tasks Completed
 

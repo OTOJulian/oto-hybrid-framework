@@ -44,10 +44,10 @@ test('phase-04 rebrand-smoke: oto/commands/oto contains expected core commands',
   }
 });
 
-test('phase-04 rebrand-smoke: oto/agents has exactly 23 oto-* agent files', () => {
+test('phase-04 rebrand-smoke: oto/agents has exactly 26 oto-* agent files', () => {
   const dir = path.join(REPO_ROOT, 'oto/agents');
   const files = fs.readdirSync(dir).filter(f => f.startsWith('oto-') && f.endsWith('.md'));
-  assert.equal(files.length, 23, `expected 23 retained agents, got ${files.length}`);
+  assert.equal(files.length, 26, `expected 26 retained agents, got ${files.length}`);
 });
 
 test('phase-04 rebrand-smoke: oto/workflows includes nested subdirs', () => {
