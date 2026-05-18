@@ -33,21 +33,21 @@
 
 - [x] **INST-01**: `oto install --claude` / `--codex` / `--gemini` / `--all` copies the three new agent files into the target runtime's agents directory, alongside the existing 23 retained agents.
 - [x] **INST-02**: Codex adapter assigns each new agent the correct `sandbox:` declaration in its installed `.toml`: `oto-doc-classifier` and `oto-eval-auditor` get `read-only`; `oto-doc-synthesizer` gets `workspace-write` (it writes `.oto/INGEST-CONFLICTS.md` and synthesized context).
-- [ ] **INST-03**: `install-smoke.yml` CI asserts each of the three new agent files is present in each runtime's agents dir after install (tarball install + unpacked-dir install paths).
+- [x] **INST-03**: `install-smoke.yml` CI asserts each of the three new agent files is present in each runtime's agents dir after install (tarball install + unpacked-dir install paths).
 
 ### Tests
 
-- [ ] **TEST-01**: `tests/ingest-docs.test.cjs` ported from `foundation-frameworks/get-shit-done-main/tests/ingest-docs.test.cjs`, namespace-rebranded (`gsd-` → `oto-`, `.planning/` → `.oto/`), and passing under `npm test`.
-- [ ] **TEST-02**: New `tests/eval-review.test.cjs` covering workflow load + agent dispatch + EVAL-REVIEW.md shape, passing under `npm test`.
-- [ ] **TEST-03**: Full `npm test` suite remains green at v0.2.0 baseline +new tests; no regressions in existing v0.1.0 / v0.2.0 surface.
+- [x] **TEST-01**: `tests/ingest-docs.test.cjs` ported from `foundation-frameworks/get-shit-done-main/tests/ingest-docs.test.cjs`, namespace-rebranded (`gsd-` → `oto-`, `.planning/` → `.oto/`), and passing under `npm test`.
+- [x] **TEST-02**: New `tests/eval-review.test.cjs` covering workflow load + agent dispatch + EVAL-REVIEW.md shape, passing under `npm test`.
+- [x] **TEST-03**: Full `npm test` suite remains green at v0.2.0 baseline +new tests; no regressions in existing v0.1.0 / v0.2.0 surface.
 
 ### Decision Record
 
-- [ ] **ADR-01**: New `decisions/ADR-15-restore-doc-and-eval-agents.md` written, referencing ADR-07's reactivation criterion ("a v2 milestone that restores document intake agents"), naming exactly which three agents return (and explicitly that the other dropped agents stay dropped), and recording the ASVS / Codex sandbox decisions per agent.
+- [x] **ADR-01**: New `decisions/ADR-15-restore-doc-and-eval-agents.md` written, referencing ADR-07's document-intake restoration framing, naming exactly which three agents return (and explicitly that the other dropped agents stay dropped), and recording the Codex sandbox decisions per agent.
 
 ### Per-Runtime Parity
 
-- [ ] **PRTY-01**: Per-runtime smoke for `/oto-ingest-docs` and `/oto-eval-review` on Claude Code (primary), Codex, and Gemini CLI matches the v0.1.0 / v0.2.0 parity pattern: command surfaces in each runtime's command dir, agent dispatch works under each runtime's Task/subagent equivalent, and the deferral stub is gone everywhere.
+- [x] **PRTY-01**: Per-runtime smoke for `/oto-ingest-docs` and `/oto-eval-review` on Claude Code (primary), Codex, and Gemini CLI matches the v0.1.0 / v0.2.0 parity pattern: command surfaces in each runtime's command dir, agent dispatch works under each runtime's Task/subagent equivalent, and the deferral stub is gone everywhere.
 
 ## v2+ Requirements
 
@@ -93,12 +93,12 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 | CMD-03 | 2 | Complete |
 | INST-01 | 1 | Complete |
 | INST-02 | 1 | Complete |
-| INST-03 | 3 | Pending |
-| TEST-01 | 3 | Pending |
-| TEST-02 | 3 | Pending |
-| TEST-03 | 3 | Pending |
-| ADR-01 | 3 | Pending |
-| PRTY-01 | 3 | Pending |
+| INST-03 | 3 | Complete |
+| TEST-01 | 3 | Complete |
+| TEST-02 | 3 | Complete |
+| TEST-03 | 3 | Complete |
+| ADR-01 | 3 | Complete |
+| PRTY-01 | 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 20 total
@@ -108,4 +108,4 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after Phase 2 execution (WF-ING-01..04, WF-EVAL-01..02, CMD-01..03 complete)*
+*Last updated: 2026-05-18 after Phase 3 execution (TEST-01..03, INST-03, ADR-01, PRTY-01 complete)*

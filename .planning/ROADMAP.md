@@ -10,7 +10,7 @@ predecessor: v0.2.0
 
 # Milestone v0.3.0: Restore doc-intake and eval-review agents
 
-**Status:** executing
+**Status:** executing - Phase 3 complete, security review pending
 **Phases:** 1–3
 **Total Requirements:** 20 (AGNT-01..03, WF-ING-01..04, WF-EVAL-01..02, CMD-01..03, INST-01..03, TEST-01..03, ADR-01, PRTY-01)
 **Granularity:** fine
@@ -34,7 +34,7 @@ Three ports + de-deferral of two existing commands → MINOR semver bump per CLA
 
 - [x] **Phase 1: Agent ports + installer wiring** — Port `oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor` agents and wire them into the per-runtime installer with correct Codex sandboxes.
 - [x] **Phase 2: Workflow rebrand-ports + command de-deferral** — Rebrand-port `ingest-docs.md` and `eval-review.md` workflows; strip deferral framing from `/oto-ingest-docs`, `/oto-eval-review`, and `/oto-help`.
-- [ ] **Phase 3: Tests, install-smoke, parity, ADR-15** — Port `ingest-docs.test.cjs`, add `eval-review.test.cjs`, extend install-smoke for new agents, run per-runtime parity check, write ADR-15.
+- [x] **Phase 3: Tests, install-smoke, parity, ADR-15** — Port `ingest-docs.test.cjs`, add `eval-review.test.cjs`, extend install-smoke for new agents, run per-runtime parity check, write ADR-15.
 
 ## Phase Details
 
@@ -101,14 +101,14 @@ Plans:
 Plans:
 
 **Wave 1** *(03-01 and 03-02 run in parallel — fully disjoint `files_modified`)*
-- [ ] 03-01-PLAN.md — TEST-01 + TEST-02 + TEST-03: port `tests/ingest-docs.test.cjs` from GSD with namespace rebrand + D-04 hand-fixups; author new `tests/eval-review.test.cjs` with two literal SDK-DEFER-01 fallback regex locks; gate full-suite green.
-- [ ] 03-02-PLAN.md — INST-03 + PRTY-01 (Claude branch): bump `EXPECTED_AGENTS` from 23 → 26 in `oto/bin/lib/model-profiles.cjs`; extend `tests/phase-04-mr01-install-smoke.test.cjs` to assert Claude command files; extend `.github/workflows/install-smoke.yml` smoke-tarball + smoke-unpacked jobs to assert 3 new agent files in each runtime config dir.
+- [x] 03-01-PLAN.md — TEST-01 + TEST-02 + TEST-03: port `tests/ingest-docs.test.cjs` from GSD with namespace rebrand + D-04 hand-fixups; author new `tests/eval-review.test.cjs` with two literal SDK-DEFER-01 fallback regex locks; gate full-suite green.
+- [x] 03-02-PLAN.md — INST-03 + PRTY-01 (Claude branch): bump `EXPECTED_AGENTS` from 23 → 26 in `oto/bin/lib/model-profiles.cjs`; extend `tests/phase-04-mr01-install-smoke.test.cjs` to assert Claude command files; extend `.github/workflows/install-smoke.yml` smoke-tarball + smoke-unpacked jobs to assert 3 new agent files in each runtime config dir.
 
 **Wave 1b** *(blocked on 03-02 completion — needs EXPECTED_AGENTS bump for full-suite regression check)*
-- [ ] 03-03-PLAN.md — PRTY-01 (Codex + Gemini branches): extend `tests/phase-08-smoke-codex.integration.test.cjs` to assert `skills/oto-*/SKILL.md` files + per-agent `sandbox_mode` TOML per D-04; extend `tests/phase-08-smoke-gemini.integration.test.cjs` to assert `.md` command files (Option A locked per existing test precedent).
+- [x] 03-03-PLAN.md — PRTY-01 (Codex + Gemini branches): extend `tests/phase-08-smoke-codex.integration.test.cjs` to assert `skills/oto-*/SKILL.md` files + per-agent `sandbox_mode` TOML per D-04; extend `tests/phase-08-smoke-gemini.integration.test.cjs` to assert `.md` command files (Option A locked per existing test precedent).
 
 **Wave 2** *(blocked on all of Wave 1 + 1b)*
-- [ ] 03-04-PLAN.md — ADR-01: author `decisions/ADR-15-restore-doc-and-eval-agents.md` with `Implements: D-24` (new global decision registering the partial ADR-07 reversal); paraphrase ADR-07's reactivation framing; name exactly 3 restored agents; affirm AGNT-DEFER-01 by enumerating the 7 still-dropped agents; record Codex sandbox decisions per agent.
+- [x] 03-04-PLAN.md — ADR-01: author `decisions/ADR-15-restore-doc-and-eval-agents.md` with `Implements: D-24` (new global decision registering the partial ADR-07 reversal); paraphrase ADR-07's reactivation framing; name exactly 3 restored agents; affirm AGNT-DEFER-01 by enumerating the 7 still-dropped agents; record Codex sandbox decisions per agent.
 
 **Cross-cutting constraints** *(must_haves shared across multiple plans)*:
 - SDK-DEFER-01 tolerance: every `oto-sdk query …` invocation referenced by tests, workflows, or CI MUST include the `2>/dev/null || …` fallback. Plan 01 locks this via two literal regex assertions on `oto/workflows/eval-review.md`; Plan 02 inherits the pattern in install-smoke YAML.
@@ -123,7 +123,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Agent ports + installer wiring | 2/2 | Complete | 2026-05-18 |
 | 2. Workflow rebrand-ports + command de-deferral | 3/3 | Complete | 2026-05-18 |
-| 3. Tests, install-smoke, parity, ADR-15 | 0/4 | Ready to execute | — |
+| 3. Tests, install-smoke, parity, ADR-15 | 4/4 | Complete; security review pending | 2026-05-18 |
 
 ## Traceability
 

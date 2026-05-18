@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
-status: executing
-last_updated: "2026-05-18T21:34:15Z"
-last_activity: 2026-05-18 -- Phase 3 execution started
+status: security_review_pending
+last_updated: "2026-05-18T21:48:47Z"
+last_activity: 2026-05-18 -- Phase 3 execution completed; security review pending
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 5
-  percent: 56
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md
 ## Current Position
 
 Phase: 3 — Tests, install-smoke, parity, ADR-15
-Plan: 1 of 4
-Status: Executing Phase 3
-Last activity: 2026-05-18 -- Phase 3 execution started
+Plan: 4 of 4
+Status: Phase 3 complete; security review pending
+Last activity: 2026-05-18 -- Phase 3 execution completed; security review pending
 
 Archive (prior milestones):
 
@@ -41,17 +41,18 @@ Archive (prior milestones):
 
 - v0.2.0 milestone audit: `status: passed`, 32/32 requirements covered.
 - Phase 1 verification passed on 2026-05-18: `01-VERIFICATION.md` status `passed`, `01-REVIEW.md` status `clean`, `01-SECURITY.md` status `passed`.
-- Phase 2 verification passed on 2026-05-18: `02-VERIFICATION.md` status `passed`, `02-REVIEW.md` status `clean`; security review pending.
-- `npm test` passed on 2026-05-18: 561 pass, 1 expected skip, 0 failures.
-- Focused Phase 1 and runtime-matrix tests also passed on 2026-05-18.
+- Phase 2 verification passed on 2026-05-18: `02-VERIFICATION.md` status `passed`, `02-REVIEW.md` status `clean`, `02-SECURITY.md` threats open `0`.
+- Phase 3 verification passed on 2026-05-18: `03-VERIFICATION.md` status `passed`, `03-REVIEW.md` status `clean`; security review pending.
+- `npm test` passed on 2026-05-18: 612 pass, 1 expected skip, 0 failures.
+- Focused Phase 3 ingest-docs, eval-review, install-smoke, Codex parity, Gemini parity, and ADR structure tests passed on 2026-05-18.
 
 ## Next Command
 
 ```bash
-/oto-execute-phase 3
+/oto-secure-phase 3
 ```
 
-Phase 3 plans authored and verified. Execute the 4 plans (Wave 1 parallel: 03-01, 03-02; Wave 1b: 03-03; Wave 2: 03-04).
+Phase 3 execution and verification are complete. Run the security review before milestone completion.
 
 ## Accumulated Context
 
@@ -61,6 +62,7 @@ Phase 3 plans authored and verified. Execute the 4 plans (Wave 1 parallel: 03-01
 - 2026-05-18: Phase 1 completed. The retained agent set is now 26 agents; Phase 2 is ready to plan.
 - 2026-05-18: Phase 2 completed. `/oto-ingest-docs` and `/oto-eval-review` now have executable workflow bodies, deferral framing is regression-guarded away, and workflow-shape/fixture tests lock the Phase 2 contracts. Phase 3 is ready to plan after `/oto-secure-phase 2`.
 - 2026-05-18: Phase 3 planned. 4 PLAN.md files written in `.planning/phases/03-tests-install-smoke-parity-adr-15/` across 2 waves (Wave 1: 03-01 tests authoring + 03-02 install-smoke; Wave 1b: 03-03 per-runtime parity sequenced after 03-02; Wave 2: 03-04 ADR-15). Plan checker passed iteration 2; all 6 phase requirements (TEST-01..03, INST-03, PRTY-01, ADR-01) covered. RESEARCH and VALIDATION (nyquist_compliant: true) drafted.
+- 2026-05-18: Phase 3 completed. Tests, install-smoke, Codex/Gemini parity, and ADR-15 landed across 4 scoped commits. `03-VERIFICATION.md` passed 6/6 success criteria and `npm test` passed with 613 tests, 612 pass, 1 skip, 0 failures. Phase 3 security review remains before milestone completion.
 
 ### Decisions
 

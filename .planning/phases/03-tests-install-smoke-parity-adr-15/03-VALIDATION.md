@@ -1,7 +1,7 @@
 ---
 phase: 3
 slug: tests-install-smoke-parity-adr-15
-status: draft
+status: passed
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-05-18
@@ -39,15 +39,15 @@ revised: 2026-05-18
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 3-01-01 | 01 | 1 | TEST-01 | — | Workflow + command + 3 agent files present per inventory | unit | `node --test tests/ingest-docs.test.cjs` | ❌ W0 (created in 03-01) | ⬜ pending |
-| 3-01-02 | 01 | 1 | TEST-02 | T-3-02 | Workflow loads; `oto-eval-auditor` dispatch surface; EVAL-REVIEW.md shape; SDK-DEFER-01 fallback locked via 2 literal regexes (B3) | unit | `node --test tests/eval-review.test.cjs` | ❌ W0 (created in 03-01) | ⬜ pending |
-| 3-01-03 | 01 | 1 | TEST-03 | — | Full suite green at v0.2.0 baseline + new tests | regression | `npm test` | ✅ existing | ⬜ pending |
-| 3-02-01 | 02 | 1 | INST-03 | — | `EXPECTED_AGENTS` includes 3 new agents (26 total) | unit | `node --test tests/phase-04-mr01-install-smoke.test.cjs` | ✅ existing (stale) | ⬜ pending |
-| 3-02-02 | 02 | 1 | INST-03 | — | CI install-smoke asserts 3 new agent files in each runtime config dir under tarball + unpacked | CI | `grep -E "oto-doc-classifier\|oto-doc-synthesizer\|oto-eval-auditor" .github/workflows/install-smoke.yml` | ✅ existing | ⬜ pending |
-| 3-03-01 | 03 | 1b | PRTY-01 | T-3-09, T-3-10 | Codex parity: `~/.codex/skills/oto-ingest-docs/SKILL.md` + `oto-eval-review/SKILL.md` exist; sandbox TOML per D-04 | integration | `node --test tests/phase-08-smoke-codex.integration.test.cjs` | ✅ existing | ⬜ pending |
-| 3-03-02 | 03 | 1b | PRTY-01 | T-3-12 | Gemini parity: `~/.gemini/commands/oto/ingest-docs.md` + `eval-review.md` exist (W2 locked — `.md` extension per existing test precedent at lines 60-62) | integration | `node --test tests/phase-08-smoke-gemini.integration.test.cjs` | ✅ existing | ⬜ pending |
-| 3-03-03 | 03 | 1b | PRTY-01 | T-3-W3 | Claude parity assertions owned by Plan 02 in `tests/phase-04-mr01-install-smoke.test.cjs`; Plan 03 Task 3 reruns full suite AFTER Plan 02 lands (depends_on: ['03-02']) | integration | `node --test tests/phase-04-mr01-install-smoke.test.cjs` | ✅ existing | ⬜ pending |
-| 3-04-01 | 04 | 2 | ADR-01 | T-3-B1, T-3-B2 | `decisions/ADR-15-restore-doc-and-eval-agents.md` exists; `Implements: D-24` (B1); cites `ADR-07-agent-trim.md` not the typo (B2); names exactly 3 agents restored; affirms AGNT-DEFER-01 stays deferred; records Codex sandbox per agent | doc | `test -f decisions/ADR-15-restore-doc-and-eval-agents.md && grep -qE "^Implements: D-24" decisions/ADR-15-*.md && grep -q "ADR-07-agent-trim.md" decisions/ADR-15-*.md && ! grep -q "ADR-07-agent-rationalization" decisions/ADR-15-*.md && node --test tests/phase-01-adr-structure.test.cjs` | ❌ W0 (created in 03-04) | ⬜ pending |
+| 3-01-01 | 01 | 1 | TEST-01 | — | Workflow + command + 3 agent files present per inventory | unit | `node --test tests/ingest-docs.test.cjs` | ✅ created in 03-01 | ✅ green |
+| 3-01-02 | 01 | 1 | TEST-02 | T-3-02 | Workflow loads; `oto-eval-auditor` dispatch surface; EVAL-REVIEW.md shape; SDK-DEFER-01 fallback locked via 2 literal regexes (B3) | unit | `node --test tests/eval-review.test.cjs` | ✅ created in 03-01 | ✅ green |
+| 3-01-03 | 01 | 1 | TEST-03 | — | Full suite green at v0.2.0 baseline + new tests | regression | `npm test` | ✅ existing | ✅ green |
+| 3-02-01 | 02 | 1 | INST-03 | — | `EXPECTED_AGENTS` includes 3 new agents (26 total) | unit | `node --test tests/phase-04-mr01-install-smoke.test.cjs` | ✅ updated in 03-02 | ✅ green |
+| 3-02-02 | 02 | 1 | INST-03 | — | CI install-smoke asserts 3 new agent files in each runtime config dir under tarball + unpacked | CI | `grep -E "oto-doc-classifier\|oto-doc-synthesizer\|oto-eval-auditor" .github/workflows/install-smoke.yml` | ✅ updated in 03-02 | ✅ green |
+| 3-03-01 | 03 | 1b | PRTY-01 | T-3-09, T-3-10 | Codex parity: `~/.codex/skills/oto-ingest-docs/SKILL.md` + `oto-eval-review/SKILL.md` exist; sandbox TOML per D-04 | integration | `node --test tests/phase-08-smoke-codex.integration.test.cjs` | ✅ updated in 03-03 | ✅ green |
+| 3-03-02 | 03 | 1b | PRTY-01 | T-3-12 | Gemini parity: `~/.gemini/commands/oto/ingest-docs.md` + `eval-review.md` exist (W2 locked — `.md` extension per existing test precedent at lines 60-62) | integration | `node --test tests/phase-08-smoke-gemini.integration.test.cjs` | ✅ updated in 03-03 | ✅ green |
+| 3-03-03 | 03 | 1b | PRTY-01 | T-3-W3 | Claude parity assertions owned by Plan 02 in `tests/phase-04-mr01-install-smoke.test.cjs`; Plan 03 Task 3 reruns full suite AFTER Plan 02 lands (depends_on: ['03-02']) | integration | `node --test tests/phase-04-mr01-install-smoke.test.cjs` | ✅ updated in 03-02 | ✅ green |
+| 3-04-01 | 04 | 2 | ADR-01 | T-3-B1, T-3-B2 | `decisions/ADR-15-restore-doc-and-eval-agents.md` exists; `Implements: D-24` (B1); cites `ADR-07-agent-trim.md` not the typo (B2); names exactly 3 agents restored; affirms AGNT-DEFER-01 stays deferred; records Codex sandbox per agent | doc | `test -f decisions/ADR-15-restore-doc-and-eval-agents.md && grep -qE "^Implements: D-24" decisions/ADR-15-*.md && grep -q "ADR-07-agent-trim.md" decisions/ADR-15-*.md && ! grep -q "ADR-07-agent-rationalization" decisions/ADR-15-*.md && node --test tests/phase-01-adr-structure.test.cjs` | ✅ created in 03-04 | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
