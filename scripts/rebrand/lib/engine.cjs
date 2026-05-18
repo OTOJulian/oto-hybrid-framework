@@ -256,6 +256,13 @@ function shouldSkipInventoryEntry(relPath, inventoryByPath) {
   return inventoryEntry && inventoryEntry.verdict === 'drop';
 }
 
+function dryRunTargetPathFor(entry, map, inventoryByPath) {
+  const inventoryEntry = inventoryEntryFor(entry.relPath, inventoryByPath);
+  if (inventoryEntry && inventoryEntry.target_path) return inventoryEntry.target_path;
+  if (entry.allowlisted) return entry.relPath;
+  return applyRelPath(entry.relPath, map);
+}
+
 async function writeJsonAndMarkdownReports(dryrun, reportsDir) {
   const dir = reportsDir
     ? (fs.mkdirSync(reportsDir, { recursive: true }), reportsDir)
@@ -276,6 +283,7 @@ async function runDryRun(target, map, allowlist, inventoryByPath, owner, options
     matchTotal += matches.length;
     files.push({
       path: entry.relPath,
+      target_path: dryRunTargetPathFor(entry, map, inventoryByPath),
       file_class: entry.file_class,
       allowlisted: entry.allowlisted,
       matches,

@@ -14,9 +14,9 @@ function renderDryrunMarkdown(dryrunJson) {
   for (const [ruleType, count] of Object.entries(dryrunJson.summary_by_rule_type)) {
     lines.push(`| ${ruleType} | ${count} |`);
   }
-  lines.push('', '| File | Class | Matches | Unclassified |', '|------|-------|---------|--------------|');
+  lines.push('', '| File | Target | Class | Matches | Unclassified |', '|------|--------|-------|---------|--------------|');
   for (const file of dryrunJson.files) {
-    lines.push(`| ${file.path} | ${file.file_class} | ${file.matches.length} | ${file.unclassified_count} |`);
+    lines.push(`| ${file.path} | ${file.target_path || ''} | ${file.file_class} | ${file.matches.length} | ${file.unclassified_count} |`);
   }
   return `${lines.join('\n')}\n`;
 }

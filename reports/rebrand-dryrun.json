@@ -5,6 +5,7 @@
   "files": [
     {
       "path": "LICENSE",
+      "target_path": "THIRD-PARTY-LICENSES.md",
       "file_class": "license",
       "allowlisted": true,
       "matches": [],
@@ -12,6 +13,7 @@
     },
     {
       "path": "agents/gsd-advisor-researcher.md",
+      "target_path": "agents/oto-advisor-researcher.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -36,6 +38,7 @@
     },
     {
       "path": "agents/gsd-assumptions-analyzer.md",
+      "target_path": "agents/oto-assumptions-analyzer.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -68,6 +71,7 @@
     },
     {
       "path": "agents/gsd-code-fixer.md",
+      "target_path": "agents/oto-code-fixer.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -164,6 +168,7 @@
     },
     {
       "path": "agents/gsd-code-reviewer.md",
+      "target_path": "agents/oto-code-reviewer.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -252,6 +257,7 @@
     },
     {
       "path": "agents/gsd-codebase-mapper.md",
+      "target_path": "agents/oto-codebase-mapper.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -340,6 +346,7 @@
     },
     {
       "path": "agents/gsd-debugger.md",
+      "target_path": "agents/oto-debugger.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -644,6 +651,7 @@
     },
     {
       "path": "agents/gsd-doc-classifier.md",
+      "target_path": "agents/oto-doc-classifier.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -708,6 +716,7 @@
     },
     {
       "path": "agents/gsd-doc-synthesizer.md",
+      "target_path": "agents/oto-doc-synthesizer.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -788,6 +797,7 @@
     },
     {
       "path": "agents/gsd-doc-verifier.md",
+      "target_path": "agents/oto-doc-verifier.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -844,6 +854,7 @@
     },
     {
       "path": "agents/gsd-doc-writer.md",
+      "target_path": "agents/oto-doc-writer.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1060,6 +1071,7 @@
     },
     {
       "path": "agents/gsd-domain-researcher.md",
+      "target_path": "agents/oto-domain-researcher.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1108,6 +1120,7 @@
     },
     {
       "path": "agents/gsd-eval-auditor.md",
+      "target_path": "agents/oto-eval-auditor.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1148,6 +1161,7 @@
     },
     {
       "path": "agents/gsd-executor.md",
+      "target_path": "agents/oto-executor.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1428,6 +1442,7 @@
     },
     {
       "path": "agents/gsd-integration-checker.md",
+      "target_path": "agents/oto-integration-checker.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1452,6 +1467,7 @@
     },
     {
       "path": "agents/gsd-nyquist-auditor.md",
+      "target_path": "agents/oto-nyquist-auditor.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1468,6 +1484,7 @@
     },
     {
       "path": "agents/gsd-phase-researcher.md",
+      "target_path": "agents/oto-phase-researcher.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1684,6 +1701,7 @@
     },
     {
       "path": "agents/gsd-plan-checker.md",
+      "target_path": "agents/oto-plan-checker.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -1948,6 +1966,7 @@
     },
     {
       "path": "agents/gsd-planner.md",
+      "target_path": "agents/oto-planner.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -2500,6 +2519,7 @@
     },
     {
       "path": "agents/gsd-project-researcher.md",
+      "target_path": "agents/oto-project-researcher.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -2644,6 +2664,7 @@
     },
     {
       "path": "agents/gsd-research-synthesizer.md",
+      "target_path": "agents/oto-research-synthesizer.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -2844,6 +2865,7 @@
     },
     {
       "path": "agents/gsd-roadmapper.md",
+      "target_path": "agents/oto-roadmapper.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -3036,6 +3058,7 @@
     },
     {
       "path": "agents/gsd-security-auditor.md",
+      "target_path": "agents/oto-security-auditor.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -3084,6 +3107,7 @@
     },
     {
       "path": "agents/gsd-ui-auditor.md",
+      "target_path": "agents/oto-ui-auditor.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -3188,6 +3212,7 @@
     },
     {
       "path": "agents/gsd-ui-checker.md",
+      "target_path": "agents/oto-ui-checker.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -3308,6 +3333,7 @@
     },
     {
       "path": "agents/gsd-ui-researcher.md",
+      "target_path": "agents/oto-ui-researcher.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -3452,6 +3478,7 @@
     },
     {
       "path": "agents/gsd-verifier.md",
+      "target_path": "agents/oto-verifier.md",
       "file_class": "agent",
       "allowlisted": false,
       "matches": [
@@ -3668,6 +3695,7 @@
     },
     {
       "path": "bin/install.js",
+      "target_path": "bin/install.js",
       "file_class": "installer",
       "allowlisted": false,
       "matches": [
@@ -9372,6 +9400,7 @@
     },
     {
       "path": "hooks/gsd-context-monitor.js",
+      "target_path": "hooks/oto-context-monitor.js",
       "file_class": "hook",
       "allowlisted": false,
       "matches": [
@@ -9540,6 +9569,7 @@
     },
     {
       "path": "hooks/gsd-prompt-guard.js",
+      "target_path": "hooks/oto-prompt-guard.js",
       "file_class": "hook",
       "allowlisted": false,
       "matches": [
@@ -9620,6 +9650,7 @@
     },
     {
       "path": "hooks/gsd-read-injection-scanner.js",
+      "target_path": "hooks/oto-read-injection-scanner.js",
       "file_class": "hook",
       "allowlisted": false,
       "matches": [
@@ -9716,6 +9747,7 @@
     },
     {
       "path": "hooks/gsd-session-state.sh",
+      "target_path": "hooks/oto-session-start",
       "file_class": "hook",
       "allowlisted": false,
       "matches": [
@@ -9844,6 +9876,7 @@
     },
     {
       "path": "hooks/gsd-statusline.js",
+      "target_path": "hooks/oto-statusline.js",
       "file_class": "hook",
       "allowlisted": false,
       "matches": [
@@ -10052,6 +10085,7 @@
     },
     {
       "path": "hooks/gsd-validate-commit.sh",
+      "target_path": "hooks/oto-validate-commit.sh",
       "file_class": "hook",
       "allowlisted": false,
       "matches": [
@@ -10132,6 +10166,7 @@
     },
     {
       "path": "commands/gsd/add-backlog.md",
+      "target_path": "commands/oto/add-backlog.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10300,6 +10335,7 @@
     },
     {
       "path": "commands/gsd/add-phase.md",
+      "target_path": "commands/oto/add-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10332,6 +10368,7 @@
     },
     {
       "path": "commands/gsd/add-tests.md",
+      "target_path": "commands/oto/add-tests.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10396,6 +10433,7 @@
     },
     {
       "path": "commands/gsd/add-todo.md",
+      "target_path": "commands/oto/add-todo.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10436,6 +10474,7 @@
     },
     {
       "path": "commands/gsd/ai-integration-phase.md",
+      "target_path": "commands/oto/ai-integration-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10516,6 +10555,7 @@
     },
     {
       "path": "commands/gsd/analyze-dependencies.md",
+      "target_path": "commands/oto/analyze-dependencies.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10564,6 +10604,7 @@
     },
     {
       "path": "commands/gsd/audit-fix.md",
+      "target_path": "commands/oto/audit-fix.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10596,6 +10637,7 @@
     },
     {
       "path": "commands/gsd/audit-milestone.md",
+      "target_path": "commands/oto/audit-milestone.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10644,6 +10686,7 @@
     },
     {
       "path": "commands/gsd/audit-uat.md",
+      "target_path": "commands/oto/audit-uat.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10684,6 +10727,7 @@
     },
     {
       "path": "commands/gsd/autonomous.md",
+      "target_path": "commands/oto/autonomous.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10740,6 +10784,7 @@
     },
     {
       "path": "commands/gsd/check-todos.md",
+      "target_path": "commands/oto/check-todos.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10772,6 +10817,7 @@
     },
     {
       "path": "commands/gsd/cleanup.md",
+      "target_path": "commands/oto/cleanup.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10804,6 +10850,7 @@
     },
     {
       "path": "commands/gsd/code-review-fix.md",
+      "target_path": "commands/oto/code-review-fix.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10860,6 +10907,7 @@
     },
     {
       "path": "commands/gsd/code-review.md",
+      "target_path": "commands/oto/code-review.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -10916,6 +10964,7 @@
     },
     {
       "path": "commands/gsd/complete-milestone.md",
+      "target_path": "commands/oto/complete-milestone.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11044,6 +11093,7 @@
     },
     {
       "path": "commands/gsd/debug.md",
+      "target_path": "commands/oto/debug.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11292,6 +11342,7 @@
     },
     {
       "path": "commands/gsd/discuss-phase.md",
+      "target_path": "commands/oto/discuss-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11332,6 +11383,7 @@
     },
     {
       "path": "commands/gsd/do.md",
+      "target_path": "commands/oto/do.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11412,6 +11464,7 @@
     },
     {
       "path": "commands/gsd/docs-update.md",
+      "target_path": "commands/oto/docs-update.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11476,6 +11529,7 @@
     },
     {
       "path": "commands/gsd/edit-phase.md",
+      "target_path": "commands/oto/edit-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11508,6 +11562,7 @@
     },
     {
       "path": "commands/gsd/eval-review.md",
+      "target_path": "commands/oto/eval-review.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11548,6 +11603,7 @@
     },
     {
       "path": "commands/gsd/execute-phase.md",
+      "target_path": "commands/oto/execute-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11596,6 +11652,7 @@
     },
     {
       "path": "commands/gsd/explore.md",
+      "target_path": "commands/oto/explore.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11652,6 +11709,7 @@
     },
     {
       "path": "commands/gsd/fast.md",
+      "target_path": "commands/oto/fast.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11732,6 +11790,7 @@
     },
     {
       "path": "commands/gsd/forensics.md",
+      "target_path": "commands/oto/forensics.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11780,6 +11839,7 @@
     },
     {
       "path": "commands/gsd/health.md",
+      "target_path": "commands/oto/health.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11812,6 +11872,7 @@
     },
     {
       "path": "commands/gsd/help.md",
+      "target_path": "commands/oto/help.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11868,6 +11929,7 @@
     },
     {
       "path": "commands/gsd/import.md",
+      "target_path": "commands/oto/import.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -11940,6 +12002,7 @@
     },
     {
       "path": "commands/gsd/ingest-docs.md",
+      "target_path": "commands/oto/ingest-docs.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12012,6 +12075,7 @@
     },
     {
       "path": "commands/gsd/insert-phase.md",
+      "target_path": "commands/oto/insert-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12044,6 +12108,7 @@
     },
     {
       "path": "commands/gsd/list-phase-assumptions.md",
+      "target_path": "commands/oto/list-phase-assumptions.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12068,6 +12133,7 @@
     },
     {
       "path": "commands/gsd/list-workspaces.md",
+      "target_path": "commands/oto/list-workspaces.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12140,6 +12206,7 @@
     },
     {
       "path": "commands/gsd/manager.md",
+      "target_path": "commands/oto/manager.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12196,6 +12263,7 @@
     },
     {
       "path": "commands/gsd/map-codebase.md",
+      "target_path": "commands/oto/map-codebase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12348,6 +12416,7 @@
     },
     {
       "path": "commands/gsd/milestone-summary.md",
+      "target_path": "commands/oto/milestone-summary.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12380,6 +12449,7 @@
     },
     {
       "path": "commands/gsd/new-milestone.md",
+      "target_path": "commands/oto/new-milestone.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12460,6 +12530,7 @@
     },
     {
       "path": "commands/gsd/new-project.md",
+      "target_path": "commands/oto/new-project.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12540,6 +12611,7 @@
     },
     {
       "path": "commands/gsd/new-workspace.md",
+      "target_path": "commands/oto/new-workspace.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12652,6 +12724,7 @@
     },
     {
       "path": "commands/gsd/next.md",
+      "target_path": "commands/oto/next.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12700,6 +12773,7 @@
     },
     {
       "path": "commands/gsd/note.md",
+      "target_path": "commands/oto/note.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12740,6 +12814,7 @@
     },
     {
       "path": "commands/gsd/pause-work.md",
+      "target_path": "commands/oto/pause-work.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12772,6 +12847,7 @@
     },
     {
       "path": "commands/gsd/plan-milestone-gaps.md",
+      "target_path": "commands/oto/plan-milestone-gaps.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12844,6 +12920,7 @@
     },
     {
       "path": "commands/gsd/plan-phase.md",
+      "target_path": "commands/oto/plan-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -12924,6 +13001,7 @@
     },
     {
       "path": "commands/gsd/plan-review-convergence.md",
+      "target_path": "commands/oto/plan-review-convergence.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13052,6 +13130,7 @@
     },
     {
       "path": "commands/gsd/plant-seed.md",
+      "target_path": "commands/oto/plant-seed.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13108,6 +13187,7 @@
     },
     {
       "path": "commands/gsd/pr-branch.md",
+      "target_path": "commands/oto/pr-branch.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13164,6 +13244,7 @@
     },
     {
       "path": "commands/gsd/progress.md",
+      "target_path": "commands/oto/progress.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13196,6 +13277,7 @@
     },
     {
       "path": "commands/gsd/quick.md",
+      "target_path": "commands/oto/quick.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13348,6 +13430,7 @@
     },
     {
       "path": "commands/gsd/remove-phase.md",
+      "target_path": "commands/oto/remove-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13380,6 +13463,7 @@
     },
     {
       "path": "commands/gsd/remove-workspace.md",
+      "target_path": "commands/oto/remove-workspace.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13428,6 +13512,7 @@
     },
     {
       "path": "commands/gsd/research-phase.md",
+      "target_path": "commands/oto/research-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13604,6 +13689,7 @@
     },
     {
       "path": "commands/gsd/resume-work.md",
+      "target_path": "commands/oto/resume-work.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13636,6 +13722,7 @@
     },
     {
       "path": "commands/gsd/review-backlog.md",
+      "target_path": "commands/oto/review-backlog.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13692,6 +13779,7 @@
     },
     {
       "path": "commands/gsd/review.md",
+      "target_path": "commands/oto/review.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13740,6 +13828,7 @@
     },
     {
       "path": "commands/gsd/scan.md",
+      "target_path": "commands/oto/scan.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13804,6 +13893,7 @@
     },
     {
       "path": "commands/gsd/secure-phase.md",
+      "target_path": "commands/oto/secure-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13836,6 +13926,7 @@
     },
     {
       "path": "commands/gsd/session-report.md",
+      "target_path": "commands/oto/session-report.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13868,6 +13959,7 @@
     },
     {
       "path": "commands/gsd/set-profile.md",
+      "target_path": "commands/oto/set-profile.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -13972,6 +14064,7 @@
     },
     {
       "path": "commands/gsd/settings-advanced.md",
+      "target_path": "commands/oto/settings-advanced.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14068,6 +14161,7 @@
     },
     {
       "path": "commands/gsd/settings-integrations.md",
+      "target_path": "commands/oto/settings-integrations.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14156,6 +14250,7 @@
     },
     {
       "path": "commands/gsd/settings.md",
+      "target_path": "commands/oto/settings.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14204,6 +14299,7 @@
     },
     {
       "path": "commands/gsd/ship.md",
+      "target_path": "commands/oto/ship.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14252,6 +14348,7 @@
     },
     {
       "path": "commands/gsd/sketch-wrap-up.md",
+      "target_path": "commands/oto/sketch-wrap-up.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14292,6 +14389,7 @@
     },
     {
       "path": "commands/gsd/sketch.md",
+      "target_path": "commands/oto/sketch.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14388,6 +14486,7 @@
     },
     {
       "path": "commands/gsd/spec-phase.md",
+      "target_path": "commands/oto/spec-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14444,6 +14543,7 @@
     },
     {
       "path": "commands/gsd/spike-wrap-up.md",
+      "target_path": "commands/oto/spike-wrap-up.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14484,6 +14584,7 @@
     },
     {
       "path": "commands/gsd/spike.md",
+      "target_path": "commands/oto/spike.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14548,6 +14649,7 @@
     },
     {
       "path": "commands/gsd/stats.md",
+      "target_path": "commands/oto/stats.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14580,6 +14682,7 @@
     },
     {
       "path": "commands/gsd/sync-skills.md",
+      "target_path": "commands/oto/sync-skills.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14628,6 +14731,7 @@
     },
     {
       "path": "commands/gsd/ui-phase.md",
+      "target_path": "commands/oto/ui-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14684,6 +14788,7 @@
     },
     {
       "path": "commands/gsd/ui-review.md",
+      "target_path": "commands/oto/ui-review.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14724,6 +14829,7 @@
     },
     {
       "path": "commands/gsd/undo.md",
+      "target_path": "commands/oto/undo.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14788,6 +14894,7 @@
     },
     {
       "path": "commands/gsd/update.md",
+      "target_path": "commands/oto/update.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14836,6 +14943,7 @@
     },
     {
       "path": "commands/gsd/validate-phase.md",
+      "target_path": "commands/oto/validate-phase.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14868,6 +14976,7 @@
     },
     {
       "path": "commands/gsd/verify-work.md",
+      "target_path": "commands/oto/verify-work.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -14924,6 +15033,7 @@
     },
     {
       "path": "commands/gsd/workstreams.md",
+      "target_path": "commands/oto/workstreams.md",
       "file_class": "command",
       "allowlisted": false,
       "matches": [
@@ -15084,6 +15194,7 @@
     },
     {
       "path": "get-shit-done/bin/gsd-tools.cjs",
+      "target_path": "oto/bin/lib/oto-tools.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -15500,6 +15611,7 @@
     },
     {
       "path": "get-shit-done/contexts/dev.md",
+      "target_path": "oto/contexts/dev.md",
       "file_class": "context",
       "allowlisted": false,
       "matches": [],
@@ -15507,6 +15619,7 @@
     },
     {
       "path": "get-shit-done/contexts/research.md",
+      "target_path": "oto/contexts/research.md",
       "file_class": "context",
       "allowlisted": false,
       "matches": [],
@@ -15514,6 +15627,7 @@
     },
     {
       "path": "get-shit-done/contexts/review.md",
+      "target_path": "oto/contexts/review.md",
       "file_class": "context",
       "allowlisted": false,
       "matches": [],
@@ -15521,6 +15635,7 @@
     },
     {
       "path": "get-shit-done/references/agent-contracts.md",
+      "target_path": "oto/references/agent-contracts.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -15737,6 +15852,7 @@
     },
     {
       "path": "get-shit-done/references/ai-evals.md",
+      "target_path": "oto/references/ai-evals.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -15761,6 +15877,7 @@
     },
     {
       "path": "get-shit-done/references/ai-frameworks.md",
+      "target_path": "oto/references/ai-frameworks.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -15785,6 +15902,7 @@
     },
     {
       "path": "get-shit-done/references/artifact-types.md",
+      "target_path": "oto/references/artifact-types.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -15961,6 +16079,7 @@
     },
     {
       "path": "get-shit-done/references/autonomous-smart-discuss.md",
+      "target_path": "oto/references/autonomous-smart-discuss.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16041,6 +16160,7 @@
     },
     {
       "path": "get-shit-done/references/checkpoints.md",
+      "target_path": "oto/references/checkpoints.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -16048,6 +16168,7 @@
     },
     {
       "path": "get-shit-done/references/common-bug-patterns.md",
+      "target_path": "oto/references/common-bug-patterns.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -16055,6 +16176,7 @@
     },
     {
       "path": "get-shit-done/references/context-budget.md",
+      "target_path": "oto/references/context-budget.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -16062,6 +16184,7 @@
     },
     {
       "path": "get-shit-done/references/continuation-format.md",
+      "target_path": "oto/references/continuation-format.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16326,6 +16449,7 @@
     },
     {
       "path": "get-shit-done/references/debugger-philosophy.md",
+      "target_path": "oto/references/debugger-philosophy.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16342,6 +16466,7 @@
     },
     {
       "path": "get-shit-done/references/decimal-phase-calculation.md",
+      "target_path": "oto/references/decimal-phase-calculation.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16406,6 +16531,7 @@
     },
     {
       "path": "get-shit-done/references/doc-conflict-engine.md",
+      "target_path": "oto/references/doc-conflict-engine.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16462,6 +16588,7 @@
     },
     {
       "path": "get-shit-done/references/domain-probes.md",
+      "target_path": "oto/references/domain-probes.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16502,6 +16629,7 @@
     },
     {
       "path": "get-shit-done/references/executor-examples.md",
+      "target_path": "oto/references/executor-examples.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16518,6 +16646,7 @@
     },
     {
       "path": "get-shit-done/references/gate-prompts.md",
+      "target_path": "oto/references/gate-prompts.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16574,6 +16703,7 @@
     },
     {
       "path": "get-shit-done/references/gates.md",
+      "target_path": "oto/references/gates.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16606,6 +16736,7 @@
     },
     {
       "path": "get-shit-done/references/git-integration.md",
+      "target_path": "oto/references/git-integration.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16750,6 +16881,7 @@
     },
     {
       "path": "get-shit-done/references/git-planning-commit.md",
+      "target_path": "oto/references/git-planning-commit.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16822,6 +16954,7 @@
     },
     {
       "path": "get-shit-done/references/ios-scaffold.md",
+      "target_path": "oto/references/ios-scaffold.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -16829,6 +16962,7 @@
     },
     {
       "path": "get-shit-done/references/mandatory-initial-read.md",
+      "target_path": "oto/references/mandatory-initial-read.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -16836,6 +16970,7 @@
     },
     {
       "path": "get-shit-done/references/model-profile-resolution.md",
+      "target_path": "oto/references/model-profile-resolution.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -16868,6 +17003,7 @@
     },
     {
       "path": "get-shit-done/references/model-profiles.md",
+      "target_path": "oto/references/model-profiles.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17164,6 +17300,7 @@
     },
     {
       "path": "get-shit-done/references/phase-argument-parsing.md",
+      "target_path": "oto/references/phase-argument-parsing.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17204,6 +17341,7 @@
     },
     {
       "path": "get-shit-done/references/planner-antipatterns.md",
+      "target_path": "oto/references/planner-antipatterns.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17220,6 +17358,7 @@
     },
     {
       "path": "get-shit-done/references/planner-chunked.md",
+      "target_path": "oto/references/planner-chunked.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17236,6 +17375,7 @@
     },
     {
       "path": "get-shit-done/references/planner-gap-closure.md",
+      "target_path": "oto/references/planner-gap-closure.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17243,6 +17383,7 @@
     },
     {
       "path": "get-shit-done/references/planner-reviews.md",
+      "target_path": "oto/references/planner-reviews.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17250,6 +17391,7 @@
     },
     {
       "path": "get-shit-done/references/planner-revision.md",
+      "target_path": "oto/references/planner-revision.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17298,6 +17440,7 @@
     },
     {
       "path": "get-shit-done/references/planner-source-audit.md",
+      "target_path": "oto/references/planner-source-audit.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17314,6 +17457,7 @@
     },
     {
       "path": "get-shit-done/references/planning-config.md",
+      "target_path": "oto/references/planning-config.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17666,6 +17810,7 @@
     },
     {
       "path": "get-shit-done/references/project-skills-discovery.md",
+      "target_path": "oto/references/project-skills-discovery.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17682,6 +17827,7 @@
     },
     {
       "path": "get-shit-done/references/questioning.md",
+      "target_path": "oto/references/questioning.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17689,6 +17835,7 @@
     },
     {
       "path": "get-shit-done/references/revision-loop.md",
+      "target_path": "oto/references/revision-loop.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17737,6 +17884,7 @@
     },
     {
       "path": "get-shit-done/references/scout-codebase.md",
+      "target_path": "oto/references/scout-codebase.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17744,6 +17892,7 @@
     },
     {
       "path": "get-shit-done/references/sketch-interactivity.md",
+      "target_path": "oto/references/sketch-interactivity.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17751,6 +17900,7 @@
     },
     {
       "path": "get-shit-done/references/sketch-theme-system.md",
+      "target_path": "oto/references/sketch-theme-system.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17767,6 +17917,7 @@
     },
     {
       "path": "get-shit-done/references/sketch-tooling.md",
+      "target_path": "oto/references/sketch-tooling.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17774,6 +17925,7 @@
     },
     {
       "path": "get-shit-done/references/sketch-variant-patterns.md",
+      "target_path": "oto/references/sketch-variant-patterns.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17781,6 +17933,7 @@
     },
     {
       "path": "get-shit-done/references/tdd.md",
+      "target_path": "oto/references/tdd.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [],
@@ -17788,6 +17941,7 @@
     },
     {
       "path": "get-shit-done/references/thinking-models-debug.md",
+      "target_path": "oto/references/thinking-models-debug.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17804,6 +17958,7 @@
     },
     {
       "path": "get-shit-done/references/thinking-models-execution.md",
+      "target_path": "oto/references/thinking-models-execution.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17820,6 +17975,7 @@
     },
     {
       "path": "get-shit-done/references/thinking-models-planning.md",
+      "target_path": "oto/references/thinking-models-planning.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17836,6 +17992,7 @@
     },
     {
       "path": "get-shit-done/references/thinking-models-research.md",
+      "target_path": "oto/references/thinking-models-research.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17852,6 +18009,7 @@
     },
     {
       "path": "get-shit-done/references/thinking-models-verification.md",
+      "target_path": "oto/references/thinking-models-verification.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17868,6 +18026,7 @@
     },
     {
       "path": "get-shit-done/references/thinking-partner.md",
+      "target_path": "oto/references/thinking-partner.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17892,6 +18051,7 @@
     },
     {
       "path": "get-shit-done/references/ui-brand.md",
+      "target_path": "oto/references/ui-brand.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -17956,6 +18116,7 @@
     },
     {
       "path": "get-shit-done/references/universal-anti-patterns.md",
+      "target_path": "oto/references/universal-anti-patterns.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -18092,6 +18253,7 @@
     },
     {
       "path": "get-shit-done/references/user-profiling.md",
+      "target_path": "oto/references/user-profiling.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -18124,6 +18286,7 @@
     },
     {
       "path": "get-shit-done/references/verification-overrides.md",
+      "target_path": "oto/references/verification-overrides.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -18188,6 +18351,7 @@
     },
     {
       "path": "get-shit-done/references/verification-patterns.md",
+      "target_path": "oto/references/verification-patterns.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -18204,6 +18368,7 @@
     },
     {
       "path": "get-shit-done/references/workstream-flag.md",
+      "target_path": "oto/references/workstream-flag.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -18436,6 +18601,7 @@
     },
     {
       "path": "get-shit-done/templates/AI-SPEC.md",
+      "target_path": "oto/templates/AI-SPEC.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -18500,6 +18666,7 @@
     },
     {
       "path": "get-shit-done/templates/DEBUG.md",
+      "target_path": "oto/templates/DEBUG.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -18532,6 +18699,7 @@
     },
     {
       "path": "get-shit-done/templates/SECURITY.md",
+      "target_path": "oto/templates/SECURITY.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -18539,6 +18707,7 @@
     },
     {
       "path": "get-shit-done/templates/UAT.md",
+      "target_path": "oto/templates/UAT.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -18627,6 +18796,7 @@
     },
     {
       "path": "get-shit-done/templates/UI-SPEC.md",
+      "target_path": "oto/templates/UI-SPEC.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -18651,6 +18821,7 @@
     },
     {
       "path": "get-shit-done/templates/VALIDATION.md",
+      "target_path": "oto/templates/VALIDATION.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -18675,6 +18846,7 @@
     },
     {
       "path": "get-shit-done/templates/claude-md.md",
+      "target_path": "oto/templates/claude-md.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -18955,6 +19127,7 @@
     },
     {
       "path": "get-shit-done/templates/config.json",
+      "target_path": "oto/templates/config.json",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -18962,6 +19135,7 @@
     },
     {
       "path": "get-shit-done/templates/context.md",
+      "target_path": "oto/templates/context.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19002,6 +19176,7 @@
     },
     {
       "path": "get-shit-done/templates/continue-here.md",
+      "target_path": "oto/templates/continue-here.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19009,6 +19184,7 @@
     },
     {
       "path": "get-shit-done/templates/copilot-instructions.md",
+      "target_path": "oto/templates/copilot-instructions.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19089,6 +19265,7 @@
     },
     {
       "path": "get-shit-done/templates/debug-subagent-prompt.md",
+      "target_path": "oto/templates/debug-subagent-prompt.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19145,6 +19322,7 @@
     },
     {
       "path": "get-shit-done/templates/dev-preferences.md",
+      "target_path": "oto/templates/dev-preferences.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19177,6 +19355,7 @@
     },
     {
       "path": "get-shit-done/templates/discovery.md",
+      "target_path": "oto/templates/discovery.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19217,6 +19396,7 @@
     },
     {
       "path": "get-shit-done/templates/discussion-log.md",
+      "target_path": "oto/templates/discussion-log.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19224,6 +19404,7 @@
     },
     {
       "path": "get-shit-done/templates/milestone-archive.md",
+      "target_path": "oto/templates/milestone-archive.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19240,6 +19421,7 @@
     },
     {
       "path": "get-shit-done/templates/milestone.md",
+      "target_path": "oto/templates/milestone.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19247,6 +19429,7 @@
     },
     {
       "path": "get-shit-done/templates/phase-prompt.md",
+      "target_path": "oto/templates/phase-prompt.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19359,6 +19542,7 @@
     },
     {
       "path": "get-shit-done/templates/planner-subagent-prompt.md",
+      "target_path": "oto/templates/planner-subagent-prompt.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19447,6 +19631,7 @@
     },
     {
       "path": "get-shit-done/templates/project.md",
+      "target_path": "oto/templates/project.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19479,6 +19664,7 @@
     },
     {
       "path": "get-shit-done/templates/requirements.md",
+      "target_path": "oto/templates/requirements.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19486,6 +19672,7 @@
     },
     {
       "path": "get-shit-done/templates/research.md",
+      "target_path": "oto/templates/research.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19518,6 +19705,7 @@
     },
     {
       "path": "get-shit-done/templates/retrospective.md",
+      "target_path": "oto/templates/retrospective.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19525,6 +19713,7 @@
     },
     {
       "path": "get-shit-done/templates/roadmap.md",
+      "target_path": "oto/templates/roadmap.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19532,6 +19721,7 @@
     },
     {
       "path": "get-shit-done/templates/spec.md",
+      "target_path": "oto/templates/spec.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19668,6 +19858,7 @@
     },
     {
       "path": "get-shit-done/templates/state.md",
+      "target_path": "oto/templates/state.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19732,6 +19923,7 @@
     },
     {
       "path": "get-shit-done/templates/summary-complex.md",
+      "target_path": "oto/templates/summary-complex.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19748,6 +19940,7 @@
     },
     {
       "path": "get-shit-done/templates/summary-minimal.md",
+      "target_path": "oto/templates/summary-minimal.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19755,6 +19948,7 @@
     },
     {
       "path": "get-shit-done/templates/summary-standard.md",
+      "target_path": "oto/templates/summary-standard.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19762,6 +19956,7 @@
     },
     {
       "path": "get-shit-done/templates/summary.md",
+      "target_path": "oto/templates/summary.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19769,6 +19964,7 @@
     },
     {
       "path": "get-shit-done/templates/user-profile.md",
+      "target_path": "oto/templates/user-profile.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19776,6 +19972,7 @@
     },
     {
       "path": "get-shit-done/templates/user-setup.md",
+      "target_path": "oto/templates/user-setup.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -19792,6 +19989,7 @@
     },
     {
       "path": "get-shit-done/templates/verification-report.md",
+      "target_path": "oto/templates/verification-report.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -19799,6 +19997,7 @@
     },
     {
       "path": "get-shit-done/workflows/add-phase.md",
+      "target_path": "oto/workflows/add-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -19967,6 +20166,7 @@
     },
     {
       "path": "get-shit-done/workflows/add-tests.md",
+      "target_path": "oto/workflows/add-tests.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -20159,6 +20359,7 @@
     },
     {
       "path": "get-shit-done/workflows/add-todo.md",
+      "target_path": "oto/workflows/add-todo.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -20279,6 +20480,7 @@
     },
     {
       "path": "get-shit-done/workflows/ai-integration-phase.md",
+      "target_path": "oto/workflows/ai-integration-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -20647,6 +20849,7 @@
     },
     {
       "path": "get-shit-done/workflows/analyze-dependencies.md",
+      "target_path": "oto/workflows/analyze-dependencies.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -20703,6 +20906,7 @@
     },
     {
       "path": "get-shit-done/workflows/audit-fix.md",
+      "target_path": "oto/workflows/audit-fix.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -20743,6 +20947,7 @@
     },
     {
       "path": "get-shit-done/workflows/audit-milestone.md",
+      "target_path": "oto/workflows/audit-milestone.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -21015,6 +21220,7 @@
     },
     {
       "path": "get-shit-done/workflows/audit-uat.md",
+      "target_path": "oto/workflows/audit-uat.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -21063,6 +21269,7 @@
     },
     {
       "path": "get-shit-done/workflows/autonomous.md",
+      "target_path": "oto/workflows/autonomous.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -21551,6 +21758,7 @@
     },
     {
       "path": "get-shit-done/workflows/check-todos.md",
+      "target_path": "oto/workflows/check-todos.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -21743,6 +21951,7 @@
     },
     {
       "path": "get-shit-done/workflows/cleanup.md",
+      "target_path": "oto/workflows/cleanup.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -21863,6 +22072,7 @@
     },
     {
       "path": "get-shit-done/workflows/code-review-fix.md",
+      "target_path": "oto/workflows/code-review-fix.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -22071,6 +22281,7 @@
     },
     {
       "path": "get-shit-done/workflows/code-review.md",
+      "target_path": "oto/workflows/code-review.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -22239,6 +22450,7 @@
     },
     {
       "path": "get-shit-done/workflows/complete-milestone.md",
+      "target_path": "oto/workflows/complete-milestone.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -22687,6 +22899,7 @@
     },
     {
       "path": "get-shit-done/workflows/diagnose-issues.md",
+      "target_path": "oto/workflows/diagnose-issues.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -22799,6 +23012,7 @@
     },
     {
       "path": "get-shit-done/workflows/discovery-phase.md",
+      "target_path": "oto/workflows/discovery-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -22903,6 +23117,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase-assumptions.md",
+      "target_path": "oto/workflows/discuss-phase-assumptions.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -23199,6 +23414,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase-power.md",
+      "target_path": "oto/workflows/discuss-phase-power.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -23255,6 +23471,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase.md",
+      "target_path": "oto/workflows/discuss-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -23631,6 +23848,7 @@
     },
     {
       "path": "get-shit-done/workflows/do.md",
+      "target_path": "oto/workflows/do.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -24151,6 +24369,7 @@
     },
     {
       "path": "get-shit-done/workflows/docs-update.md",
+      "target_path": "oto/workflows/docs-update.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -24615,6 +24834,7 @@
     },
     {
       "path": "get-shit-done/workflows/edit-phase.md",
+      "target_path": "oto/workflows/edit-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -24855,6 +25075,7 @@
     },
     {
       "path": "get-shit-done/workflows/eval-review.md",
+      "target_path": "oto/workflows/eval-review.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -25055,6 +25276,7 @@
     },
     {
       "path": "get-shit-done/workflows/execute-phase.md",
+      "target_path": "oto/workflows/execute-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -26567,6 +26789,7 @@
     },
     {
       "path": "get-shit-done/workflows/execute-plan.md",
+      "target_path": "oto/workflows/execute-plan.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27127,6 +27350,7 @@
     },
     {
       "path": "get-shit-done/workflows/explore.md",
+      "target_path": "oto/workflows/explore.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27271,6 +27495,7 @@
     },
     {
       "path": "get-shit-done/workflows/extract_learnings.md",
+      "target_path": "oto/workflows/extract_learnings.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27343,6 +27568,7 @@
     },
     {
       "path": "get-shit-done/workflows/fast.md",
+      "target_path": "oto/workflows/fast.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27447,6 +27673,7 @@
     },
     {
       "path": "get-shit-done/workflows/forensics.md",
+      "target_path": "oto/workflows/forensics.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27575,6 +27802,7 @@
     },
     {
       "path": "get-shit-done/workflows/graduation.md",
+      "target_path": "oto/workflows/graduation.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27615,6 +27843,7 @@
     },
     {
       "path": "get-shit-done/workflows/health.md",
+      "target_path": "oto/workflows/health.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -27735,6 +27964,7 @@
     },
     {
       "path": "get-shit-done/workflows/help.md",
+      "target_path": "oto/workflows/help.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -30055,6 +30285,7 @@
     },
     {
       "path": "get-shit-done/workflows/import.md",
+      "target_path": "oto/workflows/import.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -30263,6 +30494,7 @@
     },
     {
       "path": "get-shit-done/workflows/inbox.md",
+      "target_path": "oto/workflows/inbox.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -30375,6 +30607,7 @@
     },
     {
       "path": "get-shit-done/workflows/ingest-docs.md",
+      "target_path": "oto/workflows/ingest-docs.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -30711,6 +30944,7 @@
     },
     {
       "path": "get-shit-done/workflows/insert-phase.md",
+      "target_path": "oto/workflows/insert-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -30919,6 +31153,7 @@
     },
     {
       "path": "get-shit-done/workflows/list-phase-assumptions.md",
+      "target_path": "oto/workflows/list-phase-assumptions.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -30999,6 +31234,7 @@
     },
     {
       "path": "get-shit-done/workflows/list-workspaces.md",
+      "target_path": "oto/workflows/list-workspaces.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -31143,6 +31379,7 @@
     },
     {
       "path": "get-shit-done/workflows/manager.md",
+      "target_path": "oto/workflows/manager.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -31399,6 +31636,7 @@
     },
     {
       "path": "get-shit-done/workflows/map-codebase.md",
+      "target_path": "oto/workflows/map-codebase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -31767,6 +32005,7 @@
     },
     {
       "path": "get-shit-done/workflows/milestone-summary.md",
+      "target_path": "oto/workflows/milestone-summary.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -31967,6 +32206,7 @@
     },
     {
       "path": "get-shit-done/workflows/new-milestone.md",
+      "target_path": "oto/workflows/new-milestone.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -32623,6 +32863,7 @@
     },
     {
       "path": "get-shit-done/workflows/new-project.md",
+      "target_path": "oto/workflows/new-project.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -33655,6 +33896,7 @@
     },
     {
       "path": "get-shit-done/workflows/new-workspace.md",
+      "target_path": "oto/workflows/new-workspace.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -33823,6 +34065,7 @@
     },
     {
       "path": "get-shit-done/workflows/next.md",
+      "target_path": "oto/workflows/next.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -34151,6 +34394,7 @@
     },
     {
       "path": "get-shit-done/workflows/node-repair.md",
+      "target_path": "oto/workflows/node-repair.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -34158,6 +34402,7 @@
     },
     {
       "path": "get-shit-done/workflows/note.md",
+      "target_path": "oto/workflows/note.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -34270,6 +34515,7 @@
     },
     {
       "path": "get-shit-done/workflows/pause-work.md",
+      "target_path": "oto/workflows/pause-work.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -34414,6 +34660,7 @@
     },
     {
       "path": "get-shit-done/workflows/plan-milestone-gaps.md",
+      "target_path": "oto/workflows/plan-milestone-gaps.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -34614,6 +34861,7 @@
     },
     {
       "path": "get-shit-done/workflows/plan-phase.md",
+      "target_path": "oto/workflows/plan-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -35966,6 +36214,7 @@
     },
     {
       "path": "get-shit-done/workflows/plan-review-convergence.md",
+      "target_path": "oto/workflows/plan-review-convergence.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -36334,6 +36583,7 @@
     },
     {
       "path": "get-shit-done/workflows/plant-seed.md",
+      "target_path": "oto/workflows/plant-seed.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -36438,6 +36688,7 @@
     },
     {
       "path": "get-shit-done/workflows/pr-branch.md",
+      "target_path": "oto/workflows/pr-branch.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -36534,6 +36785,7 @@
     },
     {
       "path": "get-shit-done/workflows/profile-user.md",
+      "target_path": "oto/workflows/profile-user.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -36894,6 +37146,7 @@
     },
     {
       "path": "get-shit-done/workflows/progress.md",
+      "target_path": "oto/workflows/progress.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -37910,6 +38163,7 @@
     },
     {
       "path": "get-shit-done/workflows/quick.md",
+      "target_path": "oto/workflows/quick.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -38606,6 +38860,7 @@
     },
     {
       "path": "get-shit-done/workflows/remove-phase.md",
+      "target_path": "oto/workflows/remove-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -38790,6 +39045,7 @@
     },
     {
       "path": "get-shit-done/workflows/remove-workspace.md",
+      "target_path": "oto/workflows/remove-workspace.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -38830,6 +39086,7 @@
     },
     {
       "path": "get-shit-done/workflows/research-phase.md",
+      "target_path": "oto/workflows/research-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -38974,6 +39231,7 @@
     },
     {
       "path": "get-shit-done/workflows/resume-project.md",
+      "target_path": "oto/workflows/resume-project.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -39294,6 +39552,7 @@
     },
     {
       "path": "get-shit-done/workflows/review.md",
+      "target_path": "oto/workflows/review.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -39782,6 +40041,7 @@
     },
     {
       "path": "get-shit-done/workflows/scan.md",
+      "target_path": "oto/workflows/scan.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -39886,6 +40146,7 @@
     },
     {
       "path": "get-shit-done/workflows/secure-phase.md",
+      "target_path": "oto/workflows/secure-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -40110,6 +40371,7 @@
     },
     {
       "path": "get-shit-done/workflows/session-report.md",
+      "target_path": "oto/workflows/session-report.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -40190,6 +40452,7 @@
     },
     {
       "path": "get-shit-done/workflows/settings-advanced.md",
+      "target_path": "oto/workflows/settings-advanced.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -40558,6 +40821,7 @@
     },
     {
       "path": "get-shit-done/workflows/settings-integrations.md",
+      "target_path": "oto/workflows/settings-integrations.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -40870,6 +41134,7 @@
     },
     {
       "path": "get-shit-done/workflows/settings.md",
+      "target_path": "oto/workflows/settings.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -41614,6 +41879,7 @@
     },
     {
       "path": "get-shit-done/workflows/ship.md",
+      "target_path": "oto/workflows/ship.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -41790,6 +42056,7 @@
     },
     {
       "path": "get-shit-done/workflows/sketch-wrap-up.md",
+      "target_path": "oto/workflows/sketch-wrap-up.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -41974,6 +42241,7 @@
     },
     {
       "path": "get-shit-done/workflows/sketch.md",
+      "target_path": "oto/workflows/sketch.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -42174,6 +42442,7 @@
     },
     {
       "path": "get-shit-done/workflows/spec-phase.md",
+      "target_path": "oto/workflows/spec-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -42270,6 +42539,7 @@
     },
     {
       "path": "get-shit-done/workflows/spike-wrap-up.md",
+      "target_path": "oto/workflows/spike-wrap-up.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -42438,6 +42708,7 @@
     },
     {
       "path": "get-shit-done/workflows/spike.md",
+      "target_path": "oto/workflows/spike.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -42606,6 +42877,7 @@
     },
     {
       "path": "get-shit-done/workflows/stats.md",
+      "target_path": "oto/workflows/stats.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -42638,6 +42910,7 @@
     },
     {
       "path": "get-shit-done/workflows/sync-skills.md",
+      "target_path": "oto/workflows/sync-skills.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -42862,6 +43135,7 @@
     },
     {
       "path": "get-shit-done/workflows/transition.md",
+      "target_path": "oto/workflows/transition.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -43494,6 +43768,7 @@
     },
     {
       "path": "get-shit-done/workflows/ui-phase.md",
+      "target_path": "oto/workflows/ui-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -43918,6 +44193,7 @@
     },
     {
       "path": "get-shit-done/workflows/ui-review.md",
+      "target_path": "oto/workflows/ui-review.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -44134,6 +44410,7 @@
     },
     {
       "path": "get-shit-done/workflows/ultraplan-phase.md",
+      "target_path": "oto/workflows/ultraplan-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -44334,6 +44611,7 @@
     },
     {
       "path": "get-shit-done/workflows/undo.md",
+      "target_path": "oto/workflows/undo.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -44542,6 +44820,7 @@
     },
     {
       "path": "get-shit-done/workflows/update.md",
+      "target_path": "oto/workflows/update.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -45150,6 +45429,7 @@
     },
     {
       "path": "get-shit-done/workflows/validate-phase.md",
+      "target_path": "oto/workflows/validate-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -45382,6 +45662,7 @@
     },
     {
       "path": "get-shit-done/workflows/verify-phase.md",
+      "target_path": "oto/workflows/verify-phase.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -45558,6 +45839,7 @@
     },
     {
       "path": "get-shit-done/workflows/verify-work.md",
+      "target_path": "oto/workflows/verify-work.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -46094,6 +46376,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/artifacts.cjs",
+      "target_path": "oto/bin/lib/artifacts.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -46166,6 +46449,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/audit.cjs",
+      "target_path": "oto/bin/lib/audit.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -46278,6 +46562,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/commands.cjs",
+      "target_path": "oto/bin/lib/commands.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -46374,6 +46659,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/config-schema.cjs",
+      "target_path": "oto/bin/lib/config-schema.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [],
@@ -46381,6 +46667,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/config.cjs",
+      "target_path": "oto/bin/lib/config.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -46533,6 +46820,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/core.cjs",
+      "target_path": "oto/bin/lib/core.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -47277,6 +47565,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/decisions.cjs",
+      "target_path": "oto/bin/lib/decisions.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [],
@@ -47284,6 +47573,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/docs.cjs",
+      "target_path": "oto/bin/lib/docs.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -47364,6 +47654,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/drift.cjs",
+      "target_path": "oto/bin/lib/drift.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -47396,6 +47687,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/frontmatter.cjs",
+      "target_path": "oto/bin/lib/frontmatter.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -47412,6 +47704,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/gap-checker.cjs",
+      "target_path": "oto/bin/lib/gap-checker.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [],
@@ -47419,6 +47712,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/graphify.cjs",
+      "target_path": "oto/bin/lib/graphify.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -47499,6 +47793,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/gsd2-import.cjs",
+      "target_path": "oto/bin/lib/gsd2-import.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -47891,6 +48186,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/init.cjs",
+      "target_path": "oto/bin/lib/init.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48443,6 +48739,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/install-profiles.cjs",
+      "target_path": "oto/bin/lib/install-profiles.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48491,6 +48788,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/intel.cjs",
+      "target_path": "oto/bin/lib/intel.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48619,6 +48917,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/learnings.cjs",
+      "target_path": "oto/bin/lib/learnings.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48699,6 +48998,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/milestone.cjs",
+      "target_path": "oto/bin/lib/milestone.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48731,6 +49031,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/model-profiles.cjs",
+      "target_path": "oto/bin/lib/model-profiles.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48907,6 +49208,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/phase.cjs",
+      "target_path": "oto/bin/lib/phase.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -48995,6 +49297,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/profile-output.cjs",
+      "target_path": "oto/bin/lib/profile-output.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49427,6 +49730,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/profile-pipeline.cjs",
+      "target_path": "oto/bin/lib/profile-pipeline.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49467,6 +49771,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/roadmap.cjs",
+      "target_path": "oto/bin/lib/roadmap.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49483,6 +49788,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/schema-detect.cjs",
+      "target_path": "oto/bin/lib/schema-detect.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49507,6 +49813,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/secrets.cjs",
+      "target_path": "oto/bin/lib/secrets.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49531,6 +49838,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/security.cjs",
+      "target_path": "oto/bin/lib/security.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49571,6 +49879,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/state.cjs",
+      "target_path": "oto/bin/lib/state.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -49691,6 +50000,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/template.cjs",
+      "target_path": "oto/bin/lib/template.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [],
@@ -49698,6 +50008,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/uat.cjs",
+      "target_path": "oto/bin/lib/uat.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [],
@@ -49705,6 +50016,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/verify.cjs",
+      "target_path": "oto/bin/lib/verify.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -50089,6 +50401,7 @@
     },
     {
       "path": "get-shit-done/bin/lib/workstream.cjs",
+      "target_path": "oto/bin/lib/workstream.cjs",
       "file_class": "lib",
       "allowlisted": false,
       "matches": [
@@ -50169,6 +50482,7 @@
     },
     {
       "path": "get-shit-done/references/few-shot-examples/plan-checker.md",
+      "target_path": "oto/references/few-shot-examples/plan-checker.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -50209,6 +50523,7 @@
     },
     {
       "path": "get-shit-done/references/few-shot-examples/verifier.md",
+      "target_path": "oto/references/few-shot-examples/verifier.md",
       "file_class": "reference",
       "allowlisted": false,
       "matches": [
@@ -50385,6 +50700,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/architecture.md",
+      "target_path": "oto/templates/codebase/architecture.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -50409,6 +50725,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/concerns.md",
+      "target_path": "oto/templates/codebase/concerns.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50416,6 +50733,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/conventions.md",
+      "target_path": "oto/templates/codebase/conventions.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50423,6 +50741,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/integrations.md",
+      "target_path": "oto/templates/codebase/integrations.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50430,6 +50749,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/stack.md",
+      "target_path": "oto/templates/codebase/stack.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50437,6 +50757,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/structure.md",
+      "target_path": "oto/templates/codebase/structure.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [
@@ -50581,6 +50902,7 @@
     },
     {
       "path": "get-shit-done/templates/codebase/testing.md",
+      "target_path": "oto/templates/codebase/testing.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50588,6 +50910,7 @@
     },
     {
       "path": "get-shit-done/templates/research-project/ARCHITECTURE.md",
+      "target_path": "oto/templates/research-project/ARCHITECTURE.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50595,6 +50918,7 @@
     },
     {
       "path": "get-shit-done/templates/research-project/FEATURES.md",
+      "target_path": "oto/templates/research-project/FEATURES.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50602,6 +50926,7 @@
     },
     {
       "path": "get-shit-done/templates/research-project/PITFALLS.md",
+      "target_path": "oto/templates/research-project/PITFALLS.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50609,6 +50934,7 @@
     },
     {
       "path": "get-shit-done/templates/research-project/STACK.md",
+      "target_path": "oto/templates/research-project/STACK.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50616,6 +50942,7 @@
     },
     {
       "path": "get-shit-done/templates/research-project/SUMMARY.md",
+      "target_path": "oto/templates/research-project/SUMMARY.md",
       "file_class": "template",
       "allowlisted": false,
       "matches": [],
@@ -50623,6 +50950,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/advisor.md",
+      "target_path": "oto/workflows/discuss-phase/modes/advisor.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -50679,6 +51007,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/all.md",
+      "target_path": "oto/workflows/discuss-phase/modes/all.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -50686,6 +51015,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/analyze.md",
+      "target_path": "oto/workflows/discuss-phase/modes/analyze.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -50693,6 +51023,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/auto.md",
+      "target_path": "oto/workflows/discuss-phase/modes/auto.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -50709,6 +51040,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/batch.md",
+      "target_path": "oto/workflows/discuss-phase/modes/batch.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -50716,6 +51048,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/chain.md",
+      "target_path": "oto/workflows/discuss-phase/modes/chain.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -50876,6 +51209,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/default.md",
+      "target_path": "oto/workflows/discuss-phase/modes/default.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -50883,6 +51217,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/power.md",
+      "target_path": "oto/workflows/discuss-phase/modes/power.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -50899,6 +51234,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/modes/text.md",
+      "target_path": "oto/workflows/discuss-phase/modes/text.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -50931,6 +51267,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/templates/context.md",
+      "target_path": "oto/workflows/discuss-phase/templates/context.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -50938,6 +51275,7 @@
     },
     {
       "path": "get-shit-done/workflows/discuss-phase/templates/discussion-log.md",
+      "target_path": "oto/workflows/discuss-phase/templates/discussion-log.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -50945,6 +51283,7 @@
     },
     {
       "path": "get-shit-done/workflows/execute-phase/steps/codebase-drift-gate.md",
+      "target_path": "oto/workflows/execute-phase/steps/codebase-drift-gate.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [
@@ -51017,6 +51356,7 @@
     },
     {
       "path": "get-shit-done/workflows/execute-phase/steps/per-plan-worktree-gate.md",
+      "target_path": "oto/workflows/execute-phase/steps/per-plan-worktree-gate.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [],
@@ -51024,6 +51364,7 @@
     },
     {
       "path": "get-shit-done/workflows/execute-phase/steps/post-merge-gate.md",
+      "target_path": "oto/workflows/execute-phase/steps/post-merge-gate.md",
       "file_class": "workflow",
       "allowlisted": false,
       "matches": [

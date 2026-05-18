@@ -42,8 +42,33 @@ test('CLI dry-run report file entries match the D-04 shape', { timeout: 30000 },
   assert.ok(Array.isArray(json.files));
   assert.ok(json.files.length > 0);
   for (const entry of json.files.slice(0, 25)) {
-    for (const key of ['path', 'file_class', 'matches', 'unclassified_count']) {
+    for (const key of ['path', 'target_path', 'file_class', 'matches', 'unclassified_count']) {
       assert.equal(Object.hasOwn(entry, key), true, `missing ${key}`);
     }
   }
+});
+
+test('CLI dry-run report includes projected target paths for inventory-backed files', { timeout: 30000 }, () => {
+  const result = childProcess.spawnSync(process.execPath, [
+    'scripts/rebrand.cjs',
+    '--dry-run',
+    '--target',
+    'foundation-frameworks/get-shit-done-main',
+    '--owner',
+    'OTOJulian'
+  ], {
+    cwd: REPO_ROOT,
+    encoding: 'utf8'
+  });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const json = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'reports', 'rebrand-dryrun.json'), 'utf8'));
+  const byPath = new Map(json.files.map((entry) => [entry.path, entry]));
+  assert.equal(
+    byPath.get('get-shit-done/workflows/ingest-docs.md')?.target_path,
+    'oto/workflows/ingest-docs.md'
+  );
+  assert.equal(
+    byPath.get('get-shit-done/workflows/eval-review.md')?.target_path,
+    'oto/workflows/eval-review.md'
+  );
 });
