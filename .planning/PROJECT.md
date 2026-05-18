@@ -66,7 +66,7 @@ v0.3.0 — Restore doc-intake and eval-review agents (see Current Milestone belo
 - Update `/oto-ingest-docs` and `/oto-eval-review` command files to drop the deferral framing.
 - Wire new agents into the installer agent allowlist; set Codex `sandbox:` per agent.
 - Port `tests/ingest-docs.test.cjs` from GSD; adapt to `oto-` namespace; add `eval-review` smoke.
-- New ADR-09 documenting the partial reversal of ADR-07.
+- New ADR-15 documenting the partial reversal of ADR-07 (ADR-08…14 already assigned).
 - Per-runtime parity check across Claude / Codex / Gemini.
 
 ### Next Milestone Goals
