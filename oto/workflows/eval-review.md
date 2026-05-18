@@ -102,7 +102,7 @@ state: {A or B}
 </input>
 ```
 
-Spawn `Task(subagent_type="oto-eval-auditor")` and capture the agent's response body. The auditor is a read-only agent (Phase 1 D-04). After the Task returns, the workflow orchestrator writes the returned markdown to `.oto/phases/<phase>/EVAL-REVIEW.md` using its own Write tool.
+Spawn `Task(subagent_type="oto-eval-auditor")` and capture the agent's response body. The auditor is a read-only agent (Phase 1 D-04). After the Task returns, the workflow orchestrator writes the returned markdown to `.oto/phases/<phase>/EVAL-REVIEW.md` using its own Write tool. The returned review must score each evaluation dimension as COVERED, PARTIAL, or MISSING.
 
 ## 4. Parse Auditor Result
 
