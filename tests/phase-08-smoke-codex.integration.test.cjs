@@ -97,6 +97,43 @@ test('D-17 codex per-agent .toml exists with workspace-write sandbox mode', asyn
   assert.equal(/\bsuperpowers\b/i.test(executorContent), false, 'oto-executor.toml must not leak upstream skill brand');
 });
 
+test('PRTY-01: /oto-ingest-docs and /oto-eval-review skill surfaces + 3 new agents install (codex)', async (t) => {
+  const tmp = freshTmpDir('oto-smoke-codex-prty-');
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+
+  const install = installCodex(tmp);
+  assert.equal(install.status, 0, `install failed: stdout=${install.stdout} stderr=${install.stderr}`);
+
+  for (const skill of ['skills/oto-ingest-docs/SKILL.md', 'skills/oto-eval-review/SKILL.md']) {
+    assert.ok(fs.existsSync(path.join(tmp, skill)), `${skill} must install for codex`);
+  }
+
+  for (const wrongPath of ['commands/oto/ingest-docs.md', 'commands/oto/eval-review.md']) {
+    assert.equal(
+      fs.existsSync(path.join(tmp, wrongPath)),
+      false,
+      `codex must NOT install ${wrongPath} (uses skills/* instead per QUICK-260505-bxx)`,
+    );
+  }
+
+  const expectedSandboxes = {
+    'oto-doc-classifier': 'read-only',
+    'oto-doc-synthesizer': 'workspace-write',
+    'oto-eval-auditor': 'read-only',
+  };
+  for (const [agent, mode] of Object.entries(expectedSandboxes)) {
+    assert.ok(fs.existsSync(path.join(tmp, 'agents', `${agent}.md`)), `${agent}.md must install for codex`);
+    const tomlPath = path.join(tmp, 'agents', `${agent}.toml`);
+    assert.ok(fs.existsSync(tomlPath), `${agent}.toml must install for codex`);
+    const toml = fs.readFileSync(tomlPath, 'utf8');
+    assert.match(
+      toml,
+      new RegExp(`sandbox_mode\\s*=\\s*"${mode}"`),
+      `${agent}.toml must declare sandbox_mode = "${mode}" per Phase 1 D-04`,
+    );
+  }
+});
+
 test('D-17 codex live invocation skips clearly unless codex >= 0.120 is on PATH', { skip: probeCodex().reason || false }, async (t) => {
   const tmp = freshTmpDir('oto-smoke-codex-live-');
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));

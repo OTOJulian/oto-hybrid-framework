@@ -95,6 +95,26 @@ test('D-17 gemini per-runtime settings use BeforeTool and AfterTool without Clau
   assert.match(hooksJson, /replace/, 'Gemini Edit matcher must be converted');
 });
 
+test('PRTY-01: /oto-ingest-docs and /oto-eval-review command surfaces + 3 new agents install (gemini)', async (t) => {
+  const tmp = freshTmpDir('oto-smoke-gemini-prty-');
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+
+  const install = installGemini(tmp);
+  assert.equal(install.status, 0, `install failed: stdout=${install.stdout} stderr=${install.stderr}`);
+
+  for (const relPath of ['commands/oto/ingest-docs.md', 'commands/oto/eval-review.md']) {
+    const cmdPath = path.join(tmp, relPath);
+    assert.ok(fs.existsSync(cmdPath), `${relPath} must install for gemini at ${cmdPath}`);
+  }
+
+  for (const agent of ['oto-doc-classifier', 'oto-doc-synthesizer', 'oto-eval-auditor']) {
+    assert.ok(
+      fs.existsSync(path.join(tmp, 'agents', `${agent}.md`)),
+      `${agent}.md must install for gemini`,
+    );
+  }
+});
+
 test('D-17 gemini live invocation skips clearly unless gemini >= 0.38 is on PATH', { skip: probeGemini().reason || false }, async (t) => {
   const tmp = freshTmpDir('oto-smoke-gemini-live-');
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
