@@ -3,7 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
 status: executing
-last_updated: "2026-05-18T21:30:00Z"
+last_updated: "2026-05-18T21:34:15Z"
+last_activity: 2026-05-18 -- Phase 3 execution started
 progress:
   total_phases: 3
   completed_phases: 2
@@ -23,9 +24,9 @@ See: .planning/PROJECT.md
 ## Current Position
 
 Phase: 3 — Tests, install-smoke, parity, ADR-15
-Plan: complete (4 plans authored; verified by plan-checker iteration 2)
-Status: Ready to execute
-Last activity: 2026-05-18 — Phase 3 planned. 4 PLAN.md files written across 2 waves (Wave 1 parallel: 03-01 tests authoring, 03-02 install-smoke + EXPECTED_AGENTS bump; Wave 1b sequenced: 03-03 per-runtime parity; Wave 2: 03-04 ADR-15). Plan checker passed on iteration 2 (3 blockers + 7 warnings on iteration 1; B1 ADR-15 `Implements: D-24`, B2 ADR-07 filename, B3 SDK-DEFER-01 literal regex locks all resolved). 03-RESEARCH.md and 03-VALIDATION.md (nyquist_compliant: true) also committed.
+Plan: 1 of 4
+Status: Executing Phase 3
+Last activity: 2026-05-18 -- Phase 3 execution started
 
 Archive (prior milestones):
 

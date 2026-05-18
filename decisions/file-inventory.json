@@ -8136,10 +8136,11 @@
     {
       "path": "tests/ingest-docs.test.cjs",
       "upstream": "gsd",
-      "verdict": "drop",
-      "reason": "Upstream test harness; oto re-derives tests in Phase 10",
-      "rebrand_required": false,
-      "phase_owner": 1,
+      "verdict": "keep",
+      "target_path": "tests/ingest-docs.test.cjs",
+      "reason": "v0.3.0 Phase 3 TEST-01 — port upstream ingest-docs regression suite (rebrand engine + D-04 hand-fixups)",
+      "rebrand_required": true,
+      "phase_owner": 3,
       "category": "test"
     },
     {
