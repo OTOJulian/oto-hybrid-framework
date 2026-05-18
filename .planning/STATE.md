@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
-status: planning
-last_updated: "2026-05-18T00:00:00Z"
+status: executing
+last_updated: "2026-05-18T13:36:00Z"
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 2
+  total_plans: 5
   completed_plans: 2
   percent: 33
 ---
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md
 ## Current Position
 
 Phase: 2 — Workflow rebrand-ports + command de-deferral
-Plan: — (not planned)
-Status: Ready to plan (`/oto-plan-phase 2`)
-Last activity: 2026-05-18 — Phase 1 completed. Restored `oto-doc-classifier`, `oto-doc-synthesizer`, and `oto-eval-auditor`; wired Claude/Codex/Gemini install paths; verified Codex sandbox modes and regenerated runtime matrix/rebrand coverage reports. `oto-sdk` was unavailable in this Codex environment, so execution used on-disk planning artifacts as the authoritative workflow fallback.
+Plan: 02-01, 02-02, 02-03
+Status: Ready to execute (`/oto-execute-phase 2`)
+Last activity: 2026-05-18 — Phase 2 planned. 3 plans across 2 waves: 02-01 (rebrand apply + workflow hand-fixups) and 02-02 (CMD regression-guard test) run in parallel as Wave 1; 02-03 (workflow-shape + fixture-tree tests) runs as Wave 2 depending on 02-01. Plan checker passed after one revision iteration (0 blockers, all 4 warnings and 1 info resolved). `oto-sdk` remained unavailable in this environment, so plans use direct file ops + `git` only — no `oto-sdk query` calls in any task body.
 
 Archive (prior milestones):
 
@@ -46,10 +46,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-plan-phase 2
+/oto-execute-phase 2
 ```
 
-Phase 1 is complete. Plan Phase 2 to restore the executable `/oto-ingest-docs` and `/oto-eval-review` workflows and remove their deferral framing.
+Phase 2 is planned. Execute Wave 1 (02-01 + 02-02 in parallel), then Wave 2 (02-03 depends on 02-01) to deliver the executable `/oto-ingest-docs` and `/oto-eval-review` workflows and lock in deferral-framing absence.
 
 ## Accumulated Context
 

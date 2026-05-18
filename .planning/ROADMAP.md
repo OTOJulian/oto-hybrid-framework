@@ -68,7 +68,20 @@ Plans:
   3. Running `/oto-ingest-docs` against a fixture with deliberate unresolved-blocker conflicts hard-blocks all destination writes, writes `.oto/INGEST-CONFLICTS.md` with the three buckets (auto-resolved, competing-variants, unresolved-blockers), and exits non-zero; the 50-doc cap is enforced.
   4. Running `/oto-eval-review <phase>` against a fixture phase with an AI-SPEC.md produces `.oto/phases/<phase>/EVAL-REVIEW.md` scoring each eval dimension as COVERED / PARTIAL / MISSING with an actionable remediation plan when gaps exist.
   5. `/oto-help` lists `/oto-ingest-docs` and `/oto-eval-review` as live commands with no `[deferred]` tag and no v2 reactivation footnote.
-**Plans:** TBD
+**Plans:** 3 plans
+Plans:
+
+**Wave 1** *(02-01 and 02-02 run in parallel — no `files_modified` overlap)*
+- [ ] 02-01-PLAN.md — Rebrand engine apply + workflow body hand-fixups (prose .planning/ → .oto/, SDK-tolerant fallback, classifier/auditor read-only-agent persistence reshape).
+- [ ] 02-02-PLAN.md — CMD-01/02/03 regression-guard test (locks command + INDEX + help.md clean state).
+
+**Wave 2** *(blocked on 02-01 completion)*
+- [ ] 02-03-PLAN.md — Workflow-shape tests + fixture-tree smoke (3 committed fixtures + tmpdir over-cap; locks the 3 engine blind-spot fixes).
+
+**Cross-cutting constraints** *(must_haves shared across multiple plans)*:
+- Phase 1 D-04 read-only-agent reshape: classifier/auditor return values are persisted by the orchestrator, not written by the agent (locked by 02-01 implementation + 02-03 ABSENCE regression-guard tests).
+- No `oto-sdk query` calls without fallback: SDK-DEFER-01 tolerance pattern (`2>/dev/null || …`) applied in 02-01 and asserted by 02-03 workflow-shape tests.
+
 **UI hint:** no
 
 ### Phase 3: Tests, install-smoke, parity, ADR-15
