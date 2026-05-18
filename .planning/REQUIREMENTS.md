@@ -77,36 +77,35 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 
 ## Traceability
 
-Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AGNT-01 | TBD | Pending |
-| AGNT-02 | TBD | Pending |
-| AGNT-03 | TBD | Pending |
-| WF-ING-01 | TBD | Pending |
-| WF-ING-02 | TBD | Pending |
-| WF-ING-03 | TBD | Pending |
-| WF-ING-04 | TBD | Pending |
-| WF-EVAL-01 | TBD | Pending |
-| WF-EVAL-02 | TBD | Pending |
-| CMD-01 | TBD | Pending |
-| CMD-02 | TBD | Pending |
-| CMD-03 | TBD | Pending |
-| INST-01 | TBD | Pending |
-| INST-02 | TBD | Pending |
-| INST-03 | TBD | Pending |
-| TEST-01 | TBD | Pending |
-| TEST-02 | TBD | Pending |
-| TEST-03 | TBD | Pending |
-| ADR-01 | TBD | Pending |
-| PRTY-01 | TBD | Pending |
+| AGNT-01 | 1 | Pending |
+| AGNT-02 | 1 | Pending |
+| AGNT-03 | 1 | Pending |
+| WF-ING-01 | 2 | Pending |
+| WF-ING-02 | 2 | Pending |
+| WF-ING-03 | 2 | Pending |
+| WF-ING-04 | 2 | Pending |
+| WF-EVAL-01 | 2 | Pending |
+| WF-EVAL-02 | 2 | Pending |
+| CMD-01 | 2 | Pending |
+| CMD-02 | 2 | Pending |
+| CMD-03 | 2 | Pending |
+| INST-01 | 1 | Pending |
+| INST-02 | 1 | Pending |
+| INST-03 | 3 | Pending |
+| TEST-01 | 3 | Pending |
+| TEST-02 | 3 | Pending |
+| TEST-03 | 3 | Pending |
+| ADR-01 | 3 | Pending |
+| PRTY-01 | 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 20 ⚠️ (resolved at roadmap creation)
+- Mapped to phases: 20 ✓
+- Unmapped: 0
+- Per-phase distribution: Phase 1 = 5 (AGNT-01..03, INST-01, INST-02); Phase 2 = 9 (WF-ING-01..04, WF-EVAL-01..02, CMD-01..03); Phase 3 = 6 (TEST-01..03, INST-03, ADR-01, PRTY-01)
 
 ---
 *Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after initial definition*
+*Last updated: 2026-05-18 after roadmap creation (traceability filled)*

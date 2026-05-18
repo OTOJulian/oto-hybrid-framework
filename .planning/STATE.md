@@ -5,7 +5,7 @@ milestone_name: Restore doc-intake and eval-review agents
 status: planning
 last_updated: "2026-05-18T00:00:00Z"
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap approved, ready for planning)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-18 — Milestone v0.3.0 started
+Status: Awaiting `/oto-plan-phase 1`
+Last activity: 2026-05-18 — v0.3.0 roadmap created (3 phases, 20 requirements, 100% coverage)
 
 Archive (prior milestones):
 
@@ -47,24 +47,17 @@ Archive (prior milestones):
 /oto-plan-phase 1
 ```
 
-After ROADMAP.md is approved, plan Phase 1.
+After ROADMAP.md is approved, plan Phase 1 (Agent ports + installer wiring).
 
 ## Accumulated Context
 
 ### Roadmap Evolution
 
-- Phase 1 added: Add /oto:migrate — a command that converts a GSD-era project's planning artifacts to oto's command surface.
-- Phase 2 added: Build /oto-log command for capturing freeform/ad-hoc work sessions as first-class tracked artifacts surfaced by /oto-progress and /oto-resume-work
+- 2026-05-18: v0.3.0 roadmap created. Phases derived from natural dependency chain: agents (foundation) → workflows + commands (consumer) → tests + parity + ADR-15 (closure). 20/20 requirements mapped.
 
 ### Decisions
 
-- Plan 02-02 kept `/oto-log` as a pure CJS library; command dispatch and artifact commits remain Plan 02-03 workflow responsibilities.
-- Plan 02-02 preserved the explicit no-`.gitignore`-edit boundary; `.oto/logs/.active-session.json` ignore coverage is Plan 02-03-owned.
-- Plan 02-02 added a local `log.cjs` frontmatter compatibility wrapper for the RED test contract without editing shared frontmatter helpers.
-- Used existing per-runtime command scanning for /oto-log; no installer adapter changes were needed.
-- Kept /oto-log promotion surface to quick and todo only; formal phase-plan promotion remains unsupported.
-- Validated Codex /oto-log install through the generated skills/oto-log/SKILL.md surface.
-- Completed Phase 02 with immutable `.oto/logs/` artifacts surfaced in `/oto-progress` and `/oto-resume-work`.
+(Populated as phases execute.)
 
 ### Quick Tasks Completed
 
