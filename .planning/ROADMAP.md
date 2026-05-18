@@ -1,7 +1,7 @@
 ---
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
-status: executing
+status: milestone_completion_pending
 phases: [1, 2, 3]
 plans_total: 9
 requirements_total: 20
@@ -10,7 +10,7 @@ predecessor: v0.2.0
 
 # Milestone v0.3.0: Restore doc-intake and eval-review agents
 
-**Status:** executing - Phase 3 complete, security review pending
+**Status:** milestone completion pending - Phase 3 security verified
 **Phases:** 1–3
 **Total Requirements:** 20 (AGNT-01..03, WF-ING-01..04, WF-EVAL-01..02, CMD-01..03, INST-01..03, TEST-01..03, ADR-01, PRTY-01)
 **Granularity:** fine
@@ -123,7 +123,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Agent ports + installer wiring | 2/2 | Complete | 2026-05-18 |
 | 2. Workflow rebrand-ports + command de-deferral | 3/3 | Complete | 2026-05-18 |
-| 3. Tests, install-smoke, parity, ADR-15 | 4/4 | Complete; security review pending | 2026-05-18 |
+| 3. Tests, install-smoke, parity, ADR-15 | 4/4 | Complete; security verified | 2026-05-18 |
 
 ## Traceability
 
