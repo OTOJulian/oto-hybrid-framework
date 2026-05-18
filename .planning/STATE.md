@@ -7,7 +7,7 @@ last_updated: "2026-05-18T00:00:00Z"
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
   percent: 0
 ---
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: Not started (roadmap approved, ready for planning)
-Plan: —
-Status: Awaiting `/oto-plan-phase 1`
-Last activity: 2026-05-18 — v0.3.0 roadmap created (3 phases, 20 requirements, 100% coverage)
+Phase: 1 — Agent ports + installer wiring
+Plan: — (2 plans created, 0 executed)
+Status: Ready to execute (`/oto-execute-phase 1`)
+Last activity: 2026-05-18 — Phase 1 planned: 01-01 (agent file ports, wave 1), 01-02 (installer wiring, wave 2). All 5 requirements (AGNT-01/02/03, INST-01, INST-02) covered. Plan-checker: PASSED with 3 warnings addressed in revision pass.
 
 Archive (prior milestones):
 
@@ -44,10 +44,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-plan-phase 1
+/oto-execute-phase 1
 ```
 
-After ROADMAP.md is approved, plan Phase 1 (Agent ports + installer wiring).
+Phase 1 planned (2 plans, 2 waves). Execute to port the three agents + wire the installer.
 
 ## Accumulated Context
 

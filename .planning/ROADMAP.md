@@ -3,7 +3,7 @@ milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
 status: planning
 phases: [1, 2, 3]
-plans_total: 0
+plans_total: 2
 requirements_total: 20
 predecessor: v0.2.0
 ---
@@ -50,7 +50,10 @@ Three ports + de-deferral of two existing commands → MINOR semver bump per CLA
   3. After `oto install --gemini`, the same three agents are present in `~/.gemini/agents/`.
   4. Each agent is dispatchable in Claude Code via `Task(subagent_type="oto-doc-classifier" | "oto-doc-synthesizer" | "oto-eval-auditor")` and emits its canonical output shape (classification record, synthesized context + `.oto/INGEST-CONFLICTS.md` buckets, or per-dimension COVERED/PARTIAL/MISSING scoring).
   5. The rebrand engine's coverage manifest accepts the three new agents (no orphan upstream paths, no orphan target paths).
-**Plans:** TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Agent file ports: flip three inventory rows from drop to keep, run rebrand engine, reconcile classifier+auditor tool lists per D-04, regenerate coverage manifest.
+- [ ] 01-02-PLAN.md — Installer wiring: extend CODEX_AGENT_SANDBOX with three entries (D-04 locks), per-runtime install smoke against isolated --config-dir for Claude / Codex / Gemini.
 **UI hint:** no
 
 ### Phase 2: Workflow rebrand-ports + command de-deferral
@@ -88,7 +91,7 @@ Three ports + de-deferral of two existing commands → MINOR semver bump per CLA
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Agent ports + installer wiring | 0/0 | Not started | — |
+| 1. Agent ports + installer wiring | 0/2 | Planned | — |
 | 2. Workflow rebrand-ports + command de-deferral | 0/0 | Not started | — |
 | 3. Tests, install-smoke, parity, ADR-15 | 0/0 | Not started | — |
 
