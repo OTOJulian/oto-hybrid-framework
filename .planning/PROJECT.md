@@ -12,13 +12,24 @@ It is built for a single developer who likes GSD's spec-driven workflow but does
 
 ## Current State
 
-**v0.2.0 shipped on 2026-05-07.** v0.1.0 shipped on 2026-05-04; v0.1.1 was an interim Codex parity tag (2026-05-05) now superseded by v0.2.0.
+**v0.3.0 shipped on 2026-05-18.** v0.2.0 shipped on 2026-05-07; v0.1.0 shipped on 2026-05-04; v0.1.1 was an interim Codex parity tag (2026-05-05) superseded by v0.2.0.
 
-v0.2.0 added two post-release commands and brought both to per-runtime parity:
+v0.3.0 partially reversed ADR-07 to retire the two remaining `[deferred]` entries in `/oto-help`:
+- `/oto-ingest-docs` — executable workflow for converting mixed ADR/PRD/SPEC/RFC piles into a synthesized `.oto/` state, with `--mode new`/`--mode merge`, the 50-doc cap, and `INGEST-CONFLICTS.md` bucketing.
+- `/oto-eval-review` — executable workflow for retroactive eval coverage audits of completed AI phases, producing `EVAL-REVIEW.md` with per-dimension COVERED / PARTIAL / MISSING scoring.
+- Restored three agents (`oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor`) — retained agent count is now 26; the remaining ADR-07 cut list stays deferred under AGNT-DEFER-01.
+- Codex sandbox map locked per agent (classifier + auditor read-only, synthesizer workspace-write); ADR-15 records the partial reversal and reaffirms AGNT-DEFER-01.
+
+The next project action is `/oto-new-milestone` to define fresh requirements for the next cycle.
+
+<details>
+<summary>Previously shipped: v0.2.0 (post-release commands)</summary>
+
+Shipped in v0.2.0:
 - `/oto-migrate` — converts GSD-era project artifacts to the oto command surface (dry-run by default, idempotent, half-migrated conflict detection, opt-in directory rename, timestamped backups).
 - `/oto-log` — fire-and-forget and session-bookmarked ad-hoc work capture, evidence-grounded six-section bodies with prompt-injection guardrails, immutable `.oto/logs/` entries, surfaces in `/oto-progress` Recent Activity and `/oto-resume-work`.
 
-The next project action is `$gsd-new-milestone` to define fresh requirements for the next cycle.
+</details>
 
 <details>
 <summary>Previously shipped: v0.1.0 (foundation release)</summary>
@@ -35,6 +46,7 @@ Shipped in v0.1.0:
 </details>
 
 Archive:
+- v0.3.0: `.planning/milestones/v0.3.0-ROADMAP.md`, `v0.3.0-REQUIREMENTS.md`
 - v0.2.0: `.planning/milestones/v0.2.0-ROADMAP.md`, `v0.2.0-REQUIREMENTS.md`, `v0.2.0-MILESTONE-AUDIT.md`
 - v0.1.0: `.planning/milestones/v0.1.0-ROADMAP.md`, `v0.1.0-REQUIREMENTS.md`, `v0.1.0-MILESTONE-AUDIT.md`
 
@@ -44,40 +56,29 @@ Archive:
 
 - v0.1.0 Release - 100/100 v1 requirements complete and audited.
 - v0.2.0 Release - 32/32 requirements (REQ-MIG-01..10 + D-01..D-22) complete and audited.
+- v0.3.0 Release - 20/20 requirements (AGNT-01..03, WF-ING-01..04, WF-EVAL-01..02, CMD-01..03, INST-01..03, TEST-01..03, ADR-01, PRTY-01) complete; all three phases verified, security cleared.
 - Claude Code happy path - approved through MR-01 end-to-end dogfood.
-- Codex and Gemini runtime parity - instruction generation, transforms, matrix, smoke tests, and `/oto-migrate` + `/oto-log` per-runtime delivery shipped.
+- Codex and Gemini runtime parity - instruction generation, transforms, matrix, smoke tests, and `/oto-migrate` + `/oto-log` + `/oto-ingest-docs` + `/oto-eval-review` per-runtime delivery shipped.
 - Clean install release gate - `v0.1.0` tag, GitHub Release, archive install smoke, and human clean-install UAT passed.
 - `/oto-migrate` - dry-run/apply migration engine, CLI dispatch, command markdown, public CLI alias, fixture-backed coverage, and generated runtime matrix entry shipped; threats secured.
 - `/oto-log` - fire-and-forget and session-based ad-hoc logs, evidence-bounded bodies, list/show/promote, progress/resume surfaces, CLI dispatch, and fixture-backed coverage shipped; threats secured.
+- `/oto-ingest-docs` - executable workflow with directory + manifest discovery, `--mode new`/`--mode merge`, 50-doc cap, INGEST-CONFLICTS.md bucketing; agents restored; fixture- and workflow-shape-tested.
+- `/oto-eval-review` - executable workflow producing per-dimension EVAL-REVIEW.md scoring; `oto-eval-auditor` restored; workflow-shape and SDK-fallback regression tests in place.
+- ADR-15 (D-24) - partial reversal of ADR-07 recorded; AGNT-DEFER-01 explicitly reaffirmed for the remaining seven dropped agents.
 
 ### Active
 
-v0.3.0 — Restore doc-intake and eval-review agents (see Current Milestone below).
-
-## Current Milestone: v0.3.0 Restore doc-intake and eval-review agents
-
-**Goal:** Reverse ADR-07's carveout for three agents and bring `/oto-ingest-docs` and `/oto-eval-review` to GSD parity — no more dead commands in `/oto-help`.
-
-**Target features:**
-- Port `gsd-doc-classifier` → `oto-doc-classifier` (doc-type classification for mixed ADR/PRD/SPEC/RFC piles).
-- Port `gsd-doc-synthesizer` → `oto-doc-synthesizer` (cross-doc synthesis + conflict surfacing).
-- Port `gsd-eval-auditor` → `oto-eval-auditor` (retroactive eval coverage audits for AI phases).
-- Rebrand-port `ingest-docs.md` and `eval-review.md` workflows from GSD source; retire the deferral stubs.
-- Update `/oto-ingest-docs` and `/oto-eval-review` command files to drop the deferral framing.
-- Wire new agents into the installer agent allowlist; set Codex `sandbox:` per agent.
-- Port `tests/ingest-docs.test.cjs` from GSD; adapt to `oto-` namespace; add `eval-review` smoke.
-- New ADR-15 documenting the partial reversal of ADR-07 (ADR-08…14 already assigned).
-- Per-runtime parity check across Claude / Codex / Gemini.
+No active milestone — v0.3.0 complete. Next milestone TBD via `/oto-new-milestone`.
 
 ### Next Milestone Goals
 
-Deferred from v0.3.0 scoping (candidates for v0.4.0+):
-- Migrate this project's own planning root from `.planning/` to `.oto/` (dogfood the framework's own state location).
+Candidates for v0.4.0+ (deferred from prior milestones):
+- **DOG-01** — Migrate this project's own planning root from `.planning/` to `.oto/` (dogfood the framework's own state location).
+- **SDK-01** — Implement the `oto-sdk query …` CLI surface that current workflows assume; today every workflow's SDK call falls back to manual file ops.
+- **AGNT-DEFER-01** — Possible restoration of the remaining ADR-07 cut list (`oto-ai-researcher`, `oto-eval-planner`, `oto-framework-selector`, `oto-pattern-mapper`, `oto-intel-updater`, `oto-user-profiler`, `oto-debug-session-manager`) only as user-facing commands require.
 - Runtime parity hardening beyond install-shape smoke.
 - Upstream sync UX improvements.
-- Optional SDK/programmatic API work (would unblock the `oto-sdk query` calls scattered through current workflows).
 - Goose framework evaluation for next-cycle research (reference parked at `~/Desktop/goose-main/`).
-- Niche command restoration beyond doc-intake/eval-review only when it clears the personal-use cost ceiling.
 
 ### Out of Scope
 
@@ -124,6 +125,9 @@ Deferred from v0.3.0 scoping (candidates for v0.4.0+):
 | `/oto-migrate` is opt-in for `.planning/` → `.oto/` directory rename | Default-rename has too-large blast radius for users with CI/hooks grepping `.planning/`; matches oto-this-repo's actual behavior | Resolved in v0.2.0 Phase 01 |
 | `/oto-log` entries are immutable; no `edit` subcommand | Logs are point-in-time observations; mutation invites narrative revision after the fact | Resolved in v0.2.0 Phase 02 |
 | `/oto-log` body is evidence-only (transcript + git diff + git log, capped + DATA-marker wrapped) | Avoids hallucinated motives; bounds prompt-injection surface | Resolved in v0.2.0 Phase 02 |
+| Surgical partial ADR-07 reversal (3 of 10 dropped agents) | Restoring only the agents the user actively needed (`/oto-ingest-docs`, `/oto-eval-review`) keeps the maintenance surface aligned with the personal-use ceiling; AGNT-DEFER-01 keeps the rest dormant | Resolved in v0.3.0 Phase 1 (ADR-15 / D-24) |
+| Per-agent Codex sandbox map (classifier+auditor read-only, synthesizer workspace-write) | Sandbox declaration must match each agent's actual filesystem footprint; the synthesizer is the only restored agent that writes (`.oto/INGEST-CONFLICTS.md`) | Resolved in v0.3.0 Phase 1 (D-04, ADR-15) |
+| Read-only agents (classifier, auditor) return values are persisted by the orchestrator, not by the agent | Sandbox parity for `read-only` requires the agent to never write; the workflow assumes the responsibility for persisting the agent's return value | Resolved in v0.3.0 Phase 2 (D-04 follow-on) |
 
 ## Evolution
 
@@ -134,4 +138,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-18 after v0.3.0 milestone open*
+*Last updated: 2026-05-18 after v0.3.0 milestone complete*

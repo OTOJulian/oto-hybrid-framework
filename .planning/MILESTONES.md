@@ -1,5 +1,30 @@
 # Milestones
 
+## v0.3.0 Release (Shipped: 2026-05-18)
+
+**Archive:**
+- [Roadmap](milestones/v0.3.0-ROADMAP.md)
+- [Requirements](milestones/v0.3.0-REQUIREMENTS.md)
+
+**Scope:** 3 phases, 9 plans, 20 requirements (AGNT-01..03, WF-ING-01..04, WF-EVAL-01..02, CMD-01..03, INST-01..03, TEST-01..03, ADR-01, PRTY-01). 19 commits since v0.2.0; +2,455/−84 LOC across 51 core source files (excluding planning, fixtures, foundation, and node_modules).
+
+**Release status:** shipped, tagged, all phases verified and security-cleared.
+
+**Key accomplishments:**
+- Partially reversed ADR-07 by restoring three agents — `oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor` — bringing the retained agent count to 26 and enabling both previously-deferred commands.
+- Rebrand-ported the `/oto-ingest-docs` workflow (~332 LOC) with directory-and-manifest discovery, `--mode new` and `--mode merge` defaults, the 50-doc cap, and the auto-resolved / competing-variants / unresolved-blockers bucketing in `INGEST-CONFLICTS.md`.
+- Rebrand-ported the `/oto-eval-review` workflow (~155 LOC) producing `EVAL-REVIEW.md` with per-dimension COVERED / PARTIAL / MISSING scoring and a remediation plan when gaps exist.
+- Removed every `[deferred]` / "intentionally non-executable" marker from `/oto-ingest-docs`, `/oto-eval-review`, and `/oto-help`; regression-guarded the clean state with workflow-shape and command-deferral-absence tests.
+- Locked the Codex sandbox map for the restored agents (D-04): classifier and auditor `read-only`, synthesizer `workspace-write`; encoded the locks in installer adapter, `EXPECTED_AGENTS=26`, and per-agent `.toml` parity assertions for Claude / Codex / Gemini in both install-smoke and parity integration tests.
+- Authored `decisions/ADR-15-restore-doc-and-eval-agents.md` (mints D-24) — names exactly the three restored agents, enumerates the seven still-dropped agents to affirm AGNT-DEFER-01, and records the per-agent Codex sandbox locks.
+
+**Verification:**
+- All three phases: `VERIFICATION.md` status `passed`, `REVIEW.md` clean, `SECURITY.md` status `verified` (`threats_open: 0`).
+- `npm test`: 613 tests, 612 pass, 1 expected skip, 0 failures.
+- Per-runtime parity smoke green on Claude Code, Codex, and Gemini for both restored commands.
+
+---
+
 ## v0.2.0 Release (Shipped: 2026-05-07)
 
 **Archive:**
