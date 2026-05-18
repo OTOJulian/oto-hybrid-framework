@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
 status: executing
-last_updated: "2026-05-18T13:36:00Z"
+last_updated: "2026-05-18T20:03:42Z"
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 2
-  percent: 33
+  completed_plans: 5
+  percent: 66
 ---
 
 # Project State
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md
 ## Current Position
 
 Phase: 2 — Workflow rebrand-ports + command de-deferral
-Plan: 02-01, 02-02, 02-03
-Status: Ready to execute (`/oto-execute-phase 2`)
-Last activity: 2026-05-18 — Phase 2 planned. 3 plans across 2 waves: 02-01 (rebrand apply + workflow hand-fixups) and 02-02 (CMD regression-guard test) run in parallel as Wave 1; 02-03 (workflow-shape + fixture-tree tests) runs as Wave 2 depending on 02-01. Plan checker passed after one revision iteration (0 blockers, all 4 warnings and 1 info resolved). `oto-sdk` remained unavailable in this environment, so plans use direct file ops + `git` only — no `oto-sdk query` calls in any task body.
+Plan: complete
+Status: Phase 2 verified; security review pending before Phase 3 planning
+Last activity: 2026-05-18 — Phase 2 executed and verified. 3/3 plans complete: executable `oto/workflows/ingest-docs.md` and `oto/workflows/eval-review.md` replaced the deferral stubs, command/help deferral regression guards were added, workflow-shape and fixture tests were added, and the dry-run report now includes inventory-backed `target_path` values. `npm test` passed with 562 tests, 561 pass, 1 skipped, 0 failed. `02-REVIEW.md` is clean and `02-VERIFICATION.md` passed. Security enforcement defaults to enabled, so run `/oto-secure-phase 2` before Phase 3 planning.
 
 Archive (prior milestones):
 
@@ -40,16 +40,17 @@ Archive (prior milestones):
 
 - v0.2.0 milestone audit: `status: passed`, 32/32 requirements covered.
 - Phase 1 verification passed on 2026-05-18: `01-VERIFICATION.md` status `passed`, `01-REVIEW.md` status `clean`, `01-SECURITY.md` status `passed`.
-- `npm test` passed on 2026-05-18: 533 pass, 1 expected skip, 0 failures.
+- Phase 2 verification passed on 2026-05-18: `02-VERIFICATION.md` status `passed`, `02-REVIEW.md` status `clean`; security review pending.
+- `npm test` passed on 2026-05-18: 561 pass, 1 expected skip, 0 failures.
 - Focused Phase 1 and runtime-matrix tests also passed on 2026-05-18.
 
 ## Next Command
 
 ```bash
-/oto-execute-phase 2
+/oto-secure-phase 2
 ```
 
-Phase 2 is planned. Execute Wave 1 (02-01 + 02-02 in parallel), then Wave 2 (02-03 depends on 02-01) to deliver the executable `/oto-ingest-docs` and `/oto-eval-review` workflows and lock in deferral-framing absence.
+Phase 2 is executed and verified. Run the security review before advancing to Phase 3 planning.
 
 ## Accumulated Context
 
@@ -57,6 +58,7 @@ Phase 2 is planned. Execute Wave 1 (02-01 + 02-02 in parallel), then Wave 2 (02-
 
 - 2026-05-18: v0.3.0 roadmap created. Phases derived from natural dependency chain: agents (foundation) → workflows + commands (consumer) → tests + parity + ADR-15 (closure). 20/20 requirements mapped.
 - 2026-05-18: Phase 1 completed. The retained agent set is now 26 agents; Phase 2 is ready to plan.
+- 2026-05-18: Phase 2 completed. `/oto-ingest-docs` and `/oto-eval-review` now have executable workflow bodies, deferral framing is regression-guarded away, and workflow-shape/fixture tests lock the Phase 2 contracts. Phase 3 is ready to plan after `/oto-secure-phase 2`.
 
 ### Decisions
 

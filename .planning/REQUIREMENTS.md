@@ -16,18 +16,18 @@
 
 ### Workflows
 
-- [ ] **WF-ING-01**: `~/.<runtime>/oto/workflows/ingest-docs.md` is the rebrand-ported executable workflow (~332 LOC), not the current deferral stub.
-- [ ] **WF-ING-02**: `/oto-ingest-docs` discovers docs via directory conventions (`docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/rfc/`, root `{ADR,PRD,SPEC,RFC}-*.md`) or an explicit `--manifest <file>` YAML.
-- [ ] **WF-ING-03**: `/oto-ingest-docs` honors `--mode new` (bootstraps `.oto/PROJECT.md` + `REQUIREMENTS.md` + `ROADMAP.md` + `STATE.md`) and `--mode merge` (appends phases and requirements to an existing `.oto/`), defaulting based on `.oto/` presence.
-- [ ] **WF-ING-04**: `/oto-ingest-docs` hard-blocks any destination write when `INGEST-CONFLICTS.md` contains unresolved-blocker entries, and enforces the 50-doc-per-invocation cap.
-- [ ] **WF-EVAL-01**: `~/.<runtime>/oto/workflows/eval-review.md` is the rebrand-ported executable workflow (~155 LOC), not the current deferral stub.
-- [ ] **WF-EVAL-02**: `/oto-eval-review <phase>` produces `.oto/phases/<phase>/EVAL-REVIEW.md` scoring each eval dimension from the phase's AI-SPEC.md as COVERED / PARTIAL / MISSING, with an actionable remediation plan when gaps exist.
+- [x] **WF-ING-01**: `~/.<runtime>/oto/workflows/ingest-docs.md` is the rebrand-ported executable workflow (~332 LOC), not the current deferral stub.
+- [x] **WF-ING-02**: `/oto-ingest-docs` discovers docs via directory conventions (`docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/rfc/`, root `{ADR,PRD,SPEC,RFC}-*.md`) or an explicit `--manifest <file>` YAML.
+- [x] **WF-ING-03**: `/oto-ingest-docs` honors `--mode new` (bootstraps `.oto/PROJECT.md` + `REQUIREMENTS.md` + `ROADMAP.md` + `STATE.md`) and `--mode merge` (appends phases and requirements to an existing `.oto/`), defaulting based on `.oto/` presence.
+- [x] **WF-ING-04**: `/oto-ingest-docs` hard-blocks any destination write when `INGEST-CONFLICTS.md` contains unresolved-blocker entries, and enforces the 50-doc-per-invocation cap.
+- [x] **WF-EVAL-01**: `~/.<runtime>/oto/workflows/eval-review.md` is the rebrand-ported executable workflow (~155 LOC), not the current deferral stub.
+- [x] **WF-EVAL-02**: `/oto-eval-review <phase>` produces `.oto/phases/<phase>/EVAL-REVIEW.md` scoring each eval dimension from the phase's AI-SPEC.md as COVERED / PARTIAL / MISSING, with an actionable remediation plan when gaps exist.
 
 ### Commands
 
-- [ ] **CMD-01**: `/oto-ingest-docs` command file removes the deferral framing; invoking the command executes the workflow body end-to-end without the "intentionally non-executable" refusal.
-- [ ] **CMD-02**: `/oto-eval-review` command file removes the deferral framing; invoking the command executes the workflow body end-to-end without the "intentionally non-executable" refusal.
-- [ ] **CMD-03**: `/oto-help` lists `/oto-ingest-docs` and `/oto-eval-review` as live commands (no `[deferred]` tag, no v2 reactivation footnote).
+- [x] **CMD-01**: `/oto-ingest-docs` command file removes the deferral framing; invoking the command executes the workflow body end-to-end without the "intentionally non-executable" refusal.
+- [x] **CMD-02**: `/oto-eval-review` command file removes the deferral framing; invoking the command executes the workflow body end-to-end without the "intentionally non-executable" refusal.
+- [x] **CMD-03**: `/oto-help` lists `/oto-ingest-docs` and `/oto-eval-review` as live commands (no `[deferred]` tag, no v2 reactivation footnote).
 
 ### Installer
 
@@ -82,15 +82,15 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 | AGNT-01 | 1 | Complete |
 | AGNT-02 | 1 | Complete |
 | AGNT-03 | 1 | Complete |
-| WF-ING-01 | 2 | Pending |
-| WF-ING-02 | 2 | Pending |
-| WF-ING-03 | 2 | Pending |
-| WF-ING-04 | 2 | Pending |
-| WF-EVAL-01 | 2 | Pending |
-| WF-EVAL-02 | 2 | Pending |
-| CMD-01 | 2 | Pending |
-| CMD-02 | 2 | Pending |
-| CMD-03 | 2 | Pending |
+| WF-ING-01 | 2 | Complete |
+| WF-ING-02 | 2 | Complete |
+| WF-ING-03 | 2 | Complete |
+| WF-ING-04 | 2 | Complete |
+| WF-EVAL-01 | 2 | Complete |
+| WF-EVAL-02 | 2 | Complete |
+| CMD-01 | 2 | Complete |
+| CMD-02 | 2 | Complete |
+| CMD-03 | 2 | Complete |
 | INST-01 | 1 | Complete |
 | INST-02 | 1 | Complete |
 | INST-03 | 3 | Pending |
@@ -108,4 +108,4 @@ Deferred from v0.3.0 scope. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after Phase 1 execution (AGNT-01..03, INST-01..02 complete)*
+*Last updated: 2026-05-18 after Phase 2 execution (WF-ING-01..04, WF-EVAL-01..02, CMD-01..03 complete)*

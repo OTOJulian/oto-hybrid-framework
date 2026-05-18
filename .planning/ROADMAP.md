@@ -3,7 +3,7 @@ milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
 status: executing
 phases: [1, 2, 3]
-plans_total: 2
+plans_total: 5
 requirements_total: 20
 predecessor: v0.2.0
 ---
@@ -33,7 +33,7 @@ Three ports + de-deferral of two existing commands → MINOR semver bump per CLA
 ## Phases
 
 - [x] **Phase 1: Agent ports + installer wiring** — Port `oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor` agents and wire them into the per-runtime installer with correct Codex sandboxes.
-- [ ] **Phase 2: Workflow rebrand-ports + command de-deferral** — Rebrand-port `ingest-docs.md` and `eval-review.md` workflows; strip deferral framing from `/oto-ingest-docs`, `/oto-eval-review`, and `/oto-help`.
+- [x] **Phase 2: Workflow rebrand-ports + command de-deferral** — Rebrand-port `ingest-docs.md` and `eval-review.md` workflows; strip deferral framing from `/oto-ingest-docs`, `/oto-eval-review`, and `/oto-help`.
 - [ ] **Phase 3: Tests, install-smoke, parity, ADR-15** — Port `ingest-docs.test.cjs`, add `eval-review.test.cjs`, extend install-smoke for new agents, run per-runtime parity check, write ADR-15.
 
 ## Phase Details
@@ -72,11 +72,11 @@ Plans:
 Plans:
 
 **Wave 1** *(02-01 and 02-02 run in parallel — no `files_modified` overlap)*
-- [ ] 02-01-PLAN.md — Rebrand engine apply + workflow body hand-fixups (prose .planning/ → .oto/, SDK-tolerant fallback, classifier/auditor read-only-agent persistence reshape).
-- [ ] 02-02-PLAN.md — CMD-01/02/03 regression-guard test (locks command + INDEX + help.md clean state).
+- [x] 02-01-PLAN.md — Rebrand engine apply + workflow body hand-fixups (prose .planning/ → .oto/, SDK-tolerant fallback, classifier/auditor read-only-agent persistence reshape).
+- [x] 02-02-PLAN.md — CMD-01/02/03 regression-guard test (locks command + INDEX + help.md clean state).
 
 **Wave 2** *(blocked on 02-01 completion)*
-- [ ] 02-03-PLAN.md — Workflow-shape tests + fixture-tree smoke (3 committed fixtures + tmpdir over-cap; locks the 3 engine blind-spot fixes).
+- [x] 02-03-PLAN.md — Workflow-shape tests + fixture-tree smoke (3 committed fixtures + tmpdir over-cap; locks the 3 engine blind-spot fixes).
 
 **Cross-cutting constraints** *(must_haves shared across multiple plans)*:
 - Phase 1 D-04 read-only-agent reshape: classifier/auditor return values are persisted by the orchestrator, not written by the agent (locked by 02-01 implementation + 02-03 ABSENCE regression-guard tests).
@@ -105,8 +105,8 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Agent ports + installer wiring | 2/2 | Complete | 2026-05-18 |
-| 2. Workflow rebrand-ports + command de-deferral | 0/0 | Ready to plan | — |
-| 3. Tests, install-smoke, parity, ADR-15 | 0/0 | Not started | — |
+| 2. Workflow rebrand-ports + command de-deferral | 3/3 | Complete | 2026-05-18 |
+| 3. Tests, install-smoke, parity, ADR-15 | 0/0 | Ready to plan | — |
 
 ## Traceability
 
