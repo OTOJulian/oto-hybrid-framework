@@ -15,6 +15,7 @@ on:
     branches: [main]
     paths:
       - 'bin/**'
+      - 'oto/agents/**'
       - 'package.json'
       - 'scripts/install-smoke.cjs'
       - '.github/workflows/install-smoke.yml'
@@ -61,6 +62,29 @@ jobs:
           npm install -g "$GITHUB_WORKSPACE/$TARBALL"
           command -v oto
           oto --help || oto
+      - name: Assert v0.3.0 restored agents install per runtime (INST-03)
+        shell: bash
+        run: |
+          set -euo pipefail
+          AGENTS="oto-doc-classifier oto-doc-synthesizer oto-eval-auditor"
+          for RUNTIME in claude codex gemini; do
+            TMP=$(mktemp -d)
+            oto install "--$RUNTIME" --config-dir "$TMP"
+            for AGENT in $AGENTS; do
+              if [ ! -f "$TMP/agents/$AGENT.md" ]; then
+                echo "FAIL: $RUNTIME missing $AGENT.md at $TMP/agents/"
+                ls -la "$TMP/agents/" || true
+                exit 1
+              fi
+            done
+            if [ "$RUNTIME" = "codex" ]; then
+              grep -q 'sandbox_mode[[:space:]]*=[[:space:]]*"read-only"' "$TMP/agents/oto-doc-classifier.toml" || { echo "FAIL: codex classifier sandbox_mode"; exit 1; }
+              grep -q 'sandbox_mode[[:space:]]*=[[:space:]]*"workspace-write"' "$TMP/agents/oto-doc-synthesizer.toml" || { echo "FAIL: codex synthesizer sandbox_mode"; exit 1; }
+              grep -q 'sandbox_mode[[:space:]]*=[[:space:]]*"read-only"' "$TMP/agents/oto-eval-auditor.toml" || { echo "FAIL: codex auditor sandbox_mode"; exit 1; }
+            fi
+            rm -rf "$TMP"
+          done
+          echo "PASS: 3 new agents installed across claude/codex/gemini"
       - name: Assert oto is executable
         shell: bash
         run: |
@@ -96,6 +120,29 @@ jobs:
           npm install -g "$GITHUB_WORKSPACE"
           command -v oto
           oto --help || oto
+      - name: Assert v0.3.0 restored agents install per runtime (INST-03)
+        shell: bash
+        run: |
+          set -euo pipefail
+          AGENTS="oto-doc-classifier oto-doc-synthesizer oto-eval-auditor"
+          for RUNTIME in claude codex gemini; do
+            TMP=$(mktemp -d)
+            oto install "--$RUNTIME" --config-dir "$TMP"
+            for AGENT in $AGENTS; do
+              if [ ! -f "$TMP/agents/$AGENT.md" ]; then
+                echo "FAIL: $RUNTIME missing $AGENT.md at $TMP/agents/"
+                ls -la "$TMP/agents/" || true
+                exit 1
+              fi
+            done
+            if [ "$RUNTIME" = "codex" ]; then
+              grep -q 'sandbox_mode[[:space:]]*=[[:space:]]*"read-only"' "$TMP/agents/oto-doc-classifier.toml" || { echo "FAIL: codex classifier sandbox_mode"; exit 1; }
+              grep -q 'sandbox_mode[[:space:]]*=[[:space:]]*"workspace-write"' "$TMP/agents/oto-doc-synthesizer.toml" || { echo "FAIL: codex synthesizer sandbox_mode"; exit 1; }
+              grep -q 'sandbox_mode[[:space:]]*=[[:space:]]*"read-only"' "$TMP/agents/oto-eval-auditor.toml" || { echo "FAIL: codex auditor sandbox_mode"; exit 1; }
+            fi
+            rm -rf "$TMP"
+          done
+          echo "PASS: 3 new agents installed across claude/codex/gemini"
       - name: Assert oto is executable after unpacked install (#2453 regression check)
         shell: bash
         run: |

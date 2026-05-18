@@ -33,10 +33,13 @@ const EXPECTED_AGENTS = [
   'oto-code-reviewer',
   'oto-codebase-mapper',
   'oto-debugger',
+  'oto-doc-classifier', // v0.3.0 Phase 1 restoration
+  'oto-doc-synthesizer', // v0.3.0 Phase 1 restoration
   'oto-doc-verifier',
   'oto-doc-writer',
   'oto-domain-researcher',
   'oto-executor',
+  'oto-eval-auditor', // v0.3.0 Phase 1 restoration
   'oto-integration-checker',
   'oto-nyquist-auditor',
   'oto-phase-researcher',

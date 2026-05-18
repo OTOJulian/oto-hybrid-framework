@@ -12,7 +12,7 @@ const { EXPECTED_AGENTS } = require('../oto/bin/lib/model-profiles.cjs');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-test('phase-04 mr01-install-smoke: tarball install populates commands, agents, and support docs', { timeout: 120000 }, () => {
+test('phase-04 mr01-install-smoke: tarball install populates commands, agents, support docs, and PRTY-01 ingest-docs/eval-review command files (claude)', { timeout: 120000 }, () => {
   let packDir;
   let tarball;
   let prefix;
@@ -69,6 +69,18 @@ test('phase-04 mr01-install-smoke: tarball install populates commands, agents, a
       assert.ok(
         fs.existsSync(path.join(configDir, 'agents', `${agent}.md`)),
         `agents/${agent}.md not installed`,
+      );
+    }
+    for (const relativePath of ['commands/oto/ingest-docs.md', 'commands/oto/eval-review.md']) {
+      const commandPath = path.join(configDir, relativePath);
+      assert.ok(
+        fs.existsSync(commandPath),
+        `Claude command file missing at ${commandPath}`,
+      );
+      const commandContent = fs.readFileSync(commandPath, 'utf8');
+      assert.ok(
+        !/intentionally non-executable/i.test(commandContent),
+        `Claude command ${relativePath} must not contain deferral framing`,
       );
     }
     assert.ok(
