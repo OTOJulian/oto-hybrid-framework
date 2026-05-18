@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.2.0
-milestone_name: milestone
-status: milestone_complete
-last_updated: "2026-05-07T22:50:00Z"
+milestone: v0.3.0
+milestone_name: Restore doc-intake and eval-review agents
+status: planning
+last_updated: "2026-05-18T00:00:00Z"
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -22,11 +22,12 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Milestone: v0.2.0 — SHIPPED 2026-05-07
-Status: Archived. Awaiting `$gsd-new-milestone` to start the next cycle.
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-18 — Milestone v0.3.0 started
 
-Archive:
+Archive (prior milestones):
 
 - `.planning/milestones/v0.2.0-ROADMAP.md`
 - `.planning/milestones/v0.2.0-REQUIREMENTS.md`
@@ -38,19 +39,15 @@ Archive:
 ## Last Verified
 
 - v0.2.0 milestone audit: `status: passed`, 32/32 requirements covered.
-- Phase 01 `/oto-migrate`: VERIFICATION passed (2026-05-05), SECURITY verified 2026-05-07 (20/20 threats closed, ASVS L1).
-- Phase 02 `/oto-log`: VERIFICATION passed (2026-05-06), SECURITY verified 2026-05-07 (18/18 threats closed, ASVS L1).
-- `npm test`: 533 pass, 1 expected skip, 0 failures (run 2026-05-07).
-- Test hygiene: relocated `foundation-frameworks/goose-main/` to `~/Desktop/goose-main/` to silence rebrand-engine false-positive matches against random base64 substrings; no code changes required.
-- Local git tag `v0.2.0` to be created at the archive commit.
+- `npm test` last green at v0.2.0 archive (2026-05-07): 533 pass, 1 expected skip, 0 failures.
 
 ## Next Command
 
 ```bash
-$gsd-new-milestone
+/oto-plan-phase 1
 ```
 
-Start the next milestone cycle. Use `$gsd-new-milestone` to define fresh requirements and roadmap.
+After ROADMAP.md is approved, plan Phase 1.
 
 ## Accumulated Context
 

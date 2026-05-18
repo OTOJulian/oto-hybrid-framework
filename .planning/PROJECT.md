@@ -52,16 +52,32 @@ Archive:
 
 ### Active
 
-- None. Awaiting `$gsd-new-milestone` to define the next cycle.
+v0.3.0 — Restore doc-intake and eval-review agents (see Current Milestone below).
+
+## Current Milestone: v0.3.0 Restore doc-intake and eval-review agents
+
+**Goal:** Reverse ADR-07's carveout for three agents and bring `/oto-ingest-docs` and `/oto-eval-review` to GSD parity — no more dead commands in `/oto-help`.
+
+**Target features:**
+- Port `gsd-doc-classifier` → `oto-doc-classifier` (doc-type classification for mixed ADR/PRD/SPEC/RFC piles).
+- Port `gsd-doc-synthesizer` → `oto-doc-synthesizer` (cross-doc synthesis + conflict surfacing).
+- Port `gsd-eval-auditor` → `oto-eval-auditor` (retroactive eval coverage audits for AI phases).
+- Rebrand-port `ingest-docs.md` and `eval-review.md` workflows from GSD source; retire the deferral stubs.
+- Update `/oto-ingest-docs` and `/oto-eval-review` command files to drop the deferral framing.
+- Wire new agents into the installer agent allowlist; set Codex `sandbox:` per agent.
+- Port `tests/ingest-docs.test.cjs` from GSD; adapt to `oto-` namespace; add `eval-review` smoke.
+- New ADR-09 documenting the partial reversal of ADR-07.
+- Per-runtime parity check across Claude / Codex / Gemini.
 
 ### Next Milestone Goals
 
-To be defined through `$gsd-new-milestone`. Likely candidates from deferred scope:
+Deferred from v0.3.0 scoping (candidates for v0.4.0+):
+- Migrate this project's own planning root from `.planning/` to `.oto/` (dogfood the framework's own state location).
 - Runtime parity hardening beyond install-shape smoke.
 - Upstream sync UX improvements.
-- Optional SDK/programmatic API work.
+- Optional SDK/programmatic API work (would unblock the `oto-sdk query` calls scattered through current workflows).
 - Goose framework evaluation for next-cycle research (reference parked at `~/Desktop/goose-main/`).
-- Niche command restoration only when it clears the personal-use cost ceiling.
+- Niche command restoration beyond doc-intake/eval-review only when it clears the personal-use cost ceiling.
 
 ### Out of Scope
 
@@ -118,4 +134,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-07 after v0.2.0 milestone close*
+*Last updated: 2026-05-18 after v0.3.0 milestone open*
