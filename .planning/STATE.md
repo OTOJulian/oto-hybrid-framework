@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.3.0
 milestone_name: Restore doc-intake and eval-review agents
 status: executing
-last_updated: "2026-05-18T20:03:42Z"
+last_updated: "2026-05-18T21:30:00Z"
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 5
+  total_plans: 9
   completed_plans: 5
-  percent: 66
+  percent: 56
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: 2 — Workflow rebrand-ports + command de-deferral
-Plan: complete
-Status: Phase 2 verified; security review pending before Phase 3 planning
-Last activity: 2026-05-18 — Phase 2 executed and verified. 3/3 plans complete: executable `oto/workflows/ingest-docs.md` and `oto/workflows/eval-review.md` replaced the deferral stubs, command/help deferral regression guards were added, workflow-shape and fixture tests were added, and the dry-run report now includes inventory-backed `target_path` values. `npm test` passed with 562 tests, 561 pass, 1 skipped, 0 failed. `02-REVIEW.md` is clean and `02-VERIFICATION.md` passed. Security enforcement defaults to enabled, so run `/oto-secure-phase 2` before Phase 3 planning.
+Phase: 3 — Tests, install-smoke, parity, ADR-15
+Plan: complete (4 plans authored; verified by plan-checker iteration 2)
+Status: Ready to execute
+Last activity: 2026-05-18 — Phase 3 planned. 4 PLAN.md files written across 2 waves (Wave 1 parallel: 03-01 tests authoring, 03-02 install-smoke + EXPECTED_AGENTS bump; Wave 1b sequenced: 03-03 per-runtime parity; Wave 2: 03-04 ADR-15). Plan checker passed on iteration 2 (3 blockers + 7 warnings on iteration 1; B1 ADR-15 `Implements: D-24`, B2 ADR-07 filename, B3 SDK-DEFER-01 literal regex locks all resolved). 03-RESEARCH.md and 03-VALIDATION.md (nyquist_compliant: true) also committed.
 
 Archive (prior milestones):
 
@@ -47,10 +47,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-secure-phase 2
+/oto-execute-phase 3
 ```
 
-Phase 2 is executed and verified. Run the security review before advancing to Phase 3 planning.
+Phase 3 plans authored and verified. Execute the 4 plans (Wave 1 parallel: 03-01, 03-02; Wave 1b: 03-03; Wave 2: 03-04).
 
 ## Accumulated Context
 
@@ -59,6 +59,7 @@ Phase 2 is executed and verified. Run the security review before advancing to Ph
 - 2026-05-18: v0.3.0 roadmap created. Phases derived from natural dependency chain: agents (foundation) → workflows + commands (consumer) → tests + parity + ADR-15 (closure). 20/20 requirements mapped.
 - 2026-05-18: Phase 1 completed. The retained agent set is now 26 agents; Phase 2 is ready to plan.
 - 2026-05-18: Phase 2 completed. `/oto-ingest-docs` and `/oto-eval-review` now have executable workflow bodies, deferral framing is regression-guarded away, and workflow-shape/fixture tests lock the Phase 2 contracts. Phase 3 is ready to plan after `/oto-secure-phase 2`.
+- 2026-05-18: Phase 3 planned. 4 PLAN.md files written in `.planning/phases/03-tests-install-smoke-parity-adr-15/` across 2 waves (Wave 1: 03-01 tests authoring + 03-02 install-smoke; Wave 1b: 03-03 per-runtime parity sequenced after 03-02; Wave 2: 03-04 ADR-15). Plan checker passed iteration 2; all 6 phase requirements (TEST-01..03, INST-03, PRTY-01, ADR-01) covered. RESEARCH and VALIDATION (nyquist_compliant: true) drafted.
 
 ### Decisions
 
