@@ -90,6 +90,47 @@ try {
   }
   console.log('PASS: oto-sdk query generate-slug -> structured JSON, deps resolve');
 
+  const planningProject = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-planning-smoke-'));
+  const planningDir = path.join(planningProject, '.planning');
+  fs.mkdirSync(planningDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(planningDir, 'ROADMAP.md'),
+    [
+      '# Roadmap',
+      '',
+      '## Phase Details',
+      '',
+      '### Phase 11: oto-sdk package port + PATH wiring',
+      '**Goal**: smoke test',
+      '**Plans**: 1 plan',
+      '',
+    ].join('\n')
+  );
+  const r2 = spawnSync(sdkBin, ['query', 'roadmap.analyze'], { encoding: 'utf8', cwd: planningProject });
+  const combinedR2 = `${r2.stdout || ''}\n${r2.stderr || ''}`;
+  if (combinedR2.includes('ERR_MODULE_NOT_FOUND')) {
+    fs.rmSync(planningProject, { recursive: true, force: true });
+    console.error('FAIL: oto-sdk roadmap.analyze crashed with ERR_MODULE_NOT_FOUND — top-level deps did not resolve from sdk/dist/cli.js');
+    process.exit(1);
+  }
+  if (r2.status !== 0) {
+    fs.rmSync(planningProject, { recursive: true, force: true });
+    console.error(
+      `FAIL: oto-sdk query roadmap.analyze failed: status=${r2.status}\n` +
+        `stdout:\n${r2.stdout}\nstderr:\n${r2.stderr}`
+    );
+    process.exit(1);
+  }
+  try {
+    JSON.parse(r2.stdout);
+  } catch (error) {
+    fs.rmSync(planningProject, { recursive: true, force: true });
+    console.error(`FAIL: oto-sdk query roadmap.analyze stdout is not JSON: ${error.message}\nstdout:\n${r2.stdout}`);
+    process.exit(1);
+  }
+  fs.rmSync(planningProject, { recursive: true, force: true });
+  console.log('PASS: oto-sdk query roadmap.analyze -> parseable JSON');
+
   runOtoInstallSmoke(path.dirname(binPath));
 
   console.log(`PASS: install-smoke for ref ${ref} (oto v${expectedVersion})`);
@@ -152,6 +193,11 @@ function runOtoInstallSmoke(binDir) {
         console.error('FAIL: CLAUDE.md marker missing after oto install --claude');
         process.exit(1);
       }
+      if (!r.stdout.includes('OTO SDK ready')) {
+        console.error('FAIL: installer did not print PATH-gated "OTO SDK ready" (oto-sdk should be callable with binDir on PATH)');
+        process.exit(1);
+      }
+      console.log('PASS: installer reports OTO SDK ready (PATH-gated)');
 
       console.log(
         `PASS: Phase 3 smoke: oto install --claude --config-dir ${tmp} ` +
