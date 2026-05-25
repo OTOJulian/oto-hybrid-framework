@@ -74,7 +74,13 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   2. `oto-sdk` is on PATH via the `package.json` bin entry (`oto-sdk` → `bin/oto-sdk.js`) and the installer's PATH-resolution check confirms it.
   3. The clean install requires no separate manual build step — the SDK is prebuilt/shipped inside the package.
   4. The installer's existing `oto-sdk` PATH-wiring machinery (the "#2775" path) finds the `bin/oto-sdk.js` shim and bin entry it expects.
-**Plans**: TBD
+**Plans**: 4 plans across 2 waves
+  - Wave 1 (parallel):
+    - [ ] 11-01-PLAN.md — Port GSD sdk/ subpackage + commit prebuilt sdk/dist/ (SDK-04, SDK-01)
+    - [ ] 11-02-PLAN.md — bin/oto-sdk.js shim + package.json bin/deps/files wiring (SDK-01, SDK-02, SDK-04)
+    - [ ] 11-03-PLAN.md — Port #2775 PATH-wiring into bin/lib/install.cjs + sdk-wiring unit test (SDK-02)
+  - Wave 2:
+    - [ ] 11-04-PLAN.md — Extend install-smoke: clean-install oto-sdk query + ERR_MODULE_NOT_FOUND guard (SDK-01, SDK-02, SDK-04)
 
 ### Phase 12: Query registry + workflow consumption
 **Goal**: The query registry answers every key the ported workflows invoke against oto namespaces and `.oto/` paths, and workflows consume that output when present while still degrading gracefully to manual fallback when it is absent.
