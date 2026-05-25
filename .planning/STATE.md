@@ -22,7 +22,7 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 11 — oto-sdk-package-port-path-wiring (implementation complete)
+**Current focus:** Phase 12 — Query registry + workflow consumption
 
 ## Current Position
 
@@ -53,10 +53,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-verify-work 11
+/oto-plan-phase 12
 ```
 
-Verify Phase 11. Plan 11-04 extended the clean-install smoke with `oto-sdk query generate-slug`, a `.planning`-backed `roadmap.analyze` JSON probe, `ERR_MODULE_NOT_FOUND` negative guards, executable-bin assertions, and the PATH-gated `OTO SDK ready` installer check.
+Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and wire workflows to consume `oto-sdk query` output with graceful fallback when the SDK is unavailable.
 
 ## Accumulated Context
 
