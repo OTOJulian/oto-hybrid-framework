@@ -3,8 +3,13 @@
   "version": "0.3.0",
   "description": "Hybrid AI-CLI framework: GSD planning + Superpowers skills under /oto-* across Claude/Codex/Gemini",
   "engines": { "node": ">=22.0.0" },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.84",
+    "ws": "^8.20.0"
+  },
   "bin": {
-    "oto": "bin/install.js"
+    "oto": "bin/install.js",
+    "oto-sdk": "bin/oto-sdk.js"
   },
   "files": [
     "bin/",
@@ -13,6 +18,9 @@
     "scripts/rebrand/",
     "scripts/sync-upstream/",
     "scripts/build-hooks.js",
+    "sdk/dist/",
+    "sdk/package.json",
+    "sdk/prompts/",
     "rename-map.json",
     "schema/",
     "package.json",
