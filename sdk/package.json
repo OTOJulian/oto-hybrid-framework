@@ -1,7 +1,7 @@
 {
-  "name": "@gsd-build/sdk",
+  "name": "@oto-build/sdk",
   "version": "0.1.0",
-  "description": "GSD SDK — programmatic interface for running GSD plans via the Agent SDK",
+  "description": "oto SDK — programmatic interface for running oto plans via the Agent SDK",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
     }
   },
   "bin": {
-    "gsd-sdk": "./dist/cli.js"
+    "oto-sdk": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -20,14 +20,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gsd-build/get-shit-done.git",
+    "url": "git+https://github.com/OTOJulian/oto-hybrid-framework.git",
     "directory": "sdk"
   },
-  "homepage": "https://github.com/gsd-build/get-shit-done/tree/main/sdk",
+  "homepage": "https://github.com/OTOJulian/oto-hybrid-framework/tree/main/sdk",
   "bugs": {
-    "url": "https://github.com/gsd-build/get-shit-done/issues"
+    "url": "https://github.com/OTOJulian/oto-hybrid-framework/issues"
   },
-  "author": "TÂCHES",
+  "author": "Julian Isaac",
   "license": "MIT",
   "engines": {
     "node": ">=22.0.0"
