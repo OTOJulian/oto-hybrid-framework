@@ -114,7 +114,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 1. Agent ports + installer wiring | v0.3.0 | 2/2 | Complete | 2026-05-18 |
 | 2. Workflow rebrand-ports + command de-deferral | v0.3.0 | 3/3 | Complete | 2026-05-18 |
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
-| 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
+| 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete    | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 0/? | Not started | - |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 0/? | Not started | - |
 
