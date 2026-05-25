@@ -53,6 +53,43 @@ try {
     process.exit(1);
   }
 
+  const sdkBin = path.join(path.dirname(binPath), 'oto-sdk');
+  if (!fs.existsSync(sdkBin)) {
+    console.error(`FAIL: oto-sdk bin not at ${sdkBin}`);
+    process.exit(1);
+  }
+  const sdkMode = fs.statSync(sdkBin).mode;
+  if ((sdkMode & 0o111) === 0) {
+    console.error(`FAIL: oto-sdk bin not executable (mode ${sdkMode.toString(8)})`);
+    process.exit(1);
+  }
+
+  const r1 = spawnSync(sdkBin, ['query', 'generate-slug', 'Phase Eleven'], { encoding: 'utf8' });
+  const combinedR1 = `${r1.stdout || ''}\n${r1.stderr || ''}`;
+  if (combinedR1.includes('ERR_MODULE_NOT_FOUND')) {
+    console.error('FAIL: oto-sdk crashed with ERR_MODULE_NOT_FOUND — top-level deps did not resolve from sdk/dist/cli.js');
+    process.exit(1);
+  }
+  if (r1.status !== 0) {
+    console.error(
+      `FAIL: oto-sdk query generate-slug failed: status=${r1.status}\n` +
+        `stdout:\n${r1.stdout}\nstderr:\n${r1.stderr}`
+    );
+    process.exit(1);
+  }
+  let slugJson;
+  try {
+    slugJson = JSON.parse(r1.stdout);
+  } catch (error) {
+    console.error(`FAIL: oto-sdk query generate-slug stdout is not JSON: ${error.message}\nstdout:\n${r1.stdout}`);
+    process.exit(1);
+  }
+  if (slugJson.slug !== 'phase-eleven') {
+    console.error(`FAIL: oto-sdk query generate-slug expected slug phase-eleven, got ${slugJson.slug}`);
+    process.exit(1);
+  }
+  console.log('PASS: oto-sdk query generate-slug -> structured JSON, deps resolve');
+
   runOtoInstallSmoke(path.dirname(binPath));
 
   console.log(`PASS: install-smoke for ref ${ref} (oto v${expectedVersion})`);
