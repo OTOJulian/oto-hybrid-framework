@@ -3,14 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
 status: executing
-last_updated: "2026-05-25T22:03:35.207Z"
-last_activity: 2026-05-25 -- Completed 11-01-PLAN.md; ready for Plan 2
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-05-25T22:12:29.300Z"
+last_activity: 2026-05-25
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
-  percent: 25
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -26,9 +27,9 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 ## Current Position
 
 Phase: 11 (oto-sdk-package-port-path-wiring) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
-Last activity: 2026-05-25 -- Completed 11-01-PLAN.md; ready for Plan 2
+Last activity: 2026-05-25
 
 Archive (prior milestones):
 
@@ -55,7 +56,7 @@ Archive (prior milestones):
 /oto-execute-phase 11
 ```
 
-Continue Phase 11 from Plan 2 of 4. Plan 11-01 has ported the SDK subtree, applied the `oto-sdk` surface rebrand, and committed prebuilt `sdk/dist/`.
+Continue Phase 11 from Plan 3 of 4. Plan 11-02 has added the parent-package `oto-sdk` shim, top-level package metadata, runtime dependencies, lock metadata, and npm packlist verification.
 
 ## Accumulated Context
 
@@ -80,16 +81,20 @@ Continue Phase 11 from Plan 2 of 4. Plan 11-01 has ported the SDK subtree, appli
 - Plan 11-01 kept internal GSD SDK identifiers unchanged while rebranding package, bin, and user-facing CLI strings to oto-sdk.
 - Plan 11-01 committed the generated sdk/package-lock.json as SDK package metadata.
 - Plan 11-01 committed sdk/dist as a one-time author build and did not add any install-time SDK build.
+- Plan 11-02 declared SDK runtime dependencies at the top level so sdk/dist imports resolve by Node's upward node_modules walk.
+- Plan 11-02 added top-level package-lock.json because oto now has runtime dependencies.
+- Plan 11-02 used an empty verification commit for the read-only npm pack assertion task.
 
 ### Execution Metrics
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 11 | 01 | 8min | 3 | 533 |
+| 11 | 02 | 6min | 3 | 3 |
 
 ### Last Session
 
-- **Stopped At:** Completed 11-01-PLAN.md
+- **Stopped At:** Completed 11-02-PLAN.md
 - **Resume File:** None
 
 ### Quick Tasks Completed

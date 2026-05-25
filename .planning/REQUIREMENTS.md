@@ -10,7 +10,7 @@ Milestone: **SDK + Dogfood**. Make oto's own command surface work natively — s
 ### SDK — oto-sdk query CLI
 
 - [x] **SDK-01**: Running `oto-sdk query <key>` resolves the CLI and returns structured output instead of `command not found: oto-sdk`.
-- [ ] **SDK-02**: After installing oto, `oto-sdk` is callable on PATH — wired via the `package.json` bin entry (`oto-sdk` → `bin/oto-sdk.js`) and the installer's PATH-resolution check.
+- [x] **SDK-02**: After installing oto, `oto-sdk` is callable on PATH — wired via the `package.json` bin entry (`oto-sdk` → `bin/oto-sdk.js`) and the installer's PATH-resolution check.
 - [ ] **SDK-03**: The query registry answers every query key the ported workflows invoke (`init.*`, `agent-skills`, `commit`, `state.*`, `phases.*`) using oto namespaces and `.oto/` paths.
 - [x] **SDK-04**: A clean GitHub-archive install yields a working `oto-sdk` with no separate manual build step (SDK prebuilt/shipped inside the package).
 - [ ] **SDK-05**: Workflows that call `oto-sdk query …` consume its output when present and still degrade gracefully (manual fallback) when it is absent.
@@ -45,7 +45,7 @@ Phases number from 11 (above the highest existing phase folder) to avoid collidi
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SDK-01 | Phase 11 | Complete |
-| SDK-02 | Phase 11 | Pending |
+| SDK-02 | Phase 11 | Complete |
 | SDK-04 | Phase 11 | Complete |
 | SDK-03 | Phase 12 | Pending |
 | SDK-05 | Phase 12 | Pending |
