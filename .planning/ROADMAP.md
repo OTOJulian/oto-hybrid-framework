@@ -1,6 +1,8 @@
 ---
 project: oto
-status: between_milestones
+status: in_progress
+milestone: v0.4.0
+milestone_name: SDK + Dogfood
 last_shipped: v0.3.0
 last_shipped_date: 2026-05-18
 ---
@@ -12,9 +14,15 @@ last_shipped_date: 2026-05-18
 - ✅ **v0.1.0 Foundation Release** — Phases 1-10 (shipped 2026-05-04)
 - ✅ **v0.2.0 Post-Release Commands** — Phases 1-2 (shipped 2026-05-07)
 - ✅ **v0.3.0 Restore Doc-Intake and Eval-Review Agents** — Phases 1-3 (shipped 2026-05-18)
-- 📋 **Next milestone** — TBD via `/oto-new-milestone`
+- 🚧 **v0.4.0 SDK + Dogfood** — Phases 11-13 (in progress)
 
 ## Phases
+
+### 🚧 v0.4.0 SDK + Dogfood (Phases 11-13)
+
+- [ ] **Phase 11: oto-sdk package port + PATH wiring** — Port GSD's `sdk/` subpackage, add the `bin/oto-sdk.js` shim and `package.json` bin entry, and verify the installer's PATH check so `oto-sdk query` resolves on a clean archive install with no manual build step.
+- [ ] **Phase 12: Query registry + workflow consumption** — Rebuild the query registry to answer every oto key (`init.*`, `agent-skills`, `commit`, `state.*`, `phases.*`) against `.oto/` paths, and wire workflows to consume `oto-sdk query` output while still degrading gracefully when it is absent.
+- [ ] **Phase 13: Dogfood migration to `.oto/`** — Migrate this repo's planning root from `.planning/` to `.oto/` with git history preserved, make oto commands operate on `.oto/` without a path override, and update every in-repo `.planning/` reference.
 
 <details>
 <summary>✅ v0.3.0 Restore doc-intake and eval-review agents (Phases 1-3) — SHIPPED 2026-05-18</summary>
@@ -55,9 +63,40 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 
 </details>
 
-### 📋 Next milestone (TBD)
+## Phase Details
 
-Run `/oto-new-milestone` to define fresh requirements for v0.4.0+. Candidates queued in `PROJECT.md` → Next Milestone Goals.
+### Phase 11: oto-sdk package port + PATH wiring
+**Goal**: A clean GitHub-archive install yields a working `oto-sdk` on PATH — `oto-sdk query <key>` resolves and returns structured output instead of `command not found`, with no separate manual build step.
+**Depends on**: Nothing (first v0.4.0 phase; SDK foundation)
+**Requirements**: SDK-01, SDK-02, SDK-04
+**Success Criteria** (what must be TRUE):
+  1. After a clean GitHub-archive install, running `oto-sdk query <key>` resolves and returns structured output — never `command not found: oto-sdk`.
+  2. `oto-sdk` is on PATH via the `package.json` bin entry (`oto-sdk` → `bin/oto-sdk.js`) and the installer's PATH-resolution check confirms it.
+  3. The clean install requires no separate manual build step — the SDK is prebuilt/shipped inside the package.
+  4. The installer's existing `oto-sdk` PATH-wiring machinery (the "#2775" path) finds the `bin/oto-sdk.js` shim and bin entry it expects.
+**Plans**: TBD
+
+### Phase 12: Query registry + workflow consumption
+**Goal**: The query registry answers every key the ported workflows invoke against oto namespaces and `.oto/` paths, and workflows consume that output when present while still degrading gracefully to manual fallback when it is absent.
+**Depends on**: Phase 11 (the `oto-sdk` binary must resolve before its registry can answer keys or workflows can consume it)
+**Requirements**: SDK-03, SDK-05
+**Success Criteria** (what must be TRUE):
+  1. `oto-sdk query` answers every key the ported workflows invoke — `init.*`, `agent-skills`, `commit`, `state.*`, and `phases.*` — using oto namespaces.
+  2. Query keys resolve against `.oto/` paths (not GSD's `.planning/` or upstream namespaces).
+  3. Workflows that call `oto-sdk query …` consume its structured output when the SDK is present.
+  4. The same workflows fall back to manual file operations and complete successfully when `oto-sdk` is absent.
+**Plans**: TBD
+
+### Phase 13: Dogfood migration to `.oto/`
+**Goal**: This repo manages itself with oto — planning artifacts live under `.oto/` (migrated from `.planning/`) with git history preserved, oto commands operate on `.oto/` with no path override, and every in-repo reference to the old location is updated.
+**Depends on**: Phase 12 (and Phase 11) — once this repo moves to `.oto/`, the workflows managing that location need a functioning `oto-sdk` answering `.oto/`-pathed keys
+**Requirements**: DOG-01, DOG-02, DOG-03
+**Success Criteria** (what must be TRUE):
+  1. This repo's planning artifacts live under `.oto/`, migrated from `.planning/`, with the git history of the moved files preserved.
+  2. oto commands operate on this repo's `.oto/` state with no manual path override.
+  3. Every in-repo reference to `.planning/` (CLAUDE.md, config, tooling, docs) is updated so nothing points at the stale location.
+  4. The migration is a clean cutover — no dual-location shim keeping `.planning/` alive alongside `.oto/`.
+**Plans**: TBD
 
 ## Progress
 
@@ -69,6 +108,9 @@ Run `/oto-new-milestone` to define fresh requirements for v0.4.0+. Candidates qu
 | 1. Agent ports + installer wiring | v0.3.0 | 2/2 | Complete | 2026-05-18 |
 | 2. Workflow rebrand-ports + command de-deferral | v0.3.0 | 3/3 | Complete | 2026-05-18 |
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
+| 11. oto-sdk package port + PATH wiring | v0.4.0 | 0/? | Not started | - |
+| 12. Query registry + workflow consumption | v0.4.0 | 0/? | Not started | - |
+| 13. Dogfood migration to `.oto/` | v0.4.0 | 0/? | Not started | - |
 
 ---
 

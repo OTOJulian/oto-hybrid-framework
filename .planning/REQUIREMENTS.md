@@ -40,24 +40,30 @@ Deferred, not in this roadmap:
 
 ## Traceability
 
-Populated during roadmap creation (phases number from 11).
+Phases number from 11 (above the highest existing phase folder) to avoid colliding with the accumulated v0.1.0–v0.3.0 phase directories.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SDK-01 | TBD | Pending |
-| SDK-02 | TBD | Pending |
-| SDK-03 | TBD | Pending |
-| SDK-04 | TBD | Pending |
-| SDK-05 | TBD | Pending |
-| DOG-01 | TBD | Pending |
-| DOG-02 | TBD | Pending |
-| DOG-03 | TBD | Pending |
+| SDK-01 | Phase 11 | Pending |
+| SDK-02 | Phase 11 | Pending |
+| SDK-04 | Phase 11 | Pending |
+| SDK-03 | Phase 12 | Pending |
+| SDK-05 | Phase 12 | Pending |
+| DOG-01 | Phase 13 | Pending |
+| DOG-02 | Phase 13 | Pending |
+| DOG-03 | Phase 13 | Pending |
+
+**Phase mapping summary:**
+- **Phase 11 — oto-sdk package port + PATH wiring**: SDK-01, SDK-02, SDK-04
+- **Phase 12 — Query registry + workflow consumption**: SDK-03, SDK-05
+- **Phase 13 — Dogfood migration to `.oto/`**: DOG-01, DOG-02, DOG-03
 
 **Coverage:**
 - v0.4.0 requirements: 8 total
-- Mapped to phases: 0 (pending roadmapper)
-- Unmapped: 8 ⚠️
+- Mapped to phases: 8 ✓
+- Unmapped: 0 ✓
+- Duplicates: 0 ✓
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v0.4.0 milestone start*
+*Last updated: 2026-05-25 — traceability populated during v0.4.0 roadmap creation (phases 11-13)*
