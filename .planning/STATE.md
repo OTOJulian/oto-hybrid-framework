@@ -1,12 +1,12 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: between_milestones
+milestone: v0.4.0
+milestone_name: SDK + Dogfood
+status: planning
 last_shipped: v0.3.0
 last_shipped_date: 2026-05-18
-last_updated: "2026-05-18T22:30:00Z"
-last_activity: 2026-05-18 -- v0.3.0 archived, tagged, and committed
+last_updated: "2026-05-25T00:00:00Z"
+last_activity: 2026-05-25 -- Milestone v0.4.0 (SDK + Dogfood) started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -23,11 +23,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Between milestones — planning v0.4.0+ via `/oto-new-milestone`.
+**Current focus:** v0.4.0 SDK + Dogfood — defining requirements and roadmap.
 
 ## Current Position
 
-No active milestone. v0.3.0 shipped 2026-05-18 (tagged, archived).
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-25 — Milestone v0.4.0 (SDK + Dogfood) started; phases will number from 11.
 
 Archive (prior milestones):
 

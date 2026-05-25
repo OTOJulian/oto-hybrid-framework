@@ -20,7 +20,7 @@ v0.3.0 partially reversed ADR-07 to retire the two remaining `[deferred]` entrie
 - Restored three agents (`oto-doc-classifier`, `oto-doc-synthesizer`, `oto-eval-auditor`) — retained agent count is now 26; the remaining ADR-07 cut list stays deferred under AGNT-DEFER-01.
 - Codex sandbox map locked per agent (classifier + auditor read-only, synthesizer workspace-write); ADR-15 records the partial reversal and reaffirms AGNT-DEFER-01.
 
-The next project action is `/oto-new-milestone` to define fresh requirements for the next cycle.
+**v0.4.0 (SDK + Dogfood) is now active** — building the `oto-sdk` query CLI and migrating this repo's planning root to `.oto/`. See `## Current Milestone` below.
 
 <details>
 <summary>Previously shipped: v0.2.0 (post-release commands)</summary>
@@ -50,6 +50,16 @@ Archive:
 - v0.2.0: `.planning/milestones/v0.2.0-ROADMAP.md`, `v0.2.0-REQUIREMENTS.md`, `v0.2.0-MILESTONE-AUDIT.md`
 - v0.1.0: `.planning/milestones/v0.1.0-ROADMAP.md`, `v0.1.0-REQUIREMENTS.md`, `v0.1.0-MILESTONE-AUDIT.md`
 
+## Current Milestone: v0.4.0 SDK + Dogfood
+
+**Goal:** Make oto's own command surface work natively — ship the `oto-sdk` query CLI that the workflows already call, then migrate this repo onto `.oto/` so oto manages itself.
+
+**Target features:**
+- **SDK** — Build and ship the `oto-sdk` query CLI: port GSD's `sdk/` subpackage, add the `bin/oto-sdk.js` shim and `package.json` bin entry, rebuild the query registry for oto namespaces, and verify the installer's PATH-wiring. Resolves `command not found: oto-sdk` across the 74 workflows (557 references) that currently fall back to manual file ops.
+- **Dogfood** — Migrate this project's planning root from `.planning/` to `.oto/` so oto eats its own dog food and ends the GSD/oto split-brain. Sequenced after the SDK so the new location has working tooling.
+
+**Phase numbering:** v0.4.0 phases start at **11** (above the highest existing phase folder) to avoid colliding with the accumulated v0.1.0–v0.3.0 phase directories left in `.planning/phases/`.
+
 ## Requirements
 
 ### Validated
@@ -68,13 +78,13 @@ Archive:
 
 ### Active
 
-No active milestone — v0.3.0 complete. Next milestone TBD via `/oto-new-milestone`.
+**v0.4.0 SDK + Dogfood** (requirements defined in `.planning/REQUIREMENTS.md`):
+- **SDK-01** — Implement the `oto-sdk query …` CLI surface that current workflows assume; today every workflow's SDK call falls back to manual file ops.
+- **DOG-01** — Migrate this project's own planning root from `.planning/` to `.oto/` (dogfood the framework's own state location).
 
 ### Next Milestone Goals
 
-Candidates for v0.4.0+ (deferred from prior milestones):
-- **DOG-01** — Migrate this project's own planning root from `.planning/` to `.oto/` (dogfood the framework's own state location).
-- **SDK-01** — Implement the `oto-sdk query …` CLI surface that current workflows assume; today every workflow's SDK call falls back to manual file ops.
+Candidates for v0.5.0+ (deferred):
 - **AGNT-DEFER-01** — Possible restoration of the remaining ADR-07 cut list (`oto-ai-researcher`, `oto-eval-planner`, `oto-framework-selector`, `oto-pattern-mapper`, `oto-intel-updater`, `oto-user-profiler`, `oto-debug-session-manager`) only as user-facing commands require.
 - Runtime parity hardening beyond install-shape smoke.
 - Upstream sync UX improvements.
@@ -138,4 +148,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-18 after v0.3.0 milestone complete*
+*Last updated: 2026-05-25 — v0.4.0 (SDK + Dogfood) milestone started*
