@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
 status: executing
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-05-25T22:12:29.300Z"
+stopped_at: Completed 11-03-PLAN.md
+last_updated: "2026-05-25T22:23:11.813Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 ## Current Position
 
 Phase: 11 (oto-sdk-package-port-path-wiring) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-05-25
 
@@ -56,7 +56,7 @@ Archive (prior milestones):
 /oto-execute-phase 11
 ```
 
-Continue Phase 11 from Plan 3 of 4. Plan 11-02 has added the parent-package `oto-sdk` shim, top-level package metadata, runtime dependencies, lock metadata, and npm packlist verification.
+Continue Phase 11 from Plan 4 of 4. Plan 11-03 has ported the #2775 PATH-wiring into the live installer, added PATH-walk/self-link unit coverage, and gates the OTO SDK ready message on real `oto-sdk` PATH callability.
 
 ## Accumulated Context
 
@@ -84,6 +84,7 @@ Continue Phase 11 from Plan 3 of 4. Plan 11-02 has added the parent-package `oto
 - Plan 11-02 declared SDK runtime dependencies at the top level so sdk/dist imports resolve by Node's upward node_modules walk.
 - Plan 11-02 added top-level package-lock.json because oto now has runtime dependencies.
 - Plan 11-02 used an empty verification commit for the read-only npm pack assertion task.
+- Plan 11-03 ports #2775 SDK PATH-wiring into the live installer as a once-per-invocation post-install step.
 
 ### Execution Metrics
 
@@ -91,10 +92,11 @@ Continue Phase 11 from Plan 3 of 4. Plan 11-02 has added the parent-package `oto
 |-------|------|----------|-------|-------|
 | 11 | 01 | 8min | 3 | 533 |
 | 11 | 02 | 6min | 3 | 3 |
+| 11 | 03 | 7min | 2 | 4 |
 
 ### Last Session
 
-- **Stopped At:** Completed 11-02-PLAN.md
+- **Stopped At:** Completed 11-03-PLAN.md
 - **Resume File:** None
 
 ### Quick Tasks Completed
