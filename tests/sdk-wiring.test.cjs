@@ -9,6 +9,7 @@ const path = require('node:path');
 const {
   isOtoSdkOnPath,
   trySelfLinkOtoSdk,
+  wireOtoSdk,
 } = require('../bin/lib/install.cjs');
 
 function withPath(value, fn) {
@@ -138,6 +139,68 @@ test('sdk wiring: trySelfLinkOtoSdk replaces a stale oto-sdk target before linki
         assert.match(contents, new RegExp(JSON.stringify(shimSrc).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
       }
     });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('sdk wiring: trySelfLinkOtoSdk preserves unmanaged oto-sdk targets', { skip: process.platform === 'win32' }, () => {
+  const root = makeTempDir();
+  try {
+    const home = path.join(root, 'home');
+    const binDir = path.join(home, 'bin');
+    const localBin = path.join(home, '.local', 'bin');
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(localBin, { recursive: true });
+    const unmanagedTarget = path.join(binDir, 'oto-sdk');
+    fs.writeFileSync(unmanagedTarget, '#!/bin/sh\necho unmanaged\n');
+    fs.chmodSync(unmanagedTarget, 0o755);
+
+    const shimSrc = path.join(root, 'real', 'oto-sdk.js');
+    fs.mkdirSync(path.dirname(shimSrc), { recursive: true });
+    fs.writeFileSync(shimSrc, '#!/usr/bin/env node\n');
+
+    withHomeAndPath(home, binDir, () => {
+      const linked = trySelfLinkOtoSdk(shimSrc);
+      assert.equal(linked, path.join(localBin, 'oto-sdk'));
+      assert.equal(fs.readFileSync(unmanagedTarget, 'utf8'), '#!/bin/sh\necho unmanaged\n');
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('sdk wiring: wireOtoSdk refuses stale oto-sdk earlier on PATH', { skip: process.platform === 'win32' }, () => {
+  const root = makeTempDir();
+  try {
+    const repoRoot = path.join(root, 'repo');
+    const staleBin = path.join(root, 'stale-bin');
+    fs.mkdirSync(path.join(repoRoot, 'sdk', 'dist'), { recursive: true });
+    fs.mkdirSync(path.join(repoRoot, 'bin'), { recursive: true });
+    fs.mkdirSync(staleBin, { recursive: true });
+    fs.writeFileSync(path.join(repoRoot, 'sdk', 'dist', 'cli.js'), '#!/usr/bin/env node\n');
+    fs.writeFileSync(path.join(repoRoot, 'bin', 'oto-sdk.js'), '#!/usr/bin/env node\n');
+    const staleTarget = path.join(staleBin, 'oto-sdk');
+    fs.writeFileSync(staleTarget, '#!/bin/sh\necho stale\n');
+    fs.chmodSync(staleTarget, 0o755);
+
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    const output = [];
+    console.log = (...args) => output.push(args.join(' '));
+    console.warn = (...args) => output.push(args.join(' '));
+    try {
+      withPath(staleBin, () => {
+        const result = wireOtoSdk({ repoRoot });
+        assert.equal(result.ready, false);
+        assert.equal(result.reason, 'shadowed');
+        assert.equal(result.path, staleTarget);
+      });
+    } finally {
+      console.log = originalLog;
+      console.warn = originalWarn;
+    }
+    assert.doesNotMatch(output.join('\n'), /OTO SDK ready/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

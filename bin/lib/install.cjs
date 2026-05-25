@@ -43,7 +43,39 @@ function assertWithin(configDir, relPath) {
   return joined;
 }
 
-function isOtoSdkOnPath() {
+function isExecutableFile(stat) {
+  if (!stat.isFile()) return false;
+  if (process.platform === 'win32') return true;
+  return (stat.mode & 0o111) !== 0;
+}
+
+function isManagedOtoSdkTarget(target, shimSrc) {
+  try {
+    const stat = fs.lstatSync(target);
+    if (stat.isSymbolicLink()) {
+      try {
+        return fs.realpathSync(target) === fs.realpathSync(shimSrc);
+      } catch {
+        return false;
+      }
+    }
+
+    if (!stat.isFile()) return false;
+
+    try {
+      if (fs.realpathSync(target) === fs.realpathSync(shimSrc)) return true;
+    } catch {
+      // Fall through to wrapper-content detection.
+    }
+
+    const contents = fs.readFileSync(target, 'utf8');
+    return contents.includes(`require(${JSON.stringify(shimSrc)})`);
+  } catch {
+    return false;
+  }
+}
+
+function findOtoSdkOnPath(expectedShim) {
   const pathEnv = process.env.PATH || '';
   const exts = process.platform === 'win32' ? ['.cmd', '.exe', '.bat', ''] : [''];
   for (const seg of pathEnv.split(path.delimiter)) {
@@ -52,16 +84,23 @@ function isOtoSdkOnPath() {
       const candidate = path.join(seg, `oto-sdk${ext}`);
       try {
         const st = fs.statSync(candidate);
-        if (st.isFile()) {
-          if (process.platform === 'win32') return true;
-          if ((st.mode & 0o111) !== 0) return true;
+        if (isExecutableFile(st)) {
+          const result = { path: candidate };
+          if (expectedShim) {
+            result.matchesCurrentInstall = isManagedOtoSdkTarget(candidate, expectedShim);
+          }
+          return result;
         }
       } catch {
         // Missing or unreadable PATH segment; keep scanning.
       }
     }
   }
-  return false;
+  return null;
+}
+
+function isOtoSdkOnPath() {
+  return Boolean(findOtoSdkOnPath());
 }
 
 function trySelfLinkOtoSdk(shimSrc) {
@@ -90,6 +129,11 @@ function trySelfLinkOtoSdk(shimSrc) {
       fs.mkdirSync(dir, { recursive: true });
       const target = path.join(dir, 'oto-sdk');
       try {
+        const stat = fs.lstatSync(target);
+        const executable = process.platform === 'win32' || (stat.mode & 0o111) !== 0;
+        if (executable && !isManagedOtoSdkTarget(target, shimSrc)) {
+          continue;
+        }
         fs.unlinkSync(target);
       } catch {
         // No stale target to replace.
@@ -140,21 +184,35 @@ function wireOtoSdk(opts = {}) {
     // The parent shim invokes node directly, so chmod failures are non-fatal.
   }
 
-  let onPath = isOtoSdkOnPath();
+  let foundOnPath = findOtoSdkOnPath(shimSrc);
   let linked = null;
-  if (!onPath) {
+  if (foundOnPath && foundOnPath.matchesCurrentInstall === false) {
+    console.warn('');
+    console.warn(`  ⚠ OTO SDK files are present, but PATH resolves oto-sdk to a different executable: ${foundOnPath.path}`);
+    console.warn('    Put this install\'s bin directory earlier on PATH, or remove the stale executable.');
+    console.warn('');
+    return {
+      ready: false,
+      reason: 'shadowed',
+      path: foundOnPath.path,
+      sdkCliPath,
+      shimSrc,
+    };
+  }
+
+  if (!foundOnPath) {
     linked = trySelfLinkOtoSdk(shimSrc);
     if (linked) {
-      onPath = isOtoSdkOnPath();
-      if (onPath) {
+      foundOnPath = findOtoSdkOnPath(shimSrc);
+      if (foundOnPath && foundOnPath.matchesCurrentInstall) {
         console.log(`  ↪ linked oto-sdk → ${linked}`);
       }
     }
   }
 
-  if (onPath) {
+  if (foundOnPath && foundOnPath.matchesCurrentInstall) {
     console.log('  ✓ OTO SDK ready (sdk/dist/cli.js)');
-    return { ready: true, sdkCliPath, shimSrc, linked };
+    return { ready: true, sdkCliPath, shimSrc, linked, path: foundOnPath.path };
   }
 
   console.warn('');
