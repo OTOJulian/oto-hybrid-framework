@@ -112,18 +112,18 @@ test('sdk wiring: trySelfLinkOtoSdk creates oto-sdk under a writable HOME PATH d
   }
 });
 
-test('sdk wiring: trySelfLinkOtoSdk replaces a stale oto-sdk target before linking', { skip: process.platform === 'win32' }, () => {
+test('sdk wiring: trySelfLinkOtoSdk replaces a managed oto-sdk target before linking', { skip: process.platform === 'win32' }, () => {
   const root = makeTempDir();
   try {
     const home = path.join(root, 'home');
     const binDir = path.join(home, 'bin');
     fs.mkdirSync(binDir, { recursive: true });
     const staleTarget = path.join(binDir, 'oto-sdk');
-    fs.writeFileSync(staleTarget, 'stale install\n');
-
     const shimSrc = path.join(root, 'real', 'oto-sdk.js');
     fs.mkdirSync(path.dirname(shimSrc), { recursive: true });
     fs.writeFileSync(shimSrc, '#!/usr/bin/env node\n');
+    fs.writeFileSync(staleTarget, `#!/usr/bin/env node\nrequire(${JSON.stringify(shimSrc)});\n`);
+    fs.chmodSync(staleTarget, 0o644);
 
     withHomeAndPath(home, binDir, () => {
       const linked = trySelfLinkOtoSdk(shimSrc);
@@ -134,9 +134,9 @@ test('sdk wiring: trySelfLinkOtoSdk replaces a stale oto-sdk target before linki
         assert.equal(fs.readlinkSync(staleTarget), shimSrc);
       } else {
         const contents = fs.readFileSync(staleTarget, 'utf8');
-        assert.doesNotMatch(contents, /stale install/);
         assert.match(contents, /require\(/);
         assert.match(contents, new RegExp(JSON.stringify(shimSrc).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+        assert.equal((fs.statSync(staleTarget).mode & 0o111) !== 0, true);
       }
     });
   } finally {
@@ -164,6 +164,32 @@ test('sdk wiring: trySelfLinkOtoSdk preserves unmanaged oto-sdk targets', { skip
       const linked = trySelfLinkOtoSdk(shimSrc);
       assert.equal(linked, path.join(localBin, 'oto-sdk'));
       assert.equal(fs.readFileSync(unmanagedTarget, 'utf8'), '#!/bin/sh\necho unmanaged\n');
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('sdk wiring: trySelfLinkOtoSdk preserves non-executable unmanaged oto-sdk targets', { skip: process.platform === 'win32' }, () => {
+  const root = makeTempDir();
+  try {
+    const home = path.join(root, 'home');
+    const binDir = path.join(home, 'bin');
+    const localBin = path.join(home, '.local', 'bin');
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(localBin, { recursive: true });
+    const unmanagedTarget = path.join(binDir, 'oto-sdk');
+    fs.writeFileSync(unmanagedTarget, 'user note or disabled shim\n');
+    fs.chmodSync(unmanagedTarget, 0o644);
+
+    const shimSrc = path.join(root, 'real', 'oto-sdk.js');
+    fs.mkdirSync(path.dirname(shimSrc), { recursive: true });
+    fs.writeFileSync(shimSrc, '#!/usr/bin/env node\n');
+
+    withHomeAndPath(home, binDir, () => {
+      const linked = trySelfLinkOtoSdk(shimSrc);
+      assert.equal(linked, path.join(localBin, 'oto-sdk'));
+      assert.equal(fs.readFileSync(unmanagedTarget, 'utf8'), 'user note or disabled shim\n');
     });
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

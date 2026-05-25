@@ -129,9 +129,8 @@ function trySelfLinkOtoSdk(shimSrc) {
       fs.mkdirSync(dir, { recursive: true });
       const target = path.join(dir, 'oto-sdk');
       try {
-        const stat = fs.lstatSync(target);
-        const executable = process.platform === 'win32' || (stat.mode & 0o111) !== 0;
-        if (executable && !isManagedOtoSdkTarget(target, shimSrc)) {
+        fs.lstatSync(target);
+        if (!isManagedOtoSdkTarget(target, shimSrc)) {
           continue;
         }
         fs.unlinkSync(target);
