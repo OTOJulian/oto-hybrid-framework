@@ -43,6 +43,128 @@ function assertWithin(configDir, relPath) {
   return joined;
 }
 
+function isOtoSdkOnPath() {
+  const pathEnv = process.env.PATH || '';
+  const exts = process.platform === 'win32' ? ['.cmd', '.exe', '.bat', ''] : [''];
+  for (const seg of pathEnv.split(path.delimiter)) {
+    if (!seg) continue;
+    for (const ext of exts) {
+      const candidate = path.join(seg, `oto-sdk${ext}`);
+      try {
+        const st = fs.statSync(candidate);
+        if (st.isFile()) {
+          if (process.platform === 'win32') return true;
+          if ((st.mode & 0o111) !== 0) return true;
+        }
+      } catch {
+        // Missing or unreadable PATH segment; keep scanning.
+      }
+    }
+  }
+  return false;
+}
+
+function trySelfLinkOtoSdk(shimSrc) {
+  if (process.platform === 'win32') return null;
+
+  const home = os.homedir();
+  if (!home) return null;
+
+  const localBin = path.join(home, '.local', 'bin');
+  const pathCandidates = [];
+  const pathEnv = process.env.PATH || '';
+  for (const seg of pathEnv.split(path.delimiter)) {
+    if (!seg) continue;
+    const abs = path.resolve(seg);
+    if (abs.startsWith(home + path.sep) && !pathCandidates.includes(abs)) {
+      pathCandidates.push(abs);
+    }
+  }
+
+  const candidates = pathCandidates.includes(localBin)
+    ? [localBin, ...pathCandidates.filter((dir) => dir !== localBin)]
+    : [...pathCandidates, localBin];
+
+  for (const dir of candidates) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      const target = path.join(dir, 'oto-sdk');
+      try {
+        fs.unlinkSync(target);
+      } catch {
+        // No stale target to replace.
+      }
+
+      try {
+        fs.symlinkSync(shimSrc, target);
+      } catch {
+        fs.writeFileSync(
+          target,
+          `#!/usr/bin/env node\nrequire(${JSON.stringify(shimSrc)});\n`,
+        );
+        try {
+          fs.chmodSync(target, 0o755);
+        } catch {
+          // Non-fatal: the caller verifies PATH callability afterward.
+        }
+      }
+      return target;
+    } catch {
+      // Permission or read-only filesystem; try the next HOME-owned candidate.
+    }
+  }
+  return null;
+}
+
+function wireOtoSdk(opts = {}) {
+  const repoRoot = opts.repoRoot || path.join(__dirname, '..', '..');
+  const sdkCliPath = path.join(repoRoot, 'sdk', 'dist', 'cli.js');
+  const shimSrc = path.join(repoRoot, 'bin', 'oto-sdk.js');
+
+  if (!fs.existsSync(sdkCliPath)) {
+    console.warn('');
+    console.warn('  OTO SDK dist not found; runtime files were installed, but oto-sdk is not ready.');
+    console.warn(`  Missing: ${sdkCliPath}`);
+    console.warn('  For a development clone, run: cd sdk && npm install && npm run build');
+    console.warn('  For an installed package, upgrade or reinstall from a version that ships sdk/dist/.');
+    console.warn('');
+    return { ready: false, reason: 'missing-dist', sdkCliPath, shimSrc };
+  }
+
+  try {
+    const stat = fs.statSync(sdkCliPath);
+    if ((stat.mode & 0o111) === 0) {
+      fs.chmodSync(sdkCliPath, stat.mode | 0o111);
+    }
+  } catch {
+    // The parent shim invokes node directly, so chmod failures are non-fatal.
+  }
+
+  let onPath = isOtoSdkOnPath();
+  let linked = null;
+  if (!onPath) {
+    linked = trySelfLinkOtoSdk(shimSrc);
+    if (linked) {
+      onPath = isOtoSdkOnPath();
+      if (onPath) {
+        console.log(`  ↪ linked oto-sdk → ${linked}`);
+      }
+    }
+  }
+
+  if (onPath) {
+    console.log('  ✓ OTO SDK ready (sdk/dist/cli.js)');
+    return { ready: true, sdkCliPath, shimSrc, linked };
+  }
+
+  console.warn('');
+  console.warn('  ⚠ OTO SDK files are present but oto-sdk is not on your PATH.');
+  console.warn('    Workflows that call `oto-sdk query ...` will fail with "command not found".');
+  console.warn('    Add ~/.local/bin or another directory containing the shim to your PATH.');
+  console.warn('');
+  return { ready: false, reason: 'not-on-path', sdkCliPath, shimSrc, linked };
+}
+
 async function installRuntime(adapter, opts = {}) {
   const flags = opts.flags || {};
   const repoRoot = opts.repoRoot || path.join(__dirname, '..', '..');
@@ -290,4 +412,12 @@ function withHomeDirConfig(adapter, opts, homeDir) {
   };
 }
 
-module.exports = { installRuntime, uninstallRuntime, installAll, uninstallAll };
+module.exports = {
+  installRuntime,
+  uninstallRuntime,
+  installAll,
+  uninstallAll,
+  isOtoSdkOnPath,
+  trySelfLinkOtoSdk,
+  wireOtoSdk,
+};

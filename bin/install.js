@@ -9,7 +9,7 @@ if (major < 22) {
 
 const path = require('node:path');
 const { parseCliArgs, ArgError } = require('./lib/args.cjs');
-const { installRuntime, uninstallRuntime, installAll, uninstallAll } = require('./lib/install.cjs');
+const { installRuntime, uninstallRuntime, installAll, uninstallAll, wireOtoSdk } = require('./lib/install.cjs');
 const { version: OTO_VERSION } = require('../package.json');
 
 const ADAPTERS = {
@@ -113,6 +113,7 @@ async function main(argv) {
           await installRuntime(ADAPTERS[rt], opts);
         }
       }
+      wireOtoSdk(opts);
     } else if (parsed.all) {
       await uninstallAll(Object.values(ADAPTERS), opts);
     } else {
