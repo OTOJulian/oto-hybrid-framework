@@ -2,17 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
-status: in_progress
-last_shipped: v0.3.0
-last_shipped_date: 2026-05-18
-last_updated: "2026-05-25T00:00:00Z"
-last_activity: 2026-05-25 -- v0.4.0 roadmap created; phases 11-13 mapped (8/8 requirements)
+status: executing
+last_updated: "2026-05-25T22:03:35.207Z"
+last_activity: 2026-05-25 -- Completed 11-01-PLAN.md; ready for Plan 2
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 4
+  completed_plans: 1
+  percent: 25
 ---
 
 # Project State
@@ -23,14 +21,14 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** v0.4.0 SDK + Dogfood — roadmap created; Phase 11 (oto-sdk package port + PATH wiring) is ready to plan.
+**Current focus:** Phase 11 — oto-sdk-package-port-path-wiring
 
 ## Current Position
 
-Phase: 11 — oto-sdk package port + PATH wiring (not started)
-Plan: —
-Status: Roadmap complete; ready to plan Phase 11
-Last activity: 2026-05-25 — v0.4.0 roadmap created. Phases 11-13 derived (SDK port → query registry + workflow consumption → dogfood migration); 8/8 requirements mapped, SDK-before-DOG dependency enforced. Phases number from 11 to avoid collision with the accumulated v0.1.0–v0.3.0 phase directories (highest existing folder is 10).
+Phase: 11 (oto-sdk-package-port-path-wiring) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-05-25 -- Completed 11-01-PLAN.md; ready for Plan 2
 
 Archive (prior milestones):
 
@@ -54,10 +52,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-plan-phase 11
+/oto-execute-phase 11
 ```
 
-Decompose Phase 11 (oto-sdk package port + PATH wiring) into executable plans. Source: GSD's `sdk/` subpackage already exists at `foundation-frameworks/get-shit-done-main/sdk/` (this is a PORT, not greenfield); the installer at `oto/bin/install.js` (~lines 7267–7602) already contains the `oto-sdk` PATH-wiring machinery expecting a `bin/oto-sdk.js` shim and a `package.json` bin entry that do not yet exist.
+Continue Phase 11 from Plan 2 of 4. Plan 11-01 has ported the SDK subtree, applied the `oto-sdk` surface rebrand, and committed prebuilt `sdk/dist/`.
 
 ## Accumulated Context
 
@@ -78,6 +76,21 @@ Decompose Phase 11 (oto-sdk package port + PATH wiring) into executable plans. S
 - v0.4.0 numbers phases from 11 (above the highest existing phase folder, 10) so new phase directories never collide with the accumulated v0.1.0–v0.3.0 folders; do not rename/move/delete existing phase directories.
 - v0.4.0 SDK is a PORT of GSD's existing `sdk/` subpackage, not a greenfield build; the installer already carries the `oto-sdk` PATH-wiring (#2775 path) expecting a `bin/oto-sdk.js` shim and `package.json` bin entry.
 - Dogfood migration (Phase 13) is a clean cutover to `.oto/` — no dual-location shim keeping `.planning/` working (per REQUIREMENTS Out of Scope).
+- Plan 11-01 ported the full upstream GSD SDK subtree rather than trimming to query-only.
+- Plan 11-01 kept internal GSD SDK identifiers unchanged while rebranding package, bin, and user-facing CLI strings to oto-sdk.
+- Plan 11-01 committed the generated sdk/package-lock.json as SDK package metadata.
+- Plan 11-01 committed sdk/dist as a one-time author build and did not add any install-time SDK build.
+
+### Execution Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 11 | 01 | 8min | 3 | 533 |
+
+### Last Session
+
+- **Stopped At:** Completed 11-01-PLAN.md
+- **Resume File:** None
 
 ### Quick Tasks Completed
 

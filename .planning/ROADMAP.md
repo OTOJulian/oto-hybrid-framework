@@ -76,7 +76,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   4. The installer's existing `oto-sdk` PATH-wiring machinery (the "#2775" path) finds the `bin/oto-sdk.js` shim and bin entry it expects.
 **Plans**: 4 plans across 2 waves
   - Wave 1 (parallel):
-    - [ ] 11-01-PLAN.md — Port GSD sdk/ subpackage + commit prebuilt sdk/dist/ (SDK-04, SDK-01)
+    - [x] 11-01-PLAN.md — Port GSD sdk/ subpackage + commit prebuilt sdk/dist/ (SDK-04, SDK-01)
     - [ ] 11-02-PLAN.md — bin/oto-sdk.js shim + package.json bin/deps/files wiring (SDK-01, SDK-02, SDK-04)
     - [ ] 11-03-PLAN.md — Port #2775 PATH-wiring into bin/lib/install.cjs + sdk-wiring unit test (SDK-02)
   - Wave 2:
@@ -114,7 +114,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 1. Agent ports + installer wiring | v0.3.0 | 2/2 | Complete | 2026-05-18 |
 | 2. Workflow rebrand-ports + command de-deferral | v0.3.0 | 3/3 | Complete | 2026-05-18 |
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
-| 11. oto-sdk package port + PATH wiring | v0.4.0 | 0/? | Not started | - |
+| 11. oto-sdk package port + PATH wiring | v0.4.0 | 1/4 | In progress | - |
 | 12. Query registry + workflow consumption | v0.4.0 | 0/? | Not started | - |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 0/? | Not started | - |
 
