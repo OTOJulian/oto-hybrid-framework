@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
 status: executing
-stopped_at: Completed 11-03-PLAN.md
-last_updated: "2026-05-25T22:23:11.813Z"
+stopped_at: Completed 11-04-PLAN.md
+last_updated: "2026-05-25T22:29:42Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -22,13 +22,13 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 11 — oto-sdk-package-port-path-wiring
+**Current focus:** Phase 11 — oto-sdk-package-port-path-wiring (implementation complete)
 
 ## Current Position
 
-Phase: 11 (oto-sdk-package-port-path-wiring) — EXECUTING
+Phase: 11 (oto-sdk-package-port-path-wiring) — IMPLEMENTATION COMPLETE
 Plan: 4 of 4
-Status: Ready to execute
+Status: Plan 11-04 completed; ready for phase verification
 Last activity: 2026-05-25
 
 Archive (prior milestones):
@@ -53,10 +53,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-execute-phase 11
+/oto-verify-work 11
 ```
 
-Continue Phase 11 from Plan 4 of 4. Plan 11-03 has ported the #2775 PATH-wiring into the live installer, added PATH-walk/self-link unit coverage, and gates the OTO SDK ready message on real `oto-sdk` PATH callability.
+Verify Phase 11. Plan 11-04 extended the clean-install smoke with `oto-sdk query generate-slug`, a `.planning`-backed `roadmap.analyze` JSON probe, `ERR_MODULE_NOT_FOUND` negative guards, executable-bin assertions, and the PATH-gated `OTO SDK ready` installer check.
 
 ## Accumulated Context
 
@@ -69,6 +69,7 @@ Continue Phase 11 from Plan 4 of 4. Plan 11-03 has ported the #2775 PATH-wiring 
 - 2026-05-18: Phase 3 completed. Tests, install-smoke, Codex/Gemini parity, and ADR-15 landed across 4 scoped commits. `03-VERIFICATION.md` passed 6/6 success criteria, `03-SECURITY.md` verified 16/16 threats closed with `threats_open: 0`, and `npm test` passed with 613 tests, 612 pass, 1 skip, 0 failures. v0.3.0 is ready for milestone completion.
 - 2026-05-18: v0.3.0 archived and tagged. ROADMAP and REQUIREMENTS archived to `.planning/milestones/v0.3.0-*`; MILESTONES.md, PROJECT.md, RETROSPECTIVE.md updated; tag `v0.3.0` cut. Between milestones.
 - 2026-05-25: v0.4.0 roadmap created. Phases derived from the SDK-before-DOG sequencing constraint: Phase 11 ports GSD's `sdk/` subpackage and wires the `oto-sdk` binary onto PATH (SDK-01, SDK-02, SDK-04); Phase 12 rebuilds the query registry for oto namespaces/`.oto/` paths and wires graceful workflow consumption (SDK-03, SDK-05); Phase 13 migrates this repo to `.oto/` (DOG-01..03), depending on the SDK so the new location has working tooling. 8/8 requirements mapped, no orphans, no duplicates. Phases number from 11 to avoid collision with the leftover v0.1.0–v0.3.0 phase directories (highest existing folder is 10); existing phase folders are not renamed, moved, or deleted.
+- 2026-05-25: Phase 11 implementation completed across 4 plans. `scripts/install-smoke.cjs` now gates clean installs on `oto-sdk` executable linkage, structured `generate-slug` output, `.planning`-backed `roadmap.analyze` JSON, absence of `ERR_MODULE_NOT_FOUND`, and PATH-gated `OTO SDK ready` installer output. A local tarball clean-install smoke passed for the current commits; direct GitHub archive smoke awaits the commits being available remotely.
 
 ### Decisions
 
@@ -85,6 +86,7 @@ Continue Phase 11 from Plan 4 of 4. Plan 11-03 has ported the #2775 PATH-wiring 
 - Plan 11-02 added top-level package-lock.json because oto now has runtime dependencies.
 - Plan 11-02 used an empty verification commit for the read-only npm pack assertion task.
 - Plan 11-03 ports #2775 SDK PATH-wiring into the live installer as a once-per-invocation post-install step.
+- Plan 11-04 uses `roadmap.analyze` as the `.planning`-backed SDK smoke key and keeps Phase 12 `.oto` registry rewiring out of scope.
 
 ### Execution Metrics
 
@@ -93,10 +95,11 @@ Continue Phase 11 from Plan 4 of 4. Plan 11-03 has ported the #2775 PATH-wiring 
 | 11 | 01 | 8min | 3 | 533 |
 | 11 | 02 | 6min | 3 | 3 |
 | 11 | 03 | 7min | 2 | 4 |
+| 11 | 04 | 4min | 2 | 3 |
 
 ### Last Session
 
-- **Stopped At:** Completed 11-03-PLAN.md
+- **Stopped At:** Completed 11-04-PLAN.md
 - **Resume File:** None
 
 ### Quick Tasks Completed

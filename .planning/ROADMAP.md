@@ -20,7 +20,7 @@ last_shipped_date: 2026-05-18
 
 ### 🚧 v0.4.0 SDK + Dogfood (Phases 11-13)
 
-- [ ] **Phase 11: oto-sdk package port + PATH wiring** — Port GSD's `sdk/` subpackage, add the `bin/oto-sdk.js` shim and `package.json` bin entry, and verify the installer's PATH check so `oto-sdk query` resolves on a clean archive install with no manual build step.
+- [x] **Phase 11: oto-sdk package port + PATH wiring** — Port GSD's `sdk/` subpackage, add the `bin/oto-sdk.js` shim and `package.json` bin entry, and verify the installer's PATH check so `oto-sdk query` resolves on a clean archive install with no manual build step.
 - [ ] **Phase 12: Query registry + workflow consumption** — Rebuild the query registry to answer every oto key (`init.*`, `agent-skills`, `commit`, `state.*`, `phases.*`) against `.oto/` paths, and wire workflows to consume `oto-sdk query` output while still degrading gracefully when it is absent.
 - [ ] **Phase 13: Dogfood migration to `.oto/`** — Migrate this repo's planning root from `.planning/` to `.oto/` with git history preserved, make oto commands operate on `.oto/` without a path override, and update every in-repo `.planning/` reference.
 
@@ -80,7 +80,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
     - [x] 11-02-PLAN.md — bin/oto-sdk.js shim + package.json bin/deps/files wiring (SDK-01, SDK-02, SDK-04)
     - [x] 11-03-PLAN.md — Port #2775 PATH-wiring into bin/lib/install.cjs + sdk-wiring unit test (SDK-02)
   - Wave 2:
-    - [ ] 11-04-PLAN.md — Extend install-smoke: clean-install oto-sdk query + ERR_MODULE_NOT_FOUND guard (SDK-01, SDK-02, SDK-04)
+    - [x] 11-04-PLAN.md — Extend install-smoke: clean-install oto-sdk query + ERR_MODULE_NOT_FOUND guard (SDK-01, SDK-02, SDK-04)
 
 ### Phase 12: Query registry + workflow consumption
 **Goal**: The query registry answers every key the ported workflows invoke against oto namespaces and `.oto/` paths, and workflows consume that output when present while still degrading gracefully to manual fallback when it is absent.
@@ -114,7 +114,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 1. Agent ports + installer wiring | v0.3.0 | 2/2 | Complete | 2026-05-18 |
 | 2. Workflow rebrand-ports + command de-deferral | v0.3.0 | 3/3 | Complete | 2026-05-18 |
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
-| 11. oto-sdk package port + PATH wiring | v0.4.0 | 3/4 | In progress | - |
+| 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 0/? | Not started | - |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 0/? | Not started | - |
 
