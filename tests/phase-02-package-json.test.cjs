@@ -11,6 +11,7 @@ test('package.json has the locked top-level shape', () => {
   assert.deepEqual(Object.keys(pkg).sort(), [
     'author',
     'bin',
+    'dependencies',
     'description',
     'engines',
     'files',
@@ -20,7 +21,7 @@ test('package.json has the locked top-level shape', () => {
     'scripts',
     'version',
   ].sort());
-  for (const key of ['main', 'exports', 'type', 'dependencies', 'devDependencies', 'prepublishOnly']) {
+  for (const key of ['main', 'exports', 'type', 'devDependencies', 'prepublishOnly']) {
     assert.equal(Object.hasOwn(pkg, key), false, `${key} must be omitted`);
   }
 });
@@ -28,8 +29,12 @@ test('package.json has the locked top-level shape', () => {
 test('package metadata matches Phase 2 distribution decisions', () => {
   assert.equal(pkg.engines.node, '>=22.0.0');
   assert.equal(pkg.name, 'oto');
-  assert.equal(pkg.version, '0.1.0');
-  assert.deepEqual(pkg.bin, { oto: 'bin/install.js' });
+  assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
+  assert.deepEqual(pkg.bin, { oto: 'bin/install.js', 'oto-sdk': 'bin/oto-sdk.js' });
+  assert.deepEqual(pkg.dependencies, {
+    '@anthropic-ai/claude-agent-sdk': '^0.2.84',
+    ws: '^8.20.0',
+  });
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.author, 'Julian Isaac');
 });
@@ -52,6 +57,9 @@ test('files allowlist includes only the intended package surface', () => {
     'scripts/rebrand/',
     'scripts/sync-upstream/',
     'scripts/build-hooks.js',
+    'sdk/dist/',
+    'sdk/package.json',
+    'sdk/prompts/',
     'rename-map.json',
     'schema/',
     'package.json',

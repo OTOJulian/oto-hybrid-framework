@@ -44,11 +44,12 @@ test('phase-04 mr01-install-smoke: tarball install populates commands, agents, s
     assert.equal(installResult.status, 0, `npm install failed: ${installResult.stderr}\n${installResult.stdout}`);
 
     const otoBin = path.join(prefix, 'bin', 'oto');
+    const otoSdkBin = path.join(prefix, 'bin', 'oto-sdk');
     assert.ok(fs.existsSync(otoBin), `oto binary missing at ${otoBin}`);
     assert.equal(
-      fs.existsSync(path.join(prefix, 'bin', 'oto-sdk')),
-      false,
-      'oto-sdk binary should not ship in v0.1.0',
+      fs.existsSync(otoSdkBin),
+      true,
+      'oto-sdk binary should ship after Phase 11 SDK wiring',
     );
 
     const otoResult = spawnSync(otoBin, ['install', '--claude', '--config-dir', configDir], { encoding: 'utf8' });

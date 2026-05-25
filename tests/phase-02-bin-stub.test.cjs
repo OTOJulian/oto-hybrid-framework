@@ -7,11 +7,12 @@ const { spawnSync } = require('node:child_process');
 
 const REPO_ROOT = path.join(__dirname, '..');
 const BIN_PATH = path.join(REPO_ROOT, 'bin', 'install.js');
+const { version: OTO_VERSION } = require(path.join(REPO_ROOT, 'package.json'));
 
 test('bin/install.js prints version and repo hint', () => {
   const out = spawnSync(process.execPath, [BIN_PATH], { encoding: 'utf8' });
   assert.equal(out.status, 0, out.stderr);
-  assert.match(out.stdout, /oto v0\.1\.0/);
+  assert.match(out.stdout, new RegExp(`oto v${OTO_VERSION.replaceAll('.', '\\.')}`));
   assert.match(out.stdout, /\/oto-hybrid-framework/);
 });
 
