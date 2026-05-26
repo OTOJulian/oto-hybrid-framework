@@ -18,7 +18,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { GSDError, ErrorClassification } from '../errors.js';
-import { comparePhaseNum, normalizePhaseName, planningPaths, toPosixPath } from './helpers.js';
+import { comparePhaseNum, normalizePhaseName, planningPaths, toPosixPath, planningRootName } from './helpers.js';
 import { getMilestoneInfo, extractCurrentMilestone, roadmapGetPhase } from './roadmap.js';
 import { getMilestonePhaseFilter } from './state.js';
 import { findPhase } from './phase.js';
@@ -363,7 +363,7 @@ export const todoMatchPhase: QueryHandler = async (args, projectDir) => {
     throw new GSDError('phase required for todo match-phase', ErrorClassification.Validation);
   }
 
-  const pendingDir = join(projectDir, '.planning', 'todos', 'pending');
+  const pendingDir = join(projectDir, planningRootName(projectDir), 'todos', 'pending');
   const todos: Array<{
     file: string;
     title: string;
@@ -500,7 +500,7 @@ export const todoMatchPhase: QueryHandler = async (args, projectDir) => {
  */
 export const listTodos: QueryHandler = async (args, projectDir) => {
   const area = args[0] || null;
-  const pendingDir = join(projectDir, '.planning', 'todos', 'pending');
+  const pendingDir = join(projectDir, planningRootName(projectDir), 'todos', 'pending');
 
   const todos: Array<{ file: string; created: string; title: string; area: string; path: string }> = [];
 
@@ -545,8 +545,8 @@ export const todoComplete: QueryHandler = async (args, projectDir) => {
     throw new GSDError('filename required for todo complete', ErrorClassification.Validation);
   }
 
-  const pendingDir = join(projectDir, '.planning', 'todos', 'pending');
-  const completedDir = join(projectDir, '.planning', 'todos', 'completed');
+  const pendingDir = join(projectDir, planningRootName(projectDir), 'todos', 'pending');
+  const completedDir = join(projectDir, planningRootName(projectDir), 'todos', 'completed');
   const sourcePath = join(pendingDir, filename);
 
   if (!existsSync(sourcePath)) {

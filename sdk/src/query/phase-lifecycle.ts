@@ -30,6 +30,7 @@ import {
   phaseTokenMatches,
   toPosixPath,
   planningPaths,
+  planningRootName,
   stateExtractField,
 } from './helpers.js';
 import { extractFrontmatter } from './frontmatter.js';
@@ -1797,7 +1798,7 @@ export const milestoneComplete: QueryHandler = async (args, projectDir, workstre
     await writeFile(join(archiveDir, `${version}-REQUIREMENTS.md`), archiveHeader + reqContent, 'utf-8');
   }
 
-  const auditFile = join(projectDir, '.planning', `${version}-MILESTONE-AUDIT.md`);
+  const auditFile = join(projectDir, planningRootName(projectDir), `${version}-MILESTONE-AUDIT.md`);
   if (existsSync(auditFile)) {
     await rename(auditFile, join(archiveDir, `${version}-MILESTONE-AUDIT.md`));
   }

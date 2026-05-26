@@ -25,7 +25,7 @@ import { homedir } from 'node:os';
 
 import { loadConfig } from '../config.js';
 import { resolveModel } from './config-query.js';
-import { planningPaths, normalizePhaseName, phaseTokenMatches, toPosixPath } from './helpers.js';
+import { planningPaths, normalizePhaseName, phaseTokenMatches, toPosixPath, planningRootName } from './helpers.js';
 import {
   getMilestoneInfo,
   extractCurrentMilestone,
@@ -178,15 +178,15 @@ export const initNewProject: QueryHandler = async (_args, projectDir, workstream
 
     commit_docs: config.commit_docs,
 
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
-    has_codebase_map: pathExists(projectDir, '.planning/codebase'),
-    planning_exists: pathExists(projectDir, '.planning'),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
+    has_codebase_map: pathExists(projectDir, `${planningRootName(projectDir)}/codebase`),
+    planning_exists: pathExists(projectDir, planningRootName(projectDir)),
 
     has_existing_code: hasExistingCode,
     has_package_file: hasPackageFile,
     is_brownfield: hasExistingCode || hasPackageFile,
     needs_codebase_map:
-      (hasExistingCode || hasPackageFile) && !pathExists(projectDir, '.planning/codebase'),
+      (hasExistingCode || hasPackageFile) && !pathExists(projectDir, `${planningRootName(projectDir)}/codebase`),
 
     has_git: pathExists(projectDir, '.git'),
 
@@ -194,7 +194,7 @@ export const initNewProject: QueryHandler = async (_args, projectDir, workstream
     firecrawl_available: hasFirecrawl,
     exa_search_available: hasExaSearch,
 
-    project_path: '.planning/PROJECT.md',
+    project_path: `${planningRootName(projectDir)}/PROJECT.md`,
   };
 
   return { data: withProjectRoot(projectDir, result, config as Record<string, unknown>) };
@@ -350,12 +350,12 @@ export const initProgress: QueryHandler = async (_args, projectDir, workstream) 
     paused_at: pausedAt,
     has_work_in_progress: !!currentPhase,
 
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
     roadmap_exists: existsSync(paths.roadmap),
     state_exists: existsSync(paths.state),
     state_path: toPosixPath(relative(projectDir, paths.state)),
     roadmap_path: toPosixPath(relative(projectDir, paths.roadmap)),
-    project_path: '.planning/PROJECT.md',
+    project_path: `${planningRootName(projectDir)}/PROJECT.md`,
     config_path: toPosixPath(relative(projectDir, paths.config)),
   };
 
@@ -518,7 +518,7 @@ export const initManager: QueryHandler = async (_args, projectDir, workstream) =
   // Check WAITING.json signal
   let waitingSignal: unknown = null;
   try {
-    const waitingPath = join(projectDir, '.planning', 'WAITING.json');
+    const waitingPath = join(projectDir, planningRootName(projectDir), 'WAITING.json');
     if (existsSync(waitingPath)) {
       const { readFileSync } = await import('node:fs');
       waitingSignal = JSON.parse(readFileSync(waitingPath, 'utf-8'));
@@ -650,7 +650,7 @@ export const initManager: QueryHandler = async (_args, projectDir, workstream) =
     queued_phases: queuedPhases,
     queued_milestone_version: queuedMilestoneVersion,
     queued_milestone_name: queuedMilestoneName,
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
     roadmap_exists: true,
     state_exists: true,
     manager_flags: managerFlags,

@@ -32,6 +32,7 @@ import {
   normalizePhaseName,
   phaseTokenMatches,
   planningPaths,
+  planningRootName,
   normalizeMd,
   stateExtractField,
 } from './helpers.js';
@@ -1278,7 +1279,7 @@ export const stateSignalWaiting: QueryHandler = async (args, projectDir, _workst
 
   const waitingPaths = [
     join(projectDir, '.gsd', 'WAITING.json'),
-    join(projectDir, '.planning', 'WAITING.json'),
+    join(projectDir, planningRootName(projectDir), 'WAITING.json'),
   ];
 
   const signal = {
@@ -1293,7 +1294,7 @@ export const stateSignalWaiting: QueryHandler = async (args, projectDir, _workst
   try {
     const payload = JSON.stringify(signal, null, 2);
     mkdirSync(join(projectDir, '.gsd'), { recursive: true });
-    mkdirSync(join(projectDir, '.planning'), { recursive: true });
+    mkdirSync(join(projectDir, planningRootName(projectDir)), { recursive: true });
     for (const p of waitingPaths) {
       writeFileSync(p, payload, 'utf-8');
     }
@@ -1310,7 +1311,7 @@ export const stateSignalWaiting: QueryHandler = async (args, projectDir, _workst
 export const stateSignalResume: QueryHandler = async (_args, projectDir, _workstream) => {
   const paths = [
     join(projectDir, '.gsd', 'WAITING.json'),
-    join(projectDir, '.planning', 'WAITING.json'),
+    join(projectDir, planningRootName(projectDir), 'WAITING.json'),
   ];
   let removed = false;
   for (const p of paths) {

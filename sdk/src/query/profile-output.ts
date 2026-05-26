@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { loadConfig } from '../config.js';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { CLAUDE_INSTRUCTIONS } from './profile-questionnaire-data.js';
+import { planningRootName } from './helpers.js';
 import type { QueryHandler } from './utils.js';
 
 const TEMPLATE_DIR = join(dirname(fileURLToPath(import.meta.url)), '../../../get-shit-done/templates');
@@ -130,7 +131,7 @@ function detectManualEdit(fileContent: string, sectionName: string, expectedCont
 }
 
 function generateProjectSection(cwd: string): { content: string; source: string; hasFallback: boolean } {
-  const projectPath = join(cwd, '.planning', 'PROJECT.md');
+  const projectPath = join(cwd, planningRootName(cwd), 'PROJECT.md');
   const content = safeReadFile(projectPath);
   if (!content) {
     return { content: CLAUDE_MD_FALLBACKS.project, source: 'PROJECT.md', hasFallback: true };
@@ -160,8 +161,8 @@ function generateProjectSection(cwd: string): { content: string; source: string;
 }
 
 function generateStackSection(cwd: string): { content: string; source: string; hasFallback: boolean } {
-  const codebasePath = join(cwd, '.planning', 'codebase', 'STACK.md');
-  const researchPath = join(cwd, '.planning', 'research', 'STACK.md');
+  const codebasePath = join(cwd, planningRootName(cwd), 'codebase', 'STACK.md');
+  const researchPath = join(cwd, planningRootName(cwd), 'research', 'STACK.md');
   let content = safeReadFile(codebasePath);
   let source = 'codebase/STACK.md';
   if (!content) {
@@ -192,7 +193,7 @@ function generateStackSection(cwd: string): { content: string; source: string; h
 }
 
 function generateConventionsSection(cwd: string): { content: string; source: string; hasFallback: boolean } {
-  const conventionsPath = join(cwd, '.planning', 'codebase', 'CONVENTIONS.md');
+  const conventionsPath = join(cwd, planningRootName(cwd), 'codebase', 'CONVENTIONS.md');
   const content = safeReadFile(conventionsPath);
   if (!content) {
     return { content: CLAUDE_MD_FALLBACKS.conventions, source: 'CONVENTIONS.md', hasFallback: true };
@@ -211,7 +212,7 @@ function generateConventionsSection(cwd: string): { content: string; source: str
 }
 
 function generateArchitectureSection(cwd: string): { content: string; source: string; hasFallback: boolean } {
-  const architecturePath = join(cwd, '.planning', 'codebase', 'ARCHITECTURE.md');
+  const architecturePath = join(cwd, planningRootName(cwd), 'codebase', 'ARCHITECTURE.md');
   const content = safeReadFile(architecturePath);
   if (!content) {
     return { content: CLAUDE_MD_FALLBACKS.architecture, source: 'ARCHITECTURE.md', hasFallback: true };

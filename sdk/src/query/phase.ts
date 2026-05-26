@@ -27,6 +27,7 @@ import {
   phaseTokenMatches,
   toPosixPath,
   planningPaths,
+  planningRootName,
 } from './helpers.js';
 import { relPlanningPath } from '../workstream-utils.js';
 import type { QueryHandler } from './utils.js';
@@ -185,7 +186,7 @@ export const findPhase: QueryHandler = async (args, projectDir, workstream) => {
   if (current) return { data: current };
 
   // Search archived milestone phases (newest first)
-  const milestonesDir = join(projectDir, '.planning', 'milestones');
+  const milestonesDir = join(projectDir, planningRootName(projectDir), 'milestones');
   try {
     const milestoneEntries = await readdir(milestonesDir, { withFileTypes: true });
     const archiveDirs = milestoneEntries
@@ -198,7 +199,7 @@ export const findPhase: QueryHandler = async (args, projectDir, workstream) => {
       const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
       const version = versionMatch ? versionMatch[1] : archiveName;
       const archivePath = join(milestonesDir, archiveName);
-      const relBase = '.planning/milestones/' + archiveName;
+      const relBase = planningRootName(projectDir) + '/milestones/' + archiveName;
       const result = await searchPhaseInDir(archivePath, relBase, normalized);
       if (result) {
         result.archived = version;

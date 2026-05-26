@@ -21,7 +21,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, statSy
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 
-import { planningPaths, resolvePathUnderProject } from './helpers.js';
+import { planningPaths, planningRootName, resolvePathUnderProject } from './helpers.js';
 import type { QueryHandler } from './utils.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ const STALE_MS = 24 * 60 * 60 * 1000; // 24 hours
 // ─── Internal helpers ────────────────────────────────────────────────────
 
 function intelDir(projectDir: string): string {
-  return join(projectDir, '.planning', 'intel');
+  return join(projectDir, planningRootName(projectDir), 'intel');
 }
 
 function isIntelEnabled(projectDir: string): boolean {
