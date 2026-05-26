@@ -5,11 +5,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-import { progressJson, determinePhaseStatus } from './progress.js';
+import { progressJson, determinePhaseStatus, todoComplete } from './progress.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -152,5 +152,20 @@ describe('progressJson', () => {
 
     expect(phases[0].number).toBe('02');
     expect(phases[1].number).toBe('10');
+  });
+});
+
+// ─── todoComplete ────────────────────────────────────────────────────────
+
+describe('todoComplete', () => {
+  it('rejects todo filenames that escape the pending/completed directories', async () => {
+    await mkdir(join(tmpDir, '.oto', 'todos', 'pending'), { recursive: true });
+    await writeFile(join(tmpDir, '.oto', 'STATE.md'), '# State\n');
+
+    await expect(todoComplete(['../../STATE.md'], tmpDir)).rejects.toMatchObject({
+      classification: 'validation',
+    });
+
+    await expect(readFile(join(tmpDir, '.oto', 'STATE.md'), 'utf-8')).resolves.toBe('# State\n');
   });
 });

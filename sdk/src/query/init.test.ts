@@ -95,6 +95,59 @@ afterEach(async () => {
   await rm(tmpDir, { recursive: true, force: true });
 });
 
+async function setupOtoWorkstream(name = 'frontend'): Promise<void> {
+  const root = join(tmpDir, '.oto');
+  const ws = join(root, 'workstreams', name);
+  await mkdir(join(ws, 'phases', '09-foundation'), { recursive: true });
+  await writeFile(join(root, 'config.json'), JSON.stringify({
+    model_profile: 'balanced',
+    commit_docs: false,
+  }));
+  await writeFile(join(root, 'STATE.md'), [
+    '---',
+    'oto_state_version: 1.0',
+    'milestone: v1.0',
+    '---',
+    '',
+  ].join('\n'));
+  await writeFile(join(root, 'ROADMAP.md'), [
+    '# Root Roadmap',
+    '',
+    '## Current Milestone: v1.0 Root',
+    '',
+    '### Phase 1: Root Only',
+    '',
+  ].join('\n'));
+  await writeFile(join(ws, 'config.json'), JSON.stringify({
+    model_profile: 'budget',
+    commit_docs: true,
+    workflow: { research: false, plan_check: false, verifier: false, nyquist_validation: false },
+  }));
+  await writeFile(join(ws, 'STATE.md'), [
+    '---',
+    'oto_state_version: 1.0',
+    'milestone: v9.0',
+    'milestone_name: Workstream Milestone',
+    'status: planning',
+    '---',
+    '',
+    '# Workstream State',
+    '',
+  ].join('\n'));
+  await writeFile(join(ws, 'ROADMAP.md'), [
+    '# Workstream Roadmap',
+    '',
+    '## Current Milestone: v9.0 Workstream Milestone',
+    '',
+    '### Phase 9: Foundation',
+    '',
+    '**Goal:** Workstream foundation',
+    '**Requirements:** WS-01',
+    '',
+  ].join('\n'));
+  await writeFile(join(ws, 'phases', '09-foundation', '09-01-PLAN.md'), 'plan');
+}
+
 describe('withProjectRoot', () => {
   it('injects project_root, agents_installed, missing_agents into result', () => {
     const result: Record<string, unknown> = { foo: 'bar' };
@@ -352,6 +405,21 @@ describe('initPlanPhase', () => {
     expect(data.error).toBeDefined();
   });
 
+  it('uses workstream config, models, and paths when a workstream is selected', async () => {
+    await setupOtoWorkstream('frontend');
+
+    const result = await initPlanPhase(['9'], tmpDir, 'frontend');
+    const data = result.data as Record<string, unknown>;
+
+    expect(data.phase_found).toBe(true);
+    expect(data.researcher_model).toBe('haiku');
+    expect(data.planner_model).toBe('sonnet');
+    expect(data.commit_docs).toBe(true);
+    expect(data.research_enabled).toBe(false);
+    expect(data.state_path).toBe('.oto/workstreams/frontend/STATE.md');
+    expect(data.phase_req_ids).toBe('WS-01');
+  });
+
   // #2769: extractReqIds must accept all bold/colon variants of the
   // Requirements header. The forms render identically in markdown but differ
   // textually; the previous regex only matched **Requirements**: (colon
@@ -438,6 +506,20 @@ describe('initVerifyWork', () => {
     const result = await initVerifyWork([], tmpDir);
     const data = result.data as Record<string, unknown>;
     expect(data.error).toBeDefined();
+  });
+
+  it('uses workstream config, models, and phase lookup when a workstream is selected', async () => {
+    await setupOtoWorkstream('frontend');
+    await writeFile(join(tmpDir, '.oto', 'workstreams', 'frontend', 'phases', '09-foundation', '09-VERIFICATION.md'), '---\nstatus: passed\n---\n');
+
+    const result = await initVerifyWork(['9'], tmpDir, 'frontend');
+    const data = result.data as Record<string, unknown>;
+
+    expect(data.phase_found).toBe(true);
+    expect(data.phase_number).toBe('09');
+    expect(data.planner_model).toBe('sonnet');
+    expect(data.commit_docs).toBe(true);
+    expect(data.has_verification).toBe(true);
   });
 });
 

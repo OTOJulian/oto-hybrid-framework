@@ -218,7 +218,7 @@ export const phaseAdd: QueryHandler = async (args, projectDir, workstream) => {
   let dirName = '';
 
   await readModifyWriteRoadmapMd(projectDir, async (rawContent) => {
-    const content = await extractCurrentMilestone(rawContent, projectDir);
+    const content = await extractCurrentMilestone(rawContent, projectDir, workstream);
 
     if (customId || config.phase_naming === 'custom') {
       // Custom phase naming
@@ -371,7 +371,7 @@ export const phaseAddBatch: QueryHandler = async (args, projectDir, workstream) 
 
   await readModifyWriteRoadmapMd(projectDir, async (initialContent) => {
     let rawContent = initialContent;
-    const content = await extractCurrentMilestone(rawContent, projectDir);
+    const content = await extractCurrentMilestone(rawContent, projectDir, workstream);
     let maxPhase = 0;
 
     if (config.phase_naming !== 'custom') {
@@ -474,7 +474,7 @@ export const phaseInsert: QueryHandler = async (args, projectDir, workstream) =>
   let dirName = '';
 
   await readModifyWriteRoadmapMd(projectDir, async (rawContent) => {
-    const content = await extractCurrentMilestone(rawContent, projectDir);
+    const content = await extractCurrentMilestone(rawContent, projectDir, workstream);
 
     // Normalize input then strip leading zeros for flexible matching
     const normalizedAfter = normalizePhaseName(afterPhase);
@@ -1278,7 +1278,7 @@ export const phaseComplete: QueryHandler = async (args, projectDir, workstream) 
       // Step D: Update REQUIREMENTS.md
       const reqPath = paths.requirements;
       if (existsSync(reqPath)) {
-        const currentMilestoneRoadmap = await extractCurrentMilestone(roadmapContent, projectDir);
+        const currentMilestoneRoadmap = await extractCurrentMilestone(roadmapContent, projectDir, workstream);
         const phaseSectionMatch = currentMilestoneRoadmap.match(
           new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[:\\s][\\s\\S]*?)(?=#{2,4}\\s*Phase\\s+|$)`, 'i'),
         );
@@ -1365,7 +1365,7 @@ export const phaseComplete: QueryHandler = async (args, projectDir, workstream) 
     try {
       const roadmapContent = await readFile(paths.roadmap, 'utf-8');
       const roadmapForPhases = completedPhaseInPrimaryMilestone
-        ? await extractCurrentMilestone(roadmapContent, projectDir)
+        ? await extractCurrentMilestone(roadmapContent, projectDir, workstream)
         : roadmapContent;
       const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)*)\s*:\s*([^\n]+)/gi;
       let pm: RegExpExecArray | null;

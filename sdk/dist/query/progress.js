@@ -15,13 +15,19 @@
  */
 import { readFile, readdir } from 'node:fs/promises';
 import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { comparePhaseNum, normalizePhaseName, planningPaths, toPosixPath, planningRootName } from './helpers.js';
 import { getMilestoneInfo, extractCurrentMilestone, roadmapGetPhase } from './roadmap.js';
 import { getMilestonePhaseFilter } from './state.js';
 import { findPhase } from './phase.js';
 // ─── Internal helpers ─────────────────────────────────────────────────────
+function assertPathInside(baseDir, targetPath, label) {
+    const rel = relative(baseDir, targetPath);
+    if (!rel || rel.startsWith('..') || isAbsolute(rel)) {
+        throw new GSDError(`${label} escapes todo directory`, ErrorClassification.Validation);
+    }
+}
 /**
  * Determine the status of a phase based on plan/summary counts and verification state.
  *
@@ -466,7 +472,10 @@ export const todoComplete = async (args, projectDir) => {
     }
     const pendingDir = join(projectDir, planningRootName(projectDir), 'todos', 'pending');
     const completedDir = join(projectDir, planningRootName(projectDir), 'todos', 'completed');
-    const sourcePath = join(pendingDir, filename);
+    const sourcePath = resolve(pendingDir, filename);
+    const destinationPath = resolve(completedDir, filename);
+    assertPathInside(pendingDir, sourcePath, 'filename');
+    assertPathInside(completedDir, destinationPath, 'filename');
     if (!existsSync(sourcePath)) {
         throw new GSDError(`Todo not found: ${filename}`, ErrorClassification.Validation);
     }
@@ -474,7 +483,7 @@ export const todoComplete = async (args, projectDir) => {
     let content = readFileSync(sourcePath, 'utf-8');
     const today = new Date().toISOString().split('T')[0];
     content = `completed: ${today}\n` + content;
-    writeFileSync(join(completedDir, filename), content, 'utf-8');
+    writeFileSync(destinationPath, content, 'utf-8');
     unlinkSync(sourcePath);
     return { data: { completed: true, file: filename, date: today } };
 };

@@ -153,6 +153,31 @@ describe('commit', () => {
     expect(files).toContain('STATE.md');
     expect(files).not.toContain('ROADMAP.md');
   });
+
+  it('defaults to staging only the selected workstream planning tree', async () => {
+    const { commit } = await import('./commit.js');
+    await mkdir(join(tmpDir, '.oto', 'workstreams', 'frontend'), { recursive: true });
+    await writeFile(join(tmpDir, '.oto', 'config.json'), JSON.stringify({ commit_docs: true }));
+    await writeFile(join(tmpDir, '.oto', 'STATE.md'), '# Root State\n');
+    await writeFile(
+      join(tmpDir, '.oto', 'workstreams', 'frontend', 'config.json'),
+      JSON.stringify({ commit_docs: true }),
+    );
+    await writeFile(join(tmpDir, '.oto', 'workstreams', 'frontend', 'STATE.md'), '# Workstream State\n');
+
+    execSync('git add .oto', { cwd: tmpDir, stdio: 'pipe' });
+    execSync('git commit -m "init"', { cwd: tmpDir, stdio: 'pipe' });
+
+    await writeFile(join(tmpDir, '.oto', 'STATE.md'), '# Root State changed\n');
+    await writeFile(join(tmpDir, '.oto', 'workstreams', 'frontend', 'STATE.md'), '# Workstream changed\n');
+
+    const result = await commit(['docs: workstream state'], tmpDir, 'frontend');
+    expect((result.data as { committed: boolean }).committed).toBe(true);
+
+    const files = execSync('git show --name-only --format=', { cwd: tmpDir, encoding: 'utf-8' }).trim();
+    expect(files).toContain('.oto/workstreams/frontend/STATE.md');
+    expect(files).not.toContain('.oto/STATE.md');
+  });
 });
 
 // ─── checkCommit ───────────────────────────────────────────────────────────

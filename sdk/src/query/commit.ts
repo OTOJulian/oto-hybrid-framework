@@ -19,8 +19,9 @@
 
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
+import { relative } from 'node:path';
 import { GSDError } from '../errors.js';
-import { planningPaths, planningRootName, resolvePathUnderProject } from './helpers.js';
+import { planningPaths, planningRootName, resolvePathUnderProject, toPosixPath } from './helpers.js';
 import type { QueryHandler } from './utils.js';
 
 // ─── execGit ──────────────────────────────────────────────────────────────
@@ -97,6 +98,7 @@ export function sanitizeCommitMessage(text: string): string {
  */
 export const commit: QueryHandler = async (args, projectDir, workstream) => {
   const allArgs = [...args];
+  const paths = planningPaths(projectDir, workstream);
 
   // Extract flags
   const hasForce = allArgs.includes('--force');
@@ -117,7 +119,6 @@ export const commit: QueryHandler = async (args, projectDir, workstream) => {
 
   // Check commit_docs config unless --force
   if (!hasForce) {
-    const paths = planningPaths(projectDir, workstream);
     try {
       const raw = await readFile(paths.config, 'utf-8');
       const config = JSON.parse(raw) as Record<string, unknown>;
@@ -133,8 +134,8 @@ export const commit: QueryHandler = async (args, projectDir, workstream) => {
   const sanitized = message ? sanitizeCommitMessage(message) : message;
 
   // Stage files
-  const root = planningRootName(projectDir);
-  const filesToStage = filePaths.length > 0 ? filePaths : [root + '/'];
+  const planningRel = toPosixPath(relative(projectDir, paths.planning));
+  const filesToStage = filePaths.length > 0 ? filePaths : [planningRel + '/'];
   for (const file of filesToStage) {
     const addResult = execGit(projectDir, ['add', file]);
     if (addResult.exitCode !== 0) {
@@ -200,14 +201,17 @@ export const checkCommit: QueryHandler = async (_args, projectDir, workstream) =
   const stagedFiles = diffResult.stdout ? diffResult.stdout.split('\n').filter(Boolean) : [];
 
   if (!commitDocs) {
-    const root = planningRootName(projectDir);
-    const planningFiles = stagedFiles.filter(f => f.startsWith(root + '/') || f.startsWith(root + '\\'));
+    const planningRel = toPosixPath(relative(projectDir, paths.planning));
+    const planningFiles = stagedFiles.filter(f => {
+      const normalized = toPosixPath(f);
+      return normalized === planningRel || normalized.startsWith(planningRel + '/');
+    });
     if (planningFiles.length > 0) {
       return {
         data: {
           allowed: false,
           can_commit: false,
-          reason: `commit_docs is false but ${planningFiles.length} ${root}/ file(s) are staged`,
+          reason: `commit_docs is false but ${planningFiles.length} ${planningRel}/ file(s) are staged`,
           commit_docs: false,
           staged_files: planningFiles,
         },

@@ -1087,6 +1087,79 @@ describe('phaseComplete', () => {
     expect(req).toMatch(/FINAL-01\s*\|.*\|\s*Pending\s*\|/);
   });
 
+  it('uses workstream state when deriving roadmap requirements during completion', async () => {
+    const { phaseComplete } = await import('./phase-lifecycle.js');
+    const root = join(tmpDir, '.oto');
+    const ws = join(root, 'workstreams', 'frontend');
+    const p12Dir = join(ws, 'phases', '12-workstream-phase');
+    await mkdir(p12Dir, { recursive: true });
+    await writeFile(join(root, 'STATE.md'), [
+      '---',
+      'oto_state_version: 1.0',
+      'milestone: v1.0',
+      'milestone_name: Root Milestone',
+      '---',
+      '',
+    ].join('\n'));
+    await writeFile(join(root, 'ROADMAP.md'), '# Root Roadmap\n\n## Current Milestone: v1.0 Root\n');
+    await writeFile(join(root, 'REQUIREMENTS.md'), '- [ ] **WS-01** Root copy should not change\n');
+    await writeFile(join(ws, 'STATE.md'), [
+      '---',
+      'oto_state_version: 1.0',
+      'milestone: v2.0',
+      'milestone_name: Workstream Milestone',
+      'status: executing',
+      '---',
+      '',
+      'Phase: 12 (workstream phase)',
+      'Status: Executing',
+      'completed_phases: 0',
+      'total_phases: 1',
+      'percent: 0',
+    ].join('\n'));
+    await writeFile(join(ws, 'ROADMAP.md'), [
+      '# Workstream Roadmap',
+      '',
+      '## v1.0 Root-Selected Milestone',
+      '',
+      '### Phase 12: Old Work',
+      '',
+      '**Requirements:** OLD-01',
+      '',
+      '## v2.0 Workstream Milestone',
+      '',
+      '- [ ] Phase 12: Workstream Phase',
+      '',
+      '### Phase 12: Workstream Phase',
+      '',
+      '**Goal:** Complete workstream requirements',
+      '**Requirements:** WS-01',
+      '**Plans:** 1 plans',
+      '',
+      'Plans:',
+      '- [ ] 12-01',
+      '',
+    ].join('\n'));
+    await writeFile(join(ws, 'REQUIREMENTS.md'), [
+      '- [ ] **WS-01** Workstream requirement',
+      '',
+      '| Requirement | Phase | Status |',
+      '|-------------|-------|--------|',
+      '| WS-01 | Phase 12 | Pending |',
+    ].join('\n'));
+    await writeFile(join(p12Dir, '12-01-PLAN.md'), 'plan', 'utf-8');
+    await writeFile(join(p12Dir, '12-01-SUMMARY.md'), 'summary', 'utf-8');
+
+    const result = await phaseComplete(['12'], tmpDir, 'frontend');
+    const data = result.data as Record<string, unknown>;
+
+    expect(data.requirements_updated).toBe(true);
+    const req = await readFile(join(ws, 'REQUIREMENTS.md'), 'utf-8');
+    expect(req).toMatch(/\[x\].*\*\*WS-01\*\*/);
+    expect(req).toMatch(/WS-01\s*\|.*\|\s*Complete\s*\|/);
+    await expect(readFile(join(root, 'REQUIREMENTS.md'), 'utf-8')).resolves.toContain('[ ] **WS-01**');
+  });
+
   it('updates STATE.md fields: current phase, status, completed phases, percent', async () => {
     const { phaseComplete } = await import('./phase-lifecycle.js');
     await setupTestProject(tmpDir, {

@@ -36,8 +36,8 @@ import type { QueryHandler } from './utils.js';
 /**
  * Extract model alias string from a resolveModel result.
  */
-async function getModelAlias(agentType: string, projectDir: string): Promise<string> {
-  const result = await resolveModel([agentType], projectDir);
+async function getModelAlias(agentType: string, projectDir: string, workstream?: string): Promise<string> {
+  const result = await resolveModel([agentType], projectDir, workstream);
   const data = result.data as Record<string, unknown>;
   return (data.model as string) || 'sonnet';
 }
@@ -162,14 +162,15 @@ async function getPhaseInfoWithFallback(
 async function getPhaseInfoForVerifyWork(
   phase: string,
   projectDir: string,
+  workstream?: string,
 ): Promise<{ phaseInfo: Record<string, unknown> | null }> {
-  const phaseResult = await findPhase([phase], projectDir);
+  const phaseResult = await findPhase([phase], projectDir, workstream);
   let phaseInfo = phaseResult.data as Record<string, unknown> | null;
   if (phaseInfo && phaseInfo.found === false) {
     phaseInfo = null;
   }
 
-  const roadmapResult = await roadmapGetPhase([phase], projectDir);
+  const roadmapResult = await roadmapGetPhase([phase], projectDir, workstream);
   const roadmapPhase = roadmapResult.data as Record<string, unknown> | null;
 
   if (phaseInfo?.archived && roadmapPhase?.found) {
@@ -277,15 +278,15 @@ export const initExecutePhase: QueryHandler = async (args, projectDir, workstrea
     return { data: { error: 'phase required for init execute-phase' } };
   }
 
-  const config = await loadConfig(projectDir);
+  const config = await loadConfig(projectDir, workstream);
   const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
 
   const { phaseInfo, roadmapPhase } = await getPhaseInfoWithFallback(phase, projectDir, workstream);
   const phase_req_ids = extractReqIds(roadmapPhase);
 
   const [executorModel, verifierModel] = await Promise.all([
-    getModelAlias('gsd-executor', projectDir),
-    getModelAlias('gsd-verifier', projectDir),
+    getModelAlias('gsd-executor', projectDir, workstream),
+    getModelAlias('gsd-verifier', projectDir, workstream),
   ]);
 
   const milestone = await getMilestoneInfo(projectDir, workstream);
@@ -356,16 +357,16 @@ export const initPlanPhase: QueryHandler = async (args, projectDir, workstream) 
     return { data: { error: 'phase required for init plan-phase' } };
   }
 
-  const config = await loadConfig(projectDir);
+  const config = await loadConfig(projectDir, workstream);
   const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
 
   const { phaseInfo, roadmapPhase } = await getPhaseInfoWithFallback(phase, projectDir, workstream);
   const phase_req_ids = extractReqIds(roadmapPhase);
 
   const [researcherModel, plannerModel, checkerModel] = await Promise.all([
-    getModelAlias('gsd-phase-researcher', projectDir),
-    getModelAlias('gsd-planner', projectDir),
-    getModelAlias('gsd-plan-checker', projectDir),
+    getModelAlias('gsd-phase-researcher', projectDir, workstream),
+    getModelAlias('gsd-planner', projectDir, workstream),
+    getModelAlias('gsd-plan-checker', projectDir, workstream),
   ]);
 
   const phaseNumber = (phaseInfo?.phase_number as string) || null;
@@ -576,18 +577,18 @@ export const initResume: QueryHandler = async (_args, projectDir) => {
  * Init handler for verify-work workflow.
  * Port of cmdInitVerifyWork from init.cjs lines 538-586.
  */
-export const initVerifyWork: QueryHandler = async (args, projectDir) => {
+export const initVerifyWork: QueryHandler = async (args, projectDir, workstream) => {
   const phase = args[0];
   if (!phase) {
     return { data: { error: 'phase required for init verify-work' } };
   }
 
-  const config = await loadConfig(projectDir);
-  const { phaseInfo } = await getPhaseInfoForVerifyWork(phase, projectDir);
+  const config = await loadConfig(projectDir, workstream);
+  const { phaseInfo } = await getPhaseInfoForVerifyWork(phase, projectDir, workstream);
 
   const [plannerModel, checkerModel] = await Promise.all([
-    getModelAlias('gsd-planner', projectDir),
-    getModelAlias('gsd-plan-checker', projectDir),
+    getModelAlias('gsd-planner', projectDir, workstream),
+    getModelAlias('gsd-plan-checker', projectDir, workstream),
   ]);
 
   const result: Record<string, unknown> = {
@@ -616,7 +617,7 @@ export const initPhaseOp: QueryHandler = async (args, projectDir, workstream) =>
     return { data: { error: 'phase required for init phase-op' } };
   }
 
-  const config = await loadConfig(projectDir);
+  const config = await loadConfig(projectDir, workstream);
   const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
 
   // findPhase with archived override: if only match is archived, prefer ROADMAP

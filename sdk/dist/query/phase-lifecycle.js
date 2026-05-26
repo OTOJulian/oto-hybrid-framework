@@ -174,7 +174,7 @@ export const phaseAdd = async (args, projectDir, workstream) => {
     let newPhaseId = '';
     let dirName = '';
     await readModifyWriteRoadmapMd(projectDir, async (rawContent) => {
-        const content = await extractCurrentMilestone(rawContent, projectDir);
+        const content = await extractCurrentMilestone(rawContent, projectDir, workstream);
         if (customId || config.phase_naming === 'custom') {
             // Custom phase naming
             newPhaseId = customId || slug.toUpperCase().replace(/-/g, '_');
@@ -311,7 +311,7 @@ export const phaseAddBatch = async (args, projectDir, workstream) => {
     const added = [];
     await readModifyWriteRoadmapMd(projectDir, async (initialContent) => {
         let rawContent = initialContent;
-        const content = await extractCurrentMilestone(rawContent, projectDir);
+        const content = await extractCurrentMilestone(rawContent, projectDir, workstream);
         let maxPhase = 0;
         if (config.phase_naming !== 'custom') {
             const phasePattern = /#{2,4}\s*Phase\s+(\d+)[A-Z]?(?:\.\d+)*:/gi;
@@ -405,7 +405,7 @@ export const phaseInsert = async (args, projectDir, workstream) => {
     let decimalPhase = '';
     let dirName = '';
     await readModifyWriteRoadmapMd(projectDir, async (rawContent) => {
-        const content = await extractCurrentMilestone(rawContent, projectDir);
+        const content = await extractCurrentMilestone(rawContent, projectDir, workstream);
         // Normalize input then strip leading zeros for flexible matching
         const normalizedAfter = normalizePhaseName(afterPhase);
         const unpadded = normalizedAfter.replace(/^0+/, '');
@@ -1054,7 +1054,7 @@ export const phaseComplete = async (args, projectDir, workstream) => {
             // Step D: Update REQUIREMENTS.md
             const reqPath = paths.requirements;
             if (existsSync(reqPath)) {
-                const currentMilestoneRoadmap = await extractCurrentMilestone(roadmapContent, projectDir);
+                const currentMilestoneRoadmap = await extractCurrentMilestone(roadmapContent, projectDir, workstream);
                 const phaseSectionMatch = currentMilestoneRoadmap.match(new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[:\\s][\\s\\S]*?)(?=#{2,4}\\s*Phase\\s+|$)`, 'i'));
                 const sectionText = phaseSectionMatch ? phaseSectionMatch[1] : '';
                 const reqMatch = sectionText.match(/\*\*Requirements\*?\*?:?\s*([^\n]+)/i);
@@ -1123,7 +1123,7 @@ export const phaseComplete = async (args, projectDir, workstream) => {
         try {
             const roadmapContent = await readFile(paths.roadmap, 'utf-8');
             const roadmapForPhases = completedPhaseInPrimaryMilestone
-                ? await extractCurrentMilestone(roadmapContent, projectDir)
+                ? await extractCurrentMilestone(roadmapContent, projectDir, workstream)
                 : roadmapContent;
             const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)*)\s*:\s*([^\n]+)/gi;
             let pm;
