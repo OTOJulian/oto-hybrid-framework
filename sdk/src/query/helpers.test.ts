@@ -22,6 +22,9 @@ import {
   getRuntimeConfigDir,
   detectRuntime,
   findProjectRoot,
+  planningRootName,
+  hasMigratedPlanningRoot,
+  hasPlanningRoot,
   SUPPORTED_RUNTIMES,
   type Runtime,
 } from './helpers.js';
@@ -203,6 +206,75 @@ describe('planningPaths', () => {
     const paths = planningPaths('/proj');
     expect(paths.state).toContain('.planning/STATE.md');
     expect(paths.config).toContain('.planning/config.json');
+  });
+});
+
+// ─── planning-root resolution ──────────────────────────────────────────────
+
+describe('planning-root resolution', () => {
+  let workspace: string;
+
+  beforeEach(async () => {
+    workspace = await mkdtemp(join(tmpdir(), 'oto-planning-root-'));
+  });
+
+  afterEach(async () => {
+    await rm(workspace, { recursive: true, force: true });
+  });
+
+  it('.oto only -> planningRootName .oto, hasPlanningRoot true, not migrated', async () => {
+    await mkdir(join(workspace, '.oto'), { recursive: true });
+
+    expect(planningRootName(workspace)).toBe('.oto');
+    expect(hasPlanningRoot(workspace)).toBe(true);
+    expect(hasMigratedPlanningRoot(workspace)).toBe(false);
+  });
+
+  it('marker .planning, no .oto -> planningRootName .planning, migrated true', async () => {
+    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await writeFile(join(workspace, '.planning', 'STATE.md'), 'oto_state_version: 1.0\n', 'utf-8');
+
+    expect(planningRootName(workspace)).toBe('.planning');
+    expect(hasMigratedPlanningRoot(workspace)).toBe(true);
+    expect(hasPlanningRoot(workspace)).toBe(true);
+  });
+
+  it('unmarked .planning, no .oto -> planningRootName .oto, migrated false, hasPlanningRoot false', async () => {
+    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await writeFile(join(workspace, '.planning', 'STATE.md'), 'gsd_state_version: 1.0\n', 'utf-8');
+
+    expect(planningRootName(workspace)).toBe('.oto');
+    expect(hasMigratedPlanningRoot(workspace)).toBe(false);
+    expect(hasPlanningRoot(workspace)).toBe(false);
+  });
+
+  it('no root -> planningRootName .oto, hasPlanningRoot false', () => {
+    expect(planningRootName(workspace)).toBe('.oto');
+    expect(hasMigratedPlanningRoot(workspace)).toBe(false);
+    expect(hasPlanningRoot(workspace)).toBe(false);
+  });
+
+  it('both .oto and marker .planning -> planningRootName .oto wins, hasPlanningRoot true', async () => {
+    await mkdir(join(workspace, '.oto'), { recursive: true });
+    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await writeFile(join(workspace, '.planning', 'STATE.md'), 'oto_state_version: 1.0\n', 'utf-8');
+
+    expect(planningRootName(workspace)).toBe('.oto');
+    expect(hasMigratedPlanningRoot(workspace)).toBe(true);
+    expect(hasPlanningRoot(workspace)).toBe(true);
+  });
+
+  it('marker regex matches optional whitespace before colon', async () => {
+    const positive = join(workspace, 'positive');
+    await mkdir(join(positive, '.planning'), { recursive: true });
+    await writeFile(join(positive, '.planning', 'STATE.md'), 'oto_state_version : 1.0\n', 'utf-8');
+
+    const negative = join(workspace, 'negative');
+    await mkdir(join(negative, '.planning'), { recursive: true });
+    await writeFile(join(negative, '.planning', 'STATE.md'), 'oto_state_versionX: 1.0\n', 'utf-8');
+
+    expect(hasMigratedPlanningRoot(positive)).toBe(true);
+    expect(hasMigratedPlanningRoot(negative)).toBe(false);
   });
 });
 
