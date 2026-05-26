@@ -1,0 +1,12 @@
+{
+  "model_profile": "balanced",
+  "commit_docs": true,
+  "parallelization": true,
+  "git": {
+    "branching_strategy": "none",
+    "phase_branch_template": "oto/phase-{phase}-{slug}",
+    "milestone_branch_template": "oto/{milestone}-{slug}"
+  },
+  "workflow": {},
+  "agent_skills": {}
+}
