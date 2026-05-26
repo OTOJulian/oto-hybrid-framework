@@ -116,7 +116,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   - Wave 2:
     - [x] 13-02-PLAN.md — Atomic `git mv .planning .oto` pure rename + flip oto_state_version marker; human-verify the rename diff (D-01, D-06) (DOG-01)
   - Wave 3:
-    - [ ] 13-03-PLAN.md — Flip enforcement to /oto-* (template + render), ADR-01 forward-note, surgical live-artifact path-citation rewrites; allowlist-only with frozen-surface review (D-03/04/05/07/10/11) (DOG-03)
+    - [x] 13-03-PLAN.md — Flip enforcement to /oto-* (template + render), ADR-01 forward-note, surgical live-artifact path-citation rewrites; allowlist-only with frozen-surface review (D-03/04/05/07/10/11) (DOG-03)
   - Wave 4:
     - [ ] 13-04-PLAN.md — D-09 node:test guard (no .planning/, resolver → .oto/), full-suite run, D-08 empirical live-probe checkpoint (DOG-02, DOG-01, DOG-03)
 
@@ -132,7 +132,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete    | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 1/4 | Executing | - |
-| 13. Dogfood migration to `.oto/` | v0.4.0 | 2/4 | Executing | - |
+| 13. Dogfood migration to `.oto/` | v0.4.0 | 3/4 | Executing | - |
 
 ---
 

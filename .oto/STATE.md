@@ -3,15 +3,15 @@ oto_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
 status: executing
-stopped_at: Phase 13 context gathered
-last_updated: "2026-05-26T04:55:18.618Z"
-last_activity: 2026-05-26 -- Plan 13-02 complete
+stopped_at: Plan 13-03 complete
+last_updated: "2026-05-26T05:11:20Z"
+last_activity: 2026-05-26 -- Plan 13-03 complete
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -27,9 +27,9 @@ See: .oto/PROJECT.md (updated 2026-05-25)
 ## Current Position
 
 Phase: 13 (dogfood-migration-to-oto) — EXECUTING
-Plan: 3 of 4
-Status: Ready for Plan 13-03 reference cutover
-Last activity: 2026-05-26 -- Plan 13-02 complete
+Plan: 4 of 4
+Status: Ready for Plan 13-04 live probes and regression guard
+Last activity: 2026-05-26 -- Plan 13-03 complete
 
 Archive (prior milestones):
 
@@ -56,7 +56,7 @@ Archive (prior milestones):
 /oto-execute-phase 13
 ```
 
-Continue Phase 13 with Plan 13-03: flip workflow enforcement to `/oto-*` and rewrite live self-references.
+Continue Phase 13 with Plan 13-04: add the regression guard, run full-suite verification, and complete empirical live probes against `.oto/`.
 
 ## Accumulated Context
 
@@ -109,7 +109,7 @@ Continue Phase 13 with Plan 13-03: flip workflow enforcement to `/oto-*` and rew
 
 ### Last Session
 
-- **Stopped At:** Phase 13 context gathered
+- **Stopped At:** Plan 13-03 complete
 - **Resume File:** .oto/phases/13-dogfood-migration-to-oto/13-CONTEXT.md
 
 ### Quick Tasks Completed
