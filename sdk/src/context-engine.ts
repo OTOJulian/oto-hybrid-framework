@@ -84,7 +84,7 @@ export class ContextEngine {
   private readonly truncation: TruncationOptions;
 
   constructor(projectDir: string, logger?: GSDLogger, truncation?: Partial<TruncationOptions>, workstream?: string) {
-    this.planningDir = join(projectDir, relPlanningPath(workstream));
+    this.planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
     this.logger = logger;
     this.truncation = { ...DEFAULT_TRUNCATION_OPTIONS, ...truncation };
   }

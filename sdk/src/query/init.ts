@@ -278,7 +278,7 @@ export const initExecutePhase: QueryHandler = async (args, projectDir, workstrea
   }
 
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, relPlanningPath(workstream));
+  const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
 
   const { phaseInfo, roadmapPhase } = await getPhaseInfoWithFallback(phase, projectDir, workstream);
   const phase_req_ids = extractReqIds(roadmapPhase);
@@ -357,7 +357,7 @@ export const initPlanPhase: QueryHandler = async (args, projectDir, workstream) 
   }
 
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, relPlanningPath(workstream));
+  const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
 
   const { phaseInfo, roadmapPhase } = await getPhaseInfoWithFallback(phase, projectDir, workstream);
   const phase_req_ids = extractReqIds(roadmapPhase);
@@ -617,7 +617,7 @@ export const initPhaseOp: QueryHandler = async (args, projectDir, workstream) =>
   }
 
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, relPlanningPath(workstream));
+  const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
 
   // findPhase with archived override: if only match is archived, prefer ROADMAP
   const phaseResult = await findPhase([phase], projectDir, workstream);

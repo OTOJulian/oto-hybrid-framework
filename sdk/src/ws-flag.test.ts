@@ -233,6 +233,7 @@ describe('loadConfig with workstream', () => {
   it('loads config from workstream path when workstream is provided', async () => {
     const wsDir = join(tmpDir, '.planning', 'workstreams', 'frontend');
     await mkdir(wsDir, { recursive: true });
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n');
     await writeFile(
       join(wsDir, 'config.json'),
       JSON.stringify({ model_profile: 'performance' }),
@@ -246,6 +247,7 @@ describe('loadConfig with workstream', () => {
   it('falls back to root config when workstream config is missing', async () => {
     // Create root config but no workstream config
     await mkdir(join(tmpDir, '.planning'), { recursive: true });
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n');
     await writeFile(
       join(tmpDir, '.planning', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
@@ -258,6 +260,7 @@ describe('loadConfig with workstream', () => {
 
   it('loads from root .planning/ when workstream is undefined', async () => {
     await mkdir(join(tmpDir, '.planning'), { recursive: true });
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n');
     await writeFile(
       join(tmpDir, '.planning', 'config.json'),
       JSON.stringify({ model_profile: 'economy' }),
@@ -289,6 +292,7 @@ describe('ContextEngine with workstream', () => {
 
     const wsDir = join(tmpDir, '.planning', 'workstreams', 'backend');
     await mkdir(wsDir, { recursive: true });
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n');
     await writeFile(join(wsDir, 'STATE.md'), '# State\nPhase: 01');
 
     const engine = new ContextEngine(tmpDir, undefined, undefined, 'backend');
@@ -302,7 +306,7 @@ describe('ContextEngine with workstream', () => {
     const { PhaseType } = await import('./types.js');
 
     await mkdir(join(tmpDir, '.planning'), { recursive: true });
-    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '# State\nPhase: 02');
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n\n# State\nPhase: 02');
 
     const engine = new ContextEngine(tmpDir);
     const files = await engine.resolveContextFiles(PhaseType.Execute);

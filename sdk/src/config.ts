@@ -153,7 +153,7 @@ async function loadUserDefaults(): Promise<Record<string, unknown>> {
 }
 
 export async function loadConfig(projectDir: string, workstream?: string): Promise<GSDConfig> {
-  const configPath = join(projectDir, relPlanningPath(workstream), 'config.json');
+  const configPath = join(projectDir, relPlanningPath(projectDir, workstream), 'config.json');
   const rootConfigPath = join(projectDir, '.planning', 'config.json');
 
   let raw: string;

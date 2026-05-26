@@ -421,7 +421,7 @@ export function normalizeMd(content: string): string {
  * @returns Object with paths to common .planning files
  */
 export function planningPaths(projectDir: string, workstream?: string): PlanningPaths {
-  const base = join(projectDir, relPlanningPath(workstream));
+  const base = join(projectDir, relPlanningPath(projectDir, workstream));
   return {
     planning: toPosixPath(base),
     state: toPosixPath(join(base, 'STATE.md')),

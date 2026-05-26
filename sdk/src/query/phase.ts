@@ -180,7 +180,7 @@ export const findPhase: QueryHandler = async (args, projectDir, workstream) => {
   };
 
   // Search current phases first
-  const relPhasesDir = relPlanningPath(workstream) + '/phases';
+  const relPhasesDir = relPlanningPath(projectDir, workstream) + '/phases';
   const current = await searchPhaseInDir(phasesDir, relPhasesDir, normalized);
   if (current) return { data: current };
 
