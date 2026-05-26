@@ -17,9 +17,9 @@ Milestone: **SDK + Dogfood**. Make oto's own command surface work natively — s
 
 ### Dogfood — planning root migration
 
-- [ ] **DOG-01**: This repo's planning artifacts live under `.oto/` (migrated from `.planning/`), with git history of the moved files preserved.
-- [ ] **DOG-02**: oto commands operate on this repo's `.oto/` state with no manual path override.
-- [ ] **DOG-03**: This repo's own references to `.planning/` (CLAUDE.md, config, tooling, docs) are updated so nothing points at the stale location.
+- [x] **DOG-01**: This repo's planning artifacts live under `.oto/` (migrated from `.planning/`), with git history of the moved files preserved.
+- [x] **DOG-02**: oto commands operate on this repo's `.oto/` state with no manual path override.
+- [x] **DOG-03**: This repo's own references to `.planning/` (CLAUDE.md, config, tooling, docs) are updated so nothing points at the stale location.
 
 ## Future Requirements (v0.5.0+)
 
@@ -49,9 +49,9 @@ Phases number from 11 (above the highest existing phase folder) to avoid collidi
 | SDK-04 | Phase 11 | Complete |
 | SDK-03 | Phase 12 | Complete |
 | SDK-05 | Phase 12 | Complete |
-| DOG-01 | Phase 13 | Pending |
-| DOG-02 | Phase 13 | Pending |
-| DOG-03 | Phase 13 | Pending |
+| DOG-01 | Phase 13 | Complete |
+| DOG-02 | Phase 13 | Complete |
+| DOG-03 | Phase 13 | Complete |
 
 **Phase mapping summary:**
 - **Phase 11 — oto-sdk package port + PATH wiring**: SDK-01, SDK-02, SDK-04

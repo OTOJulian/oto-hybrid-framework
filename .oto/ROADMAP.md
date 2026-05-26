@@ -22,7 +22,7 @@ last_shipped_date: 2026-05-18
 
 - [x] **Phase 11: oto-sdk package port + PATH wiring** — Port GSD's `sdk/` subpackage, add the `bin/oto-sdk.js` shim and `package.json` bin entry, and verify the installer's PATH check so `oto-sdk query` resolves on a clean archive install with no manual build step.
 - [ ] **Phase 12: Query registry + workflow consumption** — Rebuild the query registry to answer every oto key (`init.*`, `agent-skills`, `commit`, `state.*`, `phases.*`) against `.oto/` paths, and wire workflows to consume `oto-sdk query` output while still degrading gracefully when it is absent.
-- [ ] **Phase 13: Dogfood migration to `.oto/`** — Migrate this repo's planning root from `.planning/` to `.oto/` with git history preserved, make oto commands operate on `.oto/` without a path override, and update every in-repo `.planning/` reference.
+- [x] **Phase 13: Dogfood migration to `.oto/`** — Migrate this repo's planning root from `.planning/` to `.oto/` with git history preserved, make oto commands operate on `.oto/` without a path override, and update every in-repo `.planning/` reference.
 
 <details>
 <summary>✅ v0.3.0 Restore doc-intake and eval-review agents (Phases 1-3) — SHIPPED 2026-05-18</summary>
@@ -132,7 +132,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete    | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 1/4 | Executing | - |
-| 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Executing | - |
+| 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete    | 2026-05-26 |
 
 ---
 

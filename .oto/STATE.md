@@ -2,13 +2,13 @@
 oto_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
-status: executing
+status: milestone_complete
 stopped_at: Plan 13-04 complete
 last_updated: "2026-05-26T15:58:30Z"
 last_activity: 2026-05-26 -- Plan 13-04 complete
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
   completed_plans: 12
   percent: 100
@@ -22,14 +22,14 @@ See: .oto/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 13 — dogfood-migration-to-oto
+**Current focus:** v0.4.0 phase execution complete; milestone closeout pending
 
 ## Current Position
 
-Phase: 13 (dogfood-migration-to-oto) — EXECUTING
-Plan: 4 of 4
-Status: Ready for Phase 13 closeout verification
-Last activity: 2026-05-26 -- Plan 13-04 complete
+Phase: 13 (dogfood-migration-to-oto)
+Plan: Not started
+Status: Milestone complete
+Last activity: 2026-05-26
 
 Archive (prior milestones):
 
@@ -49,14 +49,15 @@ Archive (prior milestones):
 - Phase 2 verification passed on 2026-05-18: `02-VERIFICATION.md` status `passed`, `02-REVIEW.md` status `clean`, `02-SECURITY.md` threats open `0`.
 - Phase 3 verification passed on 2026-05-18: `03-VERIFICATION.md` status `passed`, `03-REVIEW.md` status `clean`, `03-SECURITY.md` status `verified` with `threats_open: 0`.
 - `npm test` passed on 2026-05-18: 612 pass, 1 expected skip, 0 failures.
+- Phase 13 verification passed on 2026-05-26: `13-VERIFICATION.md` status `passed`, `13-REVIEW.md` status `clean`, `13-SECURITY.md` status `verified` with `threats_open: 0`, and `npm test` passed with 628 tests, 627 pass, 1 skip, 0 failures.
 
 ## Next Command
 
 ```bash
-/oto-execute-phase 13
+/oto-complete-milestone
 ```
 
-Continue Phase 13 closeout: run code review, regression confirmation, phase-goal verification, and final tracking updates.
+Complete the v0.4.0 milestone after reviewing the remaining Phase 12 tracking drift noted during Phase 13 closeout.
 
 ## Accumulated Context
 
