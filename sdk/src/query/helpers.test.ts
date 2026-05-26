@@ -30,6 +30,11 @@ import {
 } from './helpers.js';
 import { homedir } from 'node:os';
 
+async function createMigratedPlanningRoot(projectDir: string): Promise<void> {
+  await mkdir(join(projectDir, '.planning'), { recursive: true });
+  await writeFile(join(projectDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n', 'utf-8');
+}
+
 // ─── escapeRegex ────────────────────────────────────────────────────────────
 
 describe('escapeRegex', () => {
@@ -204,8 +209,8 @@ describe('planningPaths', () => {
 
   it('uses posix paths', () => {
     const paths = planningPaths('/proj');
-    expect(paths.state).toContain('.planning/STATE.md');
-    expect(paths.config).toContain('.planning/config.json');
+    expect(paths.state).toContain('.oto/STATE.md');
+    expect(paths.config).toContain('.oto/config.json');
   });
 });
 
@@ -511,8 +516,8 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
     await rm(workspace, { recursive: true, force: true });
   });
 
-  it('returns startDir unchanged when startDir has its own .planning/', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+  it('returns startDir unchanged when startDir has its own migrated .planning/', async () => {
+    await createMigratedPlanningRoot(workspace);
     expect(findProjectRoot(workspace)).toBe(workspace);
   });
 
@@ -523,7 +528,7 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   it('walks up to parent .planning/ when config lists the child in sub_repos (#2623)', async () => {
     // workspace/.planning/{config.json, PROJECT.md}
     // workspace/app/.git/
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     await writeFile(
       join(workspace, '.planning', 'config.json'),
       JSON.stringify({ sub_repos: ['app'] }),
@@ -536,7 +541,7 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   });
 
   it('resolves parent root from deeply nested dir inside a sub_repo', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     await writeFile(
       join(workspace, '.planning', 'config.json'),
       JSON.stringify({ sub_repos: ['app'] }),
@@ -550,7 +555,7 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   });
 
   it('supports planning.sub_repos nested config shape', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     await writeFile(
       join(workspace, '.planning', 'config.json'),
       JSON.stringify({ planning: { sub_repos: ['app'] } }),
@@ -563,7 +568,7 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   });
 
   it('falls back to .git heuristic when parent has .planning/ but no matching sub_repos', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     // Config doesn't list the child, but child has .git and parent has .planning/.
     await writeFile(
       join(workspace, '.planning', 'config.json'),
@@ -577,7 +582,7 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   });
 
   it('swallows unparseable config.json and falls back to .git heuristic', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     await writeFile(join(workspace, '.planning', 'config.json'), '{ not json', 'utf-8');
     const app = join(workspace, 'app');
     await mkdir(join(app, '.git'), { recursive: true });
@@ -586,7 +591,7 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   });
 
   it('supports legacy multiRepo: true when child is inside a git repo', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     await writeFile(
       join(workspace, '.planning', 'config.json'),
       JSON.stringify({ multiRepo: true }),
@@ -599,14 +604,14 @@ describe('findProjectRoot (multi-repo .planning resolution)', () => {
   });
 
   it('does not walk up when child has its own .planning/ (#1362 guard)', async () => {
-    await mkdir(join(workspace, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(workspace);
     await writeFile(
       join(workspace, '.planning', 'config.json'),
       JSON.stringify({ sub_repos: ['app'] }),
       'utf-8',
     );
     const app = join(workspace, 'app');
-    await mkdir(join(app, '.planning'), { recursive: true });
+    await createMigratedPlanningRoot(app);
 
     expect(findProjectRoot(app)).toBe(app);
   });

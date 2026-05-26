@@ -9,6 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { relPlanningPath } from './workstream-utils.js';
+import { planningRootName } from './query/helpers.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -154,7 +155,7 @@ async function loadUserDefaults(): Promise<Record<string, unknown>> {
 
 export async function loadConfig(projectDir: string, workstream?: string): Promise<GSDConfig> {
   const configPath = join(projectDir, relPlanningPath(projectDir, workstream), 'config.json');
-  const rootConfigPath = join(projectDir, '.planning', 'config.json');
+  const rootConfigPath = join(projectDir, planningRootName(projectDir), 'config.json');
 
   let raw: string;
   let projectConfigFound = false;

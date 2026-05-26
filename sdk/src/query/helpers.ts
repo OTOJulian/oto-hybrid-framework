@@ -23,10 +23,15 @@ import { existsSync, statSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { relPlanningPath } from '../workstream-utils.js';
+import {
+  planningRootName,
+  hasMigratedPlanningRoot,
+  hasPlanningRoot,
+} from '../planning-root.js';
 
 // Planning-root resolution lives in a dependency-free leaf module to avoid a
 // helpers <-> workstream-utils ESM cycle. Re-exported here for ergonomic imports.
-export { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot } from '../planning-root.js';
+export { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot };
 
 // ─── Runtime-aware agents directory resolution ─────────────────────────────
 
@@ -476,14 +481,9 @@ export function findProjectRoot(startDir: string): string {
   const fsRoot = parsePath(resolvedStart).root;
   const home = homedir();
 
-  // If startDir already contains .planning/, it IS the project root.
-  try {
-    const ownPlanning = join(resolvedStart, '.planning');
-    if (existsSync(ownPlanning) && statSync(ownPlanning).isDirectory()) {
-      return startDir;
-    }
-  } catch {
-    // fall through
+  // If startDir already owns an oto planning root, it IS the project root (#1362).
+  if (hasPlanningRoot(resolvedStart)) {
+    return startDir;
   }
 
   // Walk upward, mirroring isInsideGitRepo from the CJS reference.
@@ -510,16 +510,10 @@ export function findProjectRoot(startDir: string): string {
     if (parent === dir) break;
     if (parent === home) break;
 
-    const parentPlanning = join(parent, '.planning');
-    let parentPlanningIsDir = false;
-    try {
-      parentPlanningIsDir = existsSync(parentPlanning) && statSync(parentPlanning).isDirectory();
-    } catch {
-      parentPlanningIsDir = false;
-    }
+    const parentPlanningIsDir = hasPlanningRoot(parent);
 
     if (parentPlanningIsDir) {
-      const configPath = join(parentPlanning, 'config.json');
+      const configPath = join(parent, planningRootName(parent), 'config.json');
       let matched = false;
       try {
         const raw = readFileSync(configPath, 'utf-8');
