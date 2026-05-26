@@ -16,7 +16,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { extractFrontmatterLeading } from './frontmatter.js';
-import { comparePhaseNum, planningPaths, resolvePathUnderProject } from './helpers.js';
+import { comparePhaseNum, planningPaths, planningRootName, resolvePathUnderProject } from './helpers.js';
 // ─── extractOneLinerFromBody ────────────────────────────────────────────────
 /**
  * Extract a one-liner from the summary body when it is not in frontmatter.
@@ -64,7 +64,7 @@ function readSubdirectories(dirPath, sort) {
 }
 /** Match `getArchivedPhaseDirs` from core.cjs (newest milestone archive first). */
 function getArchivedPhaseDirs(cwd) {
-    const milestonesDir = join(cwd, '.planning', 'milestones');
+    const milestonesDir = join(cwd, planningRootName(cwd), 'milestones');
     const results = [];
     if (!existsSync(milestonesDir))
         return results;

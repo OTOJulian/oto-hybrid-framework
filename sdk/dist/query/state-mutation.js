@@ -23,7 +23,7 @@ import { isAbsolute, join, relative, resolve } from 'node:path';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { extractFrontmatter, stripFrontmatter } from './frontmatter.js';
 import { reconstructFrontmatter } from './frontmatter-mutation.js';
-import { comparePhaseNum, escapeRegex, normalizePhaseName, phaseTokenMatches, planningPaths, normalizeMd, stateExtractField, } from './helpers.js';
+import { comparePhaseNum, escapeRegex, normalizePhaseName, phaseTokenMatches, planningPaths, planningRootName, normalizeMd, stateExtractField, } from './helpers.js';
 import { buildStateFrontmatter, getMilestonePhaseFilter } from './state.js';
 // ─── Process exit lock cleanup (D2 — match CJS state.cjs:16-23) ─────────
 /**
@@ -1148,7 +1148,7 @@ export const stateSignalWaiting = async (args, projectDir, _workstream) => {
     const phase = parsed.phase || null;
     const waitingPaths = [
         join(projectDir, '.gsd', 'WAITING.json'),
-        join(projectDir, '.planning', 'WAITING.json'),
+        join(projectDir, planningRootName(projectDir), 'WAITING.json'),
     ];
     const signal = {
         status: 'waiting',
@@ -1161,7 +1161,7 @@ export const stateSignalWaiting = async (args, projectDir, _workstream) => {
     try {
         const payload = JSON.stringify(signal, null, 2);
         mkdirSync(join(projectDir, '.gsd'), { recursive: true });
-        mkdirSync(join(projectDir, '.planning'), { recursive: true });
+        mkdirSync(join(projectDir, planningRootName(projectDir)), { recursive: true });
         for (const p of waitingPaths) {
             writeFileSync(p, payload, 'utf-8');
         }
@@ -1178,7 +1178,7 @@ export const stateSignalWaiting = async (args, projectDir, _workstream) => {
 export const stateSignalResume = async (_args, projectDir, _workstream) => {
     const paths = [
         join(projectDir, '.gsd', 'WAITING.json'),
-        join(projectDir, '.planning', 'WAITING.json'),
+        join(projectDir, planningRootName(projectDir), 'WAITING.json'),
     ];
     let removed = false;
     for (const p of paths) {

@@ -20,7 +20,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { extractFrontmatter } from './frontmatter.js';
-import { normalizePhaseName, comparePhaseNum, phaseTokenMatches, toPosixPath, planningPaths, } from './helpers.js';
+import { normalizePhaseName, comparePhaseNum, phaseTokenMatches, toPosixPath, planningPaths, planningRootName, } from './helpers.js';
 import { relPlanningPath } from '../workstream-utils.js';
 // ─── Internal helpers ──────────────────────────────────────────────────────
 /**
@@ -138,7 +138,7 @@ export const findPhase = async (args, projectDir, workstream) => {
     if (current)
         return { data: current };
     // Search archived milestone phases (newest first)
-    const milestonesDir = join(projectDir, '.planning', 'milestones');
+    const milestonesDir = join(projectDir, planningRootName(projectDir), 'milestones');
     try {
         const milestoneEntries = await readdir(milestonesDir, { withFileTypes: true });
         const archiveDirs = milestoneEntries
@@ -150,7 +150,7 @@ export const findPhase = async (args, projectDir, workstream) => {
             const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
             const version = versionMatch ? versionMatch[1] : archiveName;
             const archivePath = join(milestonesDir, archiveName);
-            const relBase = '.planning/milestones/' + archiveName;
+            const relBase = planningRootName(projectDir) + '/milestones/' + archiveName;
             const result = await searchPhaseInDir(archivePath, relBase, normalized);
             if (result) {
                 result.archived = version;

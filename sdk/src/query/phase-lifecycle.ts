@@ -29,8 +29,7 @@ import {
   comparePhaseNum,
   phaseTokenMatches,
   toPosixPath,
-  planningPaths,
-  planningRootName,
+  planningPaths, planningRootName,
   stateExtractField,
 } from './helpers.js';
 import { extractFrontmatter } from './frontmatter.js';

@@ -9,7 +9,7 @@
  * ```typescript
  * import { commit, checkCommit } from './commit.js';
  *
- * await commit(['docs: update state', '.planning/STATE.md'], '/project');
+ * await commit(['docs: update state', '<planning-root>/STATE.md'], '/project');
  * // { data: { committed: true, hash: 'abc1234', message: 'docs: update state', files: [...] } }
  *
  * await checkCommit([], '/project');
@@ -46,7 +46,7 @@ export declare function sanitizeCommitMessage(text: string): string;
  * Stage files and create a git commit.
  *
  * Checks commit_docs config (unless --force), sanitizes message,
- * stages specified files (or all .planning/), and commits.
+ * stages specified files (or all planning-root files), and commits.
  *
  * @param args - args[0]=message, remaining=file paths or flags (--force, --amend, --no-verify)
  * @param projectDir - Project root directory

@@ -20,7 +20,7 @@
  */
 import { join } from 'node:path';
 import { GSDError, ErrorClassification } from '../errors.js';
-import { toPosixPath } from './helpers.js';
+import { planningRootName, toPosixPath } from './helpers.js';
 // ─── Validation ────────────────────────────────────────────────────────────
 /**
  * Validate a workspace or project name.
@@ -78,14 +78,14 @@ export function workspacePlanningPaths(projectDir, context) {
     let base;
     if (context?.workstream != null) {
         validateWorkspaceName(context.workstream, 'workstream');
-        base = join(projectDir, '.planning', 'workstreams', context.workstream);
+        base = join(projectDir, planningRootName(projectDir), 'workstreams', context.workstream);
     }
     else if (context?.project != null) {
         validateWorkspaceName(context.project, 'project');
-        base = join(projectDir, '.planning', 'projects', context.project);
+        base = join(projectDir, planningRootName(projectDir), 'projects', context.project);
     }
     else {
-        base = join(projectDir, '.planning');
+        base = join(projectDir, planningRootName(projectDir));
     }
     return {
         planning: toPosixPath(base),

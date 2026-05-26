@@ -21,7 +21,7 @@ import { readFile, writeFile, mkdir, readdir, rename, rm } from 'node:fs/promise
 import { existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { GSDError, ErrorClassification } from '../errors.js';
-import { escapeRegex, normalizeMd, normalizePhaseName, comparePhaseNum, phaseTokenMatches, toPosixPath, planningPaths, stateExtractField, } from './helpers.js';
+import { escapeRegex, normalizeMd, normalizePhaseName, comparePhaseNum, phaseTokenMatches, toPosixPath, planningPaths, planningRootName, stateExtractField, } from './helpers.js';
 import { extractFrontmatter } from './frontmatter.js';
 import { extractCurrentMilestone } from './roadmap.js';
 import { getMilestonePhaseFilter } from './state.js';
@@ -1495,7 +1495,7 @@ export const milestoneComplete = async (args, projectDir, workstream) => {
             `For current requirements, see \`.planning/REQUIREMENTS.md\`.\n\n---\n\n`;
         await writeFile(join(archiveDir, `${version}-REQUIREMENTS.md`), archiveHeader + reqContent, 'utf-8');
     }
-    const auditFile = join(projectDir, '.planning', `${version}-MILESTONE-AUDIT.md`);
+    const auditFile = join(projectDir, planningRootName(projectDir), `${version}-MILESTONE-AUDIT.md`);
     if (existsSync(auditFile)) {
         await rename(auditFile, join(archiveDir, `${version}-MILESTONE-AUDIT.md`));
     }

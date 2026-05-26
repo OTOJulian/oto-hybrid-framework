@@ -17,10 +17,10 @@
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, renameSync, rmdirSync, unlinkSync, } from 'node:fs';
 import { join, relative } from 'node:path';
-import { toPosixPath, stateExtractField } from './helpers.js';
+import { planningRootName, toPosixPath, stateExtractField } from './helpers.js';
 import { GSDError, ErrorClassification } from '../errors.js';
 // ─── Internal helpers ─────────────────────────────────────────────────────
-const planningRoot = (projectDir) => join(projectDir, '.planning');
+const planningRoot = (projectDir) => join(projectDir, planningRootName(projectDir));
 const workstreamsDir = (projectDir) => join(planningRoot(projectDir), 'workstreams');
 function wsPlanningPaths(projectDir, name) {
     const base = join(planningRoot(projectDir), 'workstreams', name);
@@ -123,7 +123,7 @@ export const workstreamCreate = async (args, projectDir) => {
         return { data: { created: false, reason: 'invalid workstream name — must contain at least one alphanumeric character' } };
     const baseDir = planningRoot(projectDir);
     if (!existsSync(baseDir)) {
-        return { data: { created: false, reason: '.planning/ directory not found — run /gsd-new-project first' } };
+        return { data: { created: false, reason: `${planningRootName(projectDir)}/ directory not found — run /gsd-new-project first` } };
     }
     const wsRoot = workstreamsDir(projectDir);
     const wsDir = join(wsRoot, slug);

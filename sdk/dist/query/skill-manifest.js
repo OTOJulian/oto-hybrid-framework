@@ -10,6 +10,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { extractFrontmatterLeading } from './frontmatter.js';
+import { planningRootName } from './helpers.js';
 /**
  * Scan canonical skill roots and build manifest JSON (same shape as gsd-tools.cjs).
  */
@@ -158,7 +159,7 @@ export const skillManifest = async (args, projectDir) => {
     const skillsDir = skillsDirIdx >= 0 && args[skillsDirIdx + 1] ? args[skillsDirIdx + 1] : null;
     const manifest = buildSkillManifest(projectDir, skillsDir);
     if (args.includes('--write')) {
-        const planningDir = join(projectDir, '.planning');
+        const planningDir = join(projectDir, planningRootName(projectDir));
         if (existsSync(planningDir)) {
             const manifestPath = join(planningDir, 'skill-manifest.json');
             writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');

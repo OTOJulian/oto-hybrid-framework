@@ -9,7 +9,7 @@
  * ```typescript
  * import { commit, checkCommit } from './commit.js';
  *
- * await commit(['docs: update state', '.planning/STATE.md'], '/project');
+ * await commit(['docs: update state', '<planning-root>/STATE.md'], '/project');
  * // { data: { committed: true, hash: 'abc1234', message: 'docs: update state', files: [...] } }
  *
  * await checkCommit([], '/project');
@@ -19,7 +19,7 @@
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { GSDError } from '../errors.js';
-import { planningPaths, resolvePathUnderProject } from './helpers.js';
+import { planningPaths, planningRootName, resolvePathUnderProject } from './helpers.js';
 // ─── execGit ──────────────────────────────────────────────────────────────
 /**
  * Run a git command in the given working directory.
@@ -74,7 +74,7 @@ export function sanitizeCommitMessage(text) {
  * Stage files and create a git commit.
  *
  * Checks commit_docs config (unless --force), sanitizes message,
- * stages specified files (or all .planning/), and commits.
+ * stages specified files (or all planning-root files), and commits.
  *
  * @param args - args[0]=message, remaining=file paths or flags (--force, --amend, --no-verify)
  * @param projectDir - Project root directory
@@ -113,7 +113,8 @@ export const commit = async (args, projectDir, workstream) => {
     // Sanitize message
     const sanitized = message ? sanitizeCommitMessage(message) : message;
     // Stage files
-    const filesToStage = filePaths.length > 0 ? filePaths : ['.planning/'];
+    const root = planningRootName(projectDir);
+    const filesToStage = filePaths.length > 0 ? filePaths : [root + '/'];
     for (const file of filesToStage) {
         const addResult = execGit(projectDir, ['add', file]);
         if (addResult.exitCode !== 0) {
@@ -171,14 +172,14 @@ export const checkCommit = async (_args, projectDir, workstream) => {
     const diffResult = execGit(projectDir, ['diff', '--cached', '--name-only']);
     const stagedFiles = diffResult.stdout ? diffResult.stdout.split('\n').filter(Boolean) : [];
     if (!commitDocs) {
-        // If commit_docs is false, check if any .planning/ files are staged
-        const planningFiles = stagedFiles.filter(f => f.startsWith('.planning/') || f.startsWith('.planning\\'));
+        const root = planningRootName(projectDir);
+        const planningFiles = stagedFiles.filter(f => f.startsWith(root + '/') || f.startsWith(root + '\\'));
         if (planningFiles.length > 0) {
             return {
                 data: {
                     allowed: false,
                     can_commit: false,
-                    reason: `commit_docs is false but ${planningFiles.length} .planning/ file(s) are staged`,
+                    reason: `commit_docs is false but ${planningFiles.length} ${root}/ file(s) are staged`,
                     commit_docs: false,
                     staged_files: planningFiles,
                 },
@@ -218,7 +219,7 @@ export const commitToSubrepo = async (args, projectDir, workstream) => {
     const subRepos = config.sub_repos;
     if (!subRepos || subRepos.length === 0) {
         return {
-            data: { committed: false, reason: 'no sub_repos configured in .planning/config.json' },
+            data: { committed: false, reason: `no sub_repos configured in ${planningRootName(projectDir)}/config.json` },
         };
     }
     if (files.length === 0) {
