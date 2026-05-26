@@ -95,7 +95,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   - Wave 1:
     - [x] 12-01-PLAN.md — Port planningRootName/hasMigratedPlanningRoot/hasPlanningRoot resolver into SDK helpers + unit tests (SDK-03)
   - Wave 2:
-    - [ ] 12-02-PLAN.md — Route the 3 choke points (relPlanningPath, loadConfig, findProjectRoot) through the resolver + rebuild dist (SDK-03)
+    - [x] 12-02-PLAN.md — Route the 3 choke points (relPlanningPath, loadConfig, findProjectRoot) through the resolver + rebuild dist (SDK-03)
   - Wave 3:
     - [ ] 12-03-PLAN.md — Sweep ~40 raw .planning join sites in workflow-invoked handlers + authoritative dist rebuild (SDK-03)
   - Wave 4:

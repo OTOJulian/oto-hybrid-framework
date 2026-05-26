@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
 status: executing
-stopped_at: Phase 12 context gathered
-last_updated: "2026-05-26T02:07:39.023Z"
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-05-26T02:24:45.837Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
-  percent: 63
+  completed_plans: 6
+  percent: 75
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 ## Current Position
 
 Phase: 12 (query-registry-workflow-consumption) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-05-26
 
@@ -88,6 +88,7 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 - Plan 11-03 ports #2775 SDK PATH-wiring into the live installer as a once-per-invocation post-install step.
 - Plan 11-04 uses `roadmap.analyze` as the `.planning`-backed SDK smoke key and keeps Phase 12 `.oto` registry rewiring out of scope.
 - Plan 12-01 keeps planning-root resolution in sdk/src/planning-root.ts as a node-builtin-only leaf module and re-exports it from query helpers to avoid helpers/workstream-utils cycles.
+- Phase 12 Plan 02 preserved the resolver contract: unmarked .planning roots remain GSD-era and default to .oto; Plan 12-04 .oto fixture smoke is the new parity proof.
 
 ### Execution Metrics
 
@@ -98,10 +99,11 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 | 11 | 03 | 7min | 2 | 4 |
 | 11 | 04 | 4min | 2 | 3 |
 | 12 | 01 | 3min | 2 | 3 |
+| 12 | 02 | 18min | 3 | 22 |
 
 ### Last Session
 
-- **Stopped At:** Completed 12-01-PLAN.md
+- **Stopped At:** Completed 12-02-PLAN.md
 - **Resume File:** None
 
 ### Quick Tasks Completed
