@@ -44,7 +44,7 @@
 - Cut interim `v0.1.1` Codex parity tag (nested `[[hooks.<Event>]]` schema + `~/.codex/skills/oto-<name>/SKILL.md` + `$oto-<name>` invocation), now superseded by `v0.2.0`.
 
 **Verification:**
-- `.planning/milestones/v0.2.0-MILESTONE-AUDIT.md` status: `passed`.
+- `.oto/milestones/v0.2.0-MILESTONE-AUDIT.md` status: `passed`.
 - Both phases: VERIFICATION.md `passed`, SECURITY.md `verified` (`threats_open: 0`, ASVS L1).
 - `npm test`: 533 pass, 1 expected skip, 0 failures.
 
@@ -72,7 +72,7 @@
 - Added the upstream sync pipeline for pull/rebrand/merge/conflict surfacing and release hardening across tests, CI, docs, command index, attribution, and clean install UAT.
 
 **Verification:**
-- `.planning/milestones/v0.1.0-MILESTONE-AUDIT.md` status: `passed`.
+- `.oto/milestones/v0.1.0-MILESTONE-AUDIT.md` status: `passed`.
 - `audit-open`: clear, 0 open artifacts.
 - `npm test`: 418 pass, 1 expected skip, 0 failures.
 

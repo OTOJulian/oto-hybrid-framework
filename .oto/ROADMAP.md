@@ -136,4 +136,4 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 
 ---
 
-_For prior milestone archives, see `.planning/milestones/`._
+_For prior milestone archives, see `.oto/milestones/`._

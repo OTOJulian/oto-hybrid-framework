@@ -18,7 +18,7 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-25)
+See: .oto/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
@@ -33,14 +33,14 @@ Last activity: 2026-05-26 -- Plan 13-02 complete
 
 Archive (prior milestones):
 
-- `.planning/milestones/v0.3.0-ROADMAP.md`
-- `.planning/milestones/v0.3.0-REQUIREMENTS.md`
-- `.planning/milestones/v0.2.0-ROADMAP.md`
-- `.planning/milestones/v0.2.0-REQUIREMENTS.md`
-- `.planning/milestones/v0.2.0-MILESTONE-AUDIT.md`
-- `.planning/milestones/v0.1.0-ROADMAP.md`
-- `.planning/milestones/v0.1.0-REQUIREMENTS.md`
-- `.planning/milestones/v0.1.0-MILESTONE-AUDIT.md`
+- `.oto/milestones/v0.3.0-ROADMAP.md`
+- `.oto/milestones/v0.3.0-REQUIREMENTS.md`
+- `.oto/milestones/v0.2.0-ROADMAP.md`
+- `.oto/milestones/v0.2.0-REQUIREMENTS.md`
+- `.oto/milestones/v0.2.0-MILESTONE-AUDIT.md`
+- `.oto/milestones/v0.1.0-ROADMAP.md`
+- `.oto/milestones/v0.1.0-REQUIREMENTS.md`
+- `.oto/milestones/v0.1.0-MILESTONE-AUDIT.md`
 
 ## Last Verified
 
@@ -56,7 +56,7 @@ Archive (prior milestones):
 /oto-execute-phase 13
 ```
 
-Continue Phase 13 with Plan 13-02: perform the pure `.planning/` to `.oto/` rename commit and then flip the moved state marker.
+Continue Phase 13 with Plan 13-03: flip workflow enforcement to `/oto-*` and rewrite live self-references.
 
 ## Accumulated Context
 
@@ -110,7 +110,7 @@ Continue Phase 13 with Plan 13-02: perform the pure `.planning/` to `.oto/` rena
 ### Last Session
 
 - **Stopped At:** Phase 13 context gathered
-- **Resume File:** .planning/phases/13-dogfood-migration-to-oto/13-CONTEXT.md
+- **Resume File:** .oto/phases/13-dogfood-migration-to-oto/13-CONTEXT.md
 
 ### Quick Tasks Completed
 

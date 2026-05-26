@@ -19,3 +19,7 @@ The state root is a load-bearing identity decision. A path rule keeps implementa
 ## Consequences
 
 Phase 2 must rewrite workflow, agent, hook, and library paths that reference `.planning/` through the path rule. Prose references to planning stay untouched. Downstream phases must treat `.oto/` as the only runtime state root after the rebrand engine exists.
+
+## Forward note (Phase 13)
+
+Paths in this ADR are historical (point-in-time record). As of Phase 13 (v0.4.0 dogfood migration), this repo's own state root is now `.oto/` — `.planning/` no longer exists in this repository. The `.planning/`-with-marker fallback described in the resolver remains intentional for un-migrated end-user projects.

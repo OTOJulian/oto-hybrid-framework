@@ -46,9 +46,9 @@ Shipped in v0.1.0:
 </details>
 
 Archive:
-- v0.3.0: `.planning/milestones/v0.3.0-ROADMAP.md`, `v0.3.0-REQUIREMENTS.md`
-- v0.2.0: `.planning/milestones/v0.2.0-ROADMAP.md`, `v0.2.0-REQUIREMENTS.md`, `v0.2.0-MILESTONE-AUDIT.md`
-- v0.1.0: `.planning/milestones/v0.1.0-ROADMAP.md`, `v0.1.0-REQUIREMENTS.md`, `v0.1.0-MILESTONE-AUDIT.md`
+- v0.3.0: `.oto/milestones/v0.3.0-ROADMAP.md`, `v0.3.0-REQUIREMENTS.md`
+- v0.2.0: `.oto/milestones/v0.2.0-ROADMAP.md`, `v0.2.0-REQUIREMENTS.md`, `v0.2.0-MILESTONE-AUDIT.md`
+- v0.1.0: `.oto/milestones/v0.1.0-ROADMAP.md`, `v0.1.0-REQUIREMENTS.md`, `v0.1.0-MILESTONE-AUDIT.md`
 
 ## Current Milestone: v0.4.0 SDK + Dogfood
 
@@ -58,7 +58,7 @@ Archive:
 - **SDK** — Build and ship the `oto-sdk` query CLI: port GSD's `sdk/` subpackage, add the `bin/oto-sdk.js` shim and `package.json` bin entry, rebuild the query registry for oto namespaces, and verify the installer's PATH-wiring. Resolves `command not found: oto-sdk` across the 74 workflows (557 references) that currently fall back to manual file ops.
 - **Dogfood** — Migrate this project's planning root from `.planning/` to `.oto/` so oto eats its own dog food and ends the GSD/oto split-brain. Sequenced after the SDK so the new location has working tooling.
 
-**Phase numbering:** v0.4.0 phases start at **11** (above the highest existing phase folder) to avoid colliding with the accumulated v0.1.0–v0.3.0 phase directories left in `.planning/phases/`.
+**Phase numbering:** v0.4.0 phases start at **11** (above the highest existing phase folder) to avoid colliding with the accumulated v0.1.0–v0.3.0 phase directories left in `.oto/phases/`.
 
 ## Requirements
 
@@ -78,7 +78,7 @@ Archive:
 
 ### Active
 
-**v0.4.0 SDK + Dogfood** (requirements defined in `.planning/REQUIREMENTS.md`):
+**v0.4.0 SDK + Dogfood** (requirements defined in `.oto/REQUIREMENTS.md`):
 - **SDK-01** — Implement the `oto-sdk query …` CLI surface that current workflows assume; today every workflow's SDK call falls back to manual file ops.
 - **DOG-01** — Migrate this project's own planning root from `.planning/` to `.oto/` (dogfood the framework's own state location).
 
