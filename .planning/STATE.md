@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
-status: planning
+status: executing
 stopped_at: Phase 12 context gathered
-last_updated: "2026-05-26T01:17:54.476Z"
-last_activity: 2026-05-25
+last_updated: "2026-05-26T02:07:39.023Z"
+last_activity: 2026-05-26
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_plans: 8
+  completed_plans: 5
+  percent: 63
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 ## Current Position
 
-Phase: 12
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-25
+Phase: 12 (query-registry-workflow-consumption) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-05-26
 
 Archive (prior milestones):
 
@@ -87,6 +87,7 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 - Plan 11-02 used an empty verification commit for the read-only npm pack assertion task.
 - Plan 11-03 ports #2775 SDK PATH-wiring into the live installer as a once-per-invocation post-install step.
 - Plan 11-04 uses `roadmap.analyze` as the `.planning`-backed SDK smoke key and keeps Phase 12 `.oto` registry rewiring out of scope.
+- Plan 12-01 keeps planning-root resolution in sdk/src/planning-root.ts as a node-builtin-only leaf module and re-exports it from query helpers to avoid helpers/workstream-utils cycles.
 
 ### Execution Metrics
 
@@ -96,11 +97,12 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 | 11 | 02 | 6min | 3 | 3 |
 | 11 | 03 | 7min | 2 | 4 |
 | 11 | 04 | 4min | 2 | 3 |
+| 12 | 01 | 3min | 2 | 3 |
 
 ### Last Session
 
-- **Stopped At:** Phase 12 context gathered
-- **Resume File:** .planning/phases/12-query-registry-workflow-consumption/12-CONTEXT.md
+- **Stopped At:** Completed 12-01-PLAN.md
+- **Resume File:** None
 
 ### Quick Tasks Completed
 

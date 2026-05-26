@@ -93,7 +93,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   4. The same workflows fall back to manual file operations and complete successfully when `oto-sdk` is absent.
 **Plans**: 4 plans across 4 waves (sequential — each consumes the prior wave's shared SDK resolver/dist)
   - Wave 1:
-    - [ ] 12-01-PLAN.md — Port planningRootName/hasMigratedPlanningRoot/hasPlanningRoot resolver into SDK helpers + unit tests (SDK-03)
+    - [x] 12-01-PLAN.md — Port planningRootName/hasMigratedPlanningRoot/hasPlanningRoot resolver into SDK helpers + unit tests (SDK-03)
   - Wave 2:
     - [ ] 12-02-PLAN.md — Route the 3 choke points (relPlanningPath, loadConfig, findProjectRoot) through the resolver + rebuild dist (SDK-03)
   - Wave 3:
@@ -123,7 +123,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 2. Workflow rebrand-ports + command de-deferral | v0.3.0 | 3/3 | Complete | 2026-05-18 |
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete    | 2026-05-25 |
-| 12. Query registry + workflow consumption | v0.4.0 | 0/? | Not started | - |
+| 12. Query registry + workflow consumption | v0.4.0 | 1/4 | Executing | - |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 0/? | Not started | - |
 
 ---
