@@ -27,7 +27,7 @@ import { loadConfig, type GSDConfig } from '../config.js';
 import { resolveModel, MODEL_PROFILES } from './config-query.js';
 import { findPhase } from './phase.js';
 import { roadmapGetPhase, getMilestoneInfo, extractCurrentMilestone, extractPhasesFromSection } from './roadmap.js';
-import { planningPaths, normalizePhaseName, toPosixPath, resolveAgentsDir, detectRuntime } from './helpers.js';
+import { planningPaths, normalizePhaseName, toPosixPath, resolveAgentsDir, detectRuntime, planningRootName } from './helpers.js';
 import { relPlanningPath } from '../workstream-utils.js';
 import type { QueryHandler } from './utils.js';
 
@@ -65,7 +65,7 @@ function pathExists(base: string, relPath: string): boolean {
  * Port of getLatestCompletedMilestone from init.cjs lines 10-25.
  */
 function getLatestCompletedMilestone(projectDir: string): { version: string; name: string } | null {
-  const milestonesPath = join(projectDir, '.planning', 'MILESTONES.md');
+  const milestonesPath = join(projectDir, planningRootName(projectDir), 'MILESTONES.md');
   if (!existsSync(milestonesPath)) return null;
 
   try {
@@ -249,7 +249,7 @@ export function withProjectRoot(
     result.project_code = projectCode;
   }
 
-  const projectMdPath = join(projectDir, '.planning', 'PROJECT.md');
+  const projectMdPath = join(projectDir, planningRootName(projectDir), 'PROJECT.md');
   try {
     if (existsSync(projectMdPath)) {
       const content = readFileSync(projectMdPath, 'utf-8');
@@ -436,7 +436,7 @@ export const initPlanPhase: QueryHandler = async (args, projectDir, workstream) 
  */
 export const initNewMilestone: QueryHandler = async (_args, projectDir) => {
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, '.planning');
+  const planningDir = join(projectDir, planningRootName(projectDir));
   const milestone = await getMilestoneInfo(projectDir);
   const latestCompleted = getLatestCompletedMilestone(projectDir);
 
@@ -468,12 +468,12 @@ export const initNewMilestone: QueryHandler = async (_args, projectDir) => {
     latest_completed_milestone_name: latestCompleted?.name || null,
     phase_dir_count: phaseDirCount,
     phase_archive_path: latestCompleted
-      ? toPosixPath(relative(projectDir, join(projectDir, '.planning', 'milestones', `${latestCompleted.version}-phases`)))
+      ? toPosixPath(relative(projectDir, join(projectDir, planningRootName(projectDir), 'milestones', `${latestCompleted.version}-phases`)))
       : null,
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
     roadmap_exists: existsSync(join(planningDir, 'ROADMAP.md')),
     state_exists: existsSync(join(planningDir, 'STATE.md')),
-    project_path: '.planning/PROJECT.md',
+    project_path: `${planningRootName(projectDir)}/PROJECT.md`,
     roadmap_path: toPosixPath(relative(projectDir, join(planningDir, 'ROADMAP.md'))),
     state_path: toPosixPath(relative(projectDir, join(planningDir, 'STATE.md'))),
   };
@@ -490,7 +490,7 @@ export const initNewMilestone: QueryHandler = async (_args, projectDir) => {
 export const initQuick: QueryHandler = async (args, projectDir) => {
   const description = args[0] || null;
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, '.planning');
+  const planningDir = join(projectDir, planningRootName(projectDir));
   const now = new Date();
   const slug = description ? generateSlugInternal(description).substring(0, 40) : null;
 
@@ -530,10 +530,10 @@ export const initQuick: QueryHandler = async (args, projectDir) => {
     description,
     date: now.toISOString().split('T')[0],
     timestamp: now.toISOString(),
-    quick_dir: '.planning/quick',
-    task_dir: slug ? `.planning/quick/${quickId}-${slug}` : null,
+    quick_dir: `${planningRootName(projectDir)}/quick`,
+    task_dir: slug ? `${planningRootName(projectDir)}/quick/${quickId}-${slug}` : null,
     roadmap_exists: existsSync(join(planningDir, 'ROADMAP.md')),
-    planning_exists: existsSync(join(projectDir, '.planning')),
+    planning_exists: existsSync(join(projectDir, planningRootName(projectDir))),
   };
 
   return { data: withProjectRoot(projectDir, result, config as Record<string, unknown>) };
@@ -547,21 +547,21 @@ export const initQuick: QueryHandler = async (args, projectDir) => {
  */
 export const initResume: QueryHandler = async (_args, projectDir) => {
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, '.planning');
+  const planningDir = join(projectDir, planningRootName(projectDir));
 
   let interruptedAgentId: string | null = null;
   try {
-    interruptedAgentId = readFileSync(join(projectDir, '.planning', 'current-agent-id.txt'), 'utf-8').trim();
+    interruptedAgentId = readFileSync(join(projectDir, planningRootName(projectDir), 'current-agent-id.txt'), 'utf-8').trim();
   } catch { /* intentionally empty */ }
 
   const result: Record<string, unknown> = {
     state_exists: existsSync(join(planningDir, 'STATE.md')),
     roadmap_exists: existsSync(join(planningDir, 'ROADMAP.md')),
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
-    planning_exists: existsSync(join(projectDir, '.planning')),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
+    planning_exists: existsSync(join(projectDir, planningRootName(projectDir))),
     state_path: toPosixPath(relative(projectDir, join(planningDir, 'STATE.md'))),
     roadmap_path: toPosixPath(relative(projectDir, join(planningDir, 'ROADMAP.md'))),
-    project_path: '.planning/PROJECT.md',
+    project_path: `${planningRootName(projectDir)}/PROJECT.md`,
     has_interrupted_agent: !!interruptedAgentId,
     interrupted_agent_id: interruptedAgentId,
     commit_docs: config.commit_docs,
@@ -722,7 +722,7 @@ export const initPhaseOp: QueryHandler = async (args, projectDir, workstream) =>
 export const initTodos: QueryHandler = async (args, projectDir) => {
   const area = args[0] || null;
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, '.planning');
+  const planningDir = join(projectDir, planningRootName(projectDir));
   const now = new Date();
 
   const pendingDir = join(planningDir, 'todos', 'pending');
@@ -778,7 +778,7 @@ export const initTodos: QueryHandler = async (args, projectDir) => {
  */
 export const initMilestoneOp: QueryHandler = async (_args, projectDir) => {
   const config = await loadConfig(projectDir);
-  const planningDir = join(projectDir, '.planning');
+  const planningDir = join(projectDir, planningRootName(projectDir));
   const milestone = await getMilestoneInfo(projectDir);
 
   const phasesDir = join(planningDir, 'phases');
@@ -851,7 +851,7 @@ export const initMilestoneOp: QueryHandler = async (_args, projectDir) => {
     } catch { /* intentionally empty */ }
   }
 
-  const archiveDir = join(projectDir, '.planning', 'archive');
+  const archiveDir = join(projectDir, planningRootName(projectDir), 'archive');
   let archivedMilestones: string[] = [];
   try {
     archivedMilestones = readdirSync(archiveDir, { withFileTypes: true })
@@ -869,7 +869,7 @@ export const initMilestoneOp: QueryHandler = async (_args, projectDir) => {
     all_phases_complete: phaseCount > 0 && phaseCount === completedPhases,
     archived_milestones: archivedMilestones,
     archive_count: archivedMilestones.length,
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
     roadmap_exists: existsSync(join(planningDir, 'ROADMAP.md')),
     state_exists: existsSync(join(planningDir, 'STATE.md')),
     archive_exists: existsSync(archiveDir),
@@ -888,7 +888,7 @@ export const initMilestoneOp: QueryHandler = async (_args, projectDir) => {
 export const initMapCodebase: QueryHandler = async (_args, projectDir) => {
   const config = await loadConfig(projectDir);
   const now = new Date();
-  const codebaseDir = join(projectDir, '.planning', 'codebase');
+  const codebaseDir = join(projectDir, planningRootName(projectDir), 'codebase');
   let existingMaps: string[] = [];
   try {
     existingMaps = readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
@@ -904,11 +904,11 @@ export const initMapCodebase: QueryHandler = async (_args, projectDir) => {
     subagent_timeout: (config as Record<string, unknown>).subagent_timeout ?? undefined,
     date: now.toISOString().split('T')[0],
     timestamp: now.toISOString(),
-    codebase_dir: '.planning/codebase',
+    codebase_dir: `${planningRootName(projectDir)}/codebase`,
     existing_maps: existingMaps,
     has_maps: existingMaps.length > 0,
-    planning_exists: pathExists(projectDir, '.planning'),
-    codebase_dir_exists: pathExists(projectDir, '.planning/codebase'),
+    planning_exists: pathExists(projectDir, planningRootName(projectDir)),
+    codebase_dir_exists: pathExists(projectDir, `${planningRootName(projectDir)}/codebase`),
   };
 
   return { data: withProjectRoot(projectDir, result, config as Record<string, unknown>) };
@@ -992,7 +992,7 @@ export const initListWorkspaces: QueryHandler = async (_args, _projectDir) => {
         const tableRows = manifest.split('\n').filter(l => l.match(/^\|\s*\w/) && !l.includes('Repo') && !l.includes('---'));
         repoCount = tableRows.length;
       } catch { /* best-effort */ }
-      const hasProject = existsSync(join(wsPath, '.planning', 'PROJECT.md'));
+      const hasProject = existsSync(join(wsPath, planningRootName(wsPath), 'PROJECT.md'));
 
       workspaces.push({
         name: entry.name,
@@ -1095,10 +1095,10 @@ export const initRemoveWorkspace: QueryHandler = async (args, _projectDir) => {
 export const initIngestDocs: QueryHandler = async (_args, projectDir) => {
   const config = await loadConfig(projectDir);
   const result: Record<string, unknown> = {
-    project_exists: pathExists(projectDir, '.planning/PROJECT.md'),
-    planning_exists: pathExists(projectDir, '.planning'),
+    project_exists: pathExists(projectDir, `${planningRootName(projectDir)}/PROJECT.md`),
+    planning_exists: pathExists(projectDir, planningRootName(projectDir)),
     has_git: pathExists(projectDir, '.git'),
-    project_path: '.planning/PROJECT.md',
+    project_path: `${planningRootName(projectDir)}/PROJECT.md`,
     commit_docs: config.commit_docs,
   };
   return { data: withProjectRoot(projectDir, result, config as Record<string, unknown>) };

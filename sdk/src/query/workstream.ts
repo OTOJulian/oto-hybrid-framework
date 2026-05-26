@@ -22,14 +22,14 @@ import {
 } from 'node:fs';
 import { join, relative } from 'node:path';
 
-import { toPosixPath, stateExtractField } from './helpers.js';
+import { planningRootName, toPosixPath, stateExtractField } from './helpers.js';
 import { GSDError, ErrorClassification } from '../errors.js';
 import type { QueryHandler } from './utils.js';
 
 // ─── Internal helpers ─────────────────────────────────────────────────────
 
 const planningRoot = (projectDir: string) =>
-  join(projectDir, '.planning');
+  join(projectDir, planningRootName(projectDir));
 
 const workstreamsDir = (projectDir: string) =>
   join(planningRoot(projectDir), 'workstreams');

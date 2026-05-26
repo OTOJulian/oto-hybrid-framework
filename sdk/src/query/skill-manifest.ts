@@ -12,6 +12,7 @@ import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 
 import { extractFrontmatterLeading } from './frontmatter.js';
+import { planningRootName } from './helpers.js';
 import type { QueryHandler } from './utils.js';
 
 export interface SkillManifestSkill {
@@ -203,7 +204,7 @@ export const skillManifest: QueryHandler = async (args, projectDir) => {
   const manifest = buildSkillManifest(projectDir, skillsDir);
 
   if (args.includes('--write')) {
-    const planningDir = join(projectDir, '.planning');
+    const planningDir = join(projectDir, planningRootName(projectDir));
     if (existsSync(planningDir)) {
       const manifestPath = join(planningDir, 'skill-manifest.json');
       writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
