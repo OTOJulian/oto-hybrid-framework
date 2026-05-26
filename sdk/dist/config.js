@@ -8,6 +8,7 @@ import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { relPlanningPath } from './workstream-utils.js';
+import { planningRootName } from './query/helpers.js';
 // ─── Defaults ────────────────────────────────────────────────────────────────
 export const CONFIG_DEFAULTS = {
     model_profile: 'balanced',
@@ -87,8 +88,8 @@ async function loadUserDefaults() {
     }
 }
 export async function loadConfig(projectDir, workstream) {
-    const configPath = join(projectDir, relPlanningPath(workstream), 'config.json');
-    const rootConfigPath = join(projectDir, '.planning', 'config.json');
+    const configPath = join(projectDir, relPlanningPath(projectDir, workstream), 'config.json');
+    const rootConfigPath = join(projectDir, planningRootName(projectDir), 'config.json');
     let raw;
     let projectConfigFound = false;
     try {

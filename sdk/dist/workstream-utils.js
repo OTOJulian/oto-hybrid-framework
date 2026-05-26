@@ -1,10 +1,11 @@
 /**
  * Workstream utility functions for multi-workstream project support.
  *
- * When --ws <name> is provided, all .planning/ paths are routed to
- * .planning/workstreams/<name>/ instead.
+ * When --ws <name> is provided, all planning paths are routed to
+ * <planning-root>/workstreams/<name>/ instead.
  */
 import { posix } from 'node:path';
+import { planningRootName } from './planning-root.js';
 /**
  * Validate a workstream name.
  * Allowed: alphanumeric, hyphens, underscores, dots.
@@ -20,15 +21,17 @@ export function validateWorkstreamName(name) {
     return /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(name);
 }
 /**
- * Return the relative planning directory path.
+ * Return the relative planning directory path, rooted at the project's
+ * resolved planning root (`.oto` or migrated `.planning`, per planningRootName).
  *
- * - Without workstream: `.planning`
- * - With workstream: `.planning/workstreams/<name>`
+ * - Without workstream: e.g. `.oto`
+ * - With workstream: e.g. `.oto/workstreams/<name>`
  */
-export function relPlanningPath(workstream) {
+export function relPlanningPath(projectDir, workstream) {
+    const root = planningRootName(projectDir);
     if (!workstream)
-        return '.planning';
-    // Use POSIX segments so the same logical path string is used on all platforms (Windows included).
-    return posix.join('.planning', 'workstreams', workstream);
+        return root;
+    // POSIX segments so the same logical string is used on all platforms.
+    return posix.join(root, 'workstreams', workstream);
 }
 //# sourceMappingURL=workstream-utils.js.map

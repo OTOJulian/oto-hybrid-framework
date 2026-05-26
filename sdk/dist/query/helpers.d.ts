@@ -16,6 +16,8 @@
  * // { planning: '/project/.planning', state: '/project/.planning/STATE.md', ... }
  * ```
  */
+import { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot } from '../planning-root.js';
+export { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot };
 /**
  * Supported GSD runtimes. Kept in sync with `bin/install.js:getGlobalDir()`.
  */

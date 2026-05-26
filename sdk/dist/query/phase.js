@@ -133,7 +133,7 @@ export const findPhase = async (args, projectDir, workstream) => {
         has_reviews: false,
     };
     // Search current phases first
-    const relPhasesDir = relPlanningPath(workstream) + '/phases';
+    const relPhasesDir = relPlanningPath(projectDir, workstream) + '/phases';
     const current = await searchPhaseInDir(phasesDir, relPhasesDir, normalized);
     if (current)
         return { data: current };

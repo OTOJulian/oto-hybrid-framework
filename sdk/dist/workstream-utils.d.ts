@@ -1,8 +1,8 @@
 /**
  * Workstream utility functions for multi-workstream project support.
  *
- * When --ws <name> is provided, all .planning/ paths are routed to
- * .planning/workstreams/<name>/ instead.
+ * When --ws <name> is provided, all planning paths are routed to
+ * <planning-root>/workstreams/<name>/ instead.
  */
 /**
  * Validate a workstream name.
@@ -11,10 +11,11 @@
  */
 export declare function validateWorkstreamName(name: string): boolean;
 /**
- * Return the relative planning directory path.
+ * Return the relative planning directory path, rooted at the project's
+ * resolved planning root (`.oto` or migrated `.planning`, per planningRootName).
  *
- * - Without workstream: `.planning`
- * - With workstream: `.planning/workstreams/<name>`
+ * - Without workstream: e.g. `.oto`
+ * - With workstream: e.g. `.oto/workstreams/<name>`
  */
-export declare function relPlanningPath(workstream?: string): string;
+export declare function relPlanningPath(projectDir: string, workstream?: string): string;
 //# sourceMappingURL=workstream-utils.d.ts.map

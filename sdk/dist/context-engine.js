@@ -63,7 +63,7 @@ export class ContextEngine {
     logger;
     truncation;
     constructor(projectDir, logger, truncation, workstream) {
-        this.planningDir = join(projectDir, relPlanningPath(workstream));
+        this.planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
         this.logger = logger;
         this.truncation = { ...DEFAULT_TRUNCATION_OPTIONS, ...truncation };
     }

@@ -236,7 +236,7 @@ export const initExecutePhase = async (args, projectDir, workstream) => {
         return { data: { error: 'phase required for init execute-phase' } };
     }
     const config = await loadConfig(projectDir);
-    const planningDir = join(projectDir, relPlanningPath(workstream));
+    const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
     const { phaseInfo, roadmapPhase } = await getPhaseInfoWithFallback(phase, projectDir, workstream);
     const phase_req_ids = extractReqIds(roadmapPhase);
     const [executorModel, verifierModel] = await Promise.all([
@@ -306,7 +306,7 @@ export const initPlanPhase = async (args, projectDir, workstream) => {
         return { data: { error: 'phase required for init plan-phase' } };
     }
     const config = await loadConfig(projectDir);
-    const planningDir = join(projectDir, relPlanningPath(workstream));
+    const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
     const { phaseInfo, roadmapPhase } = await getPhaseInfoWithFallback(phase, projectDir, workstream);
     const phase_req_ids = extractReqIds(roadmapPhase);
     const [researcherModel, plannerModel, checkerModel] = await Promise.all([
@@ -543,7 +543,7 @@ export const initPhaseOp = async (args, projectDir, workstream) => {
         return { data: { error: 'phase required for init phase-op' } };
     }
     const config = await loadConfig(projectDir);
-    const planningDir = join(projectDir, relPlanningPath(workstream));
+    const planningDir = join(projectDir, relPlanningPath(projectDir, workstream));
     // findPhase with archived override: if only match is archived, prefer ROADMAP
     const phaseResult = await findPhase([phase], projectDir, workstream);
     let phaseInfo = phaseResult.data;

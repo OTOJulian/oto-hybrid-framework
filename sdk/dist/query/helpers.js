@@ -18,10 +18,14 @@
  */
 import { join, dirname, relative, resolve, isAbsolute, normalize, parse as parsePath, sep as pathSep } from 'node:path';
 import { realpath } from 'node:fs/promises';
-import { existsSync, statSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { relPlanningPath } from '../workstream-utils.js';
+import { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot, } from '../planning-root.js';
+// Planning-root resolution lives in a dependency-free leaf module to avoid a
+// helpers <-> workstream-utils ESM cycle. Re-exported here for ergonomic imports.
+export { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot };
 // ─── Runtime-aware agents directory resolution ─────────────────────────────
 /**
  * Supported GSD runtimes. Kept in sync with `bin/install.js:getGlobalDir()`.
@@ -385,7 +389,7 @@ export function normalizeMd(content) {
  * @returns Object with paths to common .planning files
  */
 export function planningPaths(projectDir, workstream) {
-    const base = join(projectDir, relPlanningPath(workstream));
+    const base = join(projectDir, relPlanningPath(projectDir, workstream));
     return {
         planning: toPosixPath(base),
         state: toPosixPath(join(base, 'STATE.md')),
@@ -437,15 +441,9 @@ export function findProjectRoot(startDir) {
     }
     const fsRoot = parsePath(resolvedStart).root;
     const home = homedir();
-    // If startDir already contains .planning/, it IS the project root.
-    try {
-        const ownPlanning = join(resolvedStart, '.planning');
-        if (existsSync(ownPlanning) && statSync(ownPlanning).isDirectory()) {
-            return startDir;
-        }
-    }
-    catch {
-        // fall through
+    // If startDir already owns an oto planning root, it IS the project root (#1362).
+    if (hasPlanningRoot(resolvedStart)) {
+        return startDir;
     }
     // Walk upward, mirroring isInsideGitRepo from the CJS reference.
     function isInsideGitRepo(candidateParent) {
@@ -475,16 +473,9 @@ export function findProjectRoot(startDir) {
             break;
         if (parent === home)
             break;
-        const parentPlanning = join(parent, '.planning');
-        let parentPlanningIsDir = false;
-        try {
-            parentPlanningIsDir = existsSync(parentPlanning) && statSync(parentPlanning).isDirectory();
-        }
-        catch {
-            parentPlanningIsDir = false;
-        }
+        const parentPlanningIsDir = hasPlanningRoot(parent);
         if (parentPlanningIsDir) {
-            const configPath = join(parentPlanning, 'config.json');
+            const configPath = join(parent, planningRootName(parent), 'config.json');
             let matched = false;
             try {
                 const raw = readFileSync(configPath, 'utf-8');
