@@ -91,7 +91,15 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   2. Query keys resolve against `.oto/` paths (not GSD's `.planning/` or upstream namespaces).
   3. Workflows that call `oto-sdk query …` consume its structured output when the SDK is present.
   4. The same workflows fall back to manual file operations and complete successfully when `oto-sdk` is absent.
-**Plans**: TBD
+**Plans**: 4 plans across 4 waves (sequential — each consumes the prior wave's shared SDK resolver/dist)
+  - Wave 1:
+    - [ ] 12-01-PLAN.md — Port planningRootName/hasMigratedPlanningRoot/hasPlanningRoot resolver into SDK helpers + unit tests (SDK-03)
+  - Wave 2:
+    - [ ] 12-02-PLAN.md — Route the 3 choke points (relPlanningPath, loadConfig, findProjectRoot) through the resolver + rebuild dist (SDK-03)
+  - Wave 3:
+    - [ ] 12-03-PLAN.md — Sweep ~40 raw .planning join sites in workflow-invoked handlers + authoritative dist rebuild (SDK-03)
+  - Wave 4:
+    - [ ] 12-04-PLAN.md — Enumerate+fixture smoke harness, tiered fallback wiring/assertion, D-04 audit, D-06 reconciliation, parity checkpoint (SDK-03, SDK-05)
 
 ### Phase 13: Dogfood migration to `.oto/`
 **Goal**: This repo manages itself with oto — planning artifacts live under `.oto/` (migrated from `.planning/`) with git history preserved, oto commands operate on `.oto/` with no path override, and every in-repo reference to the old location is updated.

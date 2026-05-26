@@ -1,8 +1,8 @@
 ---
 phase: 12
 slug: query-registry-workflow-consumption
-status: draft
-nyquist_compliant: false
+status: planned
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-05-25
 ---
@@ -40,14 +40,22 @@ created: 2026-05-25
 
 ## Per-Task Verification Map
 
-> Filled per-task by gsd-planner. Each task that touches the SDK query layer must map to one of the automated commands below.
+> Filled per-task by gsd-planner. Each task that touches the SDK query layer maps to one of the automated commands below.
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 12-XX-XX | XX | X | SDK-03 | — | N/A | unit | `cd sdk && npx vitest run src/query/helpers.test.ts --project unit` | ⚠️ extend | ⬜ pending |
-| 12-XX-XX | XX | X | SDK-03 | — | N/A | integration | `cd sdk && npx vitest run src/golden/oto-query-smoke.integration.test.ts --project integration` | ❌ W0 | ⬜ pending |
-| 12-XX-XX | XX | X | SDK-05 | — | read-only degrades to default | static/shell | grep-assert read-only call sites carry `2>/dev/null \|\| echo <default>` | ❌ W0 | ⬜ pending |
-| 12-XX-XX | XX | X | SDK-05 | — | structural ops fail fast | static/shell | grep-assert structural call sites carry hard-require guard | ❌ W0 | ⬜ pending |
+| 12-01-1 | 01 | 1 | SDK-03 | T-12-01..03 | error paths swallowed (no path/stack leak) | type-check | `cd sdk && npx tsc --noEmit -p tsconfig.json` | ✅ helpers.ts | ⬜ pending |
+| 12-01-2 | 01 | 1 | SDK-03 | — | N/A | unit | `cd sdk && npx vitest run src/query/helpers.test.ts --project unit` | ⚠️ extend | ⬜ pending |
+| 12-02-1 | 02 | 2 | SDK-03 | T-12-05 | workstream traversal guard preserved | type-check | `cd sdk && npx tsc --noEmit -p tsconfig.json` | ✅ workstream-utils.ts | ⬜ pending |
+| 12-02-2 | 02 | 2 | SDK-03 | T-12-04 | walk-up home upper-bound preserved | unit | `cd sdk && npx vitest run src/query/helpers.test.ts --project unit` | ⚠️ extend | ⬜ pending |
+| 12-02-3 | 02 | 2 | SDK-03 | — | N/A | full suite | `cd sdk && npm run build && npm test` | ✅ goldens | ⬜ pending |
+| 12-03-1 | 03 | 3 | SDK-03 | T-12-09 | no half-migrated split read/write | type-check | `cd sdk && npx tsc --noEmit -p tsconfig.json` | ✅ init.ts etc | ⬜ pending |
+| 12-03-2 | 03 | 3 | SDK-03 | T-12-07,08 | mutation writes stay .oto/-rooted | type-check | `cd sdk && npx tsc --noEmit -p tsconfig.json` | ✅ progress.ts etc | ⬜ pending |
+| 12-03-3 | 03 | 3 | SDK-03 | T-12-09 | sweep-completeness (zero stray literals) | full suite | `cd sdk && npm run build && npm test` | ✅ goldens | ⬜ pending |
+| 12-04-1 | 04 | 4 | SDK-03 | T-12-10,11 | fixture/temp dir only, never repo root | integration | `cd sdk && npx vitest run src/golden/oto-query-smoke.integration.test.ts --project integration` | ❌ W0 | ⬜ pending |
+| 12-04-2 | 04 | 4 | SDK-05 | T-12-12 | read-only degrades / structural fails fast | static/shell | `node --test tests/sdk-fallback-policy.test.cjs` | ❌ W0 | ⬜ pending |
+| 12-04-3 | 04 | 4 | SDK-05 | T-12-13 | doc-text reconciliation (D-06) | static/grep | `grep -F "fail fast" .planning/ROADMAP.md && grep -F "fail fast" .planning/REQUIREMENTS.md` | ✅ docs | ⬜ pending |
+| 12-04-4 | 04 | 4 | SDK-03 | — | cross-binary parity | manual | human checkpoint (see Manual-Only Verifications) | — | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -55,10 +63,12 @@ created: 2026-05-25
 
 ## Wave 0 Requirements
 
-- [ ] `sdk/src/golden/oto-query-smoke.integration.test.ts` — enumerate (from `oto/workflows/` + `oto/commands/`) + `registry.has()` filter + fixture `.oto/` dispatch; asserts structured output and zero `.planning/` access. Covers SDK-03 / SC#1+SC#2.
-- [ ] `sdk/src/golden/fixtures/oto-project/` (or temp-dir builder) — minimal `.oto/` fixture tree: STATE.md, config.json, ROADMAP.md, REQUIREMENTS.md, one `phases/NN-name/` dir, git-init for commit-class keys; **no `.planning/`**.
-- [ ] Extend `sdk/src/query/helpers.test.ts` (or new file) — `planningRootName` / `hasMigratedPlanningRoot` / `hasPlanningRoot` unit cases: `.oto`-only, marker-`.planning`, unmarked-`.planning`, no-root, both-present.
-- [ ] Shell/static assertion (node:test or grep script) that read-only call sites carry `|| echo <default>` and structural call sites carry the hard-require guard (SDK-05).
+> Created in Plan 04 Task 1 (smoke harness + fixture) and Plan 04 Task 2 (fallback assertion); the helpers resolution test is created in Plan 01 Task 2.
+
+- [ ] `sdk/src/golden/oto-query-smoke.integration.test.ts` (Plan 04 / Task 1) — enumerate (from `oto/workflows/` + `oto/commands/`) + `registry.has()` filter + fixture `.oto/` dispatch; asserts structured output and zero `.planning/` access. Covers SDK-03 / SC#1+SC#2.
+- [ ] `sdk/src/golden/fixtures/oto-project/` (Plan 04 / Task 1) — minimal `.oto/` fixture tree: STATE.md, config.json, ROADMAP.md, REQUIREMENTS.md, one `phases/NN-name/` dir, git-init at runtime for commit-class keys; **no `.planning/`**.
+- [ ] Extend `sdk/src/query/helpers.test.ts` (Plan 01 / Task 2) — `planningRootName` / `hasMigratedPlanningRoot` / `hasPlanningRoot` unit cases: `.oto`-only, marker-`.planning`, unmarked-`.planning`, no-root, both-present + marker-regex boundary.
+- [ ] `tests/sdk-fallback-policy.test.cjs` (Plan 04 / Task 2) — node:test static assertion that read-only call sites carry `|| echo <default>` and structural call sites carry the hard-require guard (SDK-05).
 
 ---
 
@@ -66,7 +76,7 @@ created: 2026-05-25
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| End-to-end `oto-sdk query` against a real migrated project resolves `.oto/` identically to `oto-tools.cjs` | SDK-03 | Cross-binary parity is best confirmed against a real layout, not just in-process dispatch | After build, run a representative key (e.g. `oto-sdk query state-snapshot`) and `oto-tools.cjs` equivalent in a `.oto/` project; diff structured output |
+| End-to-end `oto-sdk query` against a real migrated `.oto/` project resolves identically to `oto-tools.cjs` | SDK-03 | Cross-binary parity is best confirmed against a real layout, not just in-process dispatch (Plan 04 / Task 4 checkpoint) | After build, run a representative key (e.g. `node bin/oto-sdk.js query state-snapshot --project-dir $D`) and the `oto-tools.cjs` equivalent in a throwaway `.oto/` project; confirm equivalent structured output and no `.planning/` access. Repo root must remain `.oto/`-free. |
 
 *Most phase behaviors have automated verification via the enumerate-smoke harness + helpers unit tests.*
 
@@ -74,11 +84,11 @@ created: 2026-05-25
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (smoke harness, fixture, helpers tests, fallback assertion)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies (Plan 04 Task 4 is the single manual checkpoint, documented above)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify (every auto task has a tsc/vitest/node:test command)
+- [x] Wave 0 covers all MISSING references (smoke harness + fixture in Plan 04 T1; helpers tests in Plan 01 T2; fallback assertion in Plan 04 T2)
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** planned (pending execution)
