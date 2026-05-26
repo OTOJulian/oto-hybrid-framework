@@ -209,7 +209,7 @@ describe('planningPaths', () => {
   });
 });
 
-// ─── planning-root resolution ──────────────────────────────────────────────
+// ─── planning root resolver ────────────────────────────────────────────────
 
 describe('planning-root resolution', () => {
   let workspace: string;

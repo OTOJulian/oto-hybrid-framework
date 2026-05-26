@@ -24,6 +24,10 @@ import { homedir } from 'node:os';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { relPlanningPath } from '../workstream-utils.js';
 
+// Planning-root resolution lives in a dependency-free leaf module to avoid a
+// helpers <-> workstream-utils ESM cycle. Re-exported here for ergonomic imports.
+export { planningRootName, hasMigratedPlanningRoot, hasPlanningRoot } from '../planning-root.js';
+
 // ─── Runtime-aware agents directory resolution ─────────────────────────────
 
 /**
