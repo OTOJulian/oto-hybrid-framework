@@ -48,6 +48,12 @@ When `--interactive` is set, discuss runs inline with questions (not auto-answer
 Bootstrap via milestone-level init:
 
 ```bash
+if ! command -v oto-sdk >/dev/null 2>&1; then
+  echo "ERROR: oto-sdk is required for this operation but is not on PATH." >&2
+  echo "Install: npm install -g github:OTOJulian/oto-hybrid-framework" >&2
+  exit 1
+fi
+
 INIT=$(oto-sdk query init.milestone-op)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```

@@ -67,9 +67,15 @@ If `--wave` is absent, preserve the current behavior of executing all incomplete
 Load all context in one call:
 
 ```bash
+if ! command -v oto-sdk >/dev/null 2>&1; then
+  echo "ERROR: oto-sdk is required for this operation but is not on PATH." >&2
+  echo "Install: npm install -g github:OTOJulian/oto-hybrid-framework" >&2
+  exit 1
+fi
+
 INIT=$(oto-sdk query init.execute-phase "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS=$(oto-sdk query agent-skills oto-executor)
+AGENT_SKILLS=$(oto-sdk query agent-skills oto-executor 2>/dev/null || echo "")
 ```
 
 Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `response_language`.
@@ -1320,7 +1326,7 @@ spawn template, and the two `workflow.drift_*` config keys.
 Verify phase achieved its GOAL, not just completed tasks.
 
 ```bash
-VERIFIER_SKILLS=$(oto-sdk query agent-skills oto-verifier)
+VERIFIER_SKILLS=$(oto-sdk query agent-skills oto-verifier 2>/dev/null || echo "")
 ```
 
 ```
