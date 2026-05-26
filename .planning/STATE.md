@@ -4,14 +4,14 @@ milestone: v0.4.0
 milestone_name: SDK + Dogfood
 status: executing
 stopped_at: Phase 13 context gathered
-last_updated: "2026-05-26T04:53:36.710Z"
-last_activity: 2026-05-26 -- Phase 13 execution started
+last_updated: "2026-05-26T04:55:18.618Z"
+last_activity: 2026-05-26 -- Plan 13-01 complete
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 12
-  completed_plans: 8
-  percent: 67
+  completed_plans: 9
+  percent: 75
 ---
 
 # Project State
@@ -27,9 +27,9 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 ## Current Position
 
 Phase: 13 (dogfood-migration-to-oto) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 13
-Last activity: 2026-05-26 -- Phase 13 execution started
+Plan: 2 of 4
+Status: Ready for Plan 13-02 pure rename
+Last activity: 2026-05-26 -- Plan 13-01 complete
 
 Archive (prior milestones):
 
@@ -53,10 +53,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-verify-work 12
+/oto-execute-phase 13
 ```
 
-Verify Phase 12: confirm the query registry, `.oto/` fixture parity, and tiered workflow fallback behavior before Phase 13 dogfood migration.
+Continue Phase 13 with Plan 13-02: perform the pure `.planning/` to `.oto/` rename commit and then flip the moved state marker.
 
 ## Accumulated Context
 

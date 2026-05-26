@@ -112,7 +112,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   4. The migration is a clean cutover — no dual-location shim keeping `.planning/` alive alongside `.oto/`.
 **Plans**: 4 plans across 4 waves (sequential — paths shift mid-phase at the rename pivot; each wave depends on the prior)
   - Wave 1:
-    - [ ] 13-01-PLAN.md — Clean-tree precondition: gitignore .DS_Store/.claude, commit in-flight 04-*/05-* WIP + the Phase 13 plans (D-02) (DOG-01)
+    - [x] 13-01-PLAN.md — Clean-tree precondition: gitignore .DS_Store/.claude, commit in-flight 04-*/05-* WIP + the Phase 13 plans (D-02) (DOG-01)
   - Wave 2:
     - [ ] 13-02-PLAN.md — Atomic `git mv .planning .oto` pure rename + flip oto_state_version marker; human-verify the rename diff (D-01, D-06) (DOG-01)
   - Wave 3:
@@ -132,7 +132,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 | 3. Tests, install-smoke, parity, ADR-15 | v0.3.0 | 4/4 | Complete | 2026-05-18 |
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete    | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 1/4 | Executing | - |
-| 13. Dogfood migration to `.oto/` | v0.4.0 | 0/4 | Not started | - |
+| 13. Dogfood migration to `.oto/` | v0.4.0 | 1/4 | Executing | - |
 
 ---
 
