@@ -66,14 +66,41 @@ describe('validateWorkstreamName', () => {
 import { relPlanningPath } from './workstream-utils.js';
 
 describe('relPlanningPath', () => {
-  it('returns .planning/ in flat mode (no workstream)', () => {
-    expect(relPlanningPath()).toBe('.planning');
-    expect(relPlanningPath(undefined)).toBe('.planning');
+  let tmpDir: string;
+
+  beforeEach(async () => {
+    tmpDir = join(tmpdir(), `gsd-rel-planning-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    await mkdir(tmpDir, { recursive: true });
   });
 
-  it('returns .planning/workstreams/<name>/ with workstream', () => {
-    expect(relPlanningPath('frontend')).toBe('.planning/workstreams/frontend');
-    expect(relPlanningPath('api-v2')).toBe('.planning/workstreams/api-v2');
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it('returns .oto in flat mode for .oto projects', async () => {
+    await mkdir(join(tmpDir, '.oto'), { recursive: true });
+
+    expect(relPlanningPath(tmpDir)).toBe('.oto');
+    expect(relPlanningPath(tmpDir, undefined)).toBe('.oto');
+  });
+
+  it('returns .oto/workstreams/<name> with workstream for .oto projects', async () => {
+    await mkdir(join(tmpDir, '.oto'), { recursive: true });
+
+    expect(relPlanningPath(tmpDir, 'frontend')).toBe('.oto/workstreams/frontend');
+    expect(relPlanningPath(tmpDir, 'api-v2')).toBe('.oto/workstreams/api-v2');
+  });
+
+  it('returns .planning for migrated .planning projects without .oto', async () => {
+    await mkdir(join(tmpDir, '.planning'), { recursive: true });
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), '---\noto_state_version: 1.0\n---\n');
+
+    expect(relPlanningPath(tmpDir)).toBe('.planning');
+    expect(relPlanningPath(tmpDir, 'frontend')).toBe('.planning/workstreams/frontend');
+  });
+
+  it('defaults to .oto when no planning root exists', () => {
+    expect(relPlanningPath(tmpDir)).toBe('.oto');
   });
 });
 
