@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
-status: executing
-stopped_at: Completed 12-03-PLAN.md
-last_updated: "2026-05-26T02:38:37.892Z"
+status: verifying
+stopped_at: Completed 12-04-PLAN.md
+last_updated: "2026-05-26T03:09:07.739Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
-  percent: 88
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 Phase: 12 (query-registry-workflow-consumption) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-26
 
 Archive (prior milestones):
@@ -53,10 +53,10 @@ Archive (prior milestones):
 ## Next Command
 
 ```bash
-/oto-plan-phase 12
+/oto-verify-work 12
 ```
 
-Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and wire workflows to consume `oto-sdk query` output with graceful fallback when the SDK is unavailable.
+Verify Phase 12: confirm the query registry, `.oto/` fixture parity, and tiered workflow fallback behavior before Phase 13 dogfood migration.
 
 ## Accumulated Context
 
@@ -70,6 +70,7 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 - 2026-05-18: v0.3.0 archived and tagged. ROADMAP and REQUIREMENTS archived to `.planning/milestones/v0.3.0-*`; MILESTONES.md, PROJECT.md, RETROSPECTIVE.md updated; tag `v0.3.0` cut. Between milestones.
 - 2026-05-25: v0.4.0 roadmap created. Phases derived from the SDK-before-DOG sequencing constraint: Phase 11 ports GSD's `sdk/` subpackage and wires the `oto-sdk` binary onto PATH (SDK-01, SDK-02, SDK-04); Phase 12 rebuilds the query registry for oto namespaces/`.oto/` paths and wires graceful workflow consumption (SDK-03, SDK-05); Phase 13 migrates this repo to `.oto/` (DOG-01..03), depending on the SDK so the new location has working tooling. 8/8 requirements mapped, no orphans, no duplicates. Phases number from 11 to avoid collision with the leftover v0.1.0–v0.3.0 phase directories (highest existing folder is 10); existing phase folders are not renamed, moved, or deleted.
 - 2026-05-25: Phase 11 implementation completed across 4 plans. `scripts/install-smoke.cjs` now gates clean installs on `oto-sdk` executable linkage, structured `generate-slug` output, `.planning`-backed `roadmap.analyze` JSON, absence of `ERR_MODULE_NOT_FOUND`, and PATH-gated `OTO SDK ready` installer output. A local tarball clean-install smoke passed for the current commits; direct GitHub archive smoke awaits the commits being available remotely.
+- 2026-05-26: Phase 12 implementation completed across 4 plans. The SDK query registry now resolves through the `.oto` planning-root resolver, workflow-invoked raw `.planning` joins were swept, an enumerate+fixture `.oto` smoke harness covers registered workflow query keys, representative workflows enforce the tiered SDK fallback policy, and manual Task 4 parity confirmed repo-local `oto-sdk` and CJS `oto-tools.cjs` return equivalent state snapshots against a throwaway `.oto` project.
 
 ### Decisions
 
@@ -90,6 +91,9 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 - Plan 12-01 keeps planning-root resolution in sdk/src/planning-root.ts as a node-builtin-only leaf module and re-exports it from query helpers to avoid helpers/workstream-utils cycles.
 - Phase 12 Plan 02 preserved the resolver contract: unmarked .planning roots remain GSD-era and default to .oto; Plan 12-04 .oto fixture smoke is the new parity proof.
 - Preserve the Phase 12 resolver contract: unmarked .planning roots remain GSD-era and default to .oto.
+- Plan 12-04 verifies `.oto/` parity through an in-process enumerate+fixture smoke plus a manual cross-binary check, not by marking this repo's `.planning/STATE.md` as migrated.
+- SDK-05 fallback is tiered: read-only query calls degrade to sensible defaults, while structural/stateful calls hard-require `oto-sdk` and fail fast with one clear error.
+- D-04 confirms the CJS layer remains correct-by-design; no CJS rework is part of Phase 12.
 
 ### Execution Metrics
 
@@ -101,10 +105,11 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 | 11 | 04 | 4min | 2 | 3 |
 | 12 | 01 | 3min | 2 | 3 |
 | 12 | 02 | 18min | 3 | 22 |
+| 12 | 04 | 36m | 4 | 13 |
 
 ### Last Session
 
-- **Stopped At:** Completed 12-03-PLAN.md
+- **Stopped At:** Completed 12-04-PLAN.md
 - **Resume File:** None
 
 ### Quick Tasks Completed

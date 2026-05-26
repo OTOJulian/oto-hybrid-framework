@@ -13,7 +13,7 @@ Milestone: **SDK + Dogfood**. Make oto's own command surface work natively — s
 - [x] **SDK-02**: After installing oto, `oto-sdk` is callable on PATH — wired via the `package.json` bin entry (`oto-sdk` → `bin/oto-sdk.js`) and the installer's PATH-resolution check.
 - [x] **SDK-03**: The query registry answers every query key the ported workflows invoke (`init.*`, `agent-skills`, `commit`, `state.*`, `phases.*`) using oto namespaces and `.oto/` paths.
 - [x] **SDK-04**: A clean GitHub-archive install yields a working `oto-sdk` with no separate manual build step (SDK prebuilt/shipped inside the package).
-- [ ] **SDK-05**: Workflows that call `oto-sdk query …` consume its output when present; when `oto-sdk` is absent, read-only queries degrade to sensible defaults while structural/stateful operations fail fast with one clear, actionable error (tiered fallback).
+- [x] **SDK-05**: Workflows that call `oto-sdk query …` consume its output when present; when `oto-sdk` is absent, read-only queries degrade to sensible defaults while structural/stateful operations fail fast with one clear, actionable error (tiered fallback).
 
 ### Dogfood — planning root migration
 
@@ -47,8 +47,8 @@ Phases number from 11 (above the highest existing phase folder) to avoid collidi
 | SDK-01 | Phase 11 | Complete |
 | SDK-02 | Phase 11 | Complete |
 | SDK-04 | Phase 11 | Complete |
-| SDK-03 | Phase 12 | Pending |
-| SDK-05 | Phase 12 | Pending |
+| SDK-03 | Phase 12 | Complete |
+| SDK-05 | Phase 12 | Complete |
 | DOG-01 | Phase 13 | Pending |
 | DOG-02 | Phase 13 | Pending |
 | DOG-03 | Phase 13 | Pending |
