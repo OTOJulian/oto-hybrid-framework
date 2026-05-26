@@ -90,7 +90,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   1. `oto-sdk query` answers every key the ported workflows invoke — `init.*`, `agent-skills`, `commit`, `state.*`, and `phases.*` — using oto namespaces.
   2. Query keys resolve against `.oto/` paths (not GSD's `.planning/` or upstream namespaces).
   3. Workflows that call `oto-sdk query …` consume its structured output when the SDK is present.
-  4. The same workflows fall back to manual file operations and complete successfully when `oto-sdk` is absent.
+  4. When `oto-sdk` is absent, read-only queries degrade to sensible defaults and the workflow continues; structural/stateful operations fail fast with one clear, actionable error rather than silently completing.
 **Plans**: 4 plans across 4 waves (sequential — each consumes the prior wave's shared SDK resolver/dist)
   - Wave 1:
     - [x] 12-01-PLAN.md — Port planningRootName/hasMigratedPlanningRoot/hasPlanningRoot resolver into SDK helpers + unit tests (SDK-03)
