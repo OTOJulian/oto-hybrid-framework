@@ -1,11 +1,12 @@
 ---
 oto_state_version: 1.0
-milestone: v0.4.0
-milestone_name: SDK + Dogfood
-status: milestone_complete
-stopped_at: Plan 13-04 complete
-last_updated: "2026-05-26T15:58:30Z"
-last_activity: 2026-05-26 -- Plan 13-04 complete
+milestone: null
+milestone_name: null
+status: between_milestones
+last_shipped: v0.4.0
+last_shipped_date: 2026-05-26
+last_updated: "2026-05-26T17:10:37.665Z"
+last_activity: 2026-05-26
 progress:
   total_phases: 3
   completed_phases: 3
@@ -18,21 +19,21 @@ progress:
 
 ## Project Reference
 
-See: .oto/PROJECT.md (updated 2026-05-25)
+See: .oto/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** v0.4.0 phase execution complete; milestone closeout pending
+**Current focus:** Between milestones — v0.4.0 shipped 2026-05-26. Next: `/oto-new-milestone`.
 
 ## Current Position
 
-Phase: 13 (dogfood-migration-to-oto)
-Plan: Not started
-Status: Milestone complete
+Status: v0.4.0 complete, archived, and tagged. Between milestones.
 Last activity: 2026-05-26
 
 Archive (prior milestones):
 
+- `.oto/milestones/v0.4.0-ROADMAP.md`
+- `.oto/milestones/v0.4.0-REQUIREMENTS.md`
 - `.oto/milestones/v0.3.0-ROADMAP.md`
 - `.oto/milestones/v0.3.0-REQUIREMENTS.md`
 - `.oto/milestones/v0.2.0-ROADMAP.md`
@@ -49,15 +50,32 @@ Archive (prior milestones):
 - Phase 2 verification passed on 2026-05-18: `02-VERIFICATION.md` status `passed`, `02-REVIEW.md` status `clean`, `02-SECURITY.md` threats open `0`.
 - Phase 3 verification passed on 2026-05-18: `03-VERIFICATION.md` status `passed`, `03-REVIEW.md` status `clean`, `03-SECURITY.md` status `verified` with `threats_open: 0`.
 - `npm test` passed on 2026-05-18: 612 pass, 1 expected skip, 0 failures.
+- Phase 11 verification passed: `11-VERIFICATION.md` status `passed`, `11-REVIEW.md` status `clean`, `11-SECURITY.md` status `verified` with `threats_open: 0`.
+- Phase 12 verification passed on 2026-05-26 (backfilled at milestone close): `12-VERIFICATION.md` status `passed` (4/4 success criteria, SDK-03 + SDK-05), `12-REVIEW.md` status `fixed`, `12-SECURITY.md` status `verified` with `threats_open: 0` (14/14 threats closed, CR-01 path-traversal fix confirmed).
 - Phase 13 verification passed on 2026-05-26: `13-VERIFICATION.md` status `passed`, `13-REVIEW.md` status `clean`, `13-SECURITY.md` status `verified` with `threats_open: 0`, and `npm test` passed with 628 tests, 627 pass, 1 skip, 0 failures.
 
 ## Next Command
 
 ```bash
-/oto-complete-milestone
+/oto-new-milestone
 ```
 
-Complete the v0.4.0 milestone after reviewing the remaining Phase 12 tracking drift noted during Phase 13 closeout.
+Start the next milestone cycle (questioning → research → requirements → roadmap). Phase numbering must start above the highest existing phase folder (currently 13).
+
+## Deferred Items
+
+Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are pre-v0.4.0 historical noise carried in the open-artifact audit, plus one follow-up surfaced by Phase 12 verification:
+
+| Category | Item | Status | Note |
+|----------|------|--------|------|
+| debug | knowledge-base | unknown | Stale debug session from 2026-05-05 (pre-v0.4.0); has a `resolved/` subdir. Close or archive via `/oto-debug` cleanup. |
+| quick_task | 260505-bxx-port-gsds-codex-command-to-skill-adapter | committed | Already shipped (commit f56522c); audit flags it only because the quick-task dir lacks a STATE file. |
+| quick_task | 260505-cxx-exclude-runtime-worktrees-from-migrate | committed | Already shipped (commit 69f8969). |
+| quick_task | 260506-axx-expose-migrate-through-public-cli | committed | Already shipped (commit df7aba5). |
+| quick_task | 260506-bxx-skip-gitignored-migrate-artifacts | committed | Already shipped (commit 4230d59). |
+| context_question | Phase 02 (02-CONTEXT.md) | stale | v0.3.0-era discuss question left flagged; phase shipped and verified. |
+| context_question | Phase 11 (11-CONTEXT.md) | stale | Discuss questions answered during planning; phase shipped and verified. |
+| follow-up | init.cjs `.planning/` leak + milestone.complete marker | open | `oto/bin/lib/init.cjs:554` returns `task_dir: .planning/quick/…` (SDK handler correct); `oto-sdk query milestone.complete` rewrote the STATE.md frontmatter marker to `gsd_state_version` (restored manually). Both are ported CJS/SDK tooling still emitting GSD-era identifiers — fix via `/oto-quick`. |
 
 ## Accumulated Context
 

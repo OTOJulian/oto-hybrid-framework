@@ -96,6 +96,51 @@
 
 ---
 
+## Milestone: v0.4.0 - SDK + Dogfood
+
+**Shipped:** 2026-05-26
+**Phases:** 3 | **Plans:** 12 | **Requirements:** 8/8
+
+### What Was Built
+
+- `oto-sdk` query CLI: a faithful port of GSD's `sdk/` subpackage under an `oto-sdk` surface (committed prebuilt `dist/`, parent-package bin wiring, installer PATH-resolution), resolving `command not found: oto-sdk`.
+- Query registry rebuilt to resolve against `.oto/` paths via a dependency-free planning-root resolver mirroring the CJS contract, with ~40 raw `.planning/` join sites swept.
+- Tiered SDK-fallback policy — read-only queries degrade to defaults; structural/stateful operations fail fast with one clear error — enforced by `tests/sdk-fallback-policy.test.cjs`.
+- Dogfood migration: this repo's planning root moved `.planning/` → `.oto/` via a pure `git mv` (history preserved), a clean cutover with no dual-location shim, guarded by a `node:test`.
+
+### What Worked
+
+- The two inefficiencies the v0.3.0 retro flagged as most surface-leaky — the manual `oto-sdk` file-ops fallback (SDK-DEFER-01) and the `.planning/` vs `.oto/` split-brain (DOG-01) — were made the explicit v0.4.0 targets and both closed in one milestone.
+- Porting GSD's proven `sdk/` with a surface-only rebrand (internal identifiers untouched) kept the port faithful and the diff reviewable; committing prebuilt `dist/` kept the clean install build-free.
+- Sequencing SDK before dogfood (the new `.oto/` location had working tooling before the repo moved onto it) avoided a chicken-and-egg migration.
+- Backfilling Phase 12's missing VERIFICATION + SECURITY at close (parallel agents) brought all three phases to a uniform gate before the tag — and the security pass independently re-confirmed the CR-01 path-traversal fix.
+
+### What Was Inefficient
+
+- Phase 12 shipped without a VERIFICATION.md or SECURITY.md — the only phase in the project to do so — and the gap was caught only at milestone close. A phase at 100% plan completion still skipped its quality gate; nothing blocked the omission at the time.
+- ROADMAP Progress-table drift recurred (Phase 12 left as `1/4 Executing` while actually 4/4 complete) — the same class of drift v0.3.0 flagged. `oto-sdk query milestone.complete` does not reconcile the progress table, so it needs a manual pass.
+- The ported `milestone.complete` CLI emitted GSD-era output into the dogfooded repo: it rewrote the STATE.md frontmatter marker to `gsd_state_version` (silently un-migrating DOG-01 until restored) and mis-parsed three "what broke" lines as accomplishments. Both required manual repair.
+- LOC accounting is meaningless this milestone — the diff is dominated by the vendored SDK port and the rename, not authored code.
+
+### Patterns Established
+
+- **Backfill-at-close, don't waive:** if a phase shipped without its VERIFICATION/SECURITY, generate them before archiving (parallel verifier + security-auditor agents) rather than recording the omission as accepted debt.
+- **Port-with-surface-rebrand for vendored subpackages:** keep upstream internal identifiers, rebrand only the package/bin/user-facing surface, and ship prebuilt `dist/` so a clean install needs no build step.
+- **Dogfooding is the leak detector:** the moment the tool writes to its own repo, every place it still emits the old location (`gsd_state_version`, `.planning/quick/…`) surfaces immediately — treat post-close frontmatter/markers as needing a sanity pass.
+
+### Key Lessons
+
+1. "Trust artifacts over progress %" (a v0.1.0 lesson) bites again at the phase level: a phase can be 100% plans-complete and still be missing its verification gate. Audit the gate artifacts per phase, not the checkboxes — ideally before the phase is marked done, not at milestone close.
+2. Ported tooling carries upstream identifiers into its output; dogfooding makes that visible because the tool now writes to its own state. The `milestone.complete` marker regression and the `init.cjs:554` `.planning/` leak are the same bug class, deferred to a `/oto-quick`.
+3. A retro's "What Was Inefficient" list is a forward backlog: v0.3.0 named the SDK fallback and `.planning/` split-brain as the leakiest debt, and they became the next milestone's scope. Keep mining the retro for the next milestone's targets.
+
+### Cost Observations
+
+- The largest spend was the one-time SDK port; closeout repair (marker, accomplishments, progress table) recurred and remains manual.
+- Phase 12 verification + security backfill cost ~12 min of parallel agent time — cheap insurance for a uniform release gate, and it caught the documentation asymmetry the close would otherwise have shipped.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -105,6 +150,7 @@
 | v0.1.0 | 10 | Moved from architecture/rebrand discovery to a tagged installable release. |
 | v0.2.0 | 2 | Tight post-release command additions (`/oto-migrate`, `/oto-log`) with per-runtime parity. |
 | v0.3.0 | 3 | Surgical ADR-07 partial reversal — restored three agents and de-deferred two commands without re-inflating the agent footprint. |
+| v0.4.0 | 3 | Shipped the `oto-sdk` query CLI and dogfooded the repo onto `.oto/` — closed the two leakiest deferred items the v0.3.0 retro named. |
 
 ### Cumulative Quality
 
@@ -113,10 +159,12 @@
 | v0.1.0 | `npm test` passed: 418 pass, 1 expected skip, 0 fail | GitHub Release plus clean install UAT |
 | v0.2.0 | `npm test` passed: 533 pass, 1 expected skip, 0 fail | Milestone audit `passed`, threats_open 0 across phases |
 | v0.3.0 | `npm test` passed: 612 pass, 1 expected skip, 0 fail | Per-phase VERIFICATION + SECURITY + REVIEW clean; per-runtime parity smoke green |
+| v0.4.0 | `npm test` passed: 627 pass, 1 expected skip, 0 fail | Per-phase VERIFICATION + SECURITY + REVIEW clean (Phase 12 backfilled at close); clean-install `oto-sdk` smoke + cross-binary parity green |
 
 ### Top Lessons
 
-1. Real dogfood is a required release gate for this project.
-2. Archive and state files need a final sanity pass after helper-driven closeout.
+1. Real dogfood is a required release gate for this project — and dogfooding the framework's own state location is itself the best leak detector for ported tooling.
+2. Archive and state files need a final sanity pass after helper-driven closeout; the closeout CLI still emits GSD-era markers and mis-parses accomplishments.
 3. ADR reversal is cheap when the original ADR named the reactivation criterion — keep that pattern.
 4. Engine blind-spot regression-guard tests (ABSENCE assertions) outlast individual fixups.
+5. Per-phase verification/security is the gate, not plan completion — backfill it before archiving rather than waiving it, and enforce it before a phase is marked done.
