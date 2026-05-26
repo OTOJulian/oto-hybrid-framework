@@ -12,3 +12,9 @@ node_modules/
 .oto-sync/upstream/
 .oto-sync/rebranded/
 .oto-sync-conflicts/
+
+# macOS Finder metadata
+.DS_Store
+
+# Claude Code local worktrees / per-project state (not part of the shipped framework)
+.claude/

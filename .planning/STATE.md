@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
-status: verifying
+status: executing
 stopped_at: Phase 13 context gathered
-last_updated: "2026-05-26T04:25:54.792Z"
-last_activity: 2026-05-26
+last_updated: "2026-05-26T04:53:36.710Z"
+last_activity: 2026-05-26 -- Phase 13 execution started
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 8
+  total_plans: 12
   completed_plans: 8
-  percent: 100
+  percent: 67
 ---
 
 # Project State
@@ -22,14 +22,14 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 12 — Query registry + workflow consumption
+**Current focus:** Phase 13 — dogfood-migration-to-oto
 
 ## Current Position
 
-Phase: 12 (query-registry-workflow-consumption) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-05-26
+Phase: 13 (dogfood-migration-to-oto) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 13
+Last activity: 2026-05-26 -- Phase 13 execution started
 
 Archive (prior milestones):
 
