@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.4.0
 milestone_name: SDK + Dogfood
-status: ready_to_plan
-stopped_at: Completed 11-04-PLAN.md
-last_updated: "2026-05-25T22:29:42Z"
+status: planning
+stopped_at: Phase 12 context gathered
+last_updated: "2026-05-26T01:17:54.476Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 1
   total_plans: 4
   completed_plans: 4
-  percent: 67
+  percent: 100
 ---
 
 # Project State
@@ -99,8 +99,8 @@ Plan Phase 12: rebuild the query registry for oto namespaces/`.oto/` paths and w
 
 ### Last Session
 
-- **Stopped At:** Completed 11-04-PLAN.md
-- **Resume File:** None
+- **Stopped At:** Phase 12 context gathered
+- **Resume File:** .planning/phases/12-query-registry-workflow-consumption/12-CONTEXT.md
 
 ### Quick Tasks Completed
 
