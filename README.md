@@ -25,11 +25,11 @@ sync through a one-way upstream pull pipeline.
 ## Install
 
 ```sh
-npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/v0.1.0.tar.gz
+npm install -g https://github.com/OTOJulian/oto-hybrid-framework/archive/v0.4.1.tar.gz
 oto install --claude
 ```
 
-Replace `v0.1.0` with the latest release tag from the
+Replace `v0.4.1` with the latest release tag from the
 [Releases page](https://github.com/OTOJulian/oto-hybrid-framework/releases).
 For Codex or Gemini, use `oto install --codex` or `oto install --gemini`.
 To install all detected runtimes, use `oto install --all`.
@@ -42,9 +42,9 @@ To install all detected runtimes, use `oto install --all`.
 | Codex | best-effort | `oto install --codex` |
 | Gemini CLI | best-effort | `oto install --gemini` |
 
-Claude Code is the v0.1.0 happy path. Codex and Gemini have generated
-instruction files, runtime transforms, and smoke coverage, but they remain
-lower-priority personal runtimes until post-v0.1.0 hardening.
+Claude Code is the primary, daily-use happy path. Codex and Gemini have
+generated instruction files, runtime transforms, and smoke coverage, but they
+remain lower-priority personal runtimes pending further hardening.
 
 ## Commands
 
