@@ -50,7 +50,9 @@ lower-priority personal runtimes until post-v0.1.0 hardening.
 
 oto ships about 76 `/oto-*` commands. See
 [`oto/commands/INDEX.md`](oto/commands/INDEX.md) for the full generated command
-index with one-line descriptions.
+index with one-line descriptions, or the
+[command routing guide (PDF)](docs/oto-command-routing-guide.pdf) for a visual
+walkthrough of which command to reach for when.
 
 Common entry points:
 
@@ -68,6 +70,8 @@ Common entry points:
 
 ## Documentation
 
+- [`docs/oto-command-routing-guide.pdf`](docs/oto-command-routing-guide.pdf) - a
+  visual guide to which `/oto-*` command to use for a given task.
 - [`docs/upstream-sync.md`](docs/upstream-sync.md) - how to pull, rebrand, and
   merge upstream GSD/Superpowers changes.
 - [`docs/rebrand-engine.md`](docs/rebrand-engine.md) - how the rule-typed
