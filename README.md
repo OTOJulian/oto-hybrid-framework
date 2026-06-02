@@ -8,19 +8,69 @@ across Claude Code, Codex, and Gemini CLI.
 
 ## What is oto?
 
-oto is a personal-use framework that fuses two upstream projects into a single
-command surface:
+oto fuses two complementary open-source projects into a single command surface.
+Each upstream is strong at one half of the agentic-development problem, and they
+were built to do different jobs:
 
-- **[Get Shit Done (GSD)](https://github.com/gsd-build/get-shit-done)** -
-  spec-driven phase planning, execution waves, verification loops, stateful
-  project tracking, and release workflow discipline.
-- **[Superpowers](https://github.com/obra/superpowers)** - composable skills for
-  test-driven development, systematic debugging, verification before completion,
-  parallel agents, and git worktree workflows.
+- **[Get Shit Done (GSD)](https://github.com/gsd-build/get-shit-done)** is the
+  **workflow spine** — the *what* and *when*. It gives you spec-driven phase
+  planning, wave-based execution, verification loops, stateful project tracking
+  (roadmap → phases → plans → summaries), and release discipline. GSD is opinionated
+  about *the process of shipping a project*.
+- **[Superpowers](https://github.com/obra/superpowers)** is the **capability
+  library** — the *how*. It gives you composable, reusable skills: test-driven
+  development, systematic debugging, verification-before-completion, parallel
+  agent dispatch, and git-worktree isolation. Superpowers is opinionated about
+  *how each unit of work is done well*.
 
-Both upstreams' commands and skills are rebranded under `/oto-*` and
-`oto:<skill>` namespaces, installed to whichever runtime you use, and kept in
-sync through a one-way upstream pull pipeline.
+oto rebrands both under one `/oto-*` command and `oto:<skill>` namespace, installs
+them together to whichever runtime you use (Claude Code, Codex, Gemini), and keeps
+them current through a one-way upstream pull pipeline.
+
+### How they combine
+
+GSD provides the **outer loop** (plan the milestone, sequence the phases, execute,
+verify, ship). Superpowers provides the **inner loop** (how a single phase is
+actually implemented). In oto they interlock: a GSD `/oto-execute-phase` run can
+invoke Superpowers skills as part of its disciplined cycle — writing tests first
+(`test-driven-development`), debugging methodically (`systematic-debugging`),
+fanning out independent work to parallel agents, and refusing to mark work
+"done" until it's verified (`verification-before-completion`). The planning spine
+decides *what* to build and tracks state; the skills decide *how* each step is
+executed to a high standard.
+
+| Contribution | From GSD | From Superpowers |
+|--------------|----------|------------------|
+| Project structure | roadmap, phases, plans, persistent STATE | — |
+| Process discipline | execution waves, verification gates, release flow | verification-before-completion |
+| Implementation quality | — | TDD, systematic debugging |
+| Throughput | wave parallelization | parallel-agent dispatch, worktree isolation |
+| Memory & continuity | stateful tracking across sessions | skill-encoded reusable techniques |
+
+### Why oto instead of GSD or Superpowers on their own?
+
+Running both separately is the status quo this project was built to end:
+
+- **No framework-switching.** GSD and Superpowers are two installs with two
+  command vocabularies, two sets of agents/hooks, and overlapping conventions.
+  Mid-task you'd otherwise have to stop and decide *which framework am I in?* oto
+  collapses that into one consistent `/oto-*` surface — the core value is **stop
+  framework-switching**.
+- **The pieces actually compose.** Alone, GSD has the planning spine but lacks
+  the deep skill library; Superpowers has the skills but no project spine to
+  sequence and track them. Each is half a workflow. oto wires them so the skills
+  run *inside* the planning/execution loop instead of beside it.
+- **One install, three runtimes.** A single `oto install` lays both systems down
+  for Claude Code, Codex, or Gemini, with per-runtime instruction files, hook
+  config, and agent sandboxes generated for you — no manual symlinking or
+  per-runtime reconciliation.
+- **Stays current without merge pain.** A one-way upstream sync pulls and
+  rebrands new GSD/Superpowers work, so you get upstream improvements without
+  re-resolving naming conflicts by hand.
+
+oto adds no new agent capabilities of its own — its value is the *integration*:
+the union is more usable than the sum of two parts you'd otherwise juggle
+side by side.
 
 ## Install
 
