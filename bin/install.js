@@ -38,7 +38,7 @@ USAGE
   oto migrate [--dry-run | --apply]           convert GSD-era project artifacts
   oto log <title>|start|end|list|show|promote
       capture and manage ad-hoc work logs
-  oto doctor                              check oto-sdk PATH health and shim integrity
+  oto doctor                              check oto-sdk PATH health
 
 FLAGS
   --config-dir <dir>   target a config dir (single-runtime only)
