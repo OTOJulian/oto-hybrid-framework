@@ -53,8 +53,18 @@ function isManagedOtoSdkTarget(target, shimSrc) {
   try {
     const stat = fs.lstatSync(target);
     if (stat.isSymbolicLink()) {
+      // FIRST: try resolved comparison (works for live links).
       try {
         return fs.realpathSync(target) === fs.realpathSync(shimSrc);
+      } catch {
+        // realpathSync threw — likely a dangling link. Fall through to raw readlink check.
+      }
+      // SECOND: for dangling symlinks, inspect the raw link target textually.
+      // A dangling managed link has basename 'oto-sdk.js' (the shim filename).
+      // This covers the "repo was moved" case without false-positives on user-owned links.
+      try {
+        const rawTarget = fs.readlinkSync(target);
+        return path.basename(rawTarget) === 'oto-sdk.js';
       } catch {
         return false;
       }
@@ -477,4 +487,6 @@ module.exports = {
   isOtoSdkOnPath,
   trySelfLinkOtoSdk,
   wireOtoSdk,
+  isManagedOtoSdkTarget,
+  findOtoSdkOnPath,
 };
