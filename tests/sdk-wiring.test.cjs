@@ -10,6 +10,7 @@ const {
   isOtoSdkOnPath,
   trySelfLinkOtoSdk,
   wireOtoSdk,
+  isManagedOtoSdkTarget,
 } = require('../bin/lib/install.cjs');
 
 function withPath(value, fn) {
@@ -190,6 +191,82 @@ test('sdk wiring: trySelfLinkOtoSdk preserves non-executable unmanaged oto-sdk t
       const linked = trySelfLinkOtoSdk(shimSrc);
       assert.equal(linked, path.join(localBin, 'oto-sdk'));
       assert.equal(fs.readFileSync(unmanagedTarget, 'utf8'), 'user note or disabled shim\n');
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// --- New tests for Task 1: dangling-symlink handling in isManagedOtoSdkTarget ---
+
+test('sdk wiring: isManagedOtoSdkTarget: dangling symlink to oto-sdk.js basename returns true', { skip: process.platform === 'win32' }, () => {
+  const root = makeTempDir();
+  try {
+    const shimSrc = path.join(root, 'bin', 'oto-sdk.js');
+    fs.mkdirSync(path.dirname(shimSrc), { recursive: true });
+    fs.writeFileSync(shimSrc, '#!/usr/bin/env node\n');
+
+    // Create a dangling symlink whose target basename is oto-sdk.js
+    const target = path.join(root, 'oto-sdk-link');
+    const danglingPath = path.join(root, 'nonexistent', 'repo', 'bin', 'oto-sdk.js');
+    fs.symlinkSync(danglingPath, target);
+
+    // Confirm it is dangling (realpathSync should throw)
+    assert.throws(() => fs.realpathSync(target));
+
+    assert.equal(isManagedOtoSdkTarget(target, shimSrc), true);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('sdk wiring: isManagedOtoSdkTarget: dangling symlink to unrelated basename returns false', { skip: process.platform === 'win32' }, () => {
+  const root = makeTempDir();
+  try {
+    const shimSrc = path.join(root, 'bin', 'oto-sdk.js');
+    fs.mkdirSync(path.dirname(shimSrc), { recursive: true });
+    fs.writeFileSync(shimSrc, '#!/usr/bin/env node\n');
+
+    // Create a dangling symlink to an unrelated basename
+    const target = path.join(root, 'oto-sdk-link');
+    const danglingPath = path.join(root, 'nonexistent', 'path', 'some-other.js');
+    fs.symlinkSync(danglingPath, target);
+
+    // Confirm it is dangling
+    assert.throws(() => fs.realpathSync(target));
+
+    assert.equal(isManagedOtoSdkTarget(target, shimSrc), false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('sdk wiring: trySelfLinkOtoSdk heals a dangling managed symlink (basename oto-sdk.js)', { skip: process.platform === 'win32' }, () => {
+  const root = makeTempDir();
+  try {
+    const home = path.join(root, 'home');
+    const binDir = path.join(home, 'bin');
+    fs.mkdirSync(binDir, { recursive: true });
+
+    const shimSrc = path.join(root, 'new-repo', 'bin', 'oto-sdk.js');
+    fs.mkdirSync(path.dirname(shimSrc), { recursive: true });
+    fs.writeFileSync(shimSrc, '#!/usr/bin/env node\n');
+
+    // Create a dangling managed symlink (old repo path no longer exists)
+    const linkTarget = path.join(binDir, 'oto-sdk');
+    const oldShimPath = path.join(root, 'old-repo', 'bin', 'oto-sdk.js');
+    fs.symlinkSync(oldShimPath, linkTarget);
+
+    // Verify it's dangling before healing
+    assert.throws(() => fs.realpathSync(linkTarget));
+
+    withHomeAndPath(home, binDir, () => {
+      const linked = trySelfLinkOtoSdk(shimSrc);
+      assert.equal(linked, linkTarget, 'should return the healed link path');
+
+      // After healing, the link should resolve to shimSrc
+      const resolved = fs.readlinkSync(linked);
+      assert.equal(resolved, shimSrc, 'healed link must point at new shimSrc');
     });
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

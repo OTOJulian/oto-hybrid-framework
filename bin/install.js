@@ -38,6 +38,7 @@ USAGE
   oto migrate [--dry-run | --apply]           convert GSD-era project artifacts
   oto log <title>|start|end|list|show|promote
       capture and manage ad-hoc work logs
+  oto doctor                              check oto-sdk PATH health
 
 FLAGS
   --config-dir <dir>   target a config dir (single-runtime only)
@@ -75,6 +76,12 @@ async function main(argv) {
   if (argv[0] === 'log') {
     const log = require('../oto/bin/lib/log.cjs');
     const code = await log.main(argv.slice(1), process.cwd());
+    process.exit(code);
+  }
+
+  if (argv[0] === 'doctor') {
+    const doctor = require('./lib/doctor.cjs');
+    const code = await doctor.main(argv.slice(1), path.join(__dirname, '..'));
     process.exit(code);
   }
 
