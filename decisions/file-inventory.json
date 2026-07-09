@@ -5,6 +5,7 @@
     "gsd": "v1.38.5",
     "superpowers": "v5.0.7"
   },
+  "historical_note": "foundation-frameworks/ (vendored get-shit-done-main v1.38.5 + superpowers-main v5.0.7) was removed from the repository on 2026-07-09. This inventory reflects the original vendored snapshot at generation time (2026-04-27) and is retained as a historical record; the removed tree remains retrievable via git history. Not regenerable via scripts/gen-inventory.cjs post-removal (see the note at the top of that script).",
   "entries": [
     {
       "path": ".base64scanignore",

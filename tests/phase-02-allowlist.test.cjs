@@ -25,7 +25,7 @@ function tempPair(t, prefix) {
 
 test('engine copies nested LICENSE files byte-for-byte while rewriting other files', { timeout: 30000 }, async (t) => {
   const { src, out } = tempPair(t, 'oto-allowlist');
-  const licenseSrc = path.join(REPO_ROOT, 'foundation-frameworks', 'get-shit-done-main', 'LICENSE');
+  const licenseSrc = path.join(REPO_ROOT, 'tests', 'fixtures', 'rebrand-corpus', 'get-shit-done-main', 'LICENSE');
   fs.mkdirSync(path.join(src, 'get-shit-done-main'), { recursive: true });
   fs.copyFileSync(licenseSrc, path.join(src, 'get-shit-done-main', 'LICENSE'));
   fs.writeFileSync(path.join(src, 'foo.md'), 'run gsd now\n');

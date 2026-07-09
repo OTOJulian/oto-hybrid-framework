@@ -11,7 +11,7 @@ const { spawnSync } = require('node:child_process');
 const engine = require('../scripts/rebrand/lib/engine.cjs');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const FOUNDATION_GSD = path.join(REPO_ROOT, 'foundation-frameworks/get-shit-done-main');
+const FOUNDATION_GSD = path.join(REPO_ROOT, 'tests/fixtures/rebrand-corpus/get-shit-done-main');
 const REBRAND_REPORTS = [
   path.join(REPO_ROOT, 'reports/coverage-manifest.pre.json'),
   path.join(REPO_ROOT, 'reports/coverage-manifest.post.json'),
@@ -113,7 +113,7 @@ test("SYN-03: scripts/sync-upstream/rebrand.cjs produces byte-identical output t
   }
 });
 
-test('SYN-03: sync rebrand never modifies foundation-frameworks/', async (t) => {
+test('SYN-03: sync rebrand never modifies the fixture corpus source tree', async (t) => {
   await preserveFiles(t, REBRAND_REPORTS);
   const root = await makeTempRoot(t);
   const packagePath = path.join(FOUNDATION_GSD, 'package.json');

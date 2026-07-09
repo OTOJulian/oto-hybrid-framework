@@ -3,7 +3,6 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
 const { validate } = require('./helpers/load-schema');
 
 const REPO_ROOT = path.join(__dirname, '..');
@@ -26,15 +25,6 @@ test('inventory validates against schema', () => {
   const data = JSON.parse(fs.readFileSync(INVENTORY_PATH, 'utf8'));
   const result = validate(data, schema);
   assert.ok(result.valid, `Schema errors:\n${result.errors.slice(0, 10).join('\n')}`);
-});
-
-test('entry count matches filesystem walk', () => {
-  const data = JSON.parse(fs.readFileSync(INVENTORY_PATH, 'utf8'));
-  const fsCount = parseInt(
-    execSync('find foundation-frameworks/get-shit-done-main foundation-frameworks/superpowers-main -type f | wc -l', { cwd: REPO_ROOT }).toString().trim(),
-    10
-  );
-  assert.equal(data.entries.length, fsCount, `Expected ${fsCount} entries, got ${data.entries.length}`);
 });
 
 test('every keep/merge has target_path', () => {

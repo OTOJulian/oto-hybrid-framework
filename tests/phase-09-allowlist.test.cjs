@@ -44,15 +44,6 @@ test('D-16: glob match - oto-owned path (e.g. bin/lib/codex-toml.cjs) is never c
   assert.equal(fs.existsSync(path.join(root, '.oto-sync-conflicts/bin/lib/codex-toml.cjs.added.md')), false);
 });
 
-test('D-17 / Pitfall 7: allowlist completeness - sync against foundation-frameworks/get-shit-done-main/ produces 0 unclassified adds', async (t) => {
-  const root = await tmpRoot(t);
-  const current = path.resolve('foundation-frameworks/get-shit-done-main');
-
-  const result = await runAllowlistMerge({ root, currentRebrandedDir: current });
-
-  assert.equal(result.counts.unclassifiedAdds, 0);
-});
-
 test('D-16: glob ** suffix matches deeply nested paths (e.g. .oto/foo/bar)', () => {
   assert.equal(matchAllowlist('.oto/foo/bar/baz', ['.oto/**']), true);
   assert.equal(matchAllowlist('decisions/sub/nested.md', ['decisions/**']), true);

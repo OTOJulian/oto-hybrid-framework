@@ -7,7 +7,7 @@ const childProcess = require('node:child_process');
 const REPO_ROOT = path.join(__dirname, '..');
 
 test('CLI verify-roundtrip passes on the real upstream tree', { timeout: 60000 }, () => {
-  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'foundation-frameworks/'], {
+  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'tests/fixtures/rebrand-corpus/'], {
     cwd: REPO_ROOT,
     encoding: 'utf8'
   });
@@ -15,7 +15,7 @@ test('CLI verify-roundtrip passes on the real upstream tree', { timeout: 60000 }
 });
 
 test('CLI verify-roundtrip prints the engine summary line', { timeout: 60000 }, () => {
-  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'foundation-frameworks/'], {
+  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'tests/fixtures/rebrand-corpus/'], {
     cwd: REPO_ROOT,
     encoding: 'utf8'
   });

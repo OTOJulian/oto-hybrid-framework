@@ -75,7 +75,7 @@ module.exports = {
     contexts: 'oto/contexts',
   },
   // AGT-04/INST-02: Codex sandbox mode per retained agent.
-  // 11 entries pass through from upstream foundation-frameworks/get-shit-done-main/bin/install.js:26-38
+  // 11 entries pass through from upstream get-shit-done@v1.38.5 bin/install.js:26-38
   // (gsd-* renamed to oto-* per Phase 1 ADR-07). 12 additional entries inferred from
   // per-agent `tools:` field: agents with Write/Edit/Bash get workspace-write, pure-read agents
   // get read-only. Source-of-truth analysis: .oto/phases/04-core-workflows-agents-port/04-RESEARCH.md
@@ -171,7 +171,7 @@ module.exports = {
   // QUICK-260505-bxx-01: install commands as Codex skills under skills/oto-<name>/SKILL.md.
   // Codex 0.128.0 no longer reads commands/; it reads skills/. We wrap each command body
   // in a <codex_skill_adapter> header so $oto-<name> invocation works inside Codex.
-  // Ports foundation-frameworks/get-shit-done-main/bin/install.js:4051 (copyCommandsAsCodexSkills).
+  // Ports get-shit-done@v1.38.5 bin/install.js:4051 (copyCommandsAsCodexSkills).
   async installCommandsOverride(ctx) {
     const repoRoot = ctx.repoRoot;
     const configDir = ctx.configDir;

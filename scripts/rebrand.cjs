@@ -11,7 +11,7 @@ async function main() {
       'dry-run': { type: 'boolean', default: false },
       apply: { type: 'boolean', default: false },
       'verify-roundtrip': { type: 'boolean', default: false },
-      target: { type: 'string', default: 'foundation-frameworks/' },
+      target: { type: 'string' },
       out: { type: 'string', default: '.oto-rebrand-out/' },
       force: { type: 'boolean', default: false },
       owner: { type: 'string', default: 'OTOJulian' },
@@ -19,6 +19,15 @@ async function main() {
     },
     strict: true
   });
+
+  if (!values.target) {
+    console.error(
+      "engine error: --target is required (no default — foundation-frameworks/ was removed 2026-07-09). " +
+      "Pass --target <dir>: a fixture tree, a .oto-sync/upstream/{gsd,superpowers}/current snapshot, " +
+      "or an OTO_SYNC_CORPUS=1 pinned clone."
+    );
+    process.exit(5);
+  }
 
   let mode = 'dry-run';
   if (values.apply) mode = 'apply';

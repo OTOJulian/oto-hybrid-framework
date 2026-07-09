@@ -8,7 +8,7 @@ const crypto = require('node:crypto');
 const engine = require('../scripts/rebrand/lib/engine.cjs');
 
 const REPO_ROOT = path.join(__dirname, '..');
-const TARGET = path.join(REPO_ROOT, 'foundation-frameworks');
+const TARGET = path.join(REPO_ROOT, 'tests', 'fixtures', 'rebrand-corpus');
 
 function sha256OfDirTree(root) {
   const hash = crypto.createHash('sha256');

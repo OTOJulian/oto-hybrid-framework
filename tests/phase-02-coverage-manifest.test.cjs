@@ -16,7 +16,7 @@ function loadAllowlist() {
 }
 
 test('coverage manifest pre-run counts upstream gsd tokens', { timeout: 30000 }, async () => {
-  const pre = await manifest.buildPre(path.join(REPO_ROOT, 'foundation-frameworks'), loadAllowlist(), new Map());
+  const pre = await manifest.buildPre(path.join(REPO_ROOT, 'tests', 'fixtures', 'rebrand-corpus'), loadAllowlist(), new Map());
   const hasGsd = Object.values(pre.files).some((entry) => entry.counts.gsd > 0);
   assert.equal(hasGsd, true);
 });
@@ -24,7 +24,7 @@ test('coverage manifest pre-run counts upstream gsd tokens', { timeout: 30000 },
 test('coverage manifest post-run asserts zero outside allowlist on applied tree', { timeout: 30000 }, async (t) => {
   const out = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-coverage-'));
   t.after(() => fs.rmSync(out, { recursive: true, force: true }));
-  const result = await engine.run({ mode: 'apply', target: path.join(REPO_ROOT, 'foundation-frameworks'), out, owner: 'OTOJulian' });
+  const result = await engine.run({ mode: 'apply', target: path.join(REPO_ROOT, 'tests', 'fixtures', 'rebrand-corpus'), out, owner: 'OTOJulian' });
   assert.equal(result.exitCode, 0);
   const post = await manifest.buildPost(out, loadAllowlist(), new Map());
   assert.deepEqual(manifest.assertZeroOutsideAllowlist(post, loadAllowlist()), []);
