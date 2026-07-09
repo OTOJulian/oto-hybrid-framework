@@ -35,7 +35,7 @@ function scanFiles() {
   ].filter((file) => !EXCLUDE_FILE_BASENAMES.some((base) => file.endsWith(base)));
 }
 
-test('INS-01 / SC#4: grep -E "(--opencode|--kilo|--cursor|--windsurf|--antigravity|--augment|--trae|--qwen|--codebuddy|--cline|--copilot)" returns 0 hits in bin/ and scripts/install*.cjs (excluding foundation-frameworks/, tests/, decisions/, license files, this test file)', () => {
+test('INS-01 / SC#4: grep -E "(--opencode|--kilo|--cursor|--windsurf|--antigravity|--augment|--trae|--qwen|--codebuddy|--cline|--copilot)" returns 0 hits in bin/ and scripts/install*.cjs (excluding tests/, decisions/, license files, this test file)', () => {
   const prohibited = [
     '--opencode',
     '--kilo',

@@ -45,7 +45,7 @@ function waitForNoRoundtripLeftovers() {
 
 test('verify-roundtrip does not touch .oto-rebrand-out', { timeout: 60000 }, () => {
   const before = sha256OfDirTree(SCRATCH);
-  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'foundation-frameworks/'], {
+  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'tests/fixtures/rebrand-corpus/'], {
     cwd: REPO_ROOT,
     encoding: 'utf8'
   });
@@ -55,7 +55,7 @@ test('verify-roundtrip does not touch .oto-rebrand-out', { timeout: 60000 }, () 
 });
 
 test('verify-roundtrip cleans up temporary roundtrip directories', { timeout: 60000 }, () => {
-  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'foundation-frameworks/'], {
+  const result = childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--verify-roundtrip', '--target', 'tests/fixtures/rebrand-corpus/'], {
     cwd: REPO_ROOT,
     encoding: 'utf8'
   });

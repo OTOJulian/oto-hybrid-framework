@@ -8,7 +8,7 @@ const childProcess = require('node:child_process');
 const REPO_ROOT = path.join(__dirname, '..');
 
 function runDryrun() {
-  return childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--dry-run', '--target', 'foundation-frameworks/'], {
+  return childProcess.spawnSync(process.execPath, ['scripts/rebrand.cjs', '--dry-run', '--target', 'tests/fixtures/rebrand-corpus/'], {
     cwd: REPO_ROOT,
     encoding: 'utf8'
   });
@@ -53,7 +53,7 @@ test('CLI dry-run report includes projected target paths for inventory-backed fi
     'scripts/rebrand.cjs',
     '--dry-run',
     '--target',
-    'foundation-frameworks/get-shit-done-main',
+    'tests/fixtures/rebrand-corpus/get-shit-done-main',
     '--owner',
     'OTOJulian'
   ], {

@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const AUDIT_FILE = path.join(__dirname, '..', 'decisions', 'agent-audit.md');
-// Canonical 33 GSD agent names verified against foundation-frameworks/get-shit-done-main/agents/.
+// Canonical 33 GSD agent names verified against get-shit-done@v1.38.5 agents/.
 const GSD_AGENTS = [
   'gsd-advisor-researcher',
   'gsd-ai-researcher',

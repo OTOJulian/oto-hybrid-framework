@@ -10,7 +10,7 @@ test('engine prints one summary line for dry-run mode', { timeout: 30000 }, asyn
     chunks.push(String(line));
   };
   try {
-    const result = await engine.run({ mode: 'dry-run', target: 'foundation-frameworks/' });
+    const result = await engine.run({ mode: 'dry-run', target: 'tests/fixtures/rebrand-corpus/' });
     assert.equal(result.exitCode, 0);
   } finally {
     console.log = originalLog;
