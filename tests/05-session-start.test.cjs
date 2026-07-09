@@ -82,3 +82,25 @@ test('phase-05 session-start: project-state reminder escapes JSON control charac
   assert.ok(ctx.includes('\f'), 'form feed survives after JSON parse');
   assert.ok(ctx.includes('\b'), 'backspace survives after JSON parse');
 });
+
+test('phase-05 session-start: Codex branch shape (CODEX_HOME signal)', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-ss-'));
+  const r = spawnHook({ CODEX_HOME: '/tmp/fake-codex-home', CLAUDE_PLUGIN_ROOT: '', CURSOR_PLUGIN_ROOT: '', COPILOT_CLI: '' }, cwd);
+  assert.equal(r.status, 0, `hook failed: ${r.stderr}`);
+  const out = JSON.parse(r.stdout);
+  assert.ok(out.hookSpecificOutput, 'Codex branch must return hookSpecificOutput');
+  assert.equal(out.hookSpecificOutput.hookEventName, 'SessionStart');
+  assert.equal(typeof out.hookSpecificOutput.additionalContext, 'string');
+  assert.ok(!out.additionalContext, 'Codex branch must not also return a flat top-level additionalContext (Codex deny_unknown_fields would reject it)');
+  assert.equal(Object.keys(out).length, 1, 'top-level JSON must contain only hookSpecificOutput for Codex deny_unknown_fields compatibility');
+});
+
+test('phase-05 session-start: Claude branch takes priority when both CLAUDE_PLUGIN_ROOT and CODEX_HOME are set', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-ss-'));
+  const r = spawnHook({ CLAUDE_PLUGIN_ROOT: '/tmp/fake-claude', CODEX_HOME: '/tmp/fake-codex-home', COPILOT_CLI: '' }, cwd);
+  assert.equal(r.status, 0);
+  const out = JSON.parse(r.stdout);
+  assert.equal(out.hookSpecificOutput.hookEventName, 'SessionStart');
+  // Shape is identical to the plain Claude-branch test either way (both branches emit the same
+  // envelope), but this locks branch ORDER so a future edit can't silently swap precedence.
+});
