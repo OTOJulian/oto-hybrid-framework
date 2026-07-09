@@ -225,21 +225,27 @@ fi
 
 if [ "$COMMIT_STATUS" -eq 11 ]; then
   echo '{"decision":"block","reason":"Commit message must be provided with -m/--message so oto can validate Conventional Commits."}'
+  # Codex's PreToolUseCommandOutputWire only reads stderr as the block reason on exit 2 (stdout
+  # is not parsed in that case); this static literal echo carries the reason to Codex users.
+  echo "Commit message must be provided with -m/--message so oto can validate Conventional Commits." >&2
   exit 2
 fi
 
 if [ "$COMMIT_STATUS" -eq 12 ]; then
   echo '{"decision": "block", "reason": "Commit message must follow Conventional Commits: <type>(<scope>): <subject>. Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore. Subject must be <=72 chars, lowercase, imperative mood, no trailing period."}'
+  echo "Commit message must follow Conventional Commits: <type>(<scope>): <subject>. Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore. Subject must be <=72 chars, lowercase, imperative mood, no trailing period." >&2
   exit 2
 fi
 
 if [ "$COMMIT_STATUS" -eq 13 ]; then
   echo '{"decision": "block", "reason": "Commit subject must be 72 characters or less."}'
+  echo "Commit subject must be 72 characters or less." >&2
   exit 2
 fi
 
 if [ "$COMMIT_STATUS" -ne 0 ]; then
   echo '{"decision":"block","reason":"Unable to parse git commit command for validation."}'
+  echo "Unable to parse git commit command for validation." >&2
   exit 2
 fi
 
@@ -247,6 +253,7 @@ if [ "$COMMIT_STATUS" -eq 0 ]; then
 
   if [ ! -f .oto/STATE.md ]; then
     echo '{"decision":"block","reason":"Commit blocked: no active phase found in .oto/STATE.md."}'
+    echo "Commit blocked: no active phase found in .oto/STATE.md." >&2
     exit 2
   fi
 
@@ -259,11 +266,13 @@ if [ "$COMMIT_STATUS" -eq 0 ]; then
 
   if [ -z "$PHASE_LINE" ] || [[ "$PHASE_VALUE" == *"Not started"* ]] || [[ "$PHASE_VALUE" == *"none active"* ]] || [[ "$PHASE_VALUE" == *"COMPLETE"* ]] || [[ "$PHASE_VALUE" == *"completed"* ]]; then
     echo '{"decision":"block","reason":"Commit blocked: no active phase found in .oto/STATE.md."}'
+    echo "Commit blocked: no active phase found in .oto/STATE.md." >&2
     exit 2
   fi
 
   if [ -z "$PLAN_LINE" ] || [ -z "$PLAN_VALUE" ] || [ "$PLAN_VALUE" = "—" ] || [ "$PLAN_VALUE" = "-" ] || [ "$PLAN_VALUE" = "N/A" ] || [ "$PLAN_VALUE" = "Not started" ]; then
     echo '{"decision":"block","reason":"Commit blocked: no active plan found in .oto/STATE.md."}'
+    echo "Commit blocked: no active plan found in .oto/STATE.md." >&2
     exit 2
   fi
 fi
