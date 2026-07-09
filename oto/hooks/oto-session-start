@@ -87,15 +87,22 @@ if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
   printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
 elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
   printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
-elif [ -n "${CODEX_HOME:-}" ]; then
+elif [ "${1:-}" = "--codex" ] || [ -n "${CODEX_HOME:-}" ]; then
   # Codex 0.144.0's SessionStartCommandOutputWire is #[serde(deny_unknown_fields)] and requires
   # the same nested envelope Claude uses: {hookSpecificOutput:{hookEventName,additionalContext}}.
   # The flat {additionalContext} shape below (fallback branch) fails Codex's parser outright.
-  # CODEX_HOME is Codex's own config-dir env var (see bin/lib/runtime-codex.cjs configDirEnvVar).
-  # Accepted edge case: CODEX_HOME is a persistent env var a user could export globally in their
-  # shell profile, so this branch could fire under a non-Codex session (e.g. Gemini/Copilot)
-  # launched from such a shell. No reliable negative marker exists to guard against this; branch
-  # order here (Cursor -> Claude -> Codex -> fallback) is the best available precedence.
+  #
+  # PRIMARY signal: the `--codex` argv flag, registered by oto's installer on the SessionStart
+  # command line in ~/.codex/config.toml (see bin/lib/runtime-codex.cjs buildHookEntries). This
+  # is 100% deterministic because oto's installer fully owns that command string, and Codex does
+  # NOT inject CODEX_HOME (or any other env var) into hook processes — verified against the
+  # openai/codex source, where `command.envs(&handler.env)` only applies per-hook configured env.
+  #
+  # FALLBACK signal: CODEX_HOME, kept only for installs registered before the --codex flag
+  # existed. Accepted edge case (carried over from ks5): CODEX_HOME is a persistent env var a
+  # user could export globally in their shell profile, so this fallback could fire under a
+  # non-Codex session launched from such a shell — the argv flag makes this edge nearly moot for
+  # any install performed after this fix.
   printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
 else
   printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"

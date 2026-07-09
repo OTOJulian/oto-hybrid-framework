@@ -59,6 +59,10 @@ test('INS-05: mergeSettings preserves pre-existing config.toml content and appen
   assert.match(merged, /^\[\[hooks\.PreToolUse\.hooks\]\]$/m);
   assert.equal(/^\[\[hooks\]\]$/m.test(merged), false);
   assert.match(merged, /oto-validate-commit\.sh/);
+  // lln: SessionStart command carries the deterministic --codex argv flag;
+  // other hooks' command lines remain unflagged.
+  assert.match(merged, /command = "bash '.*oto-session-start' --codex"$/m);
+  assert.match(merged, /command = "bash '.*oto-validate-commit\.sh'"$/m);
 });
 
 test('INS-05: uninstall --codex round-trips clean (state file gone, AGENTS.md restored)', async (t) => {
