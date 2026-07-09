@@ -14,7 +14,7 @@ let tmpDir: string;
 
 beforeEach(async () => {
   tmpDir = await mkdtemp(join(tmpdir(), 'gsd-cfg-'));
-  await mkdir(join(tmpDir, '.planning'), { recursive: true });
+  await mkdir(join(tmpDir, '.oto'), { recursive: true });
 });
 
 afterEach(async () => {
@@ -27,7 +27,7 @@ describe('configGet', () => {
   it('returns raw config value for top-level key', async () => {
     const { configGet } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
     const result = await configGet(['model_profile'], tmpDir);
@@ -37,7 +37,7 @@ describe('configGet', () => {
   it('traverses dot-notation for nested keys', async () => {
     const { configGet } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ workflow: { auto_advance: true } }),
     );
     const result = await configGet(['workflow.auto_advance'], tmpDir);
@@ -52,7 +52,7 @@ describe('configGet', () => {
   it('throws GSDError for nonexistent key', async () => {
     const { configGet } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
     await expect(configGet(['nonexistent.key'], tmpDir)).rejects.toThrow(GSDError);
@@ -61,7 +61,7 @@ describe('configGet', () => {
   it('throws GSDError that maps to exit code 1 for missing key (bug #2544)', async () => {
     const { configGet } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
     try {
@@ -80,7 +80,7 @@ describe('configGet', () => {
   it('throws GSDError that maps to exit code 1 when traversing into non-object (bug #2544)', async () => {
     const { configGet } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
     try {
@@ -97,7 +97,7 @@ describe('configGet', () => {
     const { configGet } = await import('./config-query.js');
     // Write config with only model_profile -- no workflow section
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     // Accessing workflow should fail (not merged with defaults)
@@ -111,7 +111,7 @@ describe('resolveModel', () => {
   it('returns model and profile for known agent', async () => {
     const { resolveModel } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     const result = await resolveModel(['gsd-planner'], tmpDir);
@@ -124,7 +124,7 @@ describe('resolveModel', () => {
   it('returns unknown_agent flag for unknown agent', async () => {
     const { resolveModel } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     const result = await resolveModel(['unknown-agent'], tmpDir);
@@ -141,7 +141,7 @@ describe('resolveModel', () => {
   it('respects model_overrides from config', async () => {
     const { resolveModel } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({
         model_profile: 'balanced',
         model_overrides: { 'gsd-planner': 'openai/gpt-5.4' },
@@ -155,7 +155,7 @@ describe('resolveModel', () => {
   it('returns empty model when resolve_model_ids is omit', async () => {
     const { resolveModel } = await import('./config-query.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({
         model_profile: 'balanced',
         resolve_model_ids: 'omit',
@@ -166,17 +166,60 @@ describe('resolveModel', () => {
     expect(data).toHaveProperty('model', '');
   });
 
+  it('returns inherit for known agent when profile is inherit', async () => {
+    const { resolveModel } = await import('./config-query.js');
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({ model_profile: 'inherit' }),
+    );
+    const result = await resolveModel(['gsd-planner'], tmpDir);
+    const data = result.data as Record<string, unknown>;
+    expect(data).toHaveProperty('model', 'inherit');
+    expect(data).toHaveProperty('profile', 'inherit');
+    expect(data).not.toHaveProperty('unknown_agent');
+  });
+
+  it('inherit takes precedence over resolve_model_ids omit (init.quick regression)', async () => {
+    const { resolveModel } = await import('./config-query.js');
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({
+        model_profile: 'inherit',
+        resolve_model_ids: 'omit',
+      }),
+    );
+    const result = await resolveModel(['gsd-planner'], tmpDir);
+    const data = result.data as Record<string, unknown>;
+    expect(data).toHaveProperty('model', 'inherit');
+    expect(data).toHaveProperty('profile', 'inherit');
+  });
+
+  it('per-agent model_overrides still beat inherit profile', async () => {
+    const { resolveModel } = await import('./config-query.js');
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({
+        model_profile: 'inherit',
+        model_overrides: { 'gsd-planner': 'openai/gpt-5.4' },
+      }),
+    );
+    const result = await resolveModel(['gsd-planner'], tmpDir);
+    const data = result.data as Record<string, unknown>;
+    expect(data).toHaveProperty('model', 'openai/gpt-5.4');
+    expect(data).toHaveProperty('profile', 'inherit');
+  });
+
   it('resolveModel uses workstream config when --ws is specified', async () => {
     const { resolveModel } = await import('./config-query.js');
     // Root config: balanced profile → gsd-executor resolves to 'sonnet'
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     // Workstream config: quality profile → gsd-executor resolves to 'opus'
-    await mkdir(join(tmpDir, '.planning', 'workstreams', 'frontend'), { recursive: true });
+    await mkdir(join(tmpDir, '.oto', 'workstreams', 'frontend'), { recursive: true });
     await writeFile(
-      join(tmpDir, '.planning', 'workstreams', 'frontend', 'config.json'),
+      join(tmpDir, '.oto', 'workstreams', 'frontend', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
 
@@ -214,8 +257,21 @@ describe('MODEL_PROFILES', () => {
 // ─── VALID_PROFILES ─────────────────────────────────────────────────────────
 
 describe('VALID_PROFILES', () => {
-  it('contains the four profile names', async () => {
+  it('contains the five profile names including inherit (sync with model-profiles.cjs)', async () => {
     const { VALID_PROFILES } = await import('./config-query.js');
-    expect(VALID_PROFILES).toEqual(['quality', 'balanced', 'budget', 'adaptive']);
+    expect(VALID_PROFILES).toEqual(['quality', 'balanced', 'budget', 'adaptive', 'inherit']);
+  });
+});
+
+// ─── getAgentToModelMapForProfile ───────────────────────────────────────────
+
+describe('getAgentToModelMapForProfile', () => {
+  it("maps every agent to 'inherit' for the inherit profile (sync with model-profiles.cjs)", async () => {
+    const { getAgentToModelMapForProfile, MODEL_PROFILES } = await import('./config-query.js');
+    const map = getAgentToModelMapForProfile('inherit');
+    expect(Object.keys(map)).toHaveLength(Object.keys(MODEL_PROFILES).length);
+    for (const agent of Object.keys(MODEL_PROFILES)) {
+      expect(map[agent]).toBe('inherit');
+    }
   });
 });
