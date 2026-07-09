@@ -28,7 +28,7 @@ See: .oto/PROJECT.md (updated 2026-05-26)
 ## Current Position
 
 Status: v0.4.0 complete, archived, and tagged. Between milestones.
-Last activity: 2026-07-09 - Completed quick task 260709-lln: deterministic --codex argv detection for Codex hooks
+Last activity: 2026-07-09 - Completed quick task 260709-ob4: oto-sdk accepts 'inherit' model profile
 
 Archive (prior milestones):
 
@@ -144,3 +144,4 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 | 260709-j0v | Remove vendored foundation-frameworks/ snapshots: tests to fixtures + opt-in corpus clone, folder deleted | 2026-07-09 | cd8d211 | Verified | [260709-j0v-remove-vendored-foundation-frameworks-sn](./quick/260709-j0v-remove-vendored-foundation-frameworks-sn/) |
 | 260709-ks5 | Fix Codex SessionStart hook JSON schema mismatch (envelope output) + validate-commit stderr block reasons | 2026-07-09 | 8806d1e | Verified | [260709-ks5-fix-codex-sessionstart-hook-json-schema-](./quick/260709-ks5-fix-codex-sessionstart-hook-json-schema-/) |
 | 260709-lln | Make Codex SessionStart hook detection deterministic via installer-registered --codex argv flag | 2026-07-09 | 1fce5a7 |  | [260709-lln-make-codex-sessionstart-hook-detection-d](./quick/260709-lln-make-codex-sessionstart-hook-detection-d/) |
+| 260709-ob4 | Fix oto-sdk model profile validator to accept 'inherit' | 2026-07-09 | 0318f65 |  | [260709-ob4-fix-oto-sdk-model-profile-validator-to-a](./quick/260709-ob4-fix-oto-sdk-model-profile-validator-to-a/) |
