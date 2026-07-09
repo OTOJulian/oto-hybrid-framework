@@ -4,7 +4,7 @@
 /**
  * oto build-hooks: vm-validates JS hook sources and copies to oto/hooks/dist/.
  * Phase 5 retargets the build from the legacy top-level hooks/ tree to oto/hooks/.
- * Pattern derived from foundation-frameworks/get-shit-done-main/scripts/build-hooks.js.
+ * Pattern derived from get-shit-done@v1.38.5 scripts/build-hooks.js.
  */
 
 const fs = require('node:fs');

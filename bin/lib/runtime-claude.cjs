@@ -4,9 +4,9 @@ const path = require('node:path');
 
 // Hook-fleet contract. Keep in sync with 05-RESEARCH.md Pattern 2 / Code Example 1.
 // validate-commit: PreToolUse / Bash because exit-2 blocking needs PreToolUse
-// (foundation-frameworks/get-shit-done-main/bin/install.js:6798-6807).
+// (get-shit-done@v1.38.5 bin/install.js:6798-6807).
 // context-monitor: PostToolUse / broad matcher / timeout 10
-// (foundation-frameworks/get-shit-done-main/bin/install.js:6643-6651).
+// (get-shit-done@v1.38.5 bin/install.js:6643-6651).
 function shellQuote(value) {
   return "'" + String(value).replace(/'/g, "'\\''") + "'";
 }
@@ -48,7 +48,7 @@ function buildOtoEntries(configDir) {
 }
 
 // JSONC tolerance: strict JSON first, then strip comment-only lines and block comments.
-// Source: simplified port of foundation-frameworks/get-shit-done-main/bin/install.js:543-589.
+// Source: simplified port of get-shit-done@v1.38.5 bin/install.js:543-589.
 function parseSettings(text) {
   if (!text || !text.trim()) return {};
   try {

@@ -398,7 +398,14 @@ async function runRoundtrip(target, map, allowlist, inventoryByPath, owner) {
 async function run(opts = {}) {
   const started = Date.now();
   const mode = opts.mode || 'dry-run';
-  const target = path.resolve(opts.target || path.join(repoRoot(), 'foundation-frameworks'));
+  if (!opts.target) {
+    throw new Error(
+      "engine.run() requires an explicit 'target' (no default — foundation-frameworks/ was removed 2026-07-09). " +
+      "Pass --target <dir>: a fixture tree, a .oto-sync/upstream/{gsd,superpowers}/current snapshot, " +
+      "or an OTO_SYNC_CORPUS=1 pinned clone."
+    );
+  }
+  const target = path.resolve(opts.target);
   const owner = opts.owner || 'OTOJulian';
   let summary = { mode, files: 0, matches: 0, unclassified: 0, duration_ms: 0 };
   try {
