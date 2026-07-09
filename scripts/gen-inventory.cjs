@@ -1,4 +1,8 @@
 'use strict';
+// HISTORICAL / NON-RUNNABLE as of 2026-07-09: foundation-frameworks/ (this script's GSD_ROOT/SP_ROOT
+// source) was removed from the repository. This script is not invoked by any npm script or test —
+// it is kept only as a record of how decisions/file-inventory.json was originally generated. Running
+// it now will throw ENOENT. See decisions/file-inventory.json's historical_note field.
 const fs = require('node:fs');
 const path = require('node:path');
 const { validate } = require('../tests/helpers/load-schema');

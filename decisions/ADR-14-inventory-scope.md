@@ -1,5 +1,7 @@
 # ADR-14: Inventory scope and drop policy
 
+> **Historical note (2026-07-09):** `foundation-frameworks/` (the vendored snapshot this ADR describes) was removed from the repository on this date. The scope and rules below describe the inventory-generation decision as originally made; they are retained for historical record and are not re-applied by any live process. See `decisions/file-inventory.json`'s `historical_note` field.
+
 Status: Accepted
 Date: 2026-04-27
 Implements: D-23

@@ -2,6 +2,7 @@
 
 const os = require('node:os');
 const path = require('node:path');
+const fsp = require('node:fs/promises');
 const { spawnSync } = require('node:child_process');
 
 const GSD_REF = { name: 'gsd', url: 'https://github.com/gsd-build/get-shit-done', ref: 'v1.38.5' };
@@ -31,6 +32,11 @@ async function cloneCorpus(source = GSD_REF) {
   const destDir = path.join(os.tmpdir(), `oto-sync-corpus-${source.name}`);
   await pullUpstream({ name: source.name, url: source.url, ref: source.ref, destDir });
   const currentDir = path.join(destDir, 'current');
+  // Strip the clone's own .git metadata dir so currentDir matches the shape of the original
+  // vendored foundation-frameworks/ snapshot (a plain directory copy, never a git checkout).
+  // Without this, sync-merge.cjs's walkFiles (unlike rebrand/lib/walker.cjs's SCRATCH_DIRS)
+  // has no .git exclusion and flags every packed-object/ref file as an unclassified addition.
+  await fsp.rm(path.join(currentDir, '.git'), { recursive: true, force: true });
   cloneCache.set(source.name, currentDir);
   return currentDir;
 }
