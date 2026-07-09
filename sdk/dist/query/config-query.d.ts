@@ -22,10 +22,11 @@ import type { QueryHandler } from './utils.js';
  * Ported from get-shit-done/bin/lib/model-profiles.cjs.
  */
 export declare const MODEL_PROFILES: Record<string, Record<string, string>>;
-/** Valid model profile names. */
+/** Valid model profile names (matches `model-profiles.cjs` — tiers plus 'inherit'). */
 export declare const VALID_PROFILES: string[];
 /**
  * Flat map of agent name → model alias for one profile tier (matches `model-profiles.cjs`).
+ * The 'inherit' profile maps every agent to 'inherit' (no tier lookup).
  */
 export declare function getAgentToModelMapForProfile(normalizedProfile: string): Record<string, string>;
 /**
