@@ -23,7 +23,10 @@ function buildHookEntries(configDir) {
   const node = (rel) => `node ${shellQuote(hookPath(rel))}`;
   const bash = (rel) => `bash ${shellQuote(hookPath(rel))}`;
   return [
-    { type: 'SessionStart', command: bash('oto-session-start') },
+    // lln: --codex argv flag is the deterministic primary signal the hook cascade uses to
+    // detect Codex (see oto/hooks/oto-session-start); Codex does not inject CODEX_HOME into
+    // hook processes, so the command string oto owns here is the reliable channel.
+    { type: 'SessionStart', command: `${bash('oto-session-start')} --codex` },
     { type: 'PreToolUse', matcher: 'Write|Edit', command: node('oto-prompt-guard.js'), timeout: 5 },
     { type: 'PreToolUse', matcher: 'Bash', command: bash('oto-validate-commit.sh'), timeout: 5 },
     { type: 'PostToolUse', matcher: 'Read', command: node('oto-read-injection-scanner.js'), timeout: 5 },
