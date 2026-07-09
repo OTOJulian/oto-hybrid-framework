@@ -328,7 +328,8 @@ export const configNewProject = async (args, projectDir, workstream) => {
     // Build default config
     const defaults = {
         model_profile: 'balanced',
-        commit_docs: false,
+        // Matches CONFIG_DEFAULTS in oto/bin/lib/core.cjs and sdk/src/config.ts (both true)
+        commit_docs: true,
         parallelization: 1,
         search_gitignored: false,
         brave_search: hasBraveSearch,

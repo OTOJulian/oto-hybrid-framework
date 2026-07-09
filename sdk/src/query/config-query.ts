@@ -50,16 +50,21 @@ export const MODEL_PROFILES: Record<string, Record<string, string>> = {
   'gsd-doc-verifier': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
 };
 
-/** Valid model profile names. */
-export const VALID_PROFILES: string[] = Object.keys(MODEL_PROFILES['gsd-planner']);
+/** Valid model profile names (matches `model-profiles.cjs` — tiers plus 'inherit'). */
+export const VALID_PROFILES: string[] = [...Object.keys(MODEL_PROFILES['gsd-planner']), 'inherit'];
 
 /**
  * Flat map of agent name → model alias for one profile tier (matches `model-profiles.cjs`).
+ * The 'inherit' profile maps every agent to 'inherit' (no tier lookup).
  */
 export function getAgentToModelMapForProfile(normalizedProfile: string): Record<string, string> {
   const profile = VALID_PROFILES.includes(normalizedProfile) ? normalizedProfile : 'balanced';
   const agentToModelMap: Record<string, string> = {};
   for (const [agent, profileToModelMap] of Object.entries(MODEL_PROFILES)) {
+    if (profile === 'inherit') {
+      agentToModelMap[agent] = 'inherit';
+      continue;
+    }
     const mapped = profileToModelMap[profile] ?? profileToModelMap.balanced;
     agentToModelMap[agent] = mapped ?? 'sonnet';
   }
@@ -169,6 +174,18 @@ export const resolveModel: QueryHandler = async (args, projectDir, workstream) =
     return { data: result };
   }
 
+  // 'inherit' profile: every agent resolves to 'inherit' (model-profile-resolution.md:
+  // "If model_profile is 'inherit', all agents resolve to 'inherit'"). This intentionally
+  // precedes the resolve_model_ids 'omit' check — otherwise omit returns model '' and
+  // init.quick's getModelAlias ('' || 'sonnet') coerces inherit configs to 'sonnet'.
+  if (profile === 'inherit') {
+    const agentModels = MODEL_PROFILES[agentType];
+    const result = agentModels
+      ? { model: 'inherit', profile }
+      : { model: 'inherit', profile, unknown_agent: true };
+    return { data: result };
+  }
+
   // resolve_model_ids: "omit" -- return empty string
   const resolveModelIds = (config as Record<string, unknown>).resolve_model_ids;
   if (resolveModelIds === 'omit') {
@@ -183,10 +200,6 @@ export const resolveModel: QueryHandler = async (args, projectDir, workstream) =
   const agentModels = MODEL_PROFILES[agentType];
   if (!agentModels) {
     return { data: { model: 'sonnet', profile, unknown_agent: true } };
-  }
-
-  if (profile === 'inherit') {
-    return { data: { model: 'inherit', profile } };
   }
 
   const alias = agentModels[profile] || agentModels['balanced'] || 'sonnet';

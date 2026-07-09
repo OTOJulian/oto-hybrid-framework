@@ -17,7 +17,7 @@ let tmpDir: string;
 
 beforeEach(async () => {
   tmpDir = await mkdtemp(join(tmpdir(), 'gsd-cfgmut-'));
-  await mkdir(join(tmpDir, '.planning'), { recursive: true });
+  await mkdir(join(tmpDir, '.oto'), { recursive: true });
 });
 
 afterEach(async () => {
@@ -169,22 +169,22 @@ describe('parseConfigValue', () => {
 describe('atomicWriteConfig internals (via configSet)', () => {
   it('uses PID-qualified temp file name (D4)', async () => {
     const { configSet } = await import('./config-mutation.js');
-    await writeFile(join(tmpDir, '.planning', 'config.json'), '{}');
+    await writeFile(join(tmpDir, '.oto', 'config.json'), '{}');
 
     await configSet(['model_profile', 'quality'], tmpDir);
 
     // Verify the config was written (temp file should be cleaned up)
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('quality');
   });
 
   it('falls back to direct write when rename fails (D5)', async () => {
     const { configSet } = await import('./config-mutation.js');
-    await writeFile(join(tmpDir, '.planning', 'config.json'), '{}');
+    await writeFile(join(tmpDir, '.oto', 'config.json'), '{}');
 
     // Even if rename would fail, config-set should still succeed via fallback
     await configSet(['model_profile', 'balanced'], tmpDir);
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('balanced');
   });
 });
@@ -194,7 +194,7 @@ describe('atomicWriteConfig internals (via configSet)', () => {
 describe('configSet lock protection (D6)', () => {
   it('acquires and releases lock around read-modify-write', async () => {
     const { configSet } = await import('./config-mutation.js');
-    await writeFile(join(tmpDir, '.planning', 'config.json'), '{}');
+    await writeFile(join(tmpDir, '.oto', 'config.json'), '{}');
 
     // Run two concurrent config-set operations — both should succeed without corruption
     const [r1, r2] = await Promise.all([
@@ -205,7 +205,7 @@ describe('configSet lock protection (D6)', () => {
     expect((r2.data as { updated: boolean }).updated).toBe(true);
 
     // Both values should be present (no lost updates)
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.commit_docs).toBe(true);
     expect(raw.model_profile).toBe('quality');
   });
@@ -216,7 +216,7 @@ describe('configSet lock protection (D6)', () => {
 describe('configSet context validation (D8)', () => {
   it('rejects invalid context values', async () => {
     const { configSet } = await import('./config-mutation.js');
-    await writeFile(join(tmpDir, '.planning', 'config.json'), '{}');
+    await writeFile(join(tmpDir, '.oto', 'config.json'), '{}');
 
     await expect(configSet(['context', 'invalid'], tmpDir)).rejects.toThrow(/Invalid context value/);
   });
@@ -225,7 +225,7 @@ describe('configSet context validation (D8)', () => {
     const { configSet } = await import('./config-mutation.js');
 
     for (const ctx of ['dev', 'research', 'review']) {
-      await writeFile(join(tmpDir, '.planning', 'config.json'), '{}');
+      await writeFile(join(tmpDir, '.oto', 'config.json'), '{}');
       const result = await configSet(['context', ctx], tmpDir);
       expect((result.data as { updated: boolean }).updated).toBe(true);
     }
@@ -240,7 +240,7 @@ describe('configNewProject global defaults (D11)', () => {
     const result = await configNewProject([], tmpDir);
     expect((result.data as { created: boolean }).created).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('balanced');
   });
 });
@@ -280,7 +280,7 @@ describe('configNewProject nested globalDefaults merging (fix #2673)', () => {
     const result = await configNewProject([], tmpDir);
     expect((result.data as { created: boolean }).created).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     // Nested workflow keys from globalDefaults must survive
     expect(raw.workflow.auto_advance).toBe(true);
     expect(raw.workflow.discuss_mode).toBe('skip');
@@ -305,7 +305,7 @@ describe('configNewProject nested globalDefaults merging (fix #2673)', () => {
     const result = await configNewProject([choices], tmpDir);
     expect((result.data as { created: boolean }).created).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     // userChoices must win over globalDefaults
     expect(raw.workflow.auto_advance).toBe(false);
   });
@@ -324,7 +324,7 @@ describe('configNewProject nested globalDefaults merging (fix #2673)', () => {
     const result = await configNewProject([], tmpDir);
     expect((result.data as { created: boolean }).created).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.hooks.context_warnings).toBe(false);
     expect(raw.agent_skills.my_skill).toBe(true);
     expect(raw.features.beta_feature).toBe(true);
@@ -337,7 +337,7 @@ describe('configSet', () => {
   it('writes value and round-trips through reading config.json', async () => {
     const { configSet } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     const result = await configSet(['model_profile', 'quality'], tmpDir);
@@ -348,14 +348,14 @@ describe('configSet', () => {
       previousValue: 'balanced',
     });
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('quality');
   });
 
   it('sets nested dot-notation keys', async () => {
     const { configSet } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ workflow: { research: true } }),
     );
     const result = await configSet(['workflow.auto_advance', 'true'], tmpDir);
@@ -365,7 +365,7 @@ describe('configSet', () => {
       value: true,
     });
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.workflow.auto_advance).toBe(true);
     expect(raw.workflow.research).toBe(true);
   });
@@ -373,7 +373,7 @@ describe('configSet', () => {
   it('rejects invalid key with GSDError', async () => {
     const { configSet } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({}),
     );
     await expect(configSet(['totally_bogus_key', 'value'], tmpDir)).rejects.toThrow(GSDError);
@@ -382,11 +382,11 @@ describe('configSet', () => {
   it('coerces values through parseConfigValue', async () => {
     const { configSet } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({}),
     );
     await configSet(['commit_docs', 'true'], tmpDir);
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.commit_docs).toBe(true);
   });
 });
@@ -397,30 +397,51 @@ describe('configSetModelProfile', () => {
   it('writes valid profile', async () => {
     const { configSetModelProfile } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     const result = await configSetModelProfile(['quality'], tmpDir);
     expect((result.data as { updated: boolean }).updated).toBe(true);
     expect((result.data as { profile: string }).profile).toBe('quality');
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('quality');
   });
 
   it('rejects invalid profile with GSDError', async () => {
     const { configSetModelProfile } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({}),
     );
     await expect(configSetModelProfile(['invalid_profile'], tmpDir)).rejects.toThrow(GSDError);
   });
 
+  it("accepts 'inherit' and maps every agent to inherit", async () => {
+    const { configSetModelProfile } = await import('./config-mutation.js');
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({ model_profile: 'balanced' }),
+    );
+    const result = await configSetModelProfile(['inherit'], tmpDir);
+    expect((result.data as { updated: boolean }).updated).toBe(true);
+    expect((result.data as { profile: string }).profile).toBe('inherit');
+
+    const agentToModelMap = (result.data as { agentToModelMap: Record<string, string> })
+      .agentToModelMap;
+    expect(Object.keys(agentToModelMap).length).toBeGreaterThan(0);
+    for (const model of Object.values(agentToModelMap)) {
+      expect(model).toBe('inherit');
+    }
+
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
+    expect(raw.model_profile).toBe('inherit');
+  });
+
   it('normalizes profile name to lowercase', async () => {
     const { configSetModelProfile } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({}),
     );
     const result = await configSetModelProfile(['Quality'], tmpDir);
@@ -436,7 +457,7 @@ describe('configNewProject', () => {
     const result = await configNewProject([], tmpDir);
     expect((result.data as { created: boolean }).created).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('balanced');
     expect(raw.commit_docs).toBe(true);
   });
@@ -447,7 +468,7 @@ describe('configNewProject', () => {
     const result = await configNewProject([choices], tmpDir);
     expect((result.data as { created: boolean }).created).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.model_profile).toBe('quality');
     expect(raw.commit_docs).toBe(true);
   });
@@ -455,7 +476,7 @@ describe('configNewProject', () => {
   it('does not overwrite existing config', async () => {
     const { configNewProject } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
     const result = await configNewProject([], tmpDir);
@@ -469,26 +490,26 @@ describe('configEnsureSection', () => {
   it('creates section if not present', async () => {
     const { configEnsureSection } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
     );
     const result = await configEnsureSection(['workflow'], tmpDir);
     expect((result.data as { ensured: boolean }).ensured).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.workflow).toEqual({});
   });
 
   it('is idempotent on existing section', async () => {
     const { configEnsureSection } = await import('./config-mutation.js');
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ workflow: { research: true } }),
     );
     const result = await configEnsureSection(['workflow'], tmpDir);
     expect((result.data as { ensured: boolean }).ensured).toBe(true);
 
-    const raw = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.workflow).toEqual({ research: true });
   });
 });

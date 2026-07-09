@@ -278,13 +278,13 @@ describe('validateConsistency', () => {
     await rm(tmpDir, { recursive: true, force: true });
   });
 
-  /** Helper: create a .planning directory structure */
+  /** Helper: create a .oto planning-root directory structure */
   async function createPlanning(opts: {
     roadmap?: string;
     phases?: Array<{ dir: string; plans?: string[]; summaries?: string[]; planContents?: Record<string, string> }>;
     config?: Record<string, unknown>;
   }): Promise<void> {
-    const planning = join(tmpDir, '.planning');
+    const planning = join(tmpDir, '.oto');
     await mkdir(planning, { recursive: true });
 
     if (opts.roadmap !== undefined) {
@@ -453,9 +453,9 @@ describe('validateHealth', () => {
     await rm(tmpDir, { recursive: true, force: true });
   });
 
-  /** Helper: create a healthy .planning directory structure */
+  /** Helper: create a healthy .oto planning-root directory structure */
   async function createHealthyPlanning(): Promise<void> {
-    const planning = join(tmpDir, '.planning');
+    const planning = join(tmpDir, '.oto');
     await mkdir(join(planning, 'phases', '01-foundation'), { recursive: true });
 
     await writeFile(join(planning, 'PROJECT.md'), '# Project\n\n## What This Is\n\nA project.\n\n## Core Value\n\nValue here.\n\n## Requirements\n\n- Req 1\n');
@@ -480,8 +480,8 @@ describe('validateHealth', () => {
     expect((data.warnings as unknown[]).length).toBe(0);
   });
 
-  it('returns broken with E001 when no .planning/ directory', async () => {
-    // tmpDir has no .planning/ — already the case
+  it('returns broken with E001 when no planning-root directory', async () => {
+    // tmpDir has no .oto/ — already the case
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -493,7 +493,7 @@ describe('validateHealth', () => {
   it('returns error E002 when PROJECT.md missing', async () => {
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'PROJECT.md'));
+    await unlink(join(tmpDir, '.oto', 'PROJECT.md'));
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -504,7 +504,7 @@ describe('validateHealth', () => {
   it('returns error E003 when ROADMAP.md missing', async () => {
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'ROADMAP.md'));
+    await unlink(join(tmpDir, '.oto', 'ROADMAP.md'));
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -515,7 +515,7 @@ describe('validateHealth', () => {
   it('returns error E004 when STATE.md missing (repairable)', async () => {
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'STATE.md'));
+    await unlink(join(tmpDir, '.oto', 'STATE.md'));
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -527,7 +527,7 @@ describe('validateHealth', () => {
 
   it('returns error E005 when config.json has invalid JSON (repairable)', async () => {
     await createHealthyPlanning();
-    await writeFile(join(tmpDir, '.planning', 'config.json'), '{invalid json!!!');
+    await writeFile(join(tmpDir, '.oto', 'config.json'), '{invalid json!!!');
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -540,7 +540,7 @@ describe('validateHealth', () => {
   it('returns warning W003 when config.json missing (repairable)', async () => {
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'config.json'));
+    await unlink(join(tmpDir, '.oto', 'config.json'));
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -556,7 +556,7 @@ describe('validateHealth', () => {
   // reference future phases (current milestone) and history phases (shipped
   // milestones) that no longer have a corresponding disk directory.
   it('does not emit W002 for roadmap-valid future or history phase refs (#2633)', async () => {
-    const planning = join(tmpDir, '.planning');
+    const planning = join(tmpDir, '.oto');
     await mkdir(join(planning, 'phases', '03-alpha'), { recursive: true });
     await mkdir(join(planning, 'phases', '04-beta'), { recursive: true });
 
@@ -595,7 +595,7 @@ describe('validateHealth', () => {
 
   it('returns warning W005 for bad phase directory naming', async () => {
     await createHealthyPlanning();
-    await mkdir(join(tmpDir, '.planning', 'phases', 'bad_name'), { recursive: true });
+    await mkdir(join(tmpDir, '.oto', 'phases', 'bad_name'), { recursive: true });
 
     const result = await validateHealth([], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -613,7 +613,7 @@ describe('validateHealth', () => {
 
   it('returns warning W008 when config.json missing workflow.nyquist_validation', async () => {
     await createHealthyPlanning();
-    await writeFile(join(tmpDir, '.planning', 'config.json'), JSON.stringify({
+    await writeFile(join(tmpDir, '.oto', 'config.json'), JSON.stringify({
       model_profile: 'balanced',
       workflow: { research: true },
     }, null, 2));
@@ -625,19 +625,19 @@ describe('validateHealth', () => {
   });
 
   it('derives status from errors (broken), warnings (degraded), none (healthy)', async () => {
-    // broken: no .planning/
+    // broken: no planning root
     const r1 = await validateHealth([], tmpDir);
     expect((r1.data as Record<string, unknown>).status).toBe('broken');
 
     // degraded: missing config.json (warning only, not error)
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'config.json'));
+    await unlink(join(tmpDir, '.oto', 'config.json'));
     const r2 = await validateHealth([], tmpDir);
     expect((r2.data as Record<string, unknown>).status).toBe('degraded');
 
     // healthy: all present
-    await writeFile(join(tmpDir, '.planning', 'config.json'), JSON.stringify({
+    await writeFile(join(tmpDir, '.oto', 'config.json'), JSON.stringify({
       model_profile: 'balanced',
       workflow: { nyquist_validation: true },
     }, null, 2));
@@ -650,7 +650,7 @@ describe('validateHealth', () => {
   it('--repair with missing config.json creates config.json with defaults', async () => {
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'config.json'));
+    await unlink(join(tmpDir, '.oto', 'config.json'));
 
     const result = await validateHealth(['--repair'], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -659,7 +659,7 @@ describe('validateHealth', () => {
     expect(repairs.some(r => r.action === 'createConfig' && r.success === true)).toBe(true);
 
     // Verify file was created
-    const config = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const config = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(config.model_profile).toBe('balanced');
     expect(config.workflow.nyquist_validation).toBe(true);
   });
@@ -667,7 +667,7 @@ describe('validateHealth', () => {
   it('--repair with missing STATE.md generates minimal STATE.md', async () => {
     await createHealthyPlanning();
     const { unlink } = await import('node:fs/promises');
-    await unlink(join(tmpDir, '.planning', 'STATE.md'));
+    await unlink(join(tmpDir, '.oto', 'STATE.md'));
 
     const result = await validateHealth(['--repair'], tmpDir);
     const data = result.data as Record<string, unknown>;
@@ -675,14 +675,14 @@ describe('validateHealth', () => {
     expect(repairs.some(r => r.action === 'regenerateState' && r.success === true)).toBe(true);
 
     // Verify file was created
-    const stateContent = await readFile(join(tmpDir, '.planning', 'STATE.md'), 'utf-8');
+    const stateContent = await readFile(join(tmpDir, '.oto', 'STATE.md'), 'utf-8');
     expect(stateContent).toContain('# Session State');
     expect(stateContent).toContain('regenerated by');
   });
 
   it('--repair with missing nyquist key adds workflow.nyquist_validation', async () => {
     await createHealthyPlanning();
-    await writeFile(join(tmpDir, '.planning', 'config.json'), JSON.stringify({
+    await writeFile(join(tmpDir, '.oto', 'config.json'), JSON.stringify({
       model_profile: 'balanced',
       workflow: { research: true },
     }, null, 2));
@@ -693,7 +693,7 @@ describe('validateHealth', () => {
     expect(repairs.some(r => r.action === 'addNyquistKey' && r.success === true)).toBe(true);
 
     // Verify key was added
-    const config = JSON.parse(await readFile(join(tmpDir, '.planning', 'config.json'), 'utf-8'));
+    const config = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(config.workflow.nyquist_validation).toBe(true);
   });
 });

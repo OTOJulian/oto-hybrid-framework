@@ -20,7 +20,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import { MODEL_PROFILES } from './config-query.js';
+import { MODEL_PROFILES, VALID_PROFILES } from './config-query.js';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { extractFrontmatter, parseMustHavesBlock } from './frontmatter.js';
 import { escapeRegex, normalizePhaseName, planningPaths, resolvePathUnderProject } from './helpers.js';
@@ -498,9 +498,9 @@ export const validateHealth: QueryHandler = async (args, projectDir, workstream)
     try {
       const raw = await readFile(configPath, 'utf-8');
       const parsed = JSON.parse(raw) as Record<string, unknown>;
-      const validProfiles = ['quality', 'balanced', 'budget', 'inherit'];
-      if (parsed.model_profile && !validProfiles.includes(parsed.model_profile as string)) {
-        addIssue('warning', 'W004', `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${validProfiles.join(', ')}`);
+      // Single source of truth: VALID_PROFILES from config-query.ts (adds 'adaptive', keeps 'inherit')
+      if (parsed.model_profile && !VALID_PROFILES.includes(parsed.model_profile as string)) {
+        addIssue('warning', 'W004', `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${VALID_PROFILES.join(', ')}`);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
