@@ -381,3 +381,33 @@ describe('USAGE', () => {
     expect(USAGE).toContain('Bootstrap from a PRD');
   });
 });
+
+// ─── Query result rendering ─────────────────────────────────────────────────
+
+describe('renderQueryOutput', () => {
+  it('uses a handler-provided raw display when no field is selected', async () => {
+    const cli = await import('./cli.js') as unknown as {
+      renderQueryOutput: (
+        result: { data: unknown; raw?: string },
+        output?: unknown,
+        pickField?: string,
+      ) => string;
+    };
+    const raw =
+      'Exa: disabled — no key detected\n' +
+      'Brave: disabled — no key detected\n' +
+      'Firecrawl: disabled — no key detected';
+
+    expect(cli.renderQueryOutput({ data: { integrations: [] }, raw })).toBe(raw);
+  });
+
+  it('keeps JSON rendering for ordinary structured query results', async () => {
+    const cli = await import('./cli.js') as unknown as {
+      renderQueryOutput: (result: { data: unknown; raw?: string }) => string;
+    };
+
+    expect(cli.renderQueryOutput({ data: { enabled: true } })).toBe(
+      JSON.stringify({ enabled: true }, null, 2),
+    );
+  });
+});
