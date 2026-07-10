@@ -5,6 +5,7 @@
  * Usage: oto-sdk run "<prompt>" [--project-dir <dir>] [--ws-port <port>]
  *                                [--model <model>] [--max-budget <n>]
  */
+import type { QueryResult } from './query/utils.js';
 export interface ParsedCliArgs {
     command: string | undefined;
     prompt: string | undefined;
@@ -42,5 +43,7 @@ export declare const USAGE: string;
  * Exported for testing.
  */
 export declare function resolveInitInput(args: ParsedCliArgs): Promise<string>;
+/** Render a native query result, honoring a handler's masked human-readable display. */
+export declare function renderQueryOutput(result: QueryResult, output?: unknown, pickField?: string): string;
 export declare function main(argv?: string[]): Promise<void>;
 //# sourceMappingURL=cli.d.ts.map

@@ -17,6 +17,7 @@ import { CLITransport } from './cli-transport.js';
 import { WSTransport } from './ws-transport.js';
 import { InitRunner } from './init-runner.js';
 import { validateWorkstreamName } from './workstream-utils.js';
+import type { QueryResult } from './query/utils.js';
 
 // ─── Parsed CLI args ─────────────────────────────────────────────────────────
 
@@ -278,6 +279,16 @@ async function parseCliQueryJsonOutput(raw: string, projectDir: string): Promise
   return JSON.parse(jsonStr);
 }
 
+/** Render a native query result, honoring a handler's masked human-readable display. */
+export function renderQueryOutput(
+  result: QueryResult,
+  output: unknown = result.data,
+  pickField?: string,
+): string {
+  if (pickField === undefined && result.raw !== undefined) return result.raw;
+  return JSON.stringify(output, null, 2) ?? '';
+}
+
 /** Map registry-style dotted command tokens to gsd-tools.cjs argv (space-separated subcommands). */
 function dottedCommandToCjsArgv(normCmd: string, normArgs: string[]): string[] {
   if (normCmd.includes('.')) {
@@ -430,7 +441,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
           output = extractField(output, pickField);
         }
 
-        console.log(JSON.stringify(output, null, 2));
+        console.log(renderQueryOutput(result, output, pickField));
       }
     } catch (err) {
       if (err instanceof GSDError) {

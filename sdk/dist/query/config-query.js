@@ -19,6 +19,7 @@ import { readFile } from 'node:fs/promises';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { loadConfig } from '../config.js';
 import { planningPaths } from './helpers.js';
+import { migrateLegacyIntegrationKeys } from './secrets.js';
 // ─── MODEL_PROFILES ─────────────────────────────────────────────────────────
 /**
  * Mapping of GSD agent type to model alias for each profile tier.
@@ -82,6 +83,11 @@ export const configGet = async (args, projectDir, workstream) => {
         throw new GSDError('Usage: config-get <key.path>', ErrorClassification.Validation);
     }
     const paths = planningPaths(projectDir, workstream);
+    // Phase 14 (SECR-03): self-heal legacy integration key strings → ~/.oto keyfiles (D-01).
+    try {
+        await migrateLegacyIntegrationKeys(paths.config);
+    }
+    catch { /* never block reads */ }
     let raw;
     try {
         raw = await readFile(paths.config, 'utf-8');

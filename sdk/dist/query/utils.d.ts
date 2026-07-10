@@ -19,6 +19,8 @@
 /** Structured result returned by all query handlers. */
 export interface QueryResult<T = unknown> {
     data: T;
+    /** Optional human-readable CLI display; structured consumers still use data. */
+    raw?: string;
 }
 /** Signature for a query handler function. */
 export type QueryHandler<T = unknown> = (args: string[], projectDir: string, workstream?: string) => Promise<QueryResult<T>>;

@@ -9,6 +9,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { relPlanningPath } from './workstream-utils.js';
 import { planningRootName } from './query/helpers.js';
+import { migrateLegacyIntegrationKeys } from './query/secrets.js';
 // ─── Defaults ────────────────────────────────────────────────────────────────
 export const CONFIG_DEFAULTS = {
     model_profile: 'balanced',
@@ -90,6 +91,11 @@ async function loadUserDefaults() {
 export async function loadConfig(projectDir, workstream) {
     const configPath = join(projectDir, relPlanningPath(projectDir, workstream), 'config.json');
     const rootConfigPath = join(projectDir, planningRootName(projectDir), 'config.json');
+    // Phase 14 (SECR-03): self-heal legacy integration key strings → ~/.oto keyfiles (D-01).
+    try {
+        await migrateLegacyIntegrationKeys(configPath);
+    }
+    catch { /* never block reads */ }
     let raw;
     let projectConfigFound = false;
     try {

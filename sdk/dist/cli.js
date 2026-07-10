@@ -232,6 +232,12 @@ async function parseCliQueryJsonOutput(raw, projectDir) {
     }
     return JSON.parse(jsonStr);
 }
+/** Render a native query result, honoring a handler's masked human-readable display. */
+export function renderQueryOutput(result, output = result.data, pickField) {
+    if (pickField === undefined && result.raw !== undefined)
+        return result.raw;
+    return JSON.stringify(output, null, 2) ?? '';
+}
 /** Map registry-style dotted command tokens to gsd-tools.cjs argv (space-separated subcommands). */
 function dottedCommandToCjsArgv(normCmd, normArgs) {
     if (normCmd.includes('.')) {
@@ -352,7 +358,7 @@ export async function main(argv = process.argv.slice(2)) {
                 if (pickField) {
                     output = extractField(output, pickField);
                 }
-                console.log(JSON.stringify(output, null, 2));
+                console.log(renderQueryOutput(result, output, pickField));
             }
         }
         catch (err) {
