@@ -135,6 +135,14 @@ describe('createRegistry', () => {
     expect(registry.has('summary-extract')).toBe(true);
   });
 
+  it('registers the secret command surface as native mutation commands', () => {
+    const registry = createRegistry();
+    const commands = ['secret-set', 'secret-clear', 'secret-status'];
+
+    expect(commands.filter((command) => !registry.has(command))).toEqual([]);
+    expect(commands.filter((command) => !QUERY_MUTATION_COMMANDS.has(command))).toEqual([]);
+  });
+
   it('can dispatch generate-slug', async () => {
     const registry = createRegistry();
     const result = await registry.dispatch('generate-slug', ['My Phase'], '/tmp');
