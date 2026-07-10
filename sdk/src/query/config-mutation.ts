@@ -25,6 +25,7 @@ import { GSDError, ErrorClassification } from '../errors.js';
 import { VALID_PROFILES, getAgentToModelMapForProfile } from './config-query.js';
 import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
+import { validateIntegrationValue, warnIfNoKeyDetected } from './secrets.js';
 import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 import type { QueryHandler } from './utils.js';
 
@@ -204,6 +205,13 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
 
   const parsedValue = rawValue !== undefined ? parseConfigValue(rawValue) : rawValue;
 
+  // Phase 14 (SECR-02): integration flags are boolean-only; keys live in ~/.oto keyfiles.
+  const integrationCheck = validateIntegrationValue(keyPath, parsedValue);
+  if (!integrationCheck.ok) {
+    throw new GSDError(integrationCheck.message, ErrorClassification.Validation);
+  }
+  if (parsedValue === true) warnIfNoKeyDetected(keyPath);
+
   // D8: Context value validation (match CJS config.cjs:357-359)
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
   if (keyPath === 'context' && !VALID_CONTEXT_VALUES.includes(String(parsedValue))) {
@@ -353,10 +361,10 @@ export const configNewProject: QueryHandler = async (args, projectDir, workstrea
     // No global defaults — continue with hardcoded defaults only
   }
 
-  // Detect API key availability (boolean only, never store keys)
-  const hasBraveSearch = !!(process.env.BRAVE_API_KEY || existsSync(join(homeDir, '.gsd', 'brave_api_key')));
-  const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY || existsSync(join(homeDir, '.gsd', 'firecrawl_api_key')));
-  const hasExaSearch = !!(process.env.EXA_API_KEY || existsSync(join(homeDir, '.gsd', 'exa_api_key')));
+  // Detect API key availability (boolean only) — keyfiles live in ~/.oto (Phase 14, D-08)
+  const hasBraveSearch = !!(process.env.BRAVE_API_KEY || existsSync(join(homeDir, '.oto', 'brave_api_key')));
+  const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY || existsSync(join(homeDir, '.oto', 'firecrawl_api_key')));
+  const hasExaSearch = !!(process.env.EXA_API_KEY || existsSync(join(homeDir, '.oto', 'exa_api_key')));
 
   // Build default config
   const defaults: Record<string, unknown> = {

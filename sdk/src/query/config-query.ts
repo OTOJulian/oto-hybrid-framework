@@ -20,6 +20,7 @@ import { readFile } from 'node:fs/promises';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { loadConfig } from '../config.js';
 import { planningPaths } from './helpers.js';
+import { migrateLegacyIntegrationKeys } from './secrets.js';
 import type { QueryHandler } from './utils.js';
 
 // ─── MODEL_PROFILES ─────────────────────────────────────────────────────────
@@ -91,6 +92,8 @@ export const configGet: QueryHandler = async (args, projectDir, workstream) => {
   }
 
   const paths = planningPaths(projectDir, workstream);
+  // Phase 14 (SECR-03): self-heal legacy integration key strings → ~/.oto keyfiles (D-01).
+  try { await migrateLegacyIntegrationKeys(paths.config); } catch { /* never block reads */ }
   let raw: string;
   try {
     raw = await readFile(paths.config, 'utf-8');
