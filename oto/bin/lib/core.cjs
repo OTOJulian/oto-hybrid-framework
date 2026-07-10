@@ -337,6 +337,9 @@ function loadConfig(cwd) {
   const configPath = path.join(planningDir(cwd), 'config.json');
   const defaults = CONFIG_DEFAULTS;
 
+  // OTO Phase 14 (SECR-03): self-heal legacy integration key strings → ~/.oto keyfiles (D-01).
+  try { require('./secrets.cjs').migrateLegacyIntegrationKeys(configPath); } catch { /* never block config load */ }
+
   try {
     const raw = fs.readFileSync(configPath, 'utf-8');
     // `fileData` is the parsed content of the config.json file on disk — used

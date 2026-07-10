@@ -11,7 +11,13 @@ const {
   formatAgentToModelMapAsTable,
 } = require('./model-profiles.cjs');
 const { VALID_CONFIG_KEYS, isValidConfigKey } = require('./config-schema.cjs');
-const { isSecretKey, maskSecret } = require('./secrets.cjs');
+const {
+  isSecretKey,
+  maskSecret,
+  validateIntegrationValue,
+  warnIfNoKeyDetected,
+  migrateLegacyIntegrationKeys,
+} = require('./secrets.cjs');
 
 const CONFIG_KEY_SUGGESTIONS = {
   'workflow.nyquist_validation_enabled': 'workflow.nyquist_validation',
@@ -330,6 +336,13 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
     try { parsedValue = JSON.parse(value); } catch { /* keep as string */ }
   }
 
+  // OTO Phase 14 (SECR-02): integration flags are boolean-only; keys live in ~/.oto keyfiles.
+  if (isSecretKey(keyPath)) {
+    const validation = validateIntegrationValue(keyPath, parsedValue);
+    if (!validation.ok) error(validation.message); // D-05: hard reject, nothing written
+    if (parsedValue === true) warnIfNoKeyDetected(keyPath); // D-06: warn but allow
+  }
+
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
   if (keyPath === 'context' && !VALID_CONTEXT_VALUES.includes(String(parsedValue))) {
     error(`Invalid context value '${value}'. Valid values: ${VALID_CONTEXT_VALUES.join(', ')}`);
@@ -355,9 +368,7 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
 
   const setConfigValueResult = setConfigValue(cwd, keyPath, parsedValue);
 
-  // Mask secrets in both JSON and text output. The plaintext is written
-  // to config.json (that's where secrets live on disk); the CLI output
-  // must never echo it. See lib/secrets.cjs.
+  // Integration values are boolean-only as of Phase 14; masking retained defensively for any legacy value echo.
   if (isSecretKey(keyPath)) {
     const masked = maskSecret(parsedValue);
     const maskedPrev = setConfigValueResult.previousValue === undefined
@@ -378,6 +389,7 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
 
 function cmdConfigGet(cwd, keyPath, raw, defaultValue) {
   const configPath = path.join(planningDir(cwd), 'config.json');
+  migrateLegacyIntegrationKeys(configPath); // OTO Phase 14 (SECR-03): self-heal legacy key strings on read.
   const hasDefault = defaultValue !== undefined;
 
   if (!keyPath) {
