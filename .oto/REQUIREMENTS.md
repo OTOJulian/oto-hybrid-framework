@@ -73,13 +73,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| _(populated by roadmap)_ | | |
+| SECR-01 | Phase 14 | Pending |
+| SECR-02 | Phase 14 | Pending |
+| SECR-03 | Phase 14 | Pending |
+| SECR-04 | Phase 14 | Pending |
+| MCP-01 | Phase 15 | Pending |
+| MCP-02 | Phase 15 | Pending |
+| MCP-03 | Phase 15 | Pending |
+| MCP-04 | Phase 15 | Pending |
+| MCP-05 | Phase 15 | Pending |
+| MCP-06 | Phase 15 | Pending |
+| MCP-07 | Phase 15 | Pending |
+| MCP-08 | Phase 15 | Pending |
+| MCP-09 | Phase 15 | Pending |
+| HARD-02 | Phase 15 | Pending |
+| GUID-01 | Phase 16 | Pending |
+| GUID-02 | Phase 16 | Pending |
+| GUID-03 | Phase 16 | Pending |
+| GUID-04 | Phase 16 | Pending |
+| GUID-05 | Phase 16 | Pending |
+| HARD-01 | Phase 16 | Pending |
+| HARD-03 | Phase 16 | Pending |
+| HARD-04 | Phase 16 | Pending |
+| HARD-05 | Phase 16 | Pending |
 
 **Coverage:**
 - v0.5.0 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23 ⚠️
+- Mapped to phases: 23
+- Unmapped: 0 ✓
+
+Mapping note: HARD-02 lands in Phase 15 — its adapter merge/unmerge round-trip family tests Phase 15 code and is the hard gate against Codex TOML corruption; the boolean-validation and no-plaintext-guard families are written alongside Phase 14's code and confirmed complete under HARD-02 in Phase 15.
 
 ---
 *Requirements defined: 2026-07-10*
-*Last updated: 2026-07-10 after initial definition*
+*Last updated: 2026-07-10 — traceability populated by v0.5.0 roadmap (phases 14-16)*
