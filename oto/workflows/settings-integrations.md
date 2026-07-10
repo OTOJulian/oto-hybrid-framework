@@ -1,9 +1,11 @@
 <purpose>
 Interactive configuration of third-party integrations for OTO — search API keys
 (Brave / Firecrawl / Exa), code-review CLI routing (`review.models.<cli>`), and
-agent-skill injection (`agent_skills.<agent-type>`). Writes to
-`.oto/config.json` via `oto-sdk`/`oto-tools` so unrelated keys are
-preserved, never clobbered.
+agent-skill injection (`agent_skills.<agent-type>`). Search API keys are stored
+in `~/.oto/<integration>_api_key` (mode 0600) via `oto-sdk query secret-*`
+commands; `.oto/config.json` holds only their boolean enable flags. Review-model
+routing and agent-skill injection still write `.oto/config.json` via
+`oto-sdk query config-set`, preserving unrelated keys.
 
 This command is deliberately separate from `/oto-settings` (workflow toggles)
 and any `/oto-settings-advanced` tuning surface. It exists because API keys and
@@ -11,21 +13,22 @@ cross-tool routing are *connectivity* concerns, not workflow or tuning knobs.
 </purpose>
 
 <security>
-**API keys are secrets.** They are written as plaintext to
-`.oto/config.json` — that is where secrets live on disk, and file
-permissions are the security boundary. The UI must never display, echo, or
-log the plaintext value. The workflow follows these rules:
+**API keys are secrets.** They live ONLY in
+`~/.oto/<integration>_api_key` (mode 0600) or their environment variables
+(`EXA_API_KEY`, `BRAVE_API_KEY`, `FIRECRAWL_API_KEY`). They are NEVER written
+to `.oto/config.json`: `exa_search`, `brave_search`, and `firecrawl` are
+boolean-only, and both config write paths hard-reject strings.
+
+- **Key entry is stdin/TTY-only.** For Set/Replace, direct the user to run
+  `! oto-sdk query secret-set <slug>` themselves. The key travels directly
+  from the terminal's hidden prompt to the process — never through argv, shell
+  history, the conversation transcript, or Claude's context. Claude must NEVER
+  ask for, receive, or echo a key value in chat.
 
 - **Masking convention: `****<last-4>`** (e.g. `sk-abc123def456` → `****f456`).
   Strings shorter than 8 characters render as `****` with no tail so a short
   secret does not leak a meaningful fraction of its bytes. Unset values render
   as `(unset)`.
-- **Plaintext is never echoed by AskUserQuestion descriptions, confirmation
-  tables, or any log line.** It is not written to any file under `.oto/`
-  other than `config.json` itself.
-- **`config-set` output is masked** for keys in the secret set
-  (`brave_search`, `firecrawl`, `exa_search`) — see
-  `oto/bin/lib/secrets.cjs`.
 - **Agent-type and CLI slug validation.** `agent_skills.<agent-type>` and
   `review.models.<cli>` keys are matched against `^[a-zA-Z0-9_-]+$`. Inputs
   containing path separators (`/`, `\`, `..`), whitespace, or shell
@@ -56,24 +59,27 @@ fi
 Store `$OTO_CONFIG_PATH`. Every subsequent read/write uses it.
 </step>
 
-<step name="read_current">
-Read the current config and compute a masked view for display. For each
-integration field, compute one of:
-
-- `(unset)` — field is null / missing
-- `****<last-4>` — secret field that is populated (plaintext never shown)
-- `<value>` — non-secret routing/skill string, shown as-is
+<step name="read_status">
+Read the current integration status through the secret-aware command and read
+the non-secret local-search flag from config:
 
 ```bash
-BRAVE=$(oto-sdk query config-get brave_search --default null)
-FIRECRAWL=$(oto-sdk query config-get firecrawl --default null)
-EXA=$(oto-sdk query config-get exa_search --default null)
+oto-sdk query secret-status
 SEARCH_GITIGNORED=$(oto-sdk query config-get search_gitignored --default false)
 ```
 
-For each secret key (`brave_search`, `firecrawl`, `exa_search`) the displayed
-value is `****<last-4>` when set, never the raw string. Never echo the
-plaintext to stdout, stderr, or any log.
+Show the `secret-status` lines verbatim; they are already masked and include
+the boolean flag plus key source. Examples of the exact output shape:
+
+```text
+Exa: enabled — key from env EXA_API_KEY (****4f2a)
+Brave: enabled — key from ~/.oto/brave_api_key (****9c1e)
+Firecrawl: disabled — no key detected
+```
+
+When an environment variable wins over a keyfile, preserve the command's
+shadowed-keyfile note. Determine whether an integration is keyed from this
+reported source, never from the config flag alone.
 </step>
 
 <step name="section_1_search_integrations">
@@ -82,9 +88,10 @@ plaintext to stdout, stderr, or any log.
 `TEXT_MODE=true` and replace every `AskUserQuestion` call with a plain-text
 numbered list. Required for non-Claude runtimes.
 
-Ask the user what they want to do for each search API key. For keys that are
-already set, show `**** already set` and offer Leave / Replace / Clear. For
-unset keys, offer Skip / Set.
+Ask the user what they want to do for each search API key. Determine keyedness
+from `secret-status`: when a source is reported, show its masked value and
+offer Leave / Replace / Clear; when no key is detected, offer Skip / Set. A
+boolean config flag by itself does not mean a key is present.
 
 ```text
 AskUserQuestion([
@@ -94,12 +101,12 @@ AskUserQuestion([
     multiSelect: false,
     options: [
       // When already set:
-      { label: "Leave (**** already set)", description: "Keep current value" },
-      { label: "Replace", description: "Enter a new API key" },
-      { label: "Clear", description: "Remove the stored key" }
+      { label: "Leave (**** already set)", description: "Keep the detected key source" },
+      { label: "Replace", description: "Replace the key through a hidden terminal prompt" },
+      { label: "Clear", description: "Remove the stored keyfile and disable the flag" }
       // When unset:
       // { label: "Skip", description: "Leave unset" },
-      // { label: "Set", description: "Enter an API key" }
+      // { label: "Set", description: "Set a key through a hidden terminal prompt" }
     ]
   },
   {
@@ -126,21 +133,40 @@ AskUserQuestion([
 ])
 ```
 
-For each "Set" or "Replace", follow with a text-input prompt that asks for the
-key value. **The answer must not be echoed back** in subsequent question
-descriptions or confirmation text. Write the value via:
+For each "Set" or "Replace", NEVER ask for the key in chat and NEVER place it
+in a command argument. Tell the user to run the integration's command
+themselves using this exact prompt (substitute the selected slug):
 
-```bash
-oto-sdk query config-set brave_search "<value>"     # masked in output
-oto-sdk query config-set firecrawl "<value>"        # masked in output
-oto-sdk query config-set exa_search "<value>"       # masked in output
-oto-sdk query config-set search_gitignored true|false
+```text
+Run this yourself (the ! prefix runs it in your terminal; the key is
+entered at a hidden prompt and never appears in this conversation):
+
+  ! oto-sdk query secret-set <slug>
+
+Then reply "done" (or "skip") to continue.
 ```
 
-For "Clear", write `null`:
+Use the exact command for the selected integration:
+
+```text
+Brave:    ! oto-sdk query secret-set brave
+Firecrawl: ! oto-sdk query secret-set firecrawl
+Exa:      ! oto-sdk query secret-set exa
+```
+
+After the user replies `done`, run `oto-sdk query secret-status <slug>` and
+show its single masked line verbatim. After `skip`, leave the integration
+unchanged.
+
+For "Clear", run `oto-sdk query secret-clear <slug>` directly because no
+secret material is involved. Show the command's one-line result verbatim,
+including its `env still set — integration remains available` notice when an
+environment variable continues to provide the key.
+
+Write the non-secret local-search choice as before:
 
 ```bash
-oto-sdk query config-set brave_search null
+oto-sdk query config-set search_gitignored true|false
 ```
 </step>
 
@@ -227,7 +253,8 @@ Loop until "Done".
 </step>
 
 <step name="confirm">
-Display the masked confirmation table. **No plaintext API keys appear in this
+Run a final `oto-sdk query secret-status` and build the Search Integrations
+table only from those pre-masked lines. **No plaintext API keys appear in this
 output under any circumstance.**
 
 ```text
@@ -236,12 +263,13 @@ output under any circumstance.**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Search Integrations
-| Field              | Value             |
-|--------------------|-------------------|
-| brave_search       | ****<last-4>      |  (or "(unset)")
-| firecrawl          | ****<last-4>      |
-| exa_search         | ****<last-4>      |
-| search_gitignored  | true | false      |
+| Integration | Enabled | Key source                         | Key          |
+|-------------|---------|------------------------------------|--------------|
+| Exa         | true    | env EXA_API_KEY                    | ****4f2a     |
+| Brave       | true    | ~/.oto/brave_api_key               | ****9c1e     |
+| Firecrawl   | false   | —                                  | (unset)      |
+
+search_gitignored: true | false
 
 Code Review CLI Routing
 | CLI         | Command                              |
@@ -258,10 +286,10 @@ Agent Skills Injection
 | ...              | ...                       |
 
 Notes:
-- API keys are stored plaintext in .oto/config.json. The confirmation
-  table above never displays plaintext — keys appear as ****<last-4>.
-- Plaintext is not echoed back by this workflow, not written to any log,
-  and not displayed in error messages.
+- API keys live in ~/.oto/<integration>_api_key (mode 0600) or env vars —
+  never in .oto/config.json (boolean flags only).
+- Keys are entered via a hidden terminal prompt (secret-set), never through
+  this conversation, argv, or shell history; displays are always masked.
 
 Quick commands:
 - /oto-settings — workflow toggles and model profile
@@ -274,7 +302,8 @@ Quick commands:
 <success_criteria>
 - [ ] Current config read from `$OTO_CONFIG_PATH`
 - [ ] User presented with three sections: Search Integrations, Review CLI Routing, Agent Skills Injection
-- [ ] API keys written plaintext only to `config.json`; never echoed, never logged, never displayed
+- [ ] API keys written only to `~/.oto/<integration>_api_key` (0600) via secret-set stdin/TTY; config.json holds booleans only; nothing plaintext ever echoed, logged, or displayed
+- [ ] Set/Replace guidance uses the `! oto-sdk query secret-set` flow; Clear uses `secret-clear`
 - [ ] Masked confirmation table uses `****<last-4>` for set keys and `(unset)` for null
 - [ ] `review.models.<cli>` and `agent_skills.<agent-type>` keys validated against `[a-zA-Z0-9_-]+` before write
 - [ ] Config merge preserves all keys outside the three sections this workflow owns
