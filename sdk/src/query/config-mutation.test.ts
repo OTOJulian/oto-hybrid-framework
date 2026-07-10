@@ -5,8 +5,8 @@
  * configSetModelProfile, configNewProject, configEnsureSection.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, writeFile, readFile, mkdir, rm } from 'node:fs/promises';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { mkdtemp, writeFile, readFile, mkdir, rm, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { GSDError } from '../errors.js';
@@ -21,6 +21,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
   await rm(tmpDir, { recursive: true, force: true });
 });
 
@@ -388,6 +390,137 @@ describe('configSet', () => {
     await configSet(['commit_docs', 'true'], tmpDir);
     const raw = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf-8'));
     expect(raw.commit_docs).toBe(true);
+  });
+});
+
+// ─── Phase 14 integration secret validation ───────────────────────────────
+
+describe('configSet integration flags (Phase 14, SECR-02)', () => {
+  it('rejects string values for all integration flags without changing config.json', async () => {
+    const { configSet } = await import('./config-mutation.js');
+    const configPath = join(tmpDir, '.oto', 'config.json');
+    const original = {
+      exa_search: false,
+      brave_search: false,
+      firecrawl: false,
+      commit_docs: true,
+    };
+    await writeFile(configPath, JSON.stringify(original));
+
+    for (const key of ['exa_search', 'brave_search', 'firecrawl']) {
+      await expect(configSet([key, 'sk-test123456789'], tmpDir)).rejects.toMatchObject({
+        classification: 'validation',
+        message: expect.stringContaining('booleans only'),
+      });
+      await expect(configSet([key, 'sk-test123456789'], tmpDir)).rejects.toThrow('secret-set');
+      expect(JSON.parse(await readFile(configPath, 'utf8'))).toEqual(original);
+    }
+  });
+
+  it('warns but allows boolean true when no key source is detected', async () => {
+    const { configSet } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home');
+    await mkdir(fakeHome, { recursive: true });
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const configPath = join(tmpDir, '.oto', 'config.json');
+    await writeFile(configPath, JSON.stringify({ exa_search: false }));
+
+    await expect(configSet(['exa_search', 'true'], tmpDir)).resolves.toMatchObject({
+      data: { value: true },
+    });
+
+    expect(JSON.parse(await readFile(configPath, 'utf8')).exa_search).toBe(true);
+    expect(stderr.mock.calls.map(([chunk]) => String(chunk)).join('')).toContain(
+      'no Exa API key detected (EXA_API_KEY or ~/.oto/exa_api_key)',
+    );
+  });
+});
+
+// ─── Phase 14 canonical keyfile detection ─────────────────────────────────
+
+describe('configNewProject integration keyfile detection (Phase 14, D-08)', () => {
+  it('enables Exa when ~/.oto/exa_api_key exists', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-oto');
+    await mkdir(join(fakeHome, '.oto'), { recursive: true });
+    await writeFile(join(fakeHome, '.oto', 'exa_api_key'), 'exa-key\n');
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+
+    await configNewProject([], tmpDir);
+
+    const config = JSON.parse(await readFile(join(tmpDir, '.oto', 'config.json'), 'utf8'));
+    expect(config.exa_search).toBe(true);
+  });
+
+  it('ignores a foreign ~/.gsd/exa_api_key with no fallback', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-gsd');
+    const projectDir = join(tmpDir, 'foreign-key-project');
+    await mkdir(join(fakeHome, '.gsd'), { recursive: true });
+    await writeFile(join(fakeHome, '.gsd', 'exa_api_key'), 'foreign-key\n');
+    await mkdir(join(projectDir, '.oto'), { recursive: true });
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+
+    await configNewProject([], projectDir);
+
+    const config = JSON.parse(await readFile(join(projectDir, '.oto', 'config.json'), 'utf8'));
+    expect(config.exa_search).toBe(false);
+  });
+});
+
+// ─── Phase 14 read-time legacy migration ──────────────────────────────────
+
+describe('SDK config read migration (Phase 14, SECR-03)', () => {
+  it('configGet migrates a legacy integration string before returning the value', async () => {
+    const { configGet } = await import('./config-query.js');
+    const fakeHome = join(tmpDir, 'home-config-get');
+    await mkdir(fakeHome, { recursive: true });
+    vi.stubEnv('HOME', fakeHome);
+    const plaintext = 'exa-legacy-config-get-1234';
+    const configPath = join(tmpDir, '.oto', 'config.json');
+    await writeFile(configPath, JSON.stringify({ exa_search: plaintext }));
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    await expect(configGet(['exa_search'], tmpDir)).resolves.toEqual({ data: true });
+
+    const keyfile = join(fakeHome, '.oto', 'exa_api_key');
+    expect(await readFile(keyfile, 'utf8')).toBe(`${plaintext}\n`);
+    expect((await stat(keyfile)).mode & 0o777).toBe(0o600);
+    expect(JSON.parse(await readFile(configPath, 'utf8')).exa_search).toBe(true);
+    expect(stderr.mock.calls.map(([chunk]) => String(chunk)).join('')).not.toContain(plaintext);
+  });
+
+  it('loadConfig migrates legacy strings while retaining missing-config defaults', async () => {
+    const { loadConfig } = await import('../config.js');
+    const fakeHome = join(tmpDir, 'home-load-config');
+    await mkdir(fakeHome, { recursive: true });
+    vi.stubEnv('HOME', fakeHome);
+    const plaintext = 'exa-legacy-load-config-5678';
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({ exa_search: plaintext }),
+    );
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    await expect(loadConfig(tmpDir)).resolves.toMatchObject({ exa_search: true });
+    const keyfile = join(fakeHome, '.oto', 'exa_api_key');
+    expect(await readFile(keyfile, 'utf8')).toBe(`${plaintext}\n`);
+    expect((await stat(keyfile)).mode & 0o777).toBe(0o600);
+    expect(stderr.mock.calls.map(([chunk]) => String(chunk)).join('')).not.toContain(plaintext);
+
+    const noConfigProject = join(tmpDir, 'no-config-project');
+    await mkdir(noConfigProject, { recursive: true });
+    await expect(loadConfig(noConfigProject)).resolves.toMatchObject({ exa_search: false });
   });
 });
 
