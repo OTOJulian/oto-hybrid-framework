@@ -1,219 +1,157 @@
-# Project Research Summary
+# Research Summary — v0.5.0 Exa Search Integration
 
-**Project:** oto — hybrid AI-CLI framework (GSD + Superpowers under unified `/oto-*` surface)
-**Domain:** Personal multi-runtime AI coding-CLI framework, distributed via public GitHub
-**Researched:** 2026-04-27
-**Confidence:** HIGH (every recommendation grounded in direct inspection of `foundation-frameworks/get-shit-done-main/` v1.38.5 and `foundation-frameworks/superpowers-main/` v5.0.7)
+**Project:** oto (hybrid AI-CLI framework)
+**Domain:** Optional MCP-backed semantic search across a multi-runtime installer (Claude Code / Codex / Gemini CLI)
+**Researched:** 2026-07-10
+**Confidence:** HIGH
+
+> Milestone-scoped research. Supersedes the v0.1.0 foundation research in these files; the
+> v0.1.0 stack prescription lives on in `CLAUDE.md` and remains in force.
 
 ## Executive Summary
 
-oto is best built as a **GSD fork** that absorbs a small, curated set of Superpowers skills as a first-class peer concept. The two upstreams are the same primitives at different abstraction levels — Markdown-with-frontmatter, fan-out subagents, multi-runtime distribution — but GSD is a *state machine with typed agents and a 3000-line installer*, while Superpowers is a *prompt library with a one-hook session-start bootstrap and per-runtime manifests*. They are complementary: GSD owns "structured work" (define → plan → execute → ship), Superpowers owns "ambient discipline" (TDD enforcement, debugging rigor, verification-before-completion). For a solo developer who already values GSD's spec-driven workflow, the right architecture is **GSD spine + 7 ported Superpowers skills as ambient amplifiers** (Option A), not a rewrite into skill-first form (Option B), and not a side-by-side install (Option C).
+The Exa integration is ~70% latent, inherited from GSD: availability detection (`config.cjs`/`init.cjs` derive `exa_search` from `EXA_API_KEY` env or `~/.oto/exa_api_key` keyfile), secret masking, agent guidance, and `mcp__exa__*` frontmatter declarations in three researcher agents all exist — but **no code anywhere registers an MCP server**, so the declared tools never exist at runtime. The milestone finishes the missing 30%: per-runtime MCP registration through oto's existing adapter architecture, plus fixing a confirmed secret-hygiene defect discovered during research.
 
-The recommended stack mirrors GSD: **Node.js >= 22.0.0, plain CommonJS `.cjs` for tooling, no top-level TypeScript, no build step at the top level, `node:test` for tests, GitHub Actions CI, distribution via `npm install -g github:owner/oto-hybrid-framework#vX.Y.Z` (no npm registry publish)**. This is precisely what GSD ships today, which is the only stack that survives the rebrand without rewriting both ecosystems. The hybrid's distinguishing infrastructure beyond pure GSD is two pieces of tooling: a **rule-typed rebrand engine** (`gsd→oto` is too dangerous as a global regex) and an **upstream-sync pipeline** with three-way merge plus deletion-surfacing (because GSD shipped 14 minor releases in 12 weeks and Superpowers shipped 7 in March 2026 alone).
+That defect is worse than the milestone description implied. The `/oto-settings-integrations` workflow writes the **raw API key string** into git-tracked `.oto/config.json` (via `oto-sdk query config-set exa_search "<key>"`), while the detection logic expects a **boolean** and reads the keyfile the settings flow never writes. Worse, the live write path (`sdk/src/query/config-mutation.ts`) has no secret masking at all — the masking in `secrets.cjs` only guards a dead CJS path. And the same dual-typing defect exists identically for `brave_search` and `firecrawl`. The key-storage fix must land first: key material lives only in `~/.oto/exa_api_key` (mode 0600) or `EXA_API_KEY`; `.oto/config.json` holds booleans, enforced by validation in both config-set paths, with self-healing migration for legacy string values.
 
-The dominant project risk is not technical — it's **scope inflation**. The intersection of "production-grade" and "personal use" creates compounding rigor demands that can absorb the entire build budget without ever shipping a usable framework. The roadmap must ship a Claude-Code-only oto with manual sync **early**, then add Codex/Gemini parity and automation incrementally. Five other critical risks anchor the phase ordering: rebrand substring collisions, agent/skill ID corruption, `.planning/` path drift, GitHub-install missing pre-built artifacts (`prepublishOnly` doesn't run on git installs), and skill auto-load colliding with command-driven flow.
+The main design risk is per-runtime secret injection: every runtime's easy path puts the key in plaintext config (Gemini headers can't expand env vars, Claude's `~/.claude.json` user-scope expansion is unverified, Codex's `env_http_headers` requires a shell-exported env var the keyfile doesn't provide). The architecture research resolves this with a launcher-script indirection (`oto/hooks/oto-exa-mcp.js` reads env/keyfile and spawns `npx -y exa-mcp-server`) — the recommended primary design, with the remote hosted endpoint (`https://mcp.exa.ai/mcp` + `x-api-key` header) as the documented alternative. This transport/auth decision is the one ADR the roadmap must lock in before the registration phase. Two hard constraints regardless: the server MUST be named `exa` (agents declare `mcp__exa__*`), and registration must be direct marker/fingerprint-tracked file merges (not CLI shell-outs), consistent with oto's existing adapter discipline.
 
 ## Key Findings
 
 ### Recommended Stack
 
-GSD's stack is the prescription verbatim. Both upstreams are Node-based; the GSD installer is 7,755 lines of CJS using `require()`/`__dirname`/`module.exports`; rewriting to ESM or TypeScript would multiply the rebrand surface for zero runtime benefit. The only "build step" is a syntax-validating hooks-copy script that runs in `prepare` (which IS run by `npm install -g github:...`, unlike `prepublishOnly`).
+Zero new npm dependencies. The "stack" is one MCP server (local stdio via `npx -y exa-mcp-server@3.2.1`, or Exa's remote streamable-HTTP endpoint) plus config entries written by oto's existing `bin/lib/` runtime adapters. Current Exa tool surface: `web_search_exa` + `web_fetch_exa` (default-on); `web_search_advanced_exa` optional. `crawling_exa`, `get_code_context_exa`, `company_research_exa`, `linkedin_search_exa`, and `deep_researcher_*` are **deprecated — never reference them** in new guidance.
 
 **Core technologies:**
-- **Node.js >= 22.0.0** — engines field; CI matrix on 22 + 24 plus one macOS runner
-- **CommonJS `.cjs`** for all tooling — matches GSD's 33-file `bin/lib/` layout
-- **Plain JS, not TypeScript at the top level** — TS would force a build step in `prepare`. TS confined to optional `sdk/` if/when needed
-- **No top-level build step** — ship raw `.cjs` / `.js` / `.md`
-- **`node:test`** (built-in, zero-deps). Vitest only inside an optional `sdk/` subpackage. NOT Jest
-- **GitHub Actions CI** — `test.yml` (matrix), `install-smoke.yml` (real `npm pack` + tarball install AND unpacked-dir install — the latter catches the mode-644 trap GSD hit in #2453), `release.yml` (tag → GitHub Release; no npm publish)
-- **Distribution via `npm install -g github:owner/oto-hybrid-framework[#vX.Y.Z]`** — git tags are the version surface
-- **`bin: { "oto": "bin/install.js" }`** — `oto install --claude/--codex/--gemini` writes runtime-specific artifacts to `~/.claude/`, `~/.codex/`, `~/.gemini/`
-- **Copy, not symlink, at install time** — npm's volatile install path breaks symlinks; Windows symlinks need elevation
+- `exa-mcp-server` 3.2.1 via `npx -y` (stdio): recommended primary transport — launched by a shipped launcher script that resolves the key from env/keyfile, so no runtime config ever contains key material. Never a `package.json` dep.
+- Remote `https://mcp.exa.ai/mcp` (streamable HTTP, `x-api-key` header): the alternative — zero child process, Exa-maintained, works keyless on a rate-limited free tier, but requires a literal key in 2–3 user-private config files (rotation = re-run settings).
+- Existing oto secret store (`oto/bin/lib/secrets.cjs`, `~/.oto/exa_api_key`, `EXA_API_KEY`): canonical key source for everything — the milestone's fix makes it real.
+
+**Hard constraints:**
+- Server name must be `exa` on all runtimes (Claude tool naming: `mcp__exa__web_search_exa`).
+- Claude user-scope MCP lives in `~/.claude.json` — NOT `~/.claude/settings.json` where `mergeSettings` already writes. Different file, needs a new adapter hook.
+- Gemini: `httpUrl` = streamable HTTP, `url` = deprecated SSE — using `url` silently negotiates the wrong transport. Header env-expansion is broken (gemini-cli#5282); only stdio `env` blocks expand.
+- Codex: `bearer_token_env_var` sends `Authorization: Bearer` — unusable for Exa's `x-api-key`.
+- Never key-in-URL (`?exaApiKey=`) — leaks into `mcp list` output, logs, proxies.
 
 ### Expected Features
 
-**Headline numbers:**
-
-| Framework | Commands | Subagents | Skills | Hooks |
-|-----------|----------|-----------|--------|-------|
-| GSD v1.38.5 | 89 slash commands | 33 typed agents | 0 (workflows are the unit) | 11 specialized hooks |
-| Superpowers v5.0.7 | 3 (all deprecated stubs) | 1 (`code-reviewer`, example only) | 14 skills | 1 SessionStart hook |
-| **oto target** | **~50–60 `/oto-*`** (after cuts) | **~20 `oto-*`** (audit + trim) | **7 ported skills** + project-local capacity | **~6–8 hooks** (consolidated SessionStart) |
-
-The cut from 89 → ~55 commands drops marketplace/community/branding artifacts, 11 of 14 GSD runtimes, BETA features, GSD-2 migration, and overlapping/heavy commands.
-
 **Must have (table stakes):**
-- GSD spine (`/oto-new-project` → discuss → plan → execute → verify → ship) — core value of the framework
-- Wave-based parallel execution with atomic commits — key GSD strength
-- `.oto/` state directory — single canonical state root
-- Multi-runtime install (Claude/Codex/Gemini) — explicit user requirement
-- Statusline + context monitor + session-state hooks — daily-use UX
-- `/oto-help`, `/oto-update`, `/oto-progress`, `/oto-next`, `/oto-health` — minimum navigational surface
-- Three Superpowers skills as first-class: `test-driven-development`, `systematic-debugging`, `verification-before-completion` — the ambient discipline layer that justifies the hybrid
-- Two skills as supporting: `dispatching-parallel-agents`, `using-git-worktrees`
-- `writing-skills` as meta-methodology — lets oto evolve
-- `using-oto` bootstrap skill — replaces `using-superpowers`, retuned to defer to in-progress workflows
-- Automated rebrand engine + upstream-sync tool — required for upstream tracking
+- Key-storage fix: keyfile (0600)/env only; `exa_search` boolean-only in config with validation in BOTH config-set paths; migration for legacy string values (this repo's own `.oto/config.json` is affected) — everything downstream depends on it
+- Consent-gated, idempotent Exa MCP registration for all three runtimes (Codex/Gemini parity is a standing project decision, not optional)
+- Graceful fallback preserved (key/server absent → Brave/WebSearch, zero errors) — regression floor for every research flow
+- Clean unregistration on uninstall (fingerprint-tracked, never deletes user-owned entries)
+- Explicit tool pinning (3 tools max) for context-cost determinism
+- Registration status in `/oto-settings-integrations` summary ("registered in: claude / codex / gemini")
+- Tests, runtime-matrix row, docs — shipping standard
 
-**Should have (competitive):**
-- Spike & sketch with wrap-up — GSD differentiator
-- Code review at two granularities (phase-level + task-level) — combines GSD's `gsd-code-reviewer` + Superpowers' inline review
-- Two-stage review (spec compliance → code quality) folded into executor
-- Workflow guards (`oto-validate-commit.sh`, `oto-prompt-guard.js`, `oto-read-injection-scanner.js`)
-- Brownfield support (`/oto-map-codebase` + `/oto-scan`) — already-coded projects
-- Roadmap manipulation (`/oto-add-phase`, `/oto-insert-phase`, `/oto-remove-phase`)
-- Cross-AI peer review (`/oto-review`)
+**Should have (differentiators):**
+- One prompt wires all three runtimes — oto's "stop framework-switching" value applied to search
+- Exa guidance in `oto-debugger` + `oto-advisor-researcher` (in milestone scope; semantic search fits "who else hit this error" debugging)
+- Subagent end-to-end verification (guards the claude-code#13898 "MCP tools stripped from restricted subagents" class)
 
-**Defer (v2+):**
-- `oto-sdk` programmatic API — nice-to-have but not required for daily personal use
-- AI-integration phase + eval-planner — heavy infrastructure
-- Workstreams + workspaces — adds complexity; phases-only viable for solo
-- `/oto-graphify`, `/oto-intel`, `/oto-profile-user`, `/oto-thread` — niche
+**Defer (v0.5.x+):**
+- Keyless unauthenticated-tier mode (works, ~150 calls/day, MEDIUM confidence on limits) — add after the authenticated path is proven
+- Live doctor ping (`tools/list` against the server)
+- `web_search_advanced_exa` recipes; broader agent rollout (per AGNT-DEFER-01 discipline)
 
-**Definite exclusion:**
-- `/gsd-join-discord`, GSD's marketing chrome — personal-use scope
-- All non-Claude/Codex/Gemini runtime adapters (OpenCode, Kilo, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen, CodeBuddy, Cline, Copilot)
-- Translated READMEs (4 languages)
-- `/gsd-ultraplan-phase` (BETA), `/gsd-from-gsd2` (migration)
-- Superpowers' contributor-facing CLAUDE.md content + `tests/` harness + `code-reviewer` example agent
+**Anti-features (do NOT build):** silent auto-registration without consent; enabling all 10+ Exa tools; Exa Agent (`agent_tools`) inside researchers (async billed polling inside orchestrated agents); shelling out to `claude mcp add` (secret-expansion bug claude-code#18692, PATH dependency, lost uninstall symmetry); project-scope registration; a parallel `oto-sdk` Exa REST wrapper.
 
 ### Architecture Approach
 
-**Recommendation: Option A — GSD spine + Superpowers skills as a first-class peer.** Justified against all four user constraints (production-grade, multi-runtime, automated rebrand, personal use). Option B (skill-first rewrite) would force structural decomposition of 86 eval-tuned workflows and break the rebrand pipeline. Option C (side-by-side install) yields no synergy.
+**Critical corrected premise:** the repo has two installers; only `bin/install.js` + `bin/lib/*.cjs` is live (`package.json` bin). The 7,758-line `oto/bin/install.js` is a vestigial GSD reference — all installer changes go in `bin/lib/`. Registration follows oto's existing adapter pattern: a new optional adapter hook pair `mergeMcp`/`unmergeMcp` dispatched from `install.cjs` beside `mergeSettings` (precedent: `emitDerivedFiles`), effectful rather than text-in/text-out because Claude's target is a different file. Registration is conditional on `detectExaKey()` — registering keyless makes every session pay a failing-server startup in three runtimes.
 
-The **load-bearing decision**: workflows survive as a primitive distinct from skills. Workflows orchestrate; skills are ambient amplifiers. GSD's typed-agent registry remains the spine.
+**Major components (NEW):**
+1. `oto/hooks/oto-exa-mcp.js` launcher — the only component touching the secret at runtime; ships through the existing build-hooks channel (auto-discovered, syntax-validated, uninstall-tracked)
+2. `mergeMcp`/`unmergeMcp` in the three runtime adapters — Claude: surgical additive edit of `~/.claude.json` `mcpServers.exa`, ownership tracked in `.install.json`; Codex: new `# === BEGIN OTO MCP ===` marker block in `codex-toml.cjs` (separate from the HOOKS block, refuse on external duplicate); Gemini: `mcpServers.exa` key in the same settings.json it already merges
+3. Secret CRUD — keyfile helpers in `secrets.cjs` + SDK `secret-set`/`secret-clear`/`secret-status` commands (value on stdin, never argv; requires sdk/dist rebuild)
 
-**Major components:**
-1. **oto-installer** (`bin/install.js`, trimmed fork) — 3 runtime targets, hook compilation, agent sandbox config, manifest writing
-2. **oto-orchestrator** (main session executing a workflow) — workflow execution, agent dispatch via `Task`, state mutation via oto-tools
-3. **oto-agents** (~20 typed subagents after audit) — strict typed names, mandatory-initial-read contract, structured Markdown returns
-4. **oto-skills** (7 ported + project-local capacity) — invoked via `Skill` tool; `using-oto` bootstrap loaded at SessionStart
-5. **oto-tools** (`oto/bin/oto-tools.cjs`) — atomic state ops; eventual deprecation in favor of oto-sdk if v2 demands
-6. **oto-hooks** — consolidated SessionStart bootstrap (replaces both upstreams' to avoid double-injection), plus statusline, context-monitor, prompt-guard, read-injection-scanner, validate-commit
-7. **rebrand-pipeline** (`scripts/sync-upstream/`) — pulls upstreams, applies rule-typed rename map, surfaces conflicts in `.oto-sync-conflicts/`
-8. **`.oto/` state directory** (per-project) — single canonical state root subsuming both upstreams' notions of state
-
-**Key architectural rules:** One canonical state root (`.oto/`); per-runtime install layouts diverge with rewritten paths from a single source tree; `Skill` tool is universal dispatch *inside agents*, slash commands (`/oto-*`) remain user-typed surface, internal `oto:<skill>` namespace reserved for `Skill()` calls (per GSD #2697 fix); `using-oto` bootstrap *defers* to in-progress workflows ("if `.oto/STATE.md` shows an in-progress phase, do not auto-invoke skills outside the workflow's allowlist").
+**Major MODIFIED:** `install.cjs` dispatch + install-state; boolean validation in `sdk/src/query/config-mutation.ts` AND `oto/bin/lib/config.cjs`; `settings-integrations.md` rewrite (keyfile flow, migration, rewritten `<security>` block); agent frontmatter/guidance for `oto-debugger` + `oto-advisor-researcher`; `runtime-matrix.cjs` + regenerated matrix doc.
 
 ### Critical Pitfalls
 
-1. **`gsd` substring collisions during automated rebrand** — `gsd` is 3 letters and appears inside ordinary words/URLs/CHANGELOG anchors. **Avoid by:** rule-typed rename engine (identifier rules with `\b` boundaries; path rules; command rules; URL rules with explicit upstream-URL preservation) plus do-not-rename allowlist. Dry-run with classified report. Reject on any unclassified match.
-
-2. **Rebrand corrupts internal IDs the runtime expects** — agent `name:` frontmatter, `Task(subagent_type=...)` references, `superpowers:<skill>` namespace, Codex `CODEX_AGENT_SANDBOX` per-agent map, hardcoded literal strings in hooks. **Avoid by:** treat IDs as schema; `rename-map.json` with explicit before/after per ID; pre/post coverage manifests; round-trip assertion.
-
-3. **GitHub-install missing pre-built artifacts** — `npm install -g github:owner/repo` runs `prepare` but NOT `prepublishOnly`. GSD shipped this exact bug in 1.38.2. **Avoid by:** put all build steps in `prepare`; OR commit built artifacts; OR (cleanest for v1) skip the SDK and fork GSD's pre-existing `gsd-tools.cjs` path. Clean-machine install smoke test in CI.
-
-4. **Two state systems leak / `.planning/` path drift** — `.planning/` hardcoded across 90+ GSD files; Superpowers has parallel `docs/superpowers/specs/`. **Avoid by:** declare `.oto/` as single canonical state root in architecture-decision phase before any rebrand; centralize path resolution in one helper; treat `.planning` as path-shaped rename rule (NOT bare word "planning"); state-leak detection acceptance test.
-
-5. **Skill auto-load conflicts with command-driven flow** — Superpowers tuned for high recall ("if 1% chance a skill applies, MUST read it"); GSD workflows are deterministic state machines. Superpowers v5.0.6 added `<SUBAGENT-STOP>` blocks for this exact problem. **Avoid by:** retune `using-oto` to defer to in-progress workflows (gate on `.oto/STATE.md`); maintain `skill-vs-command-routing.md` decision table; auto-trigger regression test.
-
-6. **Personal-use rigor inflation (cross-cutting)** — "production-grade" + "personal use" pull opposite. Concrete inflation risks: multi-runtime parity tests before Claude rock-solid; upstream-sync three-way-merge UI before manual sync used in anger; snapshot tests for every workflow output. **Avoid by:** ship Claude-Code-only oto early; defer Codex/Gemini parity until Claude daily-use stable; cap upstream-sync v1 to rename application + conflict surfacing; cost-of-defect-per-incident lens at planning time; re-read PROJECT.md cost ceiling at every milestone close.
+1. **Key committed to git via tracked `.oto/config.json`** (active defect, this repo is affected) — fix storage first; reject string values at both config-set paths; add a no-key-shaped-strings regression test.
+2. **Agents declare tools that don't exist** — make `exa_search` coherent with actual registration; standardize probe-and-fallback guidance ("tool-not-found → fall back immediately, never retry"); doctor check for flag/registration mismatch.
+3. **Wrong Claude scope / wrong file** — user scope in `~/.claude.json`; never project `.mcp.json` (committed + approval friction + untrusted-workspace blocking); never `~/.claude/settings.json`; merge strictly additively (it's Claude Code's live state file).
+4. **Codex TOML corruption** — duplicate `[mcp_servers.exa]` headers break Codex's ENTIRE config parse; marker block + external-duplicate refusal (mirror `hasMixedLegacyHooks`) + round-trip test as a hard gate.
+5. **Orphaned/clobbered registrations on uninstall/reinstall** — fingerprint what oto wrote in install state; remove only on match; skip-and-report user-owned `exa` entries.
+6. **Guidance drift + Claude-only tool names** — `mcp__exa__*` is Claude namespace; Gemini exposes bare names, Codex its own. Consolidate to one shared runtime-neutral search-tools reference with an explicit fallback ladder (Exa → Brave → WebSearch) BEFORE extending to new agents; grep transformed per-runtime output, not just source.
+7. **429s burn agent turns** — parallel researchers can drain the free tier; guidance rule: one Exa rate-limit error → switch provider for the session; verify the key is actually attached (silent unauthenticated fall-through is a documented in-the-wild failure).
+8. **Upstream sync surface** — the files this milestone touches are exactly GSD-shared (`config.cjs`, `secrets.cjs`, `settings-integrations.md`, researcher agents). Put new logic in oto-only files; keep shared-file diffs small and commented; `oto sync --dry-run` regression check at milestone end.
 
 ## Implications for Roadmap
 
-The architecture and pitfalls research independently proposed phase orderings that converge cleanly. The reconciled sequence honors both (architecture's "installer must work before core port"; pitfalls' "architecture-decision must precede rebrand").
+Three phases, dependency-ordered. This maps directly onto the architecture research's build order (1+4 / 2+3 / 5+6).
 
-### Phase 1: Inventory & Architecture Decisions
-**Rationale:** Three load-bearing decisions must be locked before any code: canonical state root name (`.oto/` recommended); skill-vs-command routing policy; which framework's session-start hook wins. Without these, the rebrand engine has no schema.
-**Delivers:** Full file inventory (per-file: keep/drop/merge + reason); rename-map specification; architecture-decision log; deprecation list.
-**Avoids:** Pitfalls 2, 3, 8, 9, 10, 13.
+### Phase 1: Key Storage Reconciliation
+**Rationale:** Every registration variant needs the key at a stable, uncommitted location; the current state is an active secret-hygiene defect (and the live SDK write path has no masking at all). Registration work without this fix tempts copy-pasting the key into three more config files.
+**Delivers:** Keyfile CRUD (`secrets.cjs` helpers + SDK `secret-set/clear/status`, stdin input, 0600 perms, sdk/dist rebuild); boolean-only validation for `exa_search`/`brave_search`/`firecrawl` in both config-set paths; self-healing migration for legacy string values; rewritten `settings-integrations.md` (Set/Replace/Clear via keyfile, corrected `<security>` block, masked status display).
+**Addresses:** Key-storage fix, masked display survival (table stakes).
+**Avoids:** Pitfall 1 (committed key), Pitfall 5 groundwork (single rotation source).
+**Scope decision to record:** fix all three integrations with the shared mechanism (marginal cost near zero), not just Exa.
 
-### Phase 2: Rebrand Engine + Distribution Skeleton
-**Rationale:** The rename engine gates everything downstream. Rule-typed (not regex), dry-runnable, with do-not-touch allowlist (LICENSE files, env vars, `foundation-frameworks/`).
-**Delivers:** `scripts/rebrand.cjs`; dry-run reporter; coverage manifest generator; `package.json` shape; install-smoke CI scaffolding.
-**Uses:** Node 22, CJS, `node:test`, GitHub Actions.
-**Avoids:** Pitfalls 1, 6, 12, 16.
+### Phase 2: MCP Registration (All Three Runtimes)
+**Rationale:** The milestone's stated missing piece. Depends on Phase 1 (key location + detect helper). Guidance extension before this just widens today's dead code.
+**Delivers:** Launcher script `oto/hooks/oto-exa-mcp.js` through the build-hooks channel; `mergeMcp`/`unmergeMcp` adapter hooks (Claude `~/.claude.json` additive merge with `CLAUDE_CONFIG_DIR` resolution; Codex `codex-toml.cjs` OTO MCP marker block with duplicate refusal; Gemini settings.json key); `install.cjs` dispatch + install-state fingerprinting; conditional registration on `detectExaKey()`; uninstall coverage; registration-status line in settings summary; per-adapter merge/unmerge round-trip tests.
+**Uses:** Existing adapter/marker/merge machinery (hooks precedent), hooks distribution channel, install-state.
+**Implements:** Components 1–2 of the architecture; the transport ADR (launcher-stdio primary vs remote-HTTP alternative) is decided at the top of this phase.
+**Avoids:** Pitfalls 2, 3, 4, 5, 6.
 
-### Phase 3: Installer Fork + Runtime Trim
-**Rationale:** Fork `bin/install.js`, drop 11 unwanted runtimes (keep Claude/Codex/Gemini), apply rename engine to installer code itself. Validates the rebrand engine against real production code before scaling.
-**Delivers:** Trimmed `bin/install.js`; per-runtime adapter modules; install-smoke passes for `--claude`.
-**Implements:** oto-installer component.
-**Avoids:** Pitfalls 7, 14, 17.
-
-### Phase 4: Core Port (Workflows + Agents + Templates + Hooks)
-**Rationale:** Bulk rebrand of `get-shit-done/`, `agents/`, `commands/gsd/`, `hooks/`, references, templates. After this, `/oto-help` works and `/oto-new-project` initializes a `.oto/` directory. Hooks consolidated to single SessionStart entrypoint with version tokens.
-**Delivers:** Full rebranded `oto/` source tree; consolidated SessionStart hook; coverage manifest CI check; state-write integration test.
-**Implements:** oto-orchestrator, oto-agents, oto-tools, oto-hooks.
-**Avoids:** Pitfalls 2, 3, 8, 15.
-
-### Phase 5: Skills Port (Superpowers Subset)
-**Rationale:** Add `oto/skills/` with 7 selected skills + retuned `using-oto` bootstrap that defers to in-progress workflows. First phase delivering value beyond rebranded GSD.
-**Delivers:** 7 ported skills; workflow-deferring `using-oto`; skill-vs-command-routing decision table.
-**Implements:** oto-skills component.
-**Avoids:** Pitfall 10.
-
-### Phase 6: Cross-System Integration
-**Rationale:** Synergy phase. Update `oto-executor` to invoke `tdd` and `verification-before-completion` skills before/after writing code. Resolve 15 conceptual overlaps from FEATURES inventory.
-**Delivers:** Updated agent prompts invoking skills at canonical points; two-stage review folded into executor; resolved overlaps documented in `.oto-sync/decisions.md`.
-
-### Phase 7: Upstream-Sync Pipeline
-**Rationale:** v1 scope intentionally capped: rename application + conflict surfacing + deletion surfacing. Three-way merge UX defers to v2 if pain emerges.
-**Delivers:** `scripts/sync-upstream/{pull-gsd,pull-spw,rebrand,merge}.cjs`; per-upstream `last-synced-commit.json` + `BREAKING-CHANGES.md`.
-**Implements:** rebrand-pipeline component.
-**Avoids:** Pitfall 4.
-
-### Phase 8: Tests & CI Hardening
-**Rationale:** Four test surfaces: rebrand-engine snapshot tests; install smoke matrix (Node 22 + 24, Linux + macOS, both tarball and unpacked-dir); per-runtime parity test; license-attribution CI check. Cost-of-defect lens; explicitly cuts low-value test ideas.
-**Delivers:** Full CI matrix; coverage manifest CI check; license CI check; auto-trigger regression test; SessionStart-output snapshot fixture.
-**Avoids:** Pitfalls 5, 6, 7, 11.
-
-### Phase 9: Docs & Release
-**Rationale:** README with explicit upstream attribution and tagged install instruction as default; `THIRD-PARTY-LICENSES.md` with both upstream LICENSE files verbatim. First tagged release (`v0.1.0`) gates this phase.
-**Delivers:** Public-ready repo; v0.1.0 GitHub Release.
+### Phase 3: Agent Guidance + Hardening
+**Rationale:** Guidance is only truthful once tools exist. Consolidation must precede extension or drift multiplies (the three researchers already disagree with each other).
+**Delivers:** Shared runtime-neutral search-tools reference with the Exa → Brave → WebSearch fallback ladder and the never-retry-on-429 rule; existing researcher agents pointed at it; `oto-debugger` + `oto-advisor-researcher` frontmatter and guidance; Codex/Gemini transform verification of tool names (grep transformed output); deprecated-tool-name sweep (`crawling_exa` etc.); runtime-matrix Exa row + regeneration; docs (setup, keyfile location, tier limits caveat); integration/regression sweep incl. no-plaintext guard and subagent e2e check; `oto sync --dry-run` conflict-surface comparison.
+**Avoids:** Pitfalls 7, 8, 9.
 
 ### Phase Ordering Rationale
 
-- **Architecture decisions in Phase 1, not later.** Pitfalls 3, 8, 9, 10 require architectural commitments before any code.
-- **Rebrand engine before rebrand application.** Phase 2 builds the engine and Phase 3 validates it on the smallest target (installer alone).
-- **GSD spine before skills.** Skills layer onto a working orchestration substrate.
-- **Skills installed (Phase 5) before cross-invocation (Phase 6).** Splitting yields ship-able milestones.
-- **Sync pipeline after first stable release, not before.** Manual sync acceptable for the first one or two upstream pulls; tooling pays back at frequency.
-- **Tests gradually, not upfront.** Tests bind to the surface being built.
+- **Storage → registration → guidance** is a strict dependency chain confirmed independently by FEATURES (dependency graph) and ARCHITECTURE (build order): registration configs reference the key location; guidance references tools registration creates.
+- Phase 2 bundles launcher + adapters + uninstall + state because they form one atomic contract (what's written must be what's removed); splitting invites Pitfall 6.
+- Sync hygiene (Pitfall 8) is a cross-cutting constraint on all phases — new logic in oto-only files wherever possible — with verification in Phase 3.
+- All existing surfaces are reused, not built: adapters, marker merges, hooks channel, secrets masking, settings AskUserQuestion flow, agent transform pipeline.
 
 ### Research Flags
 
-**Phases needing deeper research during planning:**
-- **Phase 1:** Architectural decisions need user input — multiple defensible options exist
-- **Phase 7:** Three-way merge with rename rules is non-trivial. Worth focused research on `git merge-tree` and merge-driver patterns
-- **Phase 8:** Mode-644 trap reproduction in CI requires careful setup. Short research pass on `npm install -g <unpacked>` lifecycle
+Phases likely needing deeper research during planning:
+- **Phase 2:** (a) `~/.claude.json` location under `CLAUDE_CONFIG_DIR` (MEDIUM — docs say state relocates; verify actual behavior before writing the Claude `mergeMcp` path resolution); (b) the transport ADR — STACK and ARCHITECTURE reached different primary recommendations (remote HTTP vs launcher-stdio); this summary recommends launcher-stdio because it's the only design keeping key material out of ALL runtime configs uniformly, but the decision deserves a quick fresh check of Codex HTTP-transport maturity and Claude user-scope env expansion at phase time; (c) Codex/Gemini MCP tool naming as seen by transformed agents (MEDIUM — verify empirically).
+- **Phase 3 (light):** exact Exa free-tier/unauthenticated limits before writing them into docs (MEDIUM — sources conflict; ~1,000 req/mo authenticated, ~150/day unauthenticated; do not hard-code numbers).
 
-**Phases with standard patterns (skip dedicated research):** Phase 2 (rebrand engine), Phase 3 (installer fork), Phase 4 (core port), Phase 5 (skills port), Phase 6 (cross-system integration), Phase 9 (docs/release).
+Phases with standard patterns (skip research-phase):
+- **Phase 1:** pure in-repo refactor against fully-read code; all four sites of the dual-typing bug are pinpointed with line numbers; keyfile mechanics are POSIX-standard.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Direct reproduction of GSD's actual `package.json`, install.js, lib/, scripts/, CI workflows |
-| Features | HIGH | File-by-file inventory of 89 GSD commands, 33 agents, 14 skills, all hooks |
-| Architecture | HIGH | Three options analyzed against four user constraints. Recommendation aligns with stated user preference |
-| Pitfalls | HIGH | All 23 pitfalls grounded in CHANGELOG-documented bugs (with issue numbers) or direct source evidence |
+| Stack | HIGH | Exa endpoint/auth/tools and all three runtimes' MCP config schemas verified against live official docs on 2026-07-10 |
+| Features | HIGH | Existing-surface inventory from direct source inspection; MEDIUM only on comparable-framework conventions and free-tier numbers |
+| Architecture | HIGH | All integration points read in full with file:line evidence; MEDIUM on `.claude.json`/`CLAUDE_CONFIG_DIR` interaction |
+| Pitfalls | HIGH | Local hazards verified in-repo (including that this repo's own `.oto/config.json` is git-tracked); runtime gotchas backed by official docs and specific issue numbers |
 
-**Overall confidence:** HIGH — but upper-bounded by upstream volatility. Phase 1 inventory should be re-validated against current `main` of both upstreams when Phase 2 starts.
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Phase 1 architectural decisions need user sign-off:** state root name; exact skill-vs-command routing rules; per-overlap canonical version
-- **Open questions for requirements:**
-  1. AI-integration phase + eval scaffolding: stay or drop?
-  2. Workstreams + workspaces: keep, or trim to "phases only"?
-  3. Spike + sketch: keep both, one, or neither?
-  4. `oto-sdk` programmatic API: port faithfully, port narrowly, or skip?
-  5. Skill auto-triggering vs explicit invocation: high-recall auto-trigger or explicit `/oto-*`?
-  6. Overlapping debug/review/verification: one merged surface or both exposed separately?
-  7. Windows support: drop, support, or document-as-best-effort?
-- **Codex/Gemini behavior under conditions oto exercises:** Codex `spawn_agent` with `model: inherit`; Gemini's lack of subagent support requires inline-equivalent fallbacks. Flag during Phase 3 for empirical testing
-- **Upstream sync philosophy vs reality:** v1 must be capped (rename + conflict surfacing); defer richer merging to v2
+- **Transport/auth ADR (remote HTTP vs launcher-stdio):** the one substantive divergence between research files. Resolve as the first task of Phase 2 with a written ADR; this summary's recommendation is launcher-stdio (uniform secret indirection, honors the keyfile, sidesteps three broken/unverified env-expansion dialects) at the cost of an npx cold-start per session.
+- **`CLAUDE_CONFIG_DIR` → `.claude.json` path resolution:** verify before implementing Claude `mergeMcp`; fallback logic (`$CLAUDE_CONFIG_DIR/.claude.json` else `$HOME/.claude.json`) is drafted but unconfirmed.
+- **Keyless registration policy:** the hosted endpoint works unauthenticated, but `exa_search` detection keys off key presence, and keyless stdio launches fail noisily. Recommended default: skip-and-log when no key, with re-run-install as the refresh path; revisit keyless mode in v0.5.x.
+- **Exact rate limits:** conflicting published numbers; re-verify at docs-writing time, phrase docs qualitatively.
+- **Codex/Gemini tool-name mapping in transformed agents:** verify empirically during Phase 3's transform check.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `foundation-frameworks/get-shit-done-main/` (GSD v1.38.5) — package.json, bin/install.js, get-shit-done/workflows/, agents/, commands/, hooks/, scripts/, CHANGELOG.md, LICENSE
-- `foundation-frameworks/superpowers-main/` (Superpowers v5.0.7) — package.json, README.md, CLAUDE.md, AGENTS.md, GEMINI.md, skills/, hooks/session-start, .opencode/plugins/, RELEASE-NOTES.md, LICENSE
+- Direct source inspection (read in full): `bin/install.js`, `bin/lib/{install,runtime-claude,runtime-codex,runtime-gemini,codex-toml,gemini-transform,runtime-matrix,install-state}.cjs`, `oto/bin/lib/{config,init,core,secrets,config-schema}.cjs`, `sdk/src/query/{config-mutation,index}.ts`, `oto/workflows/settings-integrations.md`, `oto/agents/oto-*-researcher.md`, `scripts/build-hooks.js`, `docs/upstream-sync.md`
+- https://exa.ai/docs/reference/exa-mcp + https://github.com/exa-labs/exa-mcp-server + `npm view exa-mcp-server` (all 2026-07-10) — endpoint, auth, tool surface incl. deprecations, v3.2.1
+- https://code.claude.com/docs/en/mcp — scopes, `~/.claude.json`, required `type` field, env expansion rules, reserved names
+- https://developers.openai.com/codex/config-reference + /codex/mcp — `[mcp_servers]` schema, `env_http_headers`, `bearer_token_env_var` semantics
+- https://google-gemini.github.io/gemini-cli/docs/tools/mcp-server.html — `httpUrl` vs `url`, headers, env expansion, `includeTools`, `trust`
+- anthropics/claude-code#18692 (CLI secret expansion), #13898 (subagent MCP tool stripping), #14313 (config-dir relocation)
 
 ### Secondary (MEDIUM confidence)
-- GSD upstream issue references (#2453, #2441, #2623, #2697, #1107, #1109, #1125, #1161) — bug history grounding pitfall recommendations
-- Superpowers v5.0.x release notes — auto-load tuning evolution
+- google-gemini/gemini-cli#5282, #5828 — header env-expansion unsupported/broken
+- code-yeongyu/oh-my-openagent#1627, #3763 — key-not-attached silent unauthenticated fall-through failure mode
+- Exa pricing pages + third-party trackers — free tier ~1,000 req/mo, unauthenticated ~150/day (conflicting; re-verify at build time)
 
 ---
-*Research completed: 2026-04-27*
+*Research completed: 2026-07-10*
 *Ready for roadmap: yes*
