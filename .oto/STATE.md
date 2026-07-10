@@ -1,18 +1,16 @@
 ---
-oto_state_version: 1.0
-milestone: null
-milestone_name: null
-status: between_milestones
-last_shipped: v0.4.0
-last_shipped_date: 2026-05-26
-last_updated: "2026-05-26T17:10:37.665Z"
-last_activity: 2026-05-26
+gsd_state_version: 1.0
+milestone: v0.5.0
+milestone_name: Exa Search Integration
+status: planning
+last_updated: "2026-07-10T19:10:05.768Z"
+last_activity: 2026-07-10
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -27,21 +25,10 @@ See: .oto/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Status: v0.4.0 complete, archived, and tagged. Between milestones.
-Last activity: 2026-07-09 - Completed quick task 260709-ob4: oto-sdk accepts 'inherit' model profile
-
-Archive (prior milestones):
-
-- `.oto/milestones/v0.4.0-ROADMAP.md`
-- `.oto/milestones/v0.4.0-REQUIREMENTS.md`
-- `.oto/milestones/v0.3.0-ROADMAP.md`
-- `.oto/milestones/v0.3.0-REQUIREMENTS.md`
-- `.oto/milestones/v0.2.0-ROADMAP.md`
-- `.oto/milestones/v0.2.0-REQUIREMENTS.md`
-- `.oto/milestones/v0.2.0-MILESTONE-AUDIT.md`
-- `.oto/milestones/v0.1.0-ROADMAP.md`
-- `.oto/milestones/v0.1.0-REQUIREMENTS.md`
-- `.oto/milestones/v0.1.0-MILESTONE-AUDIT.md`
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-10 — Milestone v0.5.0 started
 
 ## Last Verified
 

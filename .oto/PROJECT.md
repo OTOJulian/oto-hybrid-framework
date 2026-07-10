@@ -58,11 +58,19 @@ Archive:
 - v0.2.0: `.oto/milestones/v0.2.0-ROADMAP.md`, `v0.2.0-REQUIREMENTS.md`, `v0.2.0-MILESTONE-AUDIT.md`
 - v0.1.0: `.oto/milestones/v0.1.0-ROADMAP.md`, `v0.1.0-REQUIREMENTS.md`, `v0.1.0-MILESTONE-AUDIT.md`
 
-## Current Milestone
+## Current Milestone: v0.5.0 Exa Search Integration
 
-**Between milestones.** v0.4.0 shipped 2026-05-26. Start the next cycle with `/oto-new-milestone` (questioning → research → requirements → roadmap). See `### Next Milestone Goals` for parked candidates.
+**Goal:** Activate and finish oto's latent Exa integration so research-heavy agents use semantic search with inline content across all three runtimes.
 
-**Phase numbering:** the next milestone's phases must start above the highest existing phase folder in `.oto/phases/` (currently **13**) to avoid colliding with accumulated v0.1.0–v0.4.0 phase directories.
+**Target features:**
+- Exa MCP server registration per runtime (Claude Code / Codex / Gemini), wired through the installer and/or `/oto-settings-integrations` — the genuinely missing piece today
+- Fix the `exa_search` key-storage inconsistency (boolean toggle in `config.cjs`/`init.cjs` vs secret string in `settings-integrations`/`secrets.cjs`) so the API key never lands in committed `.oto/config.json`
+- Extend Exa usage guidance beyond the 3 researcher agents to other search-using agents (e.g., `oto-debugger`, `oto-advisor-researcher`)
+- Tests, runtime matrix entry, and docs consistent with oto's shipping standards
+
+**Key context:** The integration is ~70% latent from GSD — the `exa_search` config toggle, the settings surface, and researcher-agent prompt guidance already exist. This milestone is "finish the last mile," not a ground-up build. Exa's free tier (1,000 requests/month; unauthenticated MCP tier at 150 calls/day) fits the personal-use cost ceiling.
+
+**Phase numbering:** this milestone's phases must start at **14** (above the highest existing phase folder in `.oto/phases/`, currently **13**) to avoid colliding with accumulated v0.1.0–v0.4.0 phase directories.
 
 ## Requirements
 
@@ -85,7 +93,12 @@ Archive:
 
 ### Active
 
-_None — between milestones. The next milestone's requirements will be defined by `/oto-new-milestone` (which creates a fresh `.oto/REQUIREMENTS.md`)._
+v0.5.0 scope — REQ-IDs defined in `.oto/REQUIREMENTS.md`:
+
+- [ ] Exa MCP server registration per runtime (Claude Code / Codex / Gemini) via installer and/or `/oto-settings-integrations`
+- [ ] `exa_search` key-storage fix — API key kept out of committed `.oto/config.json`; boolean toggle and secret storage reconciled
+- [ ] Exa guidance extended to non-researcher search-using agents
+- [ ] Tests, runtime matrix entry, and docs for the Exa integration
 
 ### Next Milestone Goals
 
@@ -158,4 +171,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-05-26 — after v0.4.0 (SDK + Dogfood) milestone*
+*Last updated: 2026-07-10 — v0.5.0 (Exa Search Integration) milestone started*
