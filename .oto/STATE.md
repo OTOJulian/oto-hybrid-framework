@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: active
-last_updated: "2026-07-10T19:30:00.000Z"
-last_activity: 2026-07-10
+status: planning
+stopped_at: Phase 14 context gathered
+last_updated: "2026-07-10T20:55:01.788Z"
+last_activity: 2026-07-10 — v0.5.0 roadmap created (phases 14-16, 23/23 requirements mapped)
 progress:
   total_phases: 3
   completed_phases: 0
@@ -43,6 +44,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 ## Performance Metrics
 
 **Velocity (v0.4.0 reference):**
+
 - v0.4.0: 12 plans across 3 phases; recent plan durations 8/6/7/4/3/18/36 min
 
 **v0.5.0:**
@@ -95,9 +97,9 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-10
-Stopped at: v0.5.0 roadmap created; Phase 14 ready to plan
-Resume file: None
+Last session: 2026-07-10T20:55:01.785Z
+Stopped at: Phase 14 context gathered
+Resume file: .oto/phases/14-key-storage-reconciliation/14-CONTEXT.md
 
 ### Quick Tasks Completed
 
