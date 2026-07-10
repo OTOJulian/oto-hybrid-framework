@@ -95,8 +95,8 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 **Plans**: 4 plans
 
 Plans:
-- [ ] 14-01-PLAN.md — CJS layer: keyfile CRUD/migration/validation in secrets.cjs, boolean-only rejection + self-heal hooks in config.cjs/core.cjs
-- [ ] 14-02-PLAN.md — SDK layer: secrets.ts mirror, D-08 `~/.gsd/`→`~/.oto/` fix, boolean validation in configSet, migration hooks in both SDK read paths
+- [x] 14-01-PLAN.md — CJS layer: keyfile CRUD/migration/validation in secrets.cjs, boolean-only rejection + self-heal hooks in config.cjs/core.cjs
+- [x] 14-02-PLAN.md — SDK layer: secrets.ts mirror, D-08 `~/.gsd/`→`~/.oto/` fix, boolean validation in configSet, migration hooks in both SDK read paths
 - [ ] 14-03-PLAN.md — SDK secret-set/clear/status commands (stdin/TTY entry, masked status), registry wiring, sdk/dist rebuild + live smoke
 - [ ] 14-04-PLAN.md — /oto-settings-integrations rewrite (`!`-prefix secret-set flow), D-04 no-plaintext guard test, human-verify checkpoint
 
@@ -146,7 +146,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
-| 14. Key Storage Reconciliation | v0.5.0 | 0/4 | Planned | - |
+| 14. Key Storage Reconciliation | v0.5.0 | 2/4 | In Progress|  |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 0/TBD | Not started | - |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 

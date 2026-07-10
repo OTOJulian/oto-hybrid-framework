@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 14 context gathered
-last_updated: "2026-07-10T21:35:42.449Z"
-last_activity: 2026-07-10 -- Phase 14 planning complete
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-07-10T22:07:24.092Z"
+last_activity: 2026-07-10
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -22,16 +22,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 14 — Key Storage Reconciliation (v0.5.0 Exa Search Integration, phases 14-16)
+**Current focus:** Phase 14 — key-storage-reconciliation
 
 ## Current Position
 
-Phase: 14 of 16 (Key Storage Reconciliation) — first of 3 v0.5.0 phases
-Plan: Not planned yet
+Phase: 14 (key-storage-reconciliation) — EXECUTING
+Plan: 3 of 4
 Status: Ready to execute
-Last activity: 2026-07-10 -- Phase 14 planning complete
+Last activity: 2026-07-10
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Next Command
 
@@ -54,6 +54,8 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 14 P01 | 8 min | 2 tasks | 5 files |
+| Phase 14 P02 | 8 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -71,6 +73,10 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - Key-storage fix covers all three integrations (`exa_search`, `brave_search`, `firecrawl`) with the shared mechanism, not just Exa.
 - Sync hygiene is a cross-cutting v0.5.0 constraint: new logic in oto-only files where possible; shared-file diffs small and commented; `oto sync --dry-run` verified at milestone close (HARD-05).
 - All installer changes go in the live `bin/lib/` installer; `oto/bin/install.js` is a vestigial GSD reference.
+- [Phase 14]: CJS integration flags accept booleans only; API keys live in environment variables or 0600 ~/.oto keyfiles. — Prevents tracked config from persisting secret material.
+- [Phase 14]: Legacy config conflicts preserve the existing keyfile and drop the config string with masked notices. — A deliberately created keyfile is the safer source of truth.
+- [Phase 14]: SDK integration validation runs before the config lock or write — Non-boolean values never reach tracked config.
+- [Phase 14]: Both SDK read paths invoke best-effort legacy migration — Legacy strings self-heal without blocking normal reads.
 
 ### Pending Todos
 
@@ -94,12 +100,13 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 | context_question | Phase 02 (02-CONTEXT.md) | stale | v0.3.0-era discuss question left flagged; phase shipped and verified. |
 | context_question | Phase 11 (11-CONTEXT.md) | stale | Discuss questions answered during planning; phase shipped and verified. |
 | follow-up | init.cjs `.planning/` leak + milestone.complete marker | open | `oto/bin/lib/init.cjs:554` returns `task_dir: .planning/quick/…` (SDK handler correct); `oto-sdk query milestone.complete` rewrote the STATE.md frontmatter marker to `gsd_state_version` (restored manually). Both are ported CJS/SDK tooling still emitting GSD-era identifiers — fix via `/oto-quick`. |
+| follow-up | config-mutation.ts:349 global defaults path reads `~/.gsd/defaults.json` while CJS `config.cjs:66` reads `~/.oto/defaults.json` | open | GSD-era path divergence found during Phase 14; out of D-08 scope (keyfiles only) — fix via `/oto-quick` alongside the other GSD-era identifier cleanups |
 
 ## Session Continuity
 
-Last session: 2026-07-10T20:55:01.785Z
-Stopped at: Phase 14 context gathered
-Resume file: .oto/phases/14-key-storage-reconciliation/14-CONTEXT.md
+Last session: 2026-07-10T22:07:24.089Z
+Stopped at: Completed 14-02-PLAN.md
+Resume file: None
 
 ### Quick Tasks Completed
 

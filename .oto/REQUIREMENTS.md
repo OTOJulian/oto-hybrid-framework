@@ -9,9 +9,9 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 
 ### Key Storage (SECR)
 
-- [ ] **SECR-01**: User's Exa API key is stored only in `~/.oto/exa_api_key` (mode 0600) or the `EXA_API_KEY` env var — never in committed `.oto/config.json`
-- [ ] **SECR-02**: The `exa_search`, `brave_search`, and `firecrawl` config keys accept boolean values only, enforced in both write paths (SDK `config-mutation.ts` and CJS `config.cjs`)
-- [ ] **SECR-03**: Legacy API-key strings found in `.oto/config.json` are self-heal migrated to the keyfile with a boolean left in their place (this repo's own config included)
+- [x] **SECR-01**: User's Exa API key is stored only in `~/.oto/exa_api_key` (mode 0600) or the `EXA_API_KEY` env var — never in committed `.oto/config.json`
+- [x] **SECR-02**: The `exa_search`, `brave_search`, and `firecrawl` config keys accept boolean values only, enforced in both write paths (SDK `config-mutation.ts` and CJS `config.cjs`)
+- [x] **SECR-03**: Legacy API-key strings found in `.oto/config.json` are self-heal migrated to the keyfile with a boolean left in their place (this repo's own config included)
 - [ ] **SECR-04**: User can set, replace, and clear integration API keys via `/oto-settings-integrations`; keys are written to the keyfile via stdin (never argv), and status displays are masked (`****<last-4>`)
 
 ### MCP Registration (MCP)
@@ -73,9 +73,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SECR-01 | Phase 14 | Pending |
-| SECR-02 | Phase 14 | Pending |
-| SECR-03 | Phase 14 | Pending |
+| SECR-01 | Phase 14 | Complete |
+| SECR-02 | Phase 14 | Complete |
+| SECR-03 | Phase 14 | Complete |
 | SECR-04 | Phase 14 | Pending |
 | MCP-01 | Phase 15 | Pending |
 | MCP-02 | Phase 15 | Pending |
