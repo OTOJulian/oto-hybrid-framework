@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
-stopped_at: Completed 14-03-PLAN.md
-last_updated: "2026-07-10T22:34:58.026Z"
+status: verifying
+stopped_at: Completed 14-04-PLAN.md
+last_updated: "2026-07-10T23:22:14.547Z"
 last_activity: 2026-07-10
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -28,10 +28,10 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 Phase: 14 (key-storage-reconciliation) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-10
 
-Progress: [████████░░] 75%
+Progress: [██████████] 100%
 
 ## Next Command
 
@@ -57,6 +57,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 14 P01 | 8 min | 2 tasks | 5 files |
 | Phase 14 P02 | 8 min | 2 tasks | 7 files |
 | Phase 14 P03 | 14 min | 2 tasks | 34 files |
+| Phase 14 P04 | 39min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 14]: Both SDK read paths invoke best-effort legacy migration — Legacy strings self-heal without blocking normal reads.
 - [Phase 14]: Secret values enter through stdin or a muted TTY prompt only; argv and handler output remain plaintext-free. — Prevents keys from leaking through shell history, process listings, logs, or agent transcripts.
 - [Phase 14]: Native query handlers may provide optional raw display text while preserving structured data for programmatic consumers. — Lets human-facing status commands render exact masked lines without breaking registry callers.
+- [Phase 14]: Settings Set/Replace delegates key entry to the user's hidden terminal prompt; the workflow never receives secret material. — Keeps keys out of chat, argv, shell history, and tracked config.
+- [Phase 14]: The no-plaintext regression guard scans exactly git-tracked .oto files. — Protects the remote exfiltration surface without fixture false positives.
 
 ### Pending Todos
 
@@ -107,8 +110,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-10T22:34:58.023Z
-Stopped at: Completed 14-03-PLAN.md
+Last session: 2026-07-10T23:22:14.544Z
+Stopped at: Completed 14-04-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed
