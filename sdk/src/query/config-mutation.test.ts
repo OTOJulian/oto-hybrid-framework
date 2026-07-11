@@ -7,6 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtemp, writeFile, readFile, mkdir, rm, stat } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { GSDError } from '../errors.js';
@@ -475,6 +476,177 @@ describe('configNewProject integration keyfile detection (Phase 14, D-08)', () =
 
     const config = JSON.parse(await readFile(join(projectDir, '.oto', 'config.json'), 'utf8'));
     expect(config.exa_search).toBe(false);
+  });
+});
+
+// ─── Phase 14 gap-closure: new-project boolean enforcement (CR-01) ────────
+
+describe('configNewProject boolean enforcement (Phase 14 gap-closure, CR-01)', () => {
+  const INTEGRATION_CASES = [
+    ['exa_search', 'exa_api_key'],
+    ['brave_search', 'brave_api_key'],
+    ['firecrawl', 'firecrawl_api_key'],
+  ] as const;
+
+  function stubCleanHome(fakeHome: string): void {
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+  }
+
+  it('rejects caller-supplied strings for all three integrations without creating config.json', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-reject');
+    await mkdir(join(fakeHome, '.oto'), { recursive: true });
+    stubCleanHome(fakeHome);
+
+    for (const [configKey] of INTEGRATION_CASES) {
+      const projectDir = join(tmpDir, `reject-${configKey}`);
+      await mkdir(join(projectDir, '.oto'), { recursive: true });
+      const marker = `sk-test-${configKey}-0123456789`;
+
+      let caught: unknown;
+      try {
+        await configNewProject([JSON.stringify({ [configKey]: marker })], projectDir);
+      } catch (err: unknown) {
+        caught = err;
+      }
+
+      expect(caught).toBeInstanceOf(GSDError);
+      expect((caught as GSDError).message).toMatch(/booleans only/);
+      expect((caught as GSDError).message).not.toContain(marker);
+      expect(existsSync(join(projectDir, '.oto', 'config.json'))).toBe(false);
+    }
+  });
+
+  it('migrates global-default strings to 0600 ~/.oto keyfiles; .gsd/defaults.json stays byte-identical (D-08)', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+
+    for (const [configKey, keyfileName] of INTEGRATION_CASES) {
+      const fakeHome = join(tmpDir, `home-migrate-${configKey}`);
+      await mkdir(join(fakeHome, '.oto'), { recursive: true });
+      await mkdir(join(fakeHome, '.gsd'), { recursive: true });
+      const marker = `sk-test-${configKey}-9876543210`;
+      const seeded = JSON.stringify({ [configKey]: marker }, null, 2) + '\n';
+      await writeFile(join(fakeHome, '.gsd', 'defaults.json'), seeded);
+      stubCleanHome(fakeHome);
+      const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+      const projectDir = join(tmpDir, `migrate-${configKey}`);
+      await mkdir(join(projectDir, '.oto'), { recursive: true });
+      await configNewProject([], projectDir);
+
+      const config = JSON.parse(
+        await readFile(join(projectDir, '.oto', 'config.json'), 'utf8'),
+      ) as Record<string, unknown>;
+      expect(config[configKey]).toBe(true);
+
+      const keyfile = join(fakeHome, '.oto', keyfileName);
+      expect(await readFile(keyfile, 'utf8')).toBe(`${marker}\n`);
+      expect((await stat(keyfile)).mode & 0o777).toBe(0o600);
+
+      // D-08: the GSD defaults source is READ-ONLY — never rewritten.
+      expect(await readFile(join(fakeHome, '.gsd', 'defaults.json'), 'utf8')).toBe(seeded);
+
+      const output = stderr.mock.calls.map(([chunk]) => String(chunk)).join('');
+      expect(output).toContain(
+        `migrated ${configKey} API key from global defaults to ~/.oto/${keyfileName} (0600)`,
+      );
+      expect(output).not.toContain(marker);
+      stderr.mockRestore();
+    }
+  });
+
+  it('re-migrates on each new project with a repeat masked notice; .gsd untouched (T-14-05-05)', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-repeat');
+    await mkdir(join(fakeHome, '.oto'), { recursive: true });
+    await mkdir(join(fakeHome, '.gsd'), { recursive: true });
+    const marker = 'sk-test-repeat-fc-0123456789';
+    const seeded = JSON.stringify({ firecrawl: marker }, null, 2) + '\n';
+    await writeFile(join(fakeHome, '.gsd', 'defaults.json'), seeded);
+    stubCleanHome(fakeHome);
+
+    const firstProject = join(tmpDir, 'repeat-first');
+    await mkdir(join(firstProject, '.oto'), { recursive: true });
+    await configNewProject([], firstProject);
+
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const secondProject = join(tmpDir, 'repeat-second');
+    await mkdir(join(secondProject, '.oto'), { recursive: true });
+    await configNewProject([], secondProject);
+
+    const secondConfig = JSON.parse(
+      await readFile(join(secondProject, '.oto', 'config.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    expect(secondConfig.firecrawl).toBe(true);
+
+    const output = stderr.mock.calls.map(([chunk]) => String(chunk)).join('');
+    expect(output).toContain(
+      'migrated firecrawl API key from global defaults to ~/.oto/firecrawl_api_key (0600)',
+    );
+    expect(output).not.toContain(marker);
+    expect(await readFile(join(fakeHome, '.gsd', 'defaults.json'), 'utf8')).toBe(seeded);
+  });
+
+  it('keeps an existing ~/.oto keyfile over a conflicting global-default string (D-02)', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-conflict');
+    await mkdir(join(fakeHome, '.oto'), { recursive: true });
+    await mkdir(join(fakeHome, '.gsd'), { recursive: true });
+    const keyfileSecret = 'sk-existing-keyfile-0000';
+    const defaultsSecret = 'sk-defaults-different-1111';
+    const keyfile = join(fakeHome, '.oto', 'exa_api_key');
+    await writeFile(keyfile, keyfileSecret + '\n', { mode: 0o600 });
+    await writeFile(
+      join(fakeHome, '.gsd', 'defaults.json'),
+      JSON.stringify({ exa_search: defaultsSecret }),
+    );
+    stubCleanHome(fakeHome);
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const projectDir = join(tmpDir, 'conflict-project');
+    await mkdir(join(projectDir, '.oto'), { recursive: true });
+    await configNewProject([], projectDir);
+
+    // Keyfile wins: content unchanged, config gets boolean true.
+    expect(await readFile(keyfile, 'utf8')).toBe(keyfileSecret + '\n');
+    const config = JSON.parse(
+      await readFile(join(projectDir, '.oto', 'config.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    expect(config.exa_search).toBe(true);
+
+    const output = stderr.mock.calls.map(([chunk]) => String(chunk)).join('');
+    expect(output).toContain('kept; config string (****1111) dropped');
+    expect(output).not.toContain(keyfileSecret);
+    expect(output).not.toContain(defaultsSecret);
+  });
+
+  it('never writes a non-boolean integration value for mixed choices + defaults (defense gate)', async () => {
+    const { configNewProject } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-mixed');
+    await mkdir(join(fakeHome, '.oto'), { recursive: true });
+    await mkdir(join(fakeHome, '.gsd'), { recursive: true });
+    await writeFile(
+      join(fakeHome, '.gsd', 'defaults.json'),
+      JSON.stringify({ brave_search: 'sk-test-brave-mixed-0123456789' }),
+    );
+    stubCleanHome(fakeHome);
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const projectDir = join(tmpDir, 'mixed-project');
+    await mkdir(join(projectDir, '.oto'), { recursive: true });
+    await configNewProject([JSON.stringify({ exa_search: true })], projectDir);
+
+    const config = JSON.parse(
+      await readFile(join(projectDir, '.oto', 'config.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    for (const [configKey] of INTEGRATION_CASES) {
+      expect(typeof config[configKey]).toBe('boolean');
+    }
+    expect(config.exa_search).toBe(true);
+    expect(config.brave_search).toBe(true);
   });
 });
 
