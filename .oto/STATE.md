@@ -1,5 +1,5 @@
 ---
-gsd_state_version: 1.0
+oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
