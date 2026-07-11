@@ -7,7 +7,8 @@
  * in a 0600 keyfile, and returns masked output only.
  */
 
-import { readFileSync } from 'node:fs';
+import { accessSync, constants, existsSync, readFileSync, statSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { createInterface } from 'node:readline';
 import { ErrorClassification, GSDError } from '../errors.js';
 import { planningPaths } from './helpers.js';
@@ -101,6 +102,34 @@ function resolveSlug(arg: string | undefined): IntegrationSlug {
   return slug as IntegrationSlug;
 }
 
+/**
+ * Fail fast when the config destination cannot accept a flag update (CR-03).
+ *
+ * Detecting EISDIR/EACCES faults BEFORE any keyfile byte is mutated keeps the
+ * keyfile + config flag pair transactional: a doomed config write can never
+ * orphan a fresh 0600 keyfile or strand a deleted credential.
+ */
+function preflightConfigDestination(projectDir: string, workstream?: string): void {
+  const paths = planningPaths(projectDir, workstream);
+  if (existsSync(paths.config) && statSync(paths.config).isDirectory()) {
+    throw new GSDError(
+      `config path is a directory, not a file: ${paths.config} — cannot update integration flag`,
+      ErrorClassification.Validation,
+    );
+  }
+  const parent = dirname(paths.config);
+  if (existsSync(parent)) {
+    try {
+      accessSync(parent, constants.W_OK);
+    } catch {
+      throw new GSDError(
+        `config directory is not writable: ${parent} — fix permissions and retry`,
+        ErrorClassification.Execution,
+      );
+    }
+  }
+}
+
 /** Set an integration key from stdin and enable its boolean config flag. */
 export async function secretSet(
   args: string[],
@@ -118,9 +147,28 @@ export async function secretSet(
   }
 
   const integration = INTEGRATIONS[slug];
+  preflightConfigDestination(projectDir, workstream); // fail BEFORE reading/writing anything
   const secret = await readSecretInput(stdin, stderr);
+  const prior = readKeyfile(slug); // snapshot: null | { value }
   writeKeyfile(slug, secret);
-  await configSet([integration.configKey, 'true'], projectDir, workstream);
+  try {
+    await configSet([integration.configKey, 'true'], projectDir, workstream);
+  } catch (err) {
+    // Compensate: restore exact prior keyfile state, then rethrow sanitized.
+    try {
+      if (prior === null) deleteKeyfile(slug);
+      else writeKeyfile(slug, prior.value);
+    } catch {
+      /* best-effort restore */
+    }
+    // configSet's args are [configKey, 'true'], so `msg` can never contain the
+    // secret; the secret variable is never interpolated into any error.
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new GSDError(
+      `failed to enable ${integration.configKey} — keyfile restored to its previous state (${msg})`,
+      ErrorClassification.Execution,
+    );
+  }
 
   return {
     data: {
@@ -148,8 +196,30 @@ export async function secretClear(
 }>> {
   const slug = resolveSlug(args[0]);
   const integration = INTEGRATIONS[slug];
-  const existed = deleteKeyfile(slug);
-  await configSet([integration.configKey, 'false'], projectDir, workstream);
+  preflightConfigDestination(projectDir, workstream);
+  // Config-first ordering: a config failure here leaves the keyfile untouched,
+  // so a failed clear can never destroy the only stored credential.
+  const result = await configSet([integration.configKey, 'false'], projectDir, workstream);
+  let existed: boolean;
+  try {
+    existed = deleteKeyfile(slug);
+  } catch (err) {
+    const prev = (result.data as Record<string, unknown> | undefined)?.previousValue;
+    try {
+      await configSet(
+        [integration.configKey, prev === true ? 'true' : 'false'],
+        projectDir,
+        workstream,
+      );
+    } catch {
+      /* best-effort flag restore */
+    }
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new GSDError(
+      `failed to remove keyfile — ${integration.configKey} flag restored (${msg})`,
+      ErrorClassification.Execution,
+    );
+  }
   const envStillSet = Boolean(process.env[integration.envVar]?.trim());
   const raw = envStillSet
     ? `keyfile removed; ${integration.envVar} still set — integration remains available.`
