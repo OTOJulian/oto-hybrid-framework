@@ -57,6 +57,27 @@ export type IntegrationValidation = {
 };
 export declare function validateIntegrationValue(configKey: string, value: unknown): IntegrationValidation;
 export declare function warnIfNoKeyDetected(configKey: string, baseDir?: string): void;
+/**
+ * Validate/migrate the integration fields of a fully merged new-project
+ * config BEFORE any write (Phase 14 gap-closure, CR-01 / SECR-02).
+ *
+ * Mirrors `reconcileNewProjectIntegrations` in oto/bin/lib/secrets.cjs
+ * (both-write-paths discipline) with two SDK-specific differences:
+ * - Caller-supplied non-boolean values throw GSDError (Validation) instead
+ *   of returning { ok:false } — the sanitized D-05 message never echoes the
+ *   value.
+ * - There is NO defaults-file write-back of any kind: the SDK's D11 defaults
+ *   source belongs to the separate GSD install and is READ-ONLY per D-08.
+ *   The string stays there and each subsequent new-project run re-migrates
+ *   with a repeat masked notice (accepted posture, T-14-05-05).
+ *
+ * Trusted global-default strings become 0600 keyfiles under ~/.oto with the
+ * keyfile-wins conflict policy (D-02); other non-booleans are coerced via
+ * Boolean(value). Mutates `merged` in place.
+ */
+export declare function reconcileNewProjectIntegrations(merged: Record<string, unknown>, userChoices: Record<string, unknown>, baseDir?: string): {
+    migrated: string[];
+};
 export interface MigrationResult {
     migrated: string[];
     conflicts: string[];
