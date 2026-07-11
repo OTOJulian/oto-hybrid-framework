@@ -96,6 +96,13 @@ export async function loadConfig(projectDir, workstream) {
         await migrateLegacyIntegrationKeys(configPath);
     }
     catch { /* never block reads */ }
+    // Phase 14 gap-closure (SECR-03, CR-04): the root layer is a possible fallback — heal it before any read.
+    if (workstream) {
+        try {
+            await migrateLegacyIntegrationKeys(rootConfigPath);
+        }
+        catch { /* never block reads */ }
+    }
     let raw;
     let projectConfigFound = false;
     try {
@@ -143,6 +150,11 @@ export async function loadConfig(projectDir, workstream) {
     }
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
         throw new Error(`Config at ${configPath} must be a JSON object`);
+    }
+    // Phase 14 gap-closure (SECR-01): loader contract is boolean-only for integration flags.
+    for (const k of ['exa_search', 'brave_search', 'firecrawl']) {
+        if (typeof parsed[k] === 'string')
+            parsed[k] = true;
     }
     // Project config exists — user-level defaults are ignored (CJS parity).
     // `buildNewProjectConfig` already baked them into config.json at /gsd:new-project.

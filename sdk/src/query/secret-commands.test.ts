@@ -238,6 +238,45 @@ describe('secretStatus', () => {
   });
 });
 
+describe('secretStatus legacy self-heal (Phase 14 gap-closure, WR-01)', () => {
+  it('self-heals a legacy config string to a 0600 keyfile before reporting', async () => {
+    const marker = 'sk-test-ss-0123456789';
+    writeFileSync(configPath(), JSON.stringify({ exa_search: marker }) + '\n');
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const result = await secretStatus([], projectDir);
+
+    // The string became a keyfile + boolean true in the tracked file.
+    expect(readFileSync(keyfilePath('exa'), 'utf8')).toBe(`${marker}\n`);
+    expect(statSync(keyfilePath('exa')).mode & 0o777).toBe(0o600);
+    expect(JSON.parse(readFileSync(configPath(), 'utf8')).exa_search).toBe(true);
+
+    // Status reports the healed state with masked-only display.
+    const exa = result.data.integrations.find((entry) => entry.integration === 'exa');
+    expect(exa).toMatchObject({ enabled: true, source: 'keyfile', masked: '****6789' });
+    expect(result.raw).toContain('****6789');
+    expect(result.raw).not.toContain(marker);
+    expect(JSON.stringify(result)).not.toContain(marker);
+    expect(stderr.mock.calls.map(([chunk]) => String(chunk)).join('')).not.toContain(marker);
+  });
+
+  it('fail-open: still renders the masked-only display when migration cannot complete', async () => {
+    const marker = 'sk-test-ss-broken-0123456789';
+    const original = JSON.stringify({ exa_search: marker }) + '\n';
+    writeFileSync(configPath(), original);
+    // `$HOME/.oto` as a regular file: writeKeyfile's mkdirSync throws, migration cannot complete.
+    writeFileSync(join(tmpHome, '.oto'), 'not-a-dir');
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const result = await secretStatus([], projectDir);
+
+    // Read-only masked display still renders; config untouched; no secret anywhere.
+    expect(readFileSync(configPath(), 'utf8')).toBe(original);
+    expect(result.raw).not.toContain(marker);
+    expect(JSON.stringify(result)).not.toContain(marker);
+  });
+});
+
 describe('transactional set/clear (Phase 14 gap-closure, CR-03)', () => {
   const FAULT_MARKER = 'sk-fault-test-0123456789';
 

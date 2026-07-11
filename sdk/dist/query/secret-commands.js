@@ -6,12 +6,13 @@
  * only from piped stdin or a silent interactive TTY prompt (D-09), stores it
  * in a 0600 keyfile, and returns masked output only.
  */
-import { readFileSync } from 'node:fs';
+import { accessSync, constants, existsSync, readFileSync, statSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { createInterface } from 'node:readline';
 import { ErrorClassification, GSDError } from '../errors.js';
 import { planningPaths } from './helpers.js';
 import { configSet } from './config-mutation.js';
-import { INTEGRATIONS, deleteKeyfile, detectKeySource, maskSecret, readKeyfile, writeKeyfile, } from './secrets.js';
+import { INTEGRATIONS, deleteKeyfile, detectKeySource, maskSecret, migrateLegacyIntegrationKeys, readKeyfile, writeKeyfile, } from './secrets.js';
 const INTEGRATION_SLUGS = Object.keys(INTEGRATIONS);
 /**
  * Read a secret without ever accepting it through argv.
@@ -72,6 +73,28 @@ function resolveSlug(arg) {
     }
     return slug;
 }
+/**
+ * Fail fast when the config destination cannot accept a flag update (CR-03).
+ *
+ * Detecting EISDIR/EACCES faults BEFORE any keyfile byte is mutated keeps the
+ * keyfile + config flag pair transactional: a doomed config write can never
+ * orphan a fresh 0600 keyfile or strand a deleted credential.
+ */
+function preflightConfigDestination(projectDir, workstream) {
+    const paths = planningPaths(projectDir, workstream);
+    if (existsSync(paths.config) && statSync(paths.config).isDirectory()) {
+        throw new GSDError(`config path is a directory, not a file: ${paths.config} — cannot update integration flag`, ErrorClassification.Validation);
+    }
+    const parent = dirname(paths.config);
+    if (existsSync(parent)) {
+        try {
+            accessSync(parent, constants.W_OK);
+        }
+        catch {
+            throw new GSDError(`config directory is not writable: ${parent} — fix permissions and retry`, ErrorClassification.Execution);
+        }
+    }
+}
 /** Set an integration key from stdin and enable its boolean config flag. */
 export async function secretSet(args, projectDir, workstream, stdin = process.stdin, stderr = process.stderr) {
     const slug = resolveSlug(args[0]);
@@ -79,9 +102,29 @@ export async function secretSet(args, projectDir, workstream, stdin = process.st
         throw new GSDError('API keys are never accepted as arguments (argv leaks to shell history/ps) — pipe via stdin or run interactively', ErrorClassification.Validation);
     }
     const integration = INTEGRATIONS[slug];
+    preflightConfigDestination(projectDir, workstream); // fail BEFORE reading/writing anything
     const secret = await readSecretInput(stdin, stderr);
+    const prior = readKeyfile(slug); // snapshot: null | { value }
     writeKeyfile(slug, secret);
-    await configSet([integration.configKey, 'true'], projectDir, workstream);
+    try {
+        await configSet([integration.configKey, 'true'], projectDir, workstream);
+    }
+    catch (err) {
+        // Compensate: restore exact prior keyfile state, then rethrow sanitized.
+        try {
+            if (prior === null)
+                deleteKeyfile(slug);
+            else
+                writeKeyfile(slug, prior.value);
+        }
+        catch {
+            /* best-effort restore */
+        }
+        // configSet's args are [configKey, 'true'], so `msg` can never contain the
+        // secret; the secret variable is never interpolated into any error.
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new GSDError(`failed to enable ${integration.configKey} — keyfile restored to its previous state (${msg})`, ErrorClassification.Execution);
+    }
     return {
         data: {
             integration: slug,
@@ -96,8 +139,25 @@ export async function secretSet(args, projectDir, workstream, stdin = process.st
 export async function secretClear(args, projectDir, workstream) {
     const slug = resolveSlug(args[0]);
     const integration = INTEGRATIONS[slug];
-    const existed = deleteKeyfile(slug);
-    await configSet([integration.configKey, 'false'], projectDir, workstream);
+    preflightConfigDestination(projectDir, workstream);
+    // Config-first ordering: a config failure here leaves the keyfile untouched,
+    // so a failed clear can never destroy the only stored credential.
+    const result = await configSet([integration.configKey, 'false'], projectDir, workstream);
+    let existed;
+    try {
+        existed = deleteKeyfile(slug);
+    }
+    catch (err) {
+        const prev = result.data?.previousValue;
+        try {
+            await configSet([integration.configKey, prev === true ? 'true' : 'false'], projectDir, workstream);
+        }
+        catch {
+            /* best-effort flag restore */
+        }
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new GSDError(`failed to remove keyfile — ${integration.configKey} flag restored (${msg})`, ErrorClassification.Execution);
+    }
     const envStillSet = Boolean(process.env[integration.envVar]?.trim());
     const raw = envStillSet
         ? `keyfile removed; ${integration.envVar} still set — integration remains available.`
@@ -128,6 +188,12 @@ function readConfig(projectDir, workstream) {
 /** Report masked key sources and flag state for one or every integration. */
 export async function secretStatus(args, projectDir, workstream) {
     const slugs = args[0] === undefined ? INTEGRATION_SLUGS : [resolveSlug(args[0])];
+    // Phase 14 gap-closure (SECR-03, WR-01): status must self-heal legacy strings like every other read path.
+    // Fail-open is safe here: this handler's display is masked-only by construction (D-10) and never returns raw config values.
+    try {
+        await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config);
+    }
+    catch { /* masked display still renders */ }
     const config = readConfig(projectDir, workstream);
     const integrations = [];
     const lines = [];
