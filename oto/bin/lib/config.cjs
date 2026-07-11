@@ -349,6 +349,15 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
     if (parsedValue === true) warnIfNoKeyDetected(keyPath); // D-06: warn but allow
   }
 
+  // OTO Phase 14 gap-closure (SECR-03): keyfile any legacy string BEFORE overwriting it; fail closed if migration cannot complete.
+  if (isSecretKey(keyPath)) {
+    try {
+      migrateLegacyIntegrationKeys(path.join(planningDir(cwd), 'config.json'));
+    } catch {
+      error(`${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`);
+    }
+  }
+
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
   if (keyPath === 'context' && !VALID_CONTEXT_VALUES.includes(String(parsedValue))) {
     error(`Invalid context value '${value}'. Valid values: ${VALID_CONTEXT_VALUES.join(', ')}`);

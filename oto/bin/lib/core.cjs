@@ -318,6 +318,15 @@ function _deepMergeConfig(base, overlay) {
   return result;
 }
 
+// OTO Phase 14 gap-closure (SECR-01): loader contract is boolean-only for integration flags.
+function _scrubIntegrationStrings(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  for (const k of ['exa_search', 'brave_search', 'firecrawl']) {
+    if (typeof obj[k] === 'string') obj[k] = true;
+  }
+  return obj;
+}
+
 function loadConfig(cwd) {
   // When OTO_WORKSTREAM is set, load root config first so workstream config
   // can inherit from it. This prevents users from duplicating model_overrides,
@@ -326,9 +335,11 @@ function loadConfig(cwd) {
   let rootParsed = null;
   if (ws) {
     const rootConfigPath = path.join(planningRoot(cwd), 'config.json');
+    // OTO Phase 14 gap-closure (SECR-03): heal legacy root strings before parsing the root layer (CR-04).
+    try { require('./secrets.cjs').migrateLegacyIntegrationKeys(rootConfigPath); } catch { /* never block config load */ }
     try {
       const raw = fs.readFileSync(rootConfigPath, 'utf-8');
-      rootParsed = JSON.parse(raw);
+      rootParsed = _scrubIntegrationStrings(JSON.parse(raw));
     } catch {
       // Root config missing or unparseable — workstream config stands alone
     }
@@ -344,7 +355,7 @@ function loadConfig(cwd) {
     const raw = fs.readFileSync(configPath, 'utf-8');
     // `fileData` is the parsed content of the config.json file on disk — used
     // for migrations and writes so we never persist merged values back to disk.
-    const fileData = JSON.parse(raw);
+    const fileData = _scrubIntegrationStrings(JSON.parse(raw));
 
     // Migrate deprecated "depth" key to "granularity" with value mapping
     if ('depth' in fileData && !('granularity' in fileData)) {
