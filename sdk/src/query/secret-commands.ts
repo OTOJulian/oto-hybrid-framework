@@ -18,6 +18,7 @@ import {
   deleteKeyfile,
   detectKeySource,
   maskSecret,
+  migrateLegacyIntegrationKeys,
   readKeyfile,
   writeKeyfile,
   type IntegrationSlug,
@@ -270,6 +271,9 @@ export async function secretStatus(
   workstream?: string,
 ): Promise<SecretCommandResult<{ integrations: SecretStatusEntry[] }>> {
   const slugs = args[0] === undefined ? INTEGRATION_SLUGS : [resolveSlug(args[0])];
+  // Phase 14 gap-closure (SECR-03, WR-01): status must self-heal legacy strings like every other read path.
+  // Fail-open is safe here: this handler's display is masked-only by construction (D-10) and never returns raw config values.
+  try { await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config); } catch { /* masked display still renders */ }
   const config = readConfig(projectDir, workstream);
   const integrations: SecretStatusEntry[] = [];
   const lines: string[] = [];

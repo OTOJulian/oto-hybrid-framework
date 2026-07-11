@@ -27,6 +27,9 @@ import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
 import {
   INTEGRATIONS,
+  integrationForConfigKey,
+  maskSecret,
+  migrateLegacyIntegrationKeys,
   reconcileNewProjectIntegrations,
   validateIntegrationValue,
   warnIfNoKeyDetected,
@@ -217,6 +220,20 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
   }
   if (parsedValue === true) warnIfNoKeyDetected(keyPath);
 
+  // Phase 14 gap-closure (SECR-03): keyfile any legacy string BEFORE overwriting it;
+  // fail closed if self-heal cannot complete.
+  const integrationKey = integrationForConfigKey(keyPath) !== null;
+  if (integrationKey) {
+    try {
+      await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config);
+    } catch {
+      throw new GSDError(
+        `${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`,
+        ErrorClassification.Execution,
+      );
+    }
+  }
+
   // D8: Context value validation (match CJS config.cjs:357-359)
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
   if (keyPath === 'context' && !VALID_CONTEXT_VALUES.includes(String(parsedValue))) {
@@ -253,7 +270,10 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
     value: parsedValue,
   };
   if (previousValue !== undefined) {
-    data.previousValue = previousValue;
+    // Phase 14 gap-closure: previousValue is agent-visible — never echo a secret.
+    data.previousValue = integrationKey && typeof previousValue !== 'boolean'
+      ? maskSecret(previousValue) // defense-in-depth: post-migration this should already be boolean
+      : previousValue;
   }
   return { data };
 };
