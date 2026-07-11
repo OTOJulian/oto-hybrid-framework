@@ -213,6 +213,87 @@ function migrateLegacyIntegrationKeys(configPath, baseDir) {
   return { migrated, conflicts };
 }
 
+/**
+ * Validate/migrate the integration fields of a fully merged new-project
+ * config BEFORE any write (Phase 14 gap-closure, CR-01 / SECR-02).
+ *
+ * - Caller-supplied non-boolean (present in userChoices): hard reject with
+ *   the sanitized D-05 message — returns { ok:false, message }; the value is
+ *   never echoed.
+ * - Trusted global-default string (from ~/.oto/defaults.json, NOT owned by
+ *   userChoices): migrate to a 0600 keyfile (keyfile-wins on conflict, D-02)
+ *   and set the config field to boolean true. The oto-owned defaults.json is
+ *   then best-effort healed so re-migration doesn't repeat.
+ * - Any other non-boolean: coerced via Boolean(value).
+ *
+ * This helper NEVER touches the foreign GSD install's state dir (D-08 —
+ * that directory is read-only for oto; only oto-owned paths are written).
+ *
+ * Mutates `merged` in place. Returns { ok:true, migrated } on success.
+ */
+function reconcileNewProjectIntegrations(merged, userChoices, baseDir) {
+  const choices = userChoices || {};
+  const migrated = [];
+
+  for (const [slug, integration] of Object.entries(INTEGRATIONS)) {
+    const value = merged[integration.configKey];
+    if (typeof value === 'boolean') continue;
+
+    const callerOwned =
+      Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
+      typeof choices[integration.configKey] !== 'boolean';
+    if (callerOwned) {
+      // D-05: sanitized rejection — message never includes the value.
+      return validateIntegrationValue(integration.configKey, value);
+    }
+
+    if (typeof value === 'string' && value) {
+      // Trusted global-default string — same conflict policy as
+      // migrateLegacyIntegrationKeys: an existing keyfile wins (D-02).
+      const existing = readKeyfile(slug, baseDir);
+      if (existing && existing.value !== value) {
+        process.stderr.write(
+          `${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(value)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
+        );
+      } else {
+        writeKeyfile(slug, value, baseDir);
+        process.stderr.write(
+          `migrated ${integration.configKey} API key from global defaults to ~/.oto/${integration.keyfileName} (0600)\n`,
+        );
+      }
+      merged[integration.configKey] = true;
+      migrated.push(integration.configKey);
+    } else {
+      merged[integration.configKey] = Boolean(value);
+    }
+  }
+
+  if (migrated.length > 0) {
+    // Best-effort heal of the OTO-OWNED ~/.oto/defaults.json only, so the
+    // next new-project run doesn't re-migrate. Failure just means a repeat
+    // masked notice (accepted, T-14-05-05). defaults.json is not git-tracked,
+    // so no rotation warning is needed here.
+    try {
+      const defaultsPath = path.join(keyfileBase(baseDir), 'defaults.json');
+      const defaults = JSON.parse(fs.readFileSync(defaultsPath, 'utf8'));
+      if (defaults && typeof defaults === 'object' && !Array.isArray(defaults)) {
+        let changed = false;
+        for (const configKey of migrated) {
+          if (typeof defaults[configKey] === 'string' && defaults[configKey]) {
+            defaults[configKey] = true;
+            changed = true;
+          }
+        }
+        if (changed) {
+          fs.writeFileSync(defaultsPath, JSON.stringify(defaults, null, 2), 'utf8');
+        }
+      }
+    } catch { /* best-effort — repeat masked notices are the accepted fallback */ }
+  }
+
+  return { ok: true, migrated };
+}
+
 module.exports = {
   SECRET_CONFIG_KEYS,
   isSecretKey,
@@ -228,4 +309,5 @@ module.exports = {
   validateIntegrationValue,
   warnIfNoKeyDetected,
   migrateLegacyIntegrationKeys,
+  reconcileNewProjectIntegrations,
 };

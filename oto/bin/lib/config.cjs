@@ -17,6 +17,7 @@ const {
   validateIntegrationValue,
   warnIfNoKeyDetected,
   migrateLegacyIntegrationKeys,
+  reconcileNewProjectIntegrations,
 } = require('./secrets.cjs');
 
 const CONFIG_KEY_SUGGESTIONS = {
@@ -141,7 +142,7 @@ function buildNewProjectConfig(userChoices) {
   };
 
   // Three-level deep merge: hardcoded <- userDefaults <- choices
-  return {
+  const merged = {
     ...hardcoded,
     ...userDefaults,
     ...choices,
@@ -166,6 +167,11 @@ function buildNewProjectConfig(userChoices) {
       ...(choices.agent_skills || {}),
     },
   };
+
+  // OTO Phase 14 gap-closure (SECR-02): validate merged integration values before any write.
+  const reconcile = reconcileNewProjectIntegrations(merged, choices);
+  if (!reconcile.ok) error(reconcile.message); // D-05: hard reject, nothing written
+  return merged;
 }
 
 /**
