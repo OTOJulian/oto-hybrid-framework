@@ -42,21 +42,28 @@ Read all files referenced by the invoking prompt's execution_context before star
 <process>
 
 <step name="ensure_and_load_config">
-Ensure config exists and resolve the active config path (flat vs workstream, #2282):
+Resolve the active workstream, then ensure config exists via the idempotent
+`config-new-project` (returns `already_exists` when present). Every subsequent
+oto-sdk command MUST include the guarded expansion
+`${WS_ARGS[@]+"${WS_ARGS[@]}"}` (portable under bash 3.2 with `set -u` when
+the array is empty — never expand the array without the `WS_ARGS[@]+` guard).
+Flat vs workstream routing per #2282:
 
 ```bash
-oto-sdk query config-ensure-section
-if [[ -z "${OTO_CONFIG_PATH:-}" ]]; then
-  if [[ -f .oto/active-workstream ]]; then
-    WS=$(tr -d '\n\r' < .oto/active-workstream)
-    OTO_CONFIG_PATH=".oto/workstreams/${WS}/config.json"
-  else
-    OTO_CONFIG_PATH=".oto/config.json"
-  fi
+WS_ARGS=()
+if [[ -f .oto/active-workstream ]]; then
+  WS=$(tr -d '\n\r' < .oto/active-workstream)
+  WS_ARGS=(--ws "$WS")
+  OTO_CONFIG_PATH=".oto/workstreams/${WS}/config.json"
+else
+  WS=""
+  OTO_CONFIG_PATH=".oto/config.json"
 fi
+oto-sdk query config-new-project ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 
-Store `$OTO_CONFIG_PATH`. Every subsequent read/write uses it.
+Store `$OTO_CONFIG_PATH` and `WS_ARGS`. Every subsequent read/write is
+threaded through `${WS_ARGS[@]+"${WS_ARGS[@]}"}` so it targets this config.
 </step>
 
 <step name="read_status">
@@ -64,8 +71,8 @@ Read the current integration status through the secret-aware command and read
 the non-secret local-search flag from config:
 
 ```bash
-oto-sdk query secret-status
-SEARCH_GITIGNORED=$(oto-sdk query config-get search_gitignored --default false)
+oto-sdk query secret-status ${WS_ARGS[@]+"${WS_ARGS[@]}"}
+SEARCH_GITIGNORED=$(oto-sdk query config-get search_gitignored --default false ${WS_ARGS[@]+"${WS_ARGS[@]}"})
 ```
 
 Show the `secret-status` lines verbatim; they are already masked and include
@@ -146,7 +153,13 @@ entered at a hidden prompt and never appears in this conversation):
 Then reply "done" (or "skip") to continue.
 ```
 
-Use the exact command for the selected integration:
+When a workstream is active (WS non-empty), print the command WITH the flag
+so the boolean lands in the active config:
+`! oto-sdk query secret-set <slug> --ws <ws-name>` (substitute the actual
+name; the key entry itself is unchanged — hidden prompt, never argv).
+
+Use the exact command for the selected integration (append `--ws <ws-name>`
+to each when a workstream is active):
 
 ```text
 Brave:    ! oto-sdk query secret-set brave
@@ -154,11 +167,12 @@ Firecrawl: ! oto-sdk query secret-set firecrawl
 Exa:      ! oto-sdk query secret-set exa
 ```
 
-After the user replies `done`, run `oto-sdk query secret-status <slug>` and
+After the user replies `done`, run
+`oto-sdk query secret-status <slug> ${WS_ARGS[@]+"${WS_ARGS[@]}"}` and
 show its single masked line verbatim. After `skip`, leave the integration
 unchanged.
 
-For "Clear", run `oto-sdk query secret-clear <slug>` directly because no
+For "Clear", run `oto-sdk query secret-clear <slug> ${WS_ARGS[@]+"${WS_ARGS[@]}"}` directly because no
 secret material is involved. Show the command's one-line result verbatim,
 including its `env still set — integration remains available` notice when an
 environment variable continues to provide the key.
@@ -166,7 +180,7 @@ environment variable continues to provide the key.
 Write the non-secret local-search choice as before:
 
 ```bash
-oto-sdk query config-set search_gitignored true|false
+oto-sdk query config-set search_gitignored true|false ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 </step>
 
@@ -198,7 +212,7 @@ Leave / Replace / Clear, followed by a text-input prompt for the new command
 string. Write via:
 
 ```bash
-oto-sdk query config-set review.models.<cli> "<command string>"
+oto-sdk query config-set review.models.<cli> "<command string>" ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 
 Loop until the user selects "Done".
@@ -246,21 +260,23 @@ For a selected slug, prompt for the comma-separated skill list (text input).
 Show the current value if any, offer Leave / Replace / Clear. Write via:
 
 ```bash
-oto-sdk query config-set agent_skills.<slug> "<skill-a,skill-b,skill-c>"
+oto-sdk query config-set agent_skills.<slug> "<skill-a,skill-b,skill-c>" ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 
 Loop until "Done".
 </step>
 
 <step name="confirm">
-Run a final `oto-sdk query secret-status` and build the Search Integrations
-table only from those pre-masked lines. **No plaintext API keys appear in this
-output under any circumstance.**
+Run a final `oto-sdk query secret-status ${WS_ARGS[@]+"${WS_ARGS[@]}"}` and
+build the Search Integrations table only from those pre-masked lines. **No
+plaintext API keys appear in this output under any circumstance.**
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  OTO ► INTEGRATIONS UPDATED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Config: $OTO_CONFIG_PATH
 
 Search Integrations
 | Integration | Enabled | Key source                         | Key          |
@@ -300,7 +316,8 @@ Quick commands:
 </process>
 
 <success_criteria>
-- [ ] Current config read from `$OTO_CONFIG_PATH`
+- [ ] Active workstream resolved once; the guarded `${WS_ARGS[@]+"${WS_ARGS[@]}"}` expansion threaded through every oto-sdk command; confirmation shows `$OTO_CONFIG_PATH`
+- [ ] Entry uses idempotent `config-new-project` (never the argument-less legacy ensure-section call, which exits 10)
 - [ ] User presented with three sections: Search Integrations, Review CLI Routing, Agent Skills Injection
 - [ ] API keys written only to `~/.oto/<integration>_api_key` (0600) via secret-set stdin/TTY; config.json holds booleans only; nothing plaintext ever echoed, logged, or displayed
 - [ ] Set/Replace guidance uses the `! oto-sdk query secret-set` flow; Clear uses `secret-clear`
