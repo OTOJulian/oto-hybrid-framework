@@ -696,6 +696,56 @@ describe('SDK config read migration (Phase 14, SECR-03)', () => {
   });
 });
 
+// ─── Phase 14 gap-closure: root-fallback migration (CR-04) ─────────────────
+
+describe('loadConfig root-fallback migration (Phase 14 gap-closure, CR-04)', () => {
+  function stubCleanEnv(fakeHome: string): void {
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+  }
+
+  it('migrates the ROOT config layer before the root-fallback read for a missing workstream', async () => {
+    const { loadConfig } = await import('../config.js');
+    const fakeHome = join(tmpDir, 'home-root-fallback');
+    await mkdir(fakeHome, { recursive: true });
+    stubCleanEnv(fakeHome);
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const marker = 'sk-test-root-0123456789';
+    const rootConfig = join(tmpDir, '.oto', 'config.json');
+    await writeFile(rootConfig, JSON.stringify({ exa_search: marker }));
+
+    const result = await loadConfig(tmpDir, 'ws-missing');
+
+    expect(result.exa_search).toBe(true);
+    const keyfile = join(fakeHome, '.oto', 'exa_api_key');
+    expect(await readFile(keyfile, 'utf8')).toBe(`${marker}\n`);
+    expect((await stat(keyfile)).mode & 0o777).toBe(0o600);
+    expect(JSON.parse(await readFile(rootConfig, 'utf8')).exa_search).toBe(true);
+    expect(stderr.mock.calls.map(([chunk]) => String(chunk)).join('')).not.toContain(marker);
+  });
+
+  it('scrubs integration strings from the loader result when migration cannot complete', async () => {
+    const { loadConfig } = await import('../config.js');
+    const fakeHome = join(tmpDir, 'home-root-broken');
+    await mkdir(fakeHome, { recursive: true });
+    // `.oto` as a regular file: writeKeyfile's mkdirSync throws, migration cannot complete.
+    await writeFile(join(fakeHome, '.oto'), 'not-a-dir');
+    stubCleanEnv(fakeHome);
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const marker = 'sk-test-root-broken-0123456789';
+    await writeFile(join(tmpDir, '.oto', 'config.json'), JSON.stringify({ exa_search: marker }));
+
+    const result = await loadConfig(tmpDir, 'ws-missing');
+
+    expect(typeof result.exa_search).toBe('boolean');
+    expect(JSON.stringify(result)).not.toContain(marker);
+  });
+});
+
 // ─── configSetModelProfile ─────────────────────────────────────────────────
 
 describe('configSetModelProfile', () => {

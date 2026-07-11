@@ -2,8 +2,8 @@
  * Unit tests for config-get and resolve-model query handlers.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { mkdtemp, writeFile, readFile, mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { GSDError, ErrorClassification, exitCodeFor } from '../errors.js';
@@ -273,5 +273,110 @@ describe('getAgentToModelMapForProfile', () => {
     for (const agent of Object.keys(MODEL_PROFILES)) {
       expect(map[agent]).toBe('inherit');
     }
+  });
+});
+
+// ─── Phase 14 gap-closure: fail-closed integration reads (CR-02) ────────────
+// NOTE: this describe MUST stay last in the file — the post-read gate test
+// calls vi.resetModules(), which re-instantiates errors.js for any later
+// dynamic import and would break instanceof GSDError assertions elsewhere.
+
+describe('configGet fail-closed integration reads (Phase 14 gap-closure, CR-02)', () => {
+  const INTEGRATION_CASES = [
+    ['exa_search', 'exa_api_key'],
+    ['brave_search', 'brave_api_key'],
+    ['firecrawl', 'firecrawl_api_key'],
+  ] as const;
+
+  afterEach(() => {
+    vi.doUnmock('./secrets.js');
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+  });
+
+  /**
+   * Broken-home fixture: `$HOME/.oto` is a regular file, so writeKeyfile's
+   * mkdirSync throws and migrateLegacyIntegrationKeys cannot complete.
+   */
+  async function stubBrokenHome(name: string): Promise<string> {
+    const fakeHome = join(tmpDir, name);
+    await mkdir(fakeHome, { recursive: true });
+    await writeFile(join(fakeHome, '.oto'), 'not-a-dir');
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+    return fakeHome;
+  }
+
+  it('rejects with a sanitized error when migration cannot complete (all three integrations)', async () => {
+    const { configGet } = await import('./config-query.js');
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    for (const [configKey] of INTEGRATION_CASES) {
+      const fakeHome = await stubBrokenHome(`home-broken-${configKey}`);
+      const marker = `sk-test-cq-${configKey}-0123456789`;
+      const configFile = join(tmpDir, '.oto', 'config.json');
+      const original = JSON.stringify({ [configKey]: marker });
+      await writeFile(configFile, original);
+
+      let caught: unknown;
+      try {
+        await configGet([configKey], tmpDir);
+      } catch (err) {
+        caught = err;
+      }
+
+      expect(caught).toBeInstanceOf(GSDError);
+      expect((caught as GSDError).message).toContain('withheld');
+      expect((caught as GSDError).message).not.toContain(marker);
+      expect((caught as GSDError).classification).toBe(ErrorClassification.Execution);
+      // Config unchanged: the legacy string stays put, but it never left the handler.
+      expect(await readFile(configFile, 'utf8')).toBe(original);
+      // Broken home untouched — no keyfile could have been created.
+      expect(await readFile(join(fakeHome, '.oto'), 'utf8')).toBe('not-a-dir');
+    }
+  });
+
+  it('preserves fail-open reads for non-sensitive keys on the broken-home fixture', async () => {
+    const { configGet } = await import('./config-query.js');
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    await stubBrokenHome('home-broken-nonsensitive');
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({ model_profile: 'quality', exa_search: 'sk-test-cq-open-0123456789' }),
+    );
+
+    const result = await configGet(['model_profile'], tmpDir);
+    expect(result.data).toBe('quality');
+  });
+
+  it('post-read gate: an integration string never leaves configGet even when migration silently no-ops', async () => {
+    vi.resetModules();
+    const actual = await vi.importActual<typeof import('./secrets.js')>('./secrets.js');
+    vi.doMock('./secrets.js', () => ({
+      ...actual,
+      migrateLegacyIntegrationKeys: vi.fn().mockResolvedValue({ migrated: [], conflicts: [] }),
+    }));
+    const { configGet } = await import('./config-query.js');
+
+    const marker = 'sk-test-cq-gate-0123456789';
+    await writeFile(
+      join(tmpDir, '.oto', 'config.json'),
+      JSON.stringify({ exa_search: marker }),
+    );
+
+    let caught: unknown;
+    try {
+      await configGet(['exa_search'], tmpDir);
+    } catch (err) {
+      caught = err;
+    }
+
+    // vi.resetModules re-instantiates errors.js, so assert on shape, not identity.
+    expect(caught).toBeInstanceOf(Error);
+    expect((caught as Error).message).toContain('withheld');
+    expect((caught as Error).message).not.toContain(marker);
+    expect((caught as { classification?: string }).classification).toBe('execution');
   });
 });
