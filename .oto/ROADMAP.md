@@ -92,13 +92,18 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   2. A string value written to `exa_search`, `brave_search`, or `firecrawl` through either write path (SDK `config-mutation.ts` or CJS `config.cjs`) is rejected with a clear error
   3. A legacy API-key string found in `.oto/config.json` is self-heal migrated to the keyfile with a boolean left in its place — including this repo's own config
   4. User can set, replace, and clear each integration key via `/oto-settings-integrations`, and status displays are masked (`****<last-4>`)
-**Plans**: 4 plans
+**Plans**: 9 plans (4 original + 5 gap-closure)
 
 Plans:
 - [x] 14-01-PLAN.md — CJS layer: keyfile CRUD/migration/validation in secrets.cjs, boolean-only rejection + self-heal hooks in config.cjs/core.cjs
 - [x] 14-02-PLAN.md — SDK layer: secrets.ts mirror, D-08 `~/.gsd/`→`~/.oto/` fix, boolean validation in configSet, migration hooks in both SDK read paths
 - [x] 14-03-PLAN.md — SDK secret-set/clear/status commands (stdin/TTY entry, masked status), registry wiring, sdk/dist rebuild + live smoke
 - [x] 14-04-PLAN.md — /oto-settings-integrations rewrite (`!`-prefix secret-set flow), D-04 no-plaintext guard test, human-verify checkpoint
+- [ ] 14-05-PLAN.md — Gap closure: validate merged config-new-project integration values in both write paths (CR-01)
+- [ ] 14-06-PLAN.md — Gap closure: transactional secret set/clear with preflight + compensating rollback (CR-03)
+- [ ] 14-07-PLAN.md — Gap closure: CJS migrate-before-overwrite in config-set, root-layer migration + loader scrub in core.cjs (CR-04)
+- [ ] 14-08-PLAN.md — Gap closure: SDK fail-closed config-get, root-fallback migration, configSet previousValue scrub + single sdk/dist rebuild (CR-02, CR-04)
+- [ ] 14-09-PLAN.md — Gap closure: fix workflow entry command + workstream threading, correct command wrapper, e2e workflow contract test
 
 Notes: Research flags this phase as standard-pattern (skip research-phase) — all four sites of the dual-typing defect are pinpointed with line numbers. Scope decision from research: fix all three integrations (`exa_search`, `brave_search`, `firecrawl`) with the shared mechanism, not just Exa. Sync hygiene applies: keep shared-file diffs (`config.cjs`, `secrets.cjs`, `settings-integrations.md`) small and commented.
 
