@@ -107,3 +107,80 @@ test('config-set on a non-integration key is unaffected by a broken keyfile base
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(fs.readFileSync(fixture.configPath, 'utf8')).model_profile, 'quality');
 });
+
+// ── Task 2: loadConfig migrates the root layer before parse + scrubs strings ──
+
+const LOAD_CONFIG_SCRIPT = [
+  `const { loadConfig } = require(${JSON.stringify(CORE)});`,
+  'process.stdout.write(JSON.stringify(loadConfig(process.cwd()).exa_search));',
+].join(' ');
+
+function runLoadConfig(fixture, extraEnv = {}) {
+  return spawnSync(process.execPath, ['-e', LOAD_CONFIG_SCRIPT], {
+    cwd: fixture.project,
+    env: { ...cleanEnv(fixture.home), ...extraEnv },
+    encoding: 'utf8',
+  });
+}
+
+test('loadConfig migrates a legacy root string even when a workstream config exists (CR-04)', (t) => {
+  const marker = 'sk-test-root-0123456789';
+  const fixture = seedFixture(t, { exa_search: marker });
+  const wsDir = path.join(fixture.project, '.oto/workstreams/ws1');
+  fs.mkdirSync(wsDir, { recursive: true });
+  fs.writeFileSync(path.join(wsDir, 'config.json'), JSON.stringify({ exa_search: false }, null, 2) + '\n');
+
+  const result = runLoadConfig(fixture, { OTO_WORKSTREAM: 'ws1' });
+
+  assert.equal(result.status, 0, result.stderr);
+  // Root layer self-healed: boolean in config, string in a 0600 keyfile.
+  assert.equal(JSON.parse(fs.readFileSync(fixture.configPath, 'utf8')).exa_search, true);
+  const keyfile = path.join(fixture.home, '.oto/exa_api_key');
+  assert.equal(fs.readFileSync(keyfile, 'utf8'), marker + '\n');
+  assert.equal(fs.statSync(keyfile).mode & 0o777, 0o600);
+  assert.match(result.stderr, /migrated exa_search API key/);
+  assert.doesNotMatch(result.stdout + result.stderr, new RegExp(marker));
+});
+
+test('loadConfig migrates the root string when the workstream has no config.json', (t) => {
+  const marker = 'sk-test-root-0123456789';
+  const fixture = seedFixture(t, { exa_search: marker });
+  fs.mkdirSync(path.join(fixture.project, '.oto/workstreams/ws2'), { recursive: true });
+
+  const result = runLoadConfig(fixture, { OTO_WORKSTREAM: 'ws2' });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(fs.readFileSync(fixture.configPath, 'utf8')).exa_search, true);
+  const keyfile = path.join(fixture.home, '.oto/exa_api_key');
+  assert.equal(fs.readFileSync(keyfile, 'utf8'), marker + '\n');
+  assert.doesNotMatch(result.stdout + result.stderr, new RegExp(marker));
+});
+
+test('loadConfig scrubs a root integration string when migration is impossible (workstream active)', (t) => {
+  const marker = 'sk-test-root-0123456789';
+  const fixture = seedFixture(t, { exa_search: marker });
+  const wsDir = path.join(fixture.project, '.oto/workstreams/ws1');
+  fs.mkdirSync(wsDir, { recursive: true });
+  fs.writeFileSync(path.join(wsDir, 'config.json'), JSON.stringify({}, null, 2) + '\n');
+  // Migration impossible: ~/.oto is a regular file.
+  fs.writeFileSync(path.join(fixture.home, '.oto'), 'not-a-dir');
+
+  const result = runLoadConfig(fixture, { OTO_WORKSTREAM: 'ws1' });
+
+  assert.equal(result.status, 0, result.stderr);
+  // Loader contract: boolean-only — the plaintext never leaves loadConfig.
+  assert.equal(JSON.parse(result.stdout), true);
+  assert.doesNotMatch(result.stdout + result.stderr, new RegExp(marker));
+});
+
+test('loadConfig scrubs an integration string when migration is impossible (no workstream)', (t) => {
+  const marker = 'sk-test-file-0123456789';
+  const fixture = seedFixture(t, { exa_search: marker });
+  fs.writeFileSync(path.join(fixture.home, '.oto'), 'not-a-dir');
+
+  const result = runLoadConfig(fixture);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout), true);
+  assert.doesNotMatch(result.stdout + result.stderr, new RegExp(marker));
+});
