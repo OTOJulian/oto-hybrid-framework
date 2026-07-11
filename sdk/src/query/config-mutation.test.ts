@@ -696,6 +696,96 @@ describe('SDK config read migration (Phase 14, SECR-03)', () => {
   });
 });
 
+// ─── Phase 14 gap-closure: configSet legacy migration ──────────────────────
+
+describe('configSet legacy migration (Phase 14 gap-closure)', () => {
+  const INTEGRATION_CASES = [
+    ['exa_search', 'exa_api_key'],
+    ['brave_search', 'brave_api_key'],
+    ['firecrawl', 'firecrawl_api_key'],
+  ] as const;
+
+  function stubCleanEnv(fakeHome: string): void {
+    vi.stubEnv('HOME', fakeHome);
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+  }
+
+  it('migrates a legacy string to a keyfile before overwriting; previousValue never carries the secret', async () => {
+    const { configSet } = await import('./config-mutation.js');
+
+    for (const [configKey, keyfileName] of INTEGRATION_CASES) {
+      const fakeHome = join(tmpDir, `home-cs-${configKey}`);
+      await mkdir(fakeHome, { recursive: true });
+      stubCleanEnv(fakeHome);
+      const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+      const marker = `sk-test-cs-${configKey}-0123456789`;
+      const configFile = join(tmpDir, '.oto', 'config.json');
+      await writeFile(configFile, JSON.stringify({ [configKey]: marker }));
+
+      const result = await configSet([configKey, 'true'], tmpDir);
+
+      const keyfile = join(fakeHome, '.oto', keyfileName);
+      expect(await readFile(keyfile, 'utf8')).toBe(`${marker}\n`);
+      expect((await stat(keyfile)).mode & 0o777).toBe(0o600);
+      expect(JSON.parse(await readFile(configFile, 'utf8'))[configKey]).toBe(true);
+
+      const previousValue = (result.data as Record<string, unknown>).previousValue;
+      expect(previousValue).not.toBe(marker);
+      expect(String(previousValue).includes('sk-test')).toBe(false);
+      expect(JSON.stringify(result)).not.toContain(marker);
+      stderr.mockRestore();
+    }
+  });
+
+  it('fails closed when migration cannot complete — config not modified, no secret in the error', async () => {
+    const { configSet } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-cs-broken');
+    await mkdir(fakeHome, { recursive: true });
+    // `.oto` as a regular file: writeKeyfile's mkdirSync throws, migration cannot complete.
+    await writeFile(join(fakeHome, '.oto'), 'not-a-dir');
+    stubCleanEnv(fakeHome);
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const marker = 'sk-test-cs-broken-0123456789';
+    const configFile = join(tmpDir, '.oto', 'config.json');
+    const original = JSON.stringify({ exa_search: marker });
+    await writeFile(configFile, original);
+
+    let caught: unknown;
+    try {
+      await configSet(['exa_search', 'true'], tmpDir);
+    } catch (err) {
+      caught = err;
+    }
+
+    expect(caught).toBeInstanceOf(GSDError);
+    expect((caught as GSDError).message).toMatch(/migration failed — config not modified/);
+    expect((caught as GSDError).message).not.toContain(marker);
+    // Byte-identical: the legacy credential was neither destroyed nor overwritten.
+    expect(await readFile(configFile, 'utf8')).toBe(original);
+  });
+
+  it('leaves non-integration keys unaffected on the broken-home fixture', async () => {
+    const { configSet } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-cs-nonint');
+    await mkdir(fakeHome, { recursive: true });
+    await writeFile(join(fakeHome, '.oto'), 'not-a-dir');
+    stubCleanEnv(fakeHome);
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const configFile = join(tmpDir, '.oto', 'config.json');
+    await writeFile(configFile, JSON.stringify({ model_profile: 'balanced' }));
+
+    await expect(configSet(['model_profile', 'quality'], tmpDir)).resolves.toMatchObject({
+      data: { updated: true, key: 'model_profile', value: 'quality' },
+    });
+    expect(JSON.parse(await readFile(configFile, 'utf8')).model_profile).toBe('quality');
+  });
+});
+
 // ─── Phase 14 gap-closure: root-fallback migration (CR-04) ─────────────────
 
 describe('loadConfig root-fallback migration (Phase 14 gap-closure, CR-04)', () => {
