@@ -20,7 +20,7 @@ import { readFile } from 'node:fs/promises';
 import { GSDError, ErrorClassification } from '../errors.js';
 import { loadConfig } from '../config.js';
 import { planningPaths } from './helpers.js';
-import { migrateLegacyIntegrationKeys } from './secrets.js';
+import { integrationForConfigKey, migrateLegacyIntegrationKeys } from './secrets.js';
 import type { QueryHandler } from './utils.js';
 
 // ─── MODEL_PROFILES ─────────────────────────────────────────────────────────
@@ -93,7 +93,16 @@ export const configGet: QueryHandler = async (args, projectDir, workstream) => {
 
   const paths = planningPaths(projectDir, workstream);
   // Phase 14 (SECR-03): self-heal legacy integration key strings → ~/.oto keyfiles (D-01).
-  try { await migrateLegacyIntegrationKeys(paths.config); } catch { /* never block reads */ }
+  // Phase 14 gap-closure (SECR-01, CR-02): fail closed for integration keys when self-heal cannot complete.
+  const sensitive = integrationForConfigKey(keyPath) !== null;
+  let migrationFailed = false;
+  try { await migrateLegacyIntegrationKeys(paths.config); } catch { migrationFailed = true; }
+  if (sensitive && migrationFailed) {
+    throw new GSDError(
+      `${keyPath}: legacy key migration failed — value withheld (fix ~/.oto permissions and retry)`,
+      ErrorClassification.Execution,
+    );
+  }
   let raw: string;
   try {
     raw = await readFile(paths.config, 'utf-8');
@@ -120,6 +129,14 @@ export const configGet: QueryHandler = async (args, projectDir, workstream) => {
   }
   if (current === undefined) {
     throw new GSDError(`Key not found: ${keyPath}`, ErrorClassification.Execution);
+  }
+
+  // Phase 14 gap-closure: an integration string may never leave this handler.
+  if (sensitive && typeof current === 'string') {
+    throw new GSDError(
+      `${keyPath}: string value withheld — integration flags are boolean-only (run /oto-settings-integrations)`,
+      ErrorClassification.Execution,
+    );
   }
 
   return { data: current };
