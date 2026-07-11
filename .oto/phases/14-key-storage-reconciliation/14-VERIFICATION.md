@@ -1,219 +1,228 @@
 ---
 status: gaps_found
 phase: 14-key-storage-reconciliation
-score: "0/4"
-verified_at: "2026-07-11T00:03:37Z"
-verified: "2026-07-11T00:03:37Z"
-re_verification: false
+score: "2/4"
+verified: "2026-07-11T02:57:16Z"
+verified_at: "2026-07-11T02:57:16Z"
+re_verification: true
 overrides_applied: 0
 requirements:
   SECR-01: blocked
-  SECR-02: blocked
+  SECR-02: satisfied
   SECR-03: blocked
-  SECR-04: blocked
+  SECR-04: satisfied
+re_verification_detail:
+  previous_status: gaps_found
+  previous_score: "0/4"
+  gaps_closed:
+    - "Committed integration config is boolean-only across both write implementations (new-project bypass — closed by 14-05)"
+    - "Secret set and clear cannot leave split state or destroy an existing credential when config mutation fails (closed by 14-06)"
+    - "SDK config-get fail-open / previousValue leak / CJS legacy-overwrite in config-set (closed by 14-07 + 14-08)"
+    - "/oto-settings-integrations executes end to end with workstream threading and a corrected command wrapper (closed by 14-09)"
+  gaps_remaining: []
+  regressions:
+    - "CJS loader scrub introduced by 14-07 contaminates the on-disk write object: failed migration + any loader dirty-write destroys the only stored credential (new defect, reproduced)"
 gaps:
-  - truth: "Committed integration config is boolean-only across both write implementations"
+  - truth: "A legacy API-key string in .oto/config.json is self-heal migrated to the keyfile with a boolean left in its place — never destroyed"
     status: failed
     reason: >-
-      Both registered config-new-project implementations merge caller choices or global defaults
-      after constructing boolean defaults and write the merged object without integration-value
-      validation. Fresh isolated CJS and SDK probes exited successfully and persisted a synthetic
-      exa_search string without creating a keyfile.
+      _scrubIntegrationStrings is applied to fileData — the object loadConfig's dirty-write
+      paths (depth→granularity migration, multiRepo migration, sub_repos strip/sync) persist
+      back to disk. When migrateLegacyIntegrationKeys fails (unusable ~/.oto), the legacy
+      string is flipped to true in fileData and written to config.json with NO keyfile ever
+      created. Independently reproduced: {"exa_search":"<marker>","depth":"standard"} + ~/.oto
+      as a regular file → after one loadConfig() the config reads {"exa_search":true,
+      "granularity":"standard"} and no keyfile exists. The credential is unrecoverable except
+      from git history. This regresses the exact fail-closed invariant 14-07 pinned for the
+      config-set path (tests/14-migration-hardening.test.cjs).
     artifacts:
-      - path: "oto/bin/lib/config.cjs"
-        issue: "buildNewProjectConfig merges unvalidated defaults and choices at lines 143-168; cmdConfigNewProject writes the result at lines 209-215."
-      - path: "sdk/src/query/config-mutation.ts"
-        issue: "configNewProject merges unvalidated defaults and choices at lines 411-441 and writes at line 443."
-    missing:
-      - "Validate every integration field in the fully merged new-project config before either write."
-      - "Reject caller strings with sanitized errors; migrate or reject trusted legacy global-default strings."
-      - "Add CJS and SDK choice/global-default regression tests for all three integrations."
-  - truth: "Every legacy integration string self-heals to a 0600 keyfile and can never leave a read or mutation output"
-    status: failed
-    reason: >-
-      SDK config-get suppresses migration failures and returns the original string; CJS and SDK
-      workstream loading can parse or fall back to an unmigrated root config; and boolean config-set
-      overwrites a legacy string without creating a keyfile. The SDK mutation result also returns
-      that legacy plaintext as previousValue.
-    artifacts:
-      - path: "sdk/src/query/config-query.ts"
-        issue: "Migration exceptions are swallowed at line 96 before the original value is returned at line 125."
-      - path: "sdk/src/config.ts"
-        issue: "Only the requested workstream path is migrated at lines 157-162; root fallback at lines 170-174 is not migrated."
       - path: "oto/bin/lib/core.cjs"
-        issue: "Root config is parsed at lines 327-334 before only the workstream config path is migrated at lines 337-341."
-      - path: "sdk/src/query/config-mutation.ts"
-        issue: "configSet reads legacy previousValue and returns it at lines 225-252 without migration or secret scrubbing."
+        issue: "Line ~358: fileData = _scrubIntegrationStrings(JSON.parse(raw)) mutates the disk-write object; dirty-write paths at ~365 (depth), ~375-414 (multiRepo/sub_repos/configDirty) persist the scrubbed object"
+    missing:
+      - "Keep fileData pristine for disk writes; apply the scrub only to the merged/effective in-memory view (parsed), after all configDirty write-backs"
+      - "Regression test: legacy string + broken ~/.oto + depth key → config.json still contains the string after loadConfig()"
+  - truth: "The SDK loader never returns an integration string (SECR-01 boolean-only loader contract)"
+    status: failed
+    reason: >-
+      The Phase 14 scrub in sdk/src/config.ts runs only in the parsed-project-config branch.
+      The two fallback paths — no project config found and empty project config — return
+      mergeDefaults(userDefaults) with no migration and no scrub. ~/.gsd/defaults.json is
+      precisely where a legacy integration string persists by design (D-08 read-only).
+      Independently reproduced against sdk/dist/config.js: {"exa_search":"<marker>"} in
+      ~/.gsd/defaults.json + empty project dir → loadConfig() returns the plaintext marker.
+      Same defect class as the prior cycle's CR-04, one layer over.
+    artifacts:
+      - path: "sdk/src/config.ts"
+        issue: "Fallback returns at ~193-204 (!projectConfigFound and empty-config branches) bypass the scrub applied at ~218-221"
+      - path: "sdk/dist/config.js"
+        issue: "Built dist carries the same unscrubbed fallback (reproduction ran against dist)"
+    missing:
+      - "Scrub integration strings in both fallback returns (never write back to ~/.gsd per D-08), then rebuild sdk/dist"
+      - "Vitest case: string in ~/.gsd/defaults.json + no project config → loadConfig returns boolean"
+  - truth: "Self-heal migration on read never breaks unrelated config reads (fail-open for non-sensitive keys)"
+    status: failed
+    reason: >-
+      cmdConfigGet calls migrateLegacyIntegrationKeys(configPath) bare — the only unguarded
+      call site (loadConfig, cmdConfigSet, and SDK configGet all wrap it). If any integration
+      key holds a legacy string and the keyfile write fails, EVERY oto-tools config-get
+      invocation crashes with a raw stack trace, including reads of unrelated keys.
+      Independently reproduced: {"exa_search":"<marker>","model_profile":"quality"} + ~/.oto
+      as a regular file → `oto-tools config-get model_profile` dies with EEXIST mkdir and a
+      full stack trace. Workflows and hooks call config-get constantly, so one degraded
+      ~/.oto bricks the CJS read surface project-wide.
+    artifacts:
       - path: "oto/bin/lib/config.cjs"
-        issue: "cmdConfigSet overwrites a legacy integration string without first migrating it."
+        issue: "Line 407: migrateLegacyIntegrationKeys(configPath) with no try/catch in cmdConfigGet"
     missing:
-      - "Fail closed for sensitive config-get values when migration cannot complete."
-      - "Resolve and migrate every effective root/workstream config layer before parsing, fallback, or merge."
-      - "Migrate legacy values before config mutation and never return a secret previousValue."
-      - "Add migration-failure, root-plus-workstream, and legacy-overwrite tests in both implementations."
-  - truth: "Secret set and clear cannot leave split state or destroy an existing credential when config mutation fails"
-    status: failed
-    reason: >-
-      secret-set writes or replaces the keyfile before configSet, while secret-clear deletes the
-      keyfile before configSet. Fresh EACCES and EISDIR fault probes confirmed that a failed set
-      leaves a 0600 keyfile behind and a failed clear irreversibly removes the prior keyfile.
-    artifacts:
-      - path: "sdk/src/query/secret-commands.ts"
-        issue: "Keyfile mutation precedes config mutation at lines 121-123 and 149-152 with no compensation."
-    missing:
-      - "Validate the config destination first and implement a compensating transaction that restores the prior keyfile/config state on failure."
-      - "Add create, replace, and clear fault-injection tests."
-  - truth: "/oto-settings-integrations executes end to end against the active config with one consistent secure-storage contract"
-    status: failed
-    reason: >-
-      The workflow's first command invokes config-ensure-section without its required section and
-      exits 10, so the key-management flow is not reachable as written. It computes OTO_CONFIG_PATH
-      but never uses it or passes --ws to later SDK commands. The shipped command wrapper also still
-      says keys are stored plaintext in config.json and written via config-set, contradicting the
-      rewritten workflow.
-    artifacts:
-      - path: "oto/workflows/settings-integrations.md"
-        issue: "Lines 44-49 call config-ensure-section with no argument; later commands do not use the computed active config path or --ws."
-      - path: "sdk/src/query/config-mutation.ts"
-        issue: "configEnsureSection requires args[0] and throws at lines 460-464."
-      - path: "oto/commands/oto/settings-integrations.md"
-        issue: "Lines 18-20 and 35-43 retain the old plaintext/config-set contract."
-    missing:
-      - "Use a valid config-initialization command or supply the required section."
-      - "Thread the resolved workstream through every status/set/clear/config command."
-      - "Update the shipped command wrapper and add an end-to-end workflow contract test."
+      - "Wrap the migration in try/catch mirroring SDK configGet semantics: fail closed with a sanitized 'withheld' error for sensitive keys, fail open (continue the read) for non-sensitive keys"
+      - "Regression test: legacy string + broken ~/.oto → config-get of a non-integration key succeeds; config-get of an integration key errors cleanly without a stack trace"
 ---
 
-# Phase 14: Key Storage Reconciliation Verification Report
+# Phase 14: Key Storage Reconciliation Verification Report (Re-verification)
 
-**Phase goal:** Integration API keys live only in `~/.oto/<integration>_api_key`
-(mode 0600) or environment variables; committed `.oto/config.json` holds
-booleans only, enforced in both write paths with self-healing migration.
+**Phase Goal:** Integration API keys live only in `~/.oto/<integration>_api_key` (mode 0600) or env vars; committed `.oto/config.json` holds booleans only — enforced in both write paths, with self-healing migration for legacy string values.
+**Verified:** 2026-07-11T02:57:16Z
+**Status:** gaps_found
+**Re-verification:** Yes — after gap-closure plans 14-05..14-09
 
-**Verdict:** `gaps_found`. The phase contains substantive, working happy-path
-primitives, but none of the four roadmap success criteria holds end to end. The
-four critical review findings were independently reproduced, and verification
-found additional user-surface and legacy-overwrite blockers.
+## Verdict
+
+All four gaps from the previous verification (0/4) are **closed**: both `config-new-project` writers now validate merged integration values, secret set/clear is transactional with preflight and compensation, migrate-before-overwrite plus fail-closed guards landed in CJS `config-set`, SDK `config-get` fails closed, and `/oto-settings-integrations` executes end to end with workstream threading. Phase test suites pass (46/46 CJS, 114/114 SDK Vitest) and this repo's own config holds booleans only.
+
+However, three **new blockers** remain in the exact code paths the phase goal covers — each independently reproduced by this verification in fresh sandboxes (not taken on the review's word):
+
+1. The 14-07 loader scrub **destroys the only stored credential** when self-heal migration fails (a regression introduced during gap closure).
+2. The SDK loader's pre-project fallback **returns a plaintext API key** from `~/.gsd/defaults.json` (the one loader path 14-08's scrub missed).
+3. The unguarded migration call in `cmdConfigGet` **crashes every CJS config read** when `~/.oto` is unusable.
+
+A self-healing migration that can silently destroy the credential it exists to protect, and a loader contract that still leaks plaintext on one path, are goal gaps — not advisory footnotes.
 
 ## Goal Achievement
 
-| # | Roadmap success criterion | Status | Fresh evidence |
-|---|---|---|---|
-| 1 | `/oto-settings-integrations` sets Exa through stdin to a 0600 keyfile and leaves only `exa_search: true` in tracked config | **FAILED** | Direct `secret-set` works in isolation, but the workflow stops immediately: `node bin/oto-sdk.js query config-ensure-section` exited 10 with `Usage: config-ensure-section <section>`. The shipped command wrapper also advertises plaintext config storage. |
-| 2 | Strings for all three integration flags are rejected through both write implementations | **FAILED** | The focused `config-set` endpoints reject strings, but both registered `config-new-project` paths accept and persist a synthetic string from caller choices and global defaults. |
-| 3 | Legacy strings self-heal to keyfiles with booleans left in config, including this repo | **FAILED** | Ordinary root reads migrate and this repo currently has booleans, but config-get failure, workstream root fallback/inheritance, secret-status, and boolean config-set can retain, expose, or destroy legacy strings without migration. |
-| 4 | Each integration supports set, replace, clear, and masked status via the workflow | **FAILED** | Isolated handler round trips passed for Exa, Brave, and Firecrawl, but the shipped workflow is not executable as written; set/clear also become destructive or split-state operations when config mutation fails. |
+### Observable Truths (Roadmap Success Criteria)
 
-**Score:** 0/4 roadmap success criteria verified.
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 1 | Setting an Exa key through `/oto-settings-integrations` writes `~/.oto/exa_api_key` (0600) via stdin, config ends with `"exa_search": true`, no key material in tracked files | ✓ VERIFIED | Sandbox e2e: `secret-set exa` via stdin → keyfile mode 600 with content, config `exa_search: true` (boolean), argv form rejected with clear error, workflow entry `config-new-project` exits 0 idempotently; 46/46 contract tests pass. Warning WR-03 noted below (one status-display command in the workflow fails when `search_gitignored` is absent). |
+| 2 | A string written to `exa_search`/`brave_search`/`firecrawl` through either write path is rejected with a clear error | ✓ VERIFIED | All three keys rejected on both paths (SDK exit 10, CJS exit 1) with actionable messages; nothing persisted (config stayed `{}`); new-project path now validated via `reconcileNewProjectIntegrations` wired in `config.cjs:172` and `config-mutation.ts:469`; `tests/14-newproject-boolean.test.cjs` passes. |
+| 3 | A legacy string in `.oto/config.json` self-heals to the keyfile with a boolean left in its place — including this repo's config | ✗ FAILED | Happy path works and this repo's config is boolean-only, but the healing contract is broken on failure paths: loader dirty-write destroys the credential (Gap 1, reproduced), SDK fallback returns plaintext (Gap 2, reproduced), and `config-get` crashes on any key (Gap 3, reproduced). |
+| 4 | User can set, replace, and clear each key via `/oto-settings-integrations`; status displays masked `****<last-4>` | ✓ VERIFIED | Sandbox e2e: set → `****1234` masked status, replace confirmed, clear removes keyfile and flips flag to false; transactional fault-injection tests (14-06) pass; workflow contract test executes the entry sequence against the real CLI. Interactive TTY flow flagged for human verification. |
 
-## Requirement Traceability
+**Score:** 2/4 roadmap success criteria verified.
 
-Every PLAN frontmatter requirement resolves to `.oto/REQUIREMENTS.md`; no Phase
-14 requirement is orphaned.
+### Required Artifacts
 
-| Requirement | Declared by plans | Status | Evidence |
-|---|---|---|---|
-| **SECR-01** — Exa key only in 0600 keyfile or env, never committed config | 14-01, 14-02, 14-03, 14-04 | **BLOCKED** | CJS and SDK keyfile CRUD enforce 0600 on the normal path, but both new-project writers can persist a plaintext string and config-get can return one after migration failure. |
-| **SECR-02** — all three config fields boolean-only in SDK and CJS | 14-01, 14-02 | **BLOCKED** | `cmdConfigSet` and `configSet` reject all three strings, but `cmdConfigNewProject` and `configNewProject` bypass the same validation. |
-| **SECR-03** — legacy strings self-heal, including this repo | 14-01, 14-02, 14-04 | **BLOCKED** | Direct root migration tests pass and current repo values are boolean-typed; workstream, migration-failure, status, and overwrite paths do not satisfy the invariant. |
-| **SECR-04** — workflow set/replace/clear, stdin-only, masked status | 14-03, 14-04 | **BLOCKED** | Direct compiled handlers pass safe happy-path round trips, but the workflow's opening command fails, its active-workstream routing is unused, its command wrapper is stale, and failed CRUD is non-transactional. |
+| Artifact | Expected | Status | Details |
+|----------|----------|--------|---------|
+| `oto/bin/lib/secrets.cjs` | `reconcileNewProjectIntegrations` + keyfile CRUD | ✓ VERIFIED | Exported (line 312), 0600 write + chmod heal confirmed by test + sandbox |
+| `sdk/src/query/secrets.ts` | SDK mirror, no `~/.gsd` writes | ✓ VERIFIED | `reconcileNewProjectIntegrations` at line 199; D-08 respected |
+| `sdk/src/query/secret-commands.ts` | `preflightConfigDestination` + compensation | ✓ VERIFIED | Present at line 113, called in `secretSet` (151) and `secretClear` (200); mirrored in committed dist |
+| `oto/bin/lib/config.cjs` | migrate-before-overwrite + fail-closed in `cmdConfigSet` | ✓ VERIFIED (set path) | Guard at ~354-359; but `cmdConfigGet` line 407 is unguarded (Gap 3) |
+| `oto/bin/lib/core.cjs` | root-layer migration + in-memory-only scrub | ⚠️ HOLLOW | Root migration present; scrub exists but contaminates the disk-write object (Gap 1) — the "in-memory" contract of the 14-07 must-have does not hold |
+| `sdk/src/config.ts` | root-fallback migration + loader scrub | ⚠️ HOLLOW | Scrub present only on parsed-project branch; both fallback returns unscrubbed (Gap 2) |
+| `sdk/src/query/config-query.ts` | fail-closed `configGet` + post-read gate | ✓ VERIFIED | "withheld" gate present in src and committed dist |
+| `oto/workflows/settings-integrations.md` | executable entry + WS_ARGS threading + used OTO_CONFIG_PATH | ✓ VERIFIED | `config-new-project` entry, guarded `${WS_ARGS[@]+"${WS_ARGS[@]}"}` on all subsequent commands |
+| `oto/commands/oto/settings-integrations.md` | keyfile/boolean contract | ✓ VERIFIED | No plaintext/config-set storage claims remain; contract test pins it |
+| `tests/14-*.test.cjs` (6 files) | regression coverage | ✓ VERIFIED | 46/46 pass; substantive fault-injection and contract assertions |
 
-## PLAN Must-Have Evidence
+### Key Link Verification
 
-| Plan | Verified must-haves | Failed or partial must-haves |
-|---|---|---|
-| **14-01** | CJS helper CRUD, 0600 write, permission heal, env precedence, keyfile-wins conflict, masked migration notices, rotation warning, direct `config-set` rejection/warn, and ordinary root migration are implemented and covered. | “Any CJS config load” is false for an existing workstream; new-project bypasses boolean-only enforcement; boolean `config-set` can overwrite rather than migrate a legacy key. |
-| **14-02** | SDK helper parity, canonical `~/.oto` detection, direct `configSet` rejection/warn, ordinary root migration, conflict policy, and rotation warning are implemented and covered. | New-project bypasses validation; config-get fails open; root fallback under a workstream is not migrated. |
-| **14-03** | `secret-set`, `secret-clear`, and `secret-status` are registered and present in built dist; piped input, argv rejection in the expected slug-plus-extra-arg form, 0600 mode, masks, env precedence, and permission healing pass. | Set/clear has no rollback; status bypasses migration/read errors; failure paths are not covered by the plan tests. |
-| **14-04** | The workflow body contains the `! oto-sdk query secret-set` guidance, uses `secret-clear`/`secret-status`, removes defect-era integration `config-set` examples, and the current tracked `.oto` guard passes. | The actual workflow fails on its first command, does not route the computed workstream, and is contradicted by the shipped command wrapper. The guard also does not cover that shipped surface. |
+| From | To | Via | Status | Details |
+|------|----|-----|--------|---------|
+| `config.cjs buildNewProjectConfig` | `secrets.cjs` | `reconcileNewProjectIntegrations` | ✓ WIRED | Line 172 — covers `cmdConfigNewProject` and `ensureConfigFile` |
+| `config-mutation.ts configNewProject` | `secrets.ts` | `reconcileNewProjectIntegrations` | ✓ WIRED | Line 469, before write |
+| `secret-commands.ts` | `config-mutation.ts` | `configSet` in try/catch with keyfile compensation | ✓ WIRED | Fault-injection tests pass (EISDIR/EACCES, create/replace/clear) |
+| `config.cjs cmdConfigSet` | `secrets.cjs` | `migrateLegacyIntegrationKeys` before `setConfigValue` | ✓ WIRED | Fail-closed guard confirmed in code |
+| `core.cjs loadConfig` | `secrets.cjs` | `migrateLegacyIntegrationKeys(rootConfigPath)` in ws branch | ✓ WIRED | Present; failure swallowed (by design) — but see Gap 1 for the scrub side-effect |
+| `config.ts loadConfig` | `secrets.ts` | root migration before fallback read | ✓ WIRED | Present for workstream root; fallback scrub missing (Gap 2) |
+| workflow entry | SDK registry | `config-new-project` handler | ✓ WIRED | Sandbox execution exits 0 |
+| `tests/14-settings-workflow-contract.test.cjs` | `bin/oto-sdk.js` | spawnSync of real CLI | ✓ WIRED | e2e cases pass |
 
-## Required Artifacts and Key Links
-
-- Automated artifact verification reported **9/9 artifacts present and
-  substantive** across the four PLAN files.
-- Automated key-link verification reported 7/11 because four PLAN regexes are
-  malformed or over-escaped. Manual checks verified all four structural links:
-  SDK `.oto` keyfile checks at `config-mutation.ts:365-367`, secret registry
-  registrations at `index.ts:344-346`, flag flips at
-  `secret-commands.ts:123,152`, and the repo config link at
-  `tests/14-no-plaintext-guard.test.cjs:11`.
-- Structural wiring is therefore present. Behavioral data-flow verification is
-  what fails: some writers bypass validation, some readers bypass migration,
-  and the user workflow never reaches the wired secret commands.
-
-## Data-Flow Trace
+### Data-Flow Trace (Level 4)
 
 | Flow | Result |
-|---|---|
-| Terminal stdin → `secretSet` → `writeKeyfile` → `configSet(true)` | **Happy path works:** all three integrations produced mode 0600, boolean `true`, masked status, replacement mask, and clean clear in isolated temp homes. **Failure path is unsafe:** keyfile mutation is not rolled back. |
-| Config string → read-time migration → keyfile + boolean | **Partial:** direct root reads work; SDK migration failure and root/workstream resolution bypass it. |
-| New-project choices/defaults → merged config → write | **Failed invariant:** no integration validation occurs after merge in either implementation. |
-| `/oto-settings-integrations` command → workflow → secret commands | **Disconnected at entry:** the first SDK command exits 10; wrapper and workflow also state contradictory storage contracts. |
+|------|--------|
+| stdin → `secretSet` → 0600 keyfile → `configSet(true)` | ✓ FLOWING — sandbox e2e confirmed all steps including replace and clear |
+| Legacy config string → read-time migration → keyfile + boolean | ⚠️ PARTIAL — happy path flows; failure path DESTROYS the string via loader dirty-write (Gap 1, reproduced) |
+| `~/.gsd/defaults.json` legacy string → SDK loader → consumer | ✗ LEAKING — plaintext marker returned by `sdk/dist/config.js` `loadConfig()` in pre-project context (Gap 2, reproduced) |
+| Legacy string + broken `~/.oto` → `config-get <any key>` | ✗ CRASHING — raw EEXIST stack trace on unrelated-key read (Gap 3, reproduced) |
+| Workflow → secret commands with `--ws` threading | ✓ FLOWING — entry executes; WS_ARGS on all 8 commands; WR-03 degrades one display default |
 
-## Independent Review-Finding Reproduction
+### Behavioral Spot-Checks
 
-All probes used fresh temp projects/homes, cleared provider environment variables,
-and generated synthetic markers. No real API-key value was read or printed.
+| Behavior | Command | Result | Status |
+|----------|---------|--------|--------|
+| Stdin secret-set → 0600 keyfile + boolean | `printf key \| oto-sdk query secret-set exa` (sandbox HOME) | mode 600, content correct, `exa_search: true` | ✓ PASS |
+| Masked status | `oto-sdk query secret-status exa` | `Exa: enabled — key from ~/.oto/exa_api_key (****1234)` | ✓ PASS |
+| Argv rejection | `oto-sdk query secret-set exa <key-on-argv>` | "never accepted as arguments" error | ✓ PASS |
+| Clear | `oto-sdk query secret-clear exa` | keyfile removed, flag false | ✓ PASS |
+| String rejection ×3 keys ×2 paths | `config-set <key> sk-...` (SDK + CJS) | clear errors, exits 10/1, nothing persisted | ✓ PASS |
+| Workflow entry | `oto-sdk query config-new-project` (existing config) | exit 0, `created: false` | ✓ PASS |
+| Loader credential survival on failed migration | `loadConfig()` with legacy string + broken `~/.oto` + `depth` key | string overwritten with `true`, no keyfile | ✗ FAIL (Gap 1) |
+| SDK loader boolean contract, pre-project | `sdk/dist/config.js loadConfig()` with string in `~/.gsd/defaults.json` | plaintext marker returned | ✗ FAIL (Gap 2) |
+| Unrelated-key read with degraded `~/.oto` | `oto-tools config-get model_profile` | unhandled EEXIST stack trace | ✗ FAIL (Gap 3) |
+| Workflow `--default` fallback | `oto-sdk query config-get search_gitignored --default false` (key absent) | exit 1, `Key not found` — `--default` ignored by SDK handler | ✗ FAIL (WR-03, warning) |
+| CJS test suites | `node --test tests/14-*.test.cjs` | 46/46 pass | ✓ PASS |
+| SDK Vitest suites | `npx vitest run` (4 Phase-14 files) | 114/114 pass | ✓ PASS |
+| Repo config hygiene | type probe on `.oto/config.json` (tracked) | all three flags boolean | ✓ PASS |
 
-| Review finding | Result | Sanitized observation |
-|---|---|---|
-| **CR-01 new-project bypass** | **REPRODUCED** | Real CJS and SDK commands exited 0; caller-choice and global-default cases persisted `exa_search` with type `string`; no keyfile was created. |
-| **CR-02 config-get fail-open** | **REPRODUCED** | With the temp home made unusable as a keyfile directory, real SDK config-get exited 0, returned a string equal to the synthetic marker, retained the config string, and created no keyfile. |
-| **CR-03 non-transactional set/clear** | **REPRODUCED** | EACCES and EISDIR faults caused failed set to leave a 0600 keyfile and failed clear to remove the prior keyfile while config remained unchanged. |
-| **CR-04 workstream root migration** | **REPRODUCED** | CJS existing-workstream and SDK missing-workstream fallback both returned a string, retained the root string, and created no keyfile. |
+### Requirements Coverage
 
-Additional fresh reproduction showed that setting a legacy `exa_search` string
-to boolean `true` creates no keyfile in either implementation. SDK also returns
-the original string in `data.previousValue`; CJS masks output but still destroys
-the only stored credential.
+All four requirement IDs declared across plans 14-01..14-09 resolve to `.oto/REQUIREMENTS.md`; no Phase 14 requirement is orphaned.
 
-## Automated Checks
+| Requirement | Source Plans | Description | Status | Evidence |
+|-------------|--------------|-------------|--------|----------|
+| SECR-01 | 14-01..14-06, 14-08 | Exa key only in 0600 keyfile or env var, never in committed config | ✗ BLOCKED | Write paths are clean, but the SDK loader still hands consumers a plaintext key on the pre-project fallback (Gap 2), and the CJS loader can destroy the stored credential (Gap 1) |
+| SECR-02 | 14-01, 14-02, 14-05, 14-07 | Three config keys boolean-only, enforced in both write paths | ✓ SATISFIED | Direct set + new-project rejection verified for all three keys in both implementations; nothing persists on rejection |
+| SECR-03 | 14-01, 14-02, 14-04, 14-07, 14-08 | Legacy strings self-heal to keyfile with boolean left in place, incl. this repo | ✗ BLOCKED | Happy-path healing works and repo config is boolean-only, but failure-path healing destroys credentials (Gap 1) and crashes reads (Gap 3) |
+| SECR-04 | 14-03, 14-04, 14-06, 14-09 | Set/replace/clear via workflow, stdin-only, masked status | ✓ SATISFIED | E2e sandbox round trips + transactional fault tests + executable workflow; interactive TTY flow needs human confirmation (below) |
 
-| Command/check | Result |
-|---|---|
-| `node --test tests/14-secrets-keyfile.test.cjs tests/14-config-boolean.test.cjs tests/14-no-plaintext-guard.test.cjs` | **22/22 passed** |
-| `npx vitest run src/query/secrets.test.ts src/query/config-mutation.test.ts src/query/config-query.test.ts src/query/secret-commands.test.ts src/cli.test.ts` in `sdk/` | **139/139 passed** |
-| Secret registry contract test | **1/1 passed** |
-| `npm run build` in `sdk/` | **Exit 0**; `git diff --exit-code -- sdk/dist` stayed clean |
-| `node --check` for `secrets.cjs`, `config.cjs`, and `core.cjs` | **Exit 0** |
-| Workflow static contract grep | Required `secret-*`/0600 guidance present; defect-era integration `config-set` examples absent from the workflow body |
-| Repo config type probe | `exa_search`, `brave_search`, and `firecrawl` are currently present as booleans |
-| Isolated three-integration set/replace/status/clear harness | Every happy-path boolean/mode/mask/clear assertion passed |
-| Workflow entry probe | **Exit 10**: `Usage: config-ensure-section <section>` |
+### Anti-Patterns Found
 
-Per the verification scope, the broad root suite was not run. Its inherited
-baseline failures and report side effects are unrelated to this phase. The
-protected user-owned paths remained untouched.
+| File | Line | Pattern | Severity | Impact |
+|------|------|---------|----------|--------|
+| `oto/bin/lib/core.cjs` | ~358 | Scrub mutates the object documented as disk-write-only (`fileData`) | 🛑 Blocker | Credential destruction (Gap 1) |
+| `sdk/src/config.ts` | ~193-204 | Fallback branches bypass the security gate applied to the main branch | 🛑 Blocker | Plaintext leak (Gap 2) |
+| `oto/bin/lib/config.cjs` | 407 | Bare call to a throwing helper in a hot read path | 🛑 Blocker | Read-surface crash (Gap 3) |
+| `oto/bin/lib/config.cjs` | 447-451, 386-399 | `maskSecret(true)` → `****` — boolean flags unreadable via CJS CLI, diverges from SDK | ⚠️ Warning | Review WR-01; CJS `config-get exa_search` prints `****` for both true and false |
+| `oto/bin/lib/config.cjs` / `config-mutation.ts` | ~346-359 / ~221-235 | "no key detected — flag has no effect" warning fires before the migration that creates the key | ⚠️ Warning | Review WR-02; contradictory guidance for the migration cohort |
+| `oto/workflows/settings-integrations.md` | 75 | `--default` flag silently ignored by SDK `config-get`; no `\|\| echo` guard unlike every sibling workflow | ⚠️ Warning | Review WR-03; reproduced — exit 1, empty var when key absent |
+| `sdk/src/query/secret-commands.ts` | 49-73 | TTY branch never settles on readline `'close'` (Ctrl-D); relies on private `_writeToOutput` | ⚠️ Warning | Review WR-04; interactive hang risk |
+| `oto/bin/lib/secrets.cjs` / `secrets.ts` | 165-214 / 265-322 | Unlocked read-modify-write of config.json from read paths racing locked writers | ⚠️ Warning | Review WR-05; multi-worktree last-write-wins hazard |
 
-## Human Verification Evidence
+No TODO/FIXME/placeholder markers in any phase-modified file.
 
-`14-04-SUMMARY.md:78-88` records the user's approval of a direct Exa exercise:
-hidden TTY entry, 0600 mode, boolean-only config diff, masked set/replace status,
-both rejection checks, and clean clear/restoration. This is useful evidence for
-the lower-level happy path, but it did not execute the complete workflow's
-failing first step and cannot override the reproduced blockers above.
+### Human Verification Required
 
-## Gaps
+#### 1. Interactive hidden-prompt key entry
 
-1. **Boolean-only persistence is bypassable.** Validate merged new-project
-   configuration in both CJS and SDK and cover caller/default inputs.
-2. **Migration is fail-open and path-incomplete.** Migrate the actual effective
-   root/workstream layers, fail closed for sensitive reads, and scrub/migrate
-   legacy mutation `previousValue` data.
-3. **Secret CRUD is non-transactional.** Add preflight validation and rollback
-   across keyfile plus config mutations.
-4. **The shipped settings workflow is broken and contradictory.** Fix its entry
-   command, active-workstream routing, and command wrapper; then test the actual
-   command-to-workflow path end to end.
+**Test:** Run `/oto-settings-integrations` in a real Claude Code session, choose an integration, and enter a key at the hidden TTY prompt (then clear it).
+**Expected:** No echo of the key to the terminal; keyfile created 0600; masked `****<last-4>` in the follow-up status; also try Ctrl-D at the prompt — the command should exit cleanly, not hang (known WR-04 risk).
+**Why human:** TTY raw-mode behavior and readline echo suppression cannot be verified from a non-interactive sandbox. Prior human sign-off (14-04-SUMMARY) predates the 14-09 workflow rewrite.
 
-## Recommendation
+#### 2. Workflow run with an active workstream
 
-Do not advance to Phase 15. Create a Phase 14 gap-closure plan for the four
-grouped gaps above, add regression tests for every reproduced failure, then rerun
-verification. Phases 15 and 16 do not explicitly cover these defects, so none is
-eligible for deferral.
+**Test:** Activate a workstream, run `/oto-settings-integrations`, set and clear a key.
+**Expected:** All operations target the workstream config (via `--ws`), confirmation banner shows the resolved `OTO_CONFIG_PATH`.
+**Why human:** The workflow is markdown executed by the agent; end-to-end agent-driven threading can't be spawned programmatically. Note review IN-05: session-scoped workstream pointers are not seen by the workflow's `.oto/active-workstream` read.
+
+### Deferred Items
+
+None. Phase 15 (Exa MCP registration) and Phase 16 (agent guidance + hardening) goals and success criteria do not cover loader migration safety, SDK loader fallback scrubbing, or `config-get` guarding — no gap is eligible for deferral.
+
+### Gaps Summary
+
+The gap-closure wave genuinely fixed everything the previous verification flagged, and the write-path story is now solid: booleans-only is enforced everywhere a caller can write, secret CRUD is transactional, and the workflow is executable. What remains broken is the **failure half of the self-healing migration contract**, in three reproduced ways:
+
+1. **Gap 1 (regression, introduced by 14-07):** the loader scrub is applied to the object that loader dirty-writes persist, so a failed migration plus any unrelated config migration (e.g. `depth`→`granularity`) silently replaces the only stored credential with `true` — no keyfile, credential gone.
+2. **Gap 2 (incomplete 14-08 fix):** the SDK loader's two pre-project fallback branches return `~/.gsd/defaults.json` values unscrubbed — a plaintext API key leaves `loadConfig` in exactly the context (`~/.gsd` legacy defaults) the phase was built to handle.
+3. **Gap 3 (missed call site from 14-01):** `cmdConfigGet` is the only unguarded caller of the migration; one degraded `~/.oto` bricks every CJS `config-get` project-wide with a raw stack trace.
+
+All three are small, precisely located fixes (the review's suggested patches at 14-REVIEW.md are sound). Five warnings (WR-01..WR-05) should ride along in the same closure plan or be explicitly accepted.
+
+**Recommendation:** Do not advance to Phase 15. One more focused gap-closure plan covering the three blockers (plus regression tests pinning each reproduction), then re-verify.
 
 ---
 
-_Verified: 2026-07-11T00:03:37Z_  
-_Verifier: Codex (oto-verifier)_
+_Verified: 2026-07-11T02:57:16Z_
+_Verifier: Claude (oto-verifier)_
