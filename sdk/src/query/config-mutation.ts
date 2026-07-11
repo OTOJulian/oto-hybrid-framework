@@ -25,7 +25,12 @@ import { GSDError, ErrorClassification } from '../errors.js';
 import { VALID_PROFILES, getAgentToModelMapForProfile } from './config-query.js';
 import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
-import { validateIntegrationValue, warnIfNoKeyDetected } from './secrets.js';
+import {
+  INTEGRATIONS,
+  reconcileNewProjectIntegrations,
+  validateIntegrationValue,
+  warnIfNoKeyDetected,
+} from './secrets.js';
 import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 import type { QueryHandler } from './utils.js';
 
@@ -439,6 +444,17 @@ export const configNewProject: QueryHandler = async (args, projectDir, workstrea
       ...((userChoices.features as Record<string, unknown>) || {}),
     },
   };
+
+  // Phase 14 gap-closure (SECR-02): validate merged integration values before write (CR-01).
+  reconcileNewProjectIntegrations(config, userChoices);
+  for (const integration of Object.values(INTEGRATIONS)) {
+    if (integration.configKey in config && typeof config[integration.configKey] !== 'boolean') {
+      throw new GSDError(
+        `${integration.configKey}: non-boolean value blocked before write`,
+        ErrorClassification.Execution,
+      );
+    }
+  }
 
   await atomicWriteConfig(paths.config, config);
 
