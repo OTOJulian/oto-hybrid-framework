@@ -237,3 +237,90 @@ describe('secretStatus', () => {
     });
   });
 });
+
+describe('transactional set/clear (Phase 14 gap-closure, CR-03)', () => {
+  const FAULT_MARKER = 'sk-fault-test-0123456789';
+
+  /** EISDIR fault: replace .oto/config.json with a directory of the same name. */
+  function makeConfigPathADirectory(): void {
+    rmSync(configPath(), { force: true });
+    mkdirSync(configPath(), { recursive: true });
+  }
+
+  /** Run a command expected to reject; return the rejection for inspection. */
+  async function capturedRejection(promise: Promise<unknown>): Promise<unknown> {
+    try {
+      await promise;
+    } catch (err) {
+      return err;
+    }
+    throw new Error('expected the command to reject, but it resolved');
+  }
+
+  it('create-set + EISDIR: rejects and leaves NO orphan keyfile', async () => {
+    makeConfigPathADirectory();
+
+    const err = await capturedRejection(
+      secretSet(['exa'], projectDir, undefined, piped(`${FAULT_MARKER}\n`)),
+    );
+
+    expect(String(err)).not.toContain(FAULT_MARKER);
+    expect(existsSync(keyfilePath('exa'))).toBe(false);
+    expect(JSON.stringify(err instanceof Error ? err.message : err)).not.toContain(FAULT_MARKER);
+  });
+
+  it('replace-set + EISDIR: rejects and preserves the prior keyfile content at 0600', async () => {
+    const priorKey = 'sk-prior-credential-aaaa1111';
+    writeKeyfile('exa', priorKey, join(tmpHome, '.oto'));
+    makeConfigPathADirectory();
+
+    const err = await capturedRejection(
+      secretSet(['exa'], projectDir, undefined, piped(`${FAULT_MARKER}\n`)),
+    );
+
+    expect(String(err)).not.toContain(FAULT_MARKER);
+    expect(existsSync(keyfilePath('exa'))).toBe(true);
+    expect(readFileSync(keyfilePath('exa'), 'utf8')).toBe(`${priorKey}\n`);
+    expect(statSync(keyfilePath('exa')).mode & 0o777).toBe(0o600);
+  });
+
+  it('create-set + EACCES: preflight rejects before any keyfile is written', async () => {
+    if (process.getuid?.() === 0) return; // root bypasses permission checks
+
+    const otoDir = join(projectDir, '.oto');
+    chmodSync(otoDir, 0o500);
+    try {
+      const err = await capturedRejection(
+        secretSet(['exa'], projectDir, undefined, piped(`${FAULT_MARKER}\n`)),
+      );
+
+      expect(String(err)).not.toContain(FAULT_MARKER);
+      expect(existsSync(keyfilePath('exa'))).toBe(false);
+    } finally {
+      chmodSync(otoDir, 0o700);
+    }
+  });
+
+  it('clear + EISDIR: rejects WITHOUT destroying the stored credential', async () => {
+    const storedKey = 'sk-stored-credential-bbbb2222';
+    writeKeyfile('exa', storedKey, join(tmpHome, '.oto'));
+    makeConfigPathADirectory();
+
+    const err = await capturedRejection(secretClear(['exa'], projectDir));
+
+    expect(String(err)).not.toContain(storedKey);
+    expect(existsSync(keyfilePath('exa'))).toBe(true);
+    expect(readFileSync(keyfilePath('exa'), 'utf8')).toBe(`${storedKey}\n`);
+  });
+
+  it('happy path after fault coverage: set then clear still round-trips', async () => {
+    await secretSet(['exa'], projectDir, undefined, piped('sk-roundtrip-cccc3333\n'));
+    expect(JSON.parse(readFileSync(configPath(), 'utf8')).exa_search).toBe(true);
+
+    const result = await secretClear(['exa'], projectDir);
+
+    expect(existsSync(keyfilePath('exa'))).toBe(false);
+    expect(JSON.parse(readFileSync(configPath(), 'utf8')).exa_search).toBe(false);
+    expect(result.data).toMatchObject({ cleared: true, keyfile_existed: true, enabled: false });
+  });
+});
