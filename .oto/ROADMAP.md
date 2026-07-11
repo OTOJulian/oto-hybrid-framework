@@ -101,7 +101,7 @@ Plans:
 - [x] 14-04-PLAN.md — /oto-settings-integrations rewrite (`!`-prefix secret-set flow), D-04 no-plaintext guard test, human-verify checkpoint
 - [x] 14-05-PLAN.md — Gap closure: validate merged config-new-project integration values in both write paths (CR-01)
 - [x] 14-06-PLAN.md — Gap closure: transactional secret set/clear with preflight + compensating rollback (CR-03)
-- [ ] 14-07-PLAN.md — Gap closure: CJS migrate-before-overwrite in config-set, root-layer migration + loader scrub in core.cjs (CR-04)
+- [x] 14-07-PLAN.md — Gap closure: CJS migrate-before-overwrite in config-set, root-layer migration + loader scrub in core.cjs (CR-04)
 - [ ] 14-08-PLAN.md — Gap closure: SDK fail-closed config-get, root-fallback migration, configSet previousValue scrub + single sdk/dist rebuild (CR-02, CR-04)
 - [ ] 14-09-PLAN.md — Gap closure: fix workflow entry command + workstream threading, correct command wrapper, e2e workflow contract test
 
@@ -151,7 +151,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
-| 14. Key Storage Reconciliation | v0.5.0 | 6/9 | In Progress|  |
+| 14. Key Storage Reconciliation | v0.5.0 | 7/9 | In Progress|  |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 0/TBD | Not started | - |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
