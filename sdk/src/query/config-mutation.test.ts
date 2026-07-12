@@ -712,6 +712,24 @@ describe('configSet legacy migration (Phase 14 gap-closure)', () => {
     vi.stubEnv('FIRECRAWL_API_KEY', '');
   }
 
+  it('migrates before warning so a newly created keyfile is detected', async () => {
+    const { configSet } = await import('./config-mutation.js');
+    const fakeHome = join(tmpDir, 'home-cs-warning-order');
+    await mkdir(fakeHome, { recursive: true });
+    stubCleanEnv(fakeHome);
+    const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    const marker = 'sk-test-cs-warning-order-0123456789';
+    const configFile = join(tmpDir, '.oto', 'config.json');
+    await writeFile(configFile, JSON.stringify({ exa_search: marker }));
+
+    await configSet(['exa_search', 'true'], tmpDir);
+
+    const output = stderr.mock.calls.map(([chunk]) => String(chunk)).join('');
+    expect(output).toContain('migrated exa_search API key');
+    expect(output).not.toContain('no Exa API key detected');
+  });
+
   it('migrates a legacy string to a keyfile before overwriting; previousValue never carries the secret', async () => {
     const { configSet } = await import('./config-mutation.js');
 
