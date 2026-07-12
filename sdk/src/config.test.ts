@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { loadConfig, CONFIG_DEFAULTS } from './config.js';
-import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -12,7 +13,7 @@ describe('loadConfig', () => {
 
   beforeEach(async () => {
     tmpDir = join(tmpdir(), `gsd-config-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-    await mkdir(join(tmpDir, '.planning'), { recursive: true });
+    await mkdir(join(tmpDir, '.oto'), { recursive: true });
     // Isolate ~/.gsd/defaults.json by pointing HOME at an empty tmp dir.
     fakeHome = join(tmpdir(), `gsd-home-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await mkdir(fakeHome, { recursive: true });
@@ -39,13 +40,13 @@ describe('loadConfig', () => {
 
   it('returns all defaults when config file is missing', async () => {
     // No config.json created
-    await rm(join(tmpDir, '.planning', 'config.json'), { force: true });
+    await rm(join(tmpDir, '.oto', 'config.json'), { force: true });
     const config = await loadConfig(tmpDir);
     expect(config).toEqual(CONFIG_DEFAULTS);
   });
 
   it('returns all defaults when config file is empty', async () => {
-    await writeFile(join(tmpDir, '.planning', 'config.json'), '');
+    await writeFile(join(tmpDir, '.oto', 'config.json'), '');
     const config = await loadConfig(tmpDir);
     expect(config).toEqual(CONFIG_DEFAULTS);
   });
@@ -56,7 +57,7 @@ describe('loadConfig', () => {
       workflow: { research: false },
     };
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify(userConfig),
     );
 
@@ -78,7 +79,7 @@ describe('loadConfig', () => {
       hooks: { context_warnings: false },
     };
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify(userConfig),
     );
 
@@ -93,7 +94,7 @@ describe('loadConfig', () => {
   it('preserves unknown top-level keys', async () => {
     const userConfig = { custom_key: 'custom_value' };
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify(userConfig),
     );
 
@@ -106,7 +107,7 @@ describe('loadConfig', () => {
       agent_skills: { planner: 'custom-skill' },
     };
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify(userConfig),
     );
 
@@ -118,7 +119,7 @@ describe('loadConfig', () => {
 
   it('throws on malformed JSON', async () => {
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       '{bad json',
     );
 
@@ -127,7 +128,7 @@ describe('loadConfig', () => {
 
   it('throws when config is not an object (array)', async () => {
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       '[1, 2, 3]',
     );
 
@@ -136,7 +137,7 @@ describe('loadConfig', () => {
 
   it('throws when config is not an object (string)', async () => {
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       '"just a string"',
     );
 
@@ -149,7 +150,7 @@ describe('loadConfig', () => {
       another_unknown: { nested: 'value' },
     };
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify(userConfig),
     );
 
@@ -165,7 +166,7 @@ describe('loadConfig', () => {
       parallelization: 0,
     };
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify(userConfig),
     );
 
@@ -219,7 +220,7 @@ describe('loadConfig', () => {
       model_profile: 'fast',
     });
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'quality' }),
     );
 
@@ -242,11 +243,82 @@ describe('loadConfig', () => {
     const before = structuredClone(CONFIG_DEFAULTS);
 
     await writeFile(
-      join(tmpDir, '.planning', 'config.json'),
+      join(tmpDir, '.oto', 'config.json'),
       JSON.stringify({ model_profile: 'fast', workflow: { research: false } }),
     );
     await loadConfig(tmpDir);
 
     expect(CONFIG_DEFAULTS).toEqual(before);
+  });
+});
+
+describe('loadConfig fallback integration scrub', () => {
+  const leakyMarker = 'sk-leaky-marker-0123456789';
+  let projectDir: string;
+  let gsdHome: string;
+  let defaultsPath: string;
+  let previousGsdHome: string | undefined;
+
+  beforeEach(async () => {
+    projectDir = await mkdtemp(join(tmpdir(), 'oto-config-fallback-project-'));
+    gsdHome = await mkdtemp(join(tmpdir(), 'oto-config-fallback-home-'));
+    defaultsPath = join(gsdHome, '.gsd', 'defaults.json');
+    await mkdir(join(gsdHome, '.gsd'), { recursive: true });
+    previousGsdHome = process.env.GSD_HOME;
+    process.env.GSD_HOME = gsdHome;
+  });
+
+  afterEach(async () => {
+    await rm(projectDir, { recursive: true, force: true });
+    await rm(gsdHome, { recursive: true, force: true });
+    if (previousGsdHome === undefined) delete process.env.GSD_HOME;
+    else process.env.GSD_HOME = previousGsdHome;
+  });
+
+  it('scrubs a legacy integration string when project config is missing', async () => {
+    await writeFile(defaultsPath, JSON.stringify({ exa_search: leakyMarker }));
+
+    const config = await loadConfig(projectDir);
+
+    expect(config.exa_search).toBe(true);
+    expect(typeof config.exa_search).toBe('boolean');
+  });
+
+  it('scrubs a legacy integration string when project config is empty', async () => {
+    await writeFile(defaultsPath, JSON.stringify({ exa_search: leakyMarker }));
+    await mkdir(join(projectDir, '.oto'), { recursive: true });
+    await writeFile(join(projectDir, '.oto', 'config.json'), '  \n');
+
+    const config = await loadConfig(projectDir);
+
+    expect(config.exa_search).toBe(true);
+    expect(typeof config.exa_search).toBe('boolean');
+  });
+
+  it('leaves legacy defaults byte-identical across both fallback loads', async () => {
+    const seededContent = `{\n  "exa_search": "${leakyMarker}"\n}\n`;
+    await writeFile(defaultsPath, seededContent);
+
+    await loadConfig(projectDir);
+    expect(readFileSync(defaultsPath, 'utf-8')).toBe(seededContent);
+
+    await mkdir(join(projectDir, '.oto'), { recursive: true });
+    await writeFile(join(projectDir, '.oto', 'config.json'), '\n');
+    await loadConfig(projectDir);
+    expect(readFileSync(defaultsPath, 'utf-8')).toBe(seededContent);
+  });
+
+  it('scrubs all integration strings from user defaults', async () => {
+    await writeFile(defaultsPath, JSON.stringify({
+      exa_search: 'sk-a-0123456789',
+      brave_search: 'sk-b-0123456789',
+      firecrawl: 'sk-c-0123456789',
+    }));
+
+    const config = await loadConfig(projectDir);
+
+    expect(config.exa_search).toBe(true);
+    expect(config.brave_search).toBe(true);
+    expect(config.firecrawl).toBe(true);
   });
 });
