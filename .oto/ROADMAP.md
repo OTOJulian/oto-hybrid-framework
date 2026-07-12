@@ -104,9 +104,9 @@ Plans:
 - [x] 14-07-PLAN.md — Gap closure: CJS migrate-before-overwrite in config-set, root-layer migration + loader scrub in core.cjs (CR-04)
 - [x] 14-08-PLAN.md — Gap closure: SDK fail-closed config-get, root-fallback migration, configSet previousValue scrub + single sdk/dist rebuild (CR-02, CR-04)
 - [x] 14-09-PLAN.md — Gap closure: fix workflow entry command + workstream threading, correct command wrapper, e2e workflow contract test
-- [ ] 14-10-PLAN.md — Gap closure: CJS loader keeps fileData pristine so a failed migration can never destroy the stored credential (Gap 1)
-- [ ] 14-11-PLAN.md — Gap closure: guarded config-get migration (fail-open/fail-closed), boolean echo, migrate-before-warn, workflow default guard (Gap 3, WR-01/02/03; WR-05 deferred)
-- [ ] 14-12-PLAN.md — Gap closure: SDK loader fallback scrub, configSet warn ordering, TTY EOF handling, sdk/dist rebuild (Gap 2, WR-02/04)
+- [x] 14-10-PLAN.md — Gap closure: CJS loader keeps fileData pristine so a failed migration can never destroy the stored credential (Gap 1)
+- [x] 14-11-PLAN.md — Gap closure: guarded config-get migration (fail-open/fail-closed), boolean echo, migrate-before-warn, workflow default guard (Gap 3, WR-01/02/03; WR-05 deferred)
+- [x] 14-12-PLAN.md — Gap closure: SDK loader fallback scrub, configSet warn ordering, TTY EOF handling, sdk/dist rebuild (Gap 2, WR-02/04)
 
 Notes: Research flags this phase as standard-pattern (skip research-phase) — all four sites of the dual-typing defect are pinpointed with line numbers. Scope decision from research: fix all three integrations (`exa_search`, `brave_search`, `firecrawl`) with the shared mechanism, not just Exa. Sync hygiene applies: keep shared-file diffs (`config.cjs`, `secrets.cjs`, `settings-integrations.md`) small and commented.
 
@@ -154,7 +154,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
-| 14. Key Storage Reconciliation | v0.5.0 | 9/12 | Gap closure (round 3) | - |
+| 14. Key Storage Reconciliation | v0.5.0 | 12/12 | Complete   | 2026-07-12 |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 0/TBD | Not started | - |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
