@@ -28,13 +28,22 @@ export async function readSecretInput(stdin = process.stdin, stderr = process.st
             const rl = createInterface({ input: stdin, output: stderr, terminal: true });
             const muted = rl;
             stderr.write('Enter API key (input hidden): ');
-            muted._writeToOutput = () => { };
+            // NOTE: _writeToOutput is a Node readline INTERNAL (undocumented). Guarded so a
+            // future Node release removing it degrades to visible echo rather than a crash.
+            if (typeof muted._writeToOutput === 'function')
+                muted._writeToOutput = () => { };
             const onError = (error) => {
                 rl.close();
                 reject(error);
             };
             stdin.once('error', onError);
+            const onClose = () => {
+                stdin.removeListener('error', onError);
+                reject(new GSDError('API key entry cancelled', ErrorClassification.Interruption));
+            };
+            rl.once('close', onClose);
             rl.once('line', (line) => {
+                rl.removeListener('close', onClose);
                 stdin.removeListener('error', onError);
                 stderr.write('\n');
                 rl.close();

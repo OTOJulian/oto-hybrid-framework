@@ -88,6 +88,16 @@ async function loadUserDefaults() {
         return {};
     }
 }
+// Phase 14 gap-closure (SECR-01, Gap 2): loader contract is boolean-only for
+// integration flags on EVERY return path — including the ~/.gsd fallbacks.
+// Never write the scrubbed result back to ~/.gsd (D-08: that file is read-only for oto).
+function scrubIntegrationStrings(obj) {
+    for (const k of ['exa_search', 'brave_search', 'firecrawl']) {
+        if (typeof obj[k] === 'string')
+            obj[k] = true;
+    }
+    return obj;
+}
 export async function loadConfig(projectDir, workstream) {
     const configPath = join(projectDir, relPlanningPath(projectDir, workstream), 'config.json');
     const rootConfigPath = join(projectDir, planningRootName(projectDir), 'config.json');
@@ -131,14 +141,14 @@ export async function loadConfig(projectDir, workstream) {
     // honor user-level knobs like `resolve_model_ids: "omit"`.
     if (!projectConfigFound) {
         const userDefaults = await loadUserDefaults();
-        return mergeDefaults(userDefaults);
+        return mergeDefaults(scrubIntegrationStrings({ ...userDefaults }));
     }
     const trimmed = raw.trim();
     if (trimmed === '') {
         // Empty project config — treat as no project config (CJS core.cjs
         // catches JSON.parse on empty and falls through to the pre-project path).
         const userDefaults = await loadUserDefaults();
-        return mergeDefaults(userDefaults);
+        return mergeDefaults(scrubIntegrationStrings({ ...userDefaults }));
     }
     let parsed;
     try {
@@ -152,10 +162,7 @@ export async function loadConfig(projectDir, workstream) {
         throw new Error(`Config at ${configPath} must be a JSON object`);
     }
     // Phase 14 gap-closure (SECR-01): loader contract is boolean-only for integration flags.
-    for (const k of ['exa_search', 'brave_search', 'firecrawl']) {
-        if (typeof parsed[k] === 'string')
-            parsed[k] = true;
-    }
+    scrubIntegrationStrings(parsed);
     // Project config exists — user-level defaults are ignored (CJS parity).
     // `buildNewProjectConfig` already baked them into config.json at /gsd:new-project.
     return mergeDefaults(parsed);
