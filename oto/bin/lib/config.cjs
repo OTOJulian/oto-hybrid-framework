@@ -342,20 +342,18 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
     try { parsedValue = JSON.parse(value); } catch { /* keep as string */ }
   }
 
-  // OTO Phase 14 (SECR-02): integration flags are boolean-only; keys live in ~/.oto keyfiles.
+  // OTO Phase 14 (SECR-02/SECR-03): integration flags are boolean-only; keys live in ~/.oto keyfiles.
   if (isSecretKey(keyPath)) {
     const validation = validateIntegrationValue(keyPath, parsedValue);
     if (!validation.ok) error(validation.message); // D-05: hard reject, nothing written
-    if (parsedValue === true) warnIfNoKeyDetected(keyPath); // D-06: warn but allow
-  }
-
-  // OTO Phase 14 gap-closure (SECR-03): keyfile any legacy string BEFORE overwriting it; fail closed if migration cannot complete.
-  if (isSecretKey(keyPath)) {
+    // Gap-closure: keyfile any legacy string BEFORE overwriting it; fail closed if migration cannot complete.
     try {
       migrateLegacyIntegrationKeys(path.join(planningDir(cwd), 'config.json'));
     } catch {
       error(`${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`);
     }
+    // WR-02: warn only after migration — a just-migrated key must not trigger "no key detected".
+    if (parsedValue === true) warnIfNoKeyDetected(keyPath);
   }
 
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
@@ -384,7 +382,7 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
   const setConfigValueResult = setConfigValue(cwd, keyPath, parsedValue);
 
   // Integration values are boolean-only as of Phase 14; masking retained defensively for any legacy value echo.
-  if (isSecretKey(keyPath)) {
+  if (isSecretKey(keyPath) && (typeof parsedValue !== 'boolean' || typeof setConfigValueResult.previousValue === 'string')) {
     const masked = maskSecret(parsedValue);
     const maskedPrev = setConfigValueResult.previousValue === undefined
       ? undefined
@@ -403,13 +401,18 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
 }
 
 function cmdConfigGet(cwd, keyPath, raw, defaultValue) {
-  const configPath = path.join(planningDir(cwd), 'config.json');
-  migrateLegacyIntegrationKeys(configPath); // OTO Phase 14 (SECR-03): self-heal legacy key strings on read.
-  const hasDefault = defaultValue !== undefined;
-
   if (!keyPath) {
     error('Usage: config-get <key.path> [--default <value>]');
   }
+  const configPath = path.join(planningDir(cwd), 'config.json');
+  // OTO Phase 14 gap-closure (SECR-03, Gap 3): self-heal on read, but never let a
+  // failed migration crash the read surface — fail closed ONLY for sensitive keys.
+  let migrationFailed = false;
+  try { migrateLegacyIntegrationKeys(configPath); } catch { migrationFailed = true; }
+  if (migrationFailed && isSecretKey(keyPath)) {
+    error(`${keyPath}: legacy key migration failed — value withheld (fix ~/.oto permissions and retry)`);
+  }
+  const hasDefault = defaultValue !== undefined;
 
   let config = {};
   try {
@@ -444,7 +447,7 @@ function cmdConfigGet(cwd, keyPath, raw, defaultValue) {
 
   // Never echo plaintext for sensitive keys via config-get. Plaintext lives
   // in config.json on disk; the CLI surface always shows the masked form.
-  if (isSecretKey(keyPath)) {
+  if (isSecretKey(keyPath) && typeof current !== 'boolean') {
     const masked = maskSecret(current);
     output(masked, raw, masked);
     return;

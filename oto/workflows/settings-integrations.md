@@ -72,7 +72,7 @@ the non-secret local-search flag from config:
 
 ```bash
 oto-sdk query secret-status ${WS_ARGS[@]+"${WS_ARGS[@]}"}
-SEARCH_GITIGNORED=$(oto-sdk query config-get search_gitignored --default false ${WS_ARGS[@]+"${WS_ARGS[@]}"})
+SEARCH_GITIGNORED=$(oto-sdk query config-get search_gitignored ${WS_ARGS[@]+"${WS_ARGS[@]}"} 2>/dev/null || echo false)
 ```
 
 Show the `secret-status` lines verbatim; they are already masked and include
