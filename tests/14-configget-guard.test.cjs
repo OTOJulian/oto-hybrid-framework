@@ -93,6 +93,16 @@ test('config-get prints boolean integration flags without masking', (t) => {
   assert.doesNotMatch(falseResult.stdout, /\*\*\*\*/);
 });
 
+test('config-set echoes a boolean integration flag without masking', (t) => {
+  const fixture = seedFixture(t, { exa_search: true });
+
+  const result = runConfig(fixture, 'config-set', 'exa_search', 'false', '--raw');
+
+  assert.equal(result.status, 0, combinedOutput(result));
+  assert.match(result.stdout, /exa_search=false/);
+  assert.doesNotMatch(result.stdout, /\*\*\*\*/);
+});
+
 test('config-set migrates a legacy key before checking whether a key exists', (t) => {
   const fixture = seedFixture(t, { exa_search: MARKER });
 
