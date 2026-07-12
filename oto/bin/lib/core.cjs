@@ -355,7 +355,7 @@ function loadConfig(cwd) {
     const raw = fs.readFileSync(configPath, 'utf-8');
     // `fileData` is the parsed content of the config.json file on disk — used
     // for migrations and writes so we never persist merged values back to disk.
-    const fileData = _scrubIntegrationStrings(JSON.parse(raw));
+    const fileData = JSON.parse(raw);
 
     // Migrate deprecated "depth" key to "granularity" with value mapping
     if ('depth' in fileData && !('granularity' in fileData)) {
@@ -415,7 +415,10 @@ function loadConfig(cwd) {
 
     // Now apply root→workstream inheritance. `parsed` is the effective config
     // used for value extraction below; fileData is kept for disk writes only.
-    const parsed = rootParsed ? _deepMergeConfig(rootParsed, fileData) : fileData;
+    // OTO Phase 14 gap-closure (SECR-01/SECR-03, Gap 1): scrub ONLY the effective
+    // in-memory view — never fileData, which the dirty-write paths above persist
+    // to disk. A failed migration must leave the legacy string on disk intact.
+    const parsed = _scrubIntegrationStrings(rootParsed ? _deepMergeConfig(rootParsed, fileData) : { ...fileData });
 
     // Warn about unrecognized top-level keys so users don't silently lose config.
     // Derived from config-set's VALID_CONFIG_KEYS (canonical source) plus internal-only
