@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 14 verification gaps found
+stopped_at: Phase 14 gap-closure replanned (bounded convergence contract) — plans 14-13..14-19 pending execution
 last_updated: "2026-07-12T17:11:45.880Z"
-last_activity: 2026-07-12 -- Phase 14 planning complete
+last_activity: 2026-07-12 -- Phase 14 gap-closure plans revised into bounded convergence contract (7 plans, 4 waves)
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 15
+  total_plans: 19
   completed_plans: 12
-  percent: 80
+  percent: 63
 ---
 
 # Project State
@@ -26,18 +26,20 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 14 (key-storage-reconciliation) — GAPS FOUND
-Plan: 12 of 12
-Status: Ready to execute
-Last activity: 2026-07-12 -- Phase 14 planning complete
+Phase: 14 (key-storage-reconciliation) — GAPS FOUND, gap-closure plans pending
+Plan: 12 of 19 complete (gap-closure plans 14-13..14-19 not yet executed)
+Status: Ready to execute gap-closure waves (Wave 1: 14-13/14/16/17 → Wave 2: 14-15 → Wave 3: 14-18 → Wave 4: 14-19 terminal gate)
+Last activity: 2026-07-12 -- Gap-closure plans revised into bounded convergence contract; all 15 review findings dispositioned in 14-DISPOSITIONS.md
 
-Progress: [██████████] 100%
+Progress: [██████░░░░] 63%
 
 ## Next Command
 
 ```bash
-/oto-plan-phase 14 --gaps
+/oto-execute-phase 14
 ```
+
+Phase 14 is NOT complete: it closes only per the convergence contract in 14-DISPOSITIONS.md / 14-19-PLAN.md (fresh verifier 4/4, fresh review zero unresolved Criticals, four-part test gate, full-SDK-suite no worse than 14-SDK-BASELINE.txt; ≤2 further revision cycles).
 
 Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15 carries research flags (`CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution, transport ADR).
 
@@ -86,7 +88,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 
 ### Pending Todos
 
-None yet.
+- **Phase 16 pre-task (WR-04, deferred from Phase 14 review):** the settings workflow persists comma-separated agent skills as ONE quoted string (`oto/workflows/settings-integrations.md` agent-skills step); consumers treat it as a single nonexistent skill path. Phase 16 (agent guidance — owns the agent_skills consumers) must parse/trim/validate each name, persist a JSON array, and add an end-to-end two-skill injection test. Tracked in `.oto/phases/14-key-storage-reconciliation/14-DISPOSITIONS.md`.
 
 ### Blockers/Concerns
 

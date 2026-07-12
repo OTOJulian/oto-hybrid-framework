@@ -1,0 +1,45 @@
+# Phase 14: Review-Finding Dispositions
+
+**Source review:** 14-REVIEW.md (2026-07-12T02:16:40Z, Codex gsd-code-reviewer, standard depth — 3 Critical / 10 Warning / 2 Info)
+**Source verification:** 14-VERIFICATION.md (2026-07-12T02:27:06Z, 0/4, three reproduced blockers)
+**Created by:** gap-closure replan (bounded convergence contract), 2026-07-12
+**Rule:** no finding may remain silently unaddressed. Every entry is FIX (plan/task/test references), ACCEPT (concrete security justification), or DEFER (named owner, phase, prerequisite).
+
+## Disposition Matrix
+
+| Finding | Title (short) | Disposition | Where | Evidence / Tests | Notes |
+|---------|---------------|-------------|-------|------------------|-------|
+| CR-01 | Empty keyfile destroys the only valid legacy credential | **FIX** | Plan 14-13 (Tasks 1-2) | tests/14-empty-keyfile.test.cjs (Tests 1-8, incl. heal-first ordering Test 3), sdk/src/query/secrets-empty-keyfile.test.ts (Tests 1-8 incl. secretStatus `((unset))` inversion) | User-mandated ordering honored: heal perms BEFORE read/trim; empty check AFTER heal. Migration overwrites empty keyfile at 0600. |
+| CR-02 | Array-shaped new-project choices persist nested plaintext | **FIX** | Plan 14-15 (Tasks 1-2) | tests/14-newproject-shape-guard.test.cjs (Tests 1-10), sdk/src/query/config-newproject-shape.test.ts (Tests 1-9) | Full fix per mandate: plain-object root guard, top-level choice-key allowlist (schema-key validation, typo'd keys reject by name), nested integration-string rejection INCLUDING empty `""` (scanner has no truthiness test), mkdir moved AFTER complete validation (amendment-2 preferred fix). Dist-level reproduction re-run in 14-19. |
+| CR-03 | SDK config mutators erase malformed config instead of failing closed | **FIX** | Plan 14-14 (Tasks 1-2) | sdk/src/query/config-mutation-failclosed.test.ts (byte-preservation Tests 1-7 + secretSet/secretClear A-C) | ENOENT-only empty start via readConfigForMutation; CJS setConfigValue message sanitized (no err.message interpolation); dist rebuild in 14-19. |
+| WR-01 | Legacy migration bypasses the config lock; can lose concurrent updates | **FIX** | Plan 14-18 (Tasks 1-2) | tests/14-migration-lock.test.cjs (L1 lock-respect inversion of the reviewer's clobber, L4 multi-process interleave, L5 single-transaction real-process), sdk/src/query/migration-lock.test.ts (S1-S4) | Migration + mutation in ONE lock region (both layers); read-triggered migration self-locks with skip-on-contention (CJS) / same-lock join (SDK). Residual: SDK lock's pre-existing 2s force-acquire — ACCEPTED (see T-14-18-04): lock-internal semantics predate Phase 14; contention window shrinks from unbounded to ≤2s; changing lock internals is out of phase scope. |
+| WR-02 | Settings workflow misses session-scoped and migrated-root workstreams | **FIX** | Plan 14-17 (Task 1) | tests/14-settings-workflow-contract.test.cjs (session-pointer via CODEX_THREAD_ID, migrated `.planning` root, static pins) | Workflow resolves via the canonical dispatch resolver (`oto-tools workstream get --raw` + `config-path`); hardcoded `.oto/active-workstream` read removed (grep-pinned to 0). |
+| WR-03 | Event-enabled registry wrappers discard the workstream argument | **FIX** | Plan 14-14 (Task 3) | registry.test.ts WR-03 describe block (W1 workstream-config-mutated + event emitted, W2 undefined case) | Wrapper signature now `(args, projectDir, workstream)` forwarding all three. |
+| WR-04 | Comma-separated agent skills persisted as one nonexistent skill | **DEFER** | **Owner: Phase 16 (Agent Guidance + Hardening)** — pre-task recorded in .oto/STATE.md Pending Todos | Prerequisite: Phase 16 owns the agent_skills consumers (GUID-01..05); persisting a JSON array now, without updating consumers, would break skill resolution | Concrete tracked owner, not silence: STATE.md Pending Todos entry "Phase 16 pre-task (WR-04): parse/validate comma-separated agent skills into a JSON array + end-to-end two-skill injection test". |
+| WR-05 | Failed migration lets non-boolean integration values escape loaders | **FIX** | Plan 14-16 (Task 2) | tests/14-loader-scrub.test.cjs (object/number/null/array/string under forced migration failure, disk bytes pristine), sdk/src/config-loader-parity.test.ts scrub block | Every PRESENT non-boolean → Boolean(value) on the effective view of BOTH loaders; fileData/disk never touched. |
+| WR-06 | New-project reconciliation mutates before validating; loses provenance | **FIX** | Plan 14-15 (Tasks 1-2) | Shape-guard suites Tests 7-8 (CJS) / 6-7 (SDK): "valid Exa default + invalid Brave choice" leaves NO config/keyfile/dir/defaults change; explicit caller boolean overrides config value while the legacy default string STILL migrates to a 0600 keyfile | Two-phase reconcile: Phase A validates all (zero side effects), Phase B writes with rollback compensation; provenance from rawDefaults, not the merged view. Subsumed by amendment 3. |
+| WR-07 | Keyfile ops follow symlinks; write before tightening mode | **FIX** | Plan 14-13 (Tasks 1-2) | tests/14-keyfile-symlink.test.cjs (S1-S4), sdk/src/query/secrets-symlink.test.ts | lstat rejection of non-regular files in read+write; O_NOFOLLOW open; heal-permissions-before-truncation. Residual lstat→open TOCTOU on regular-file swap ACCEPTED (T-14-13-07: requires local same-user access; O_NOFOLLOW closes the symlink case). |
+| WR-08 | Hidden input fails open to visible echo if the private readline API changes | **FIX** (fail closed) | Plan 14-14 (Task 3) | sdk/src/query/secret-input-failclosed.test.ts (H1 unavailable-hook rejection before any input, H2 no prompt written) | When `_writeToOutput` is unavailable, secret-set rejects with a pipe-via-stdin instruction instead of echoing. Threat register T-14-14-05. |
+| WR-09 | SDK workstream config loading drops root inheritance | **FIX** (now, not deferred) | Plan 14-16 (Task 3) | sdk/src/config-loader-parity.test.ts (I1 commit_docs reproduction, I2 nested, I3 override, I4 fallback regression, I5 both-layer scrub) | Root + workstream parsed, scrubbed, deep-merged (root under workstream) before defaults — mirrors core.cjs. Chosen over the permitted Phase-15-prerequisite deferral: the divergence sits inside Phase 14's own config surface and the CJS semantics are an executable spec. |
+| WR-10 | Registry test red: stale two-argument dispatch spy | **FIX** | Plan 14-14 (Tasks 2-3) | registry.test.ts:80 expectation fixed to `(['arg1'], '/tmp', undefined)`; sibling real-workstream spec `(['arg1'], '/tmp', 'ws1')`; the WR-03 event-wrapper regression (W1) exercises a real workstream through the event path as mandated | |
+| IR-01 | No-plaintext token scan misses separator-containing provider keys | **FIX** | Plan 14-17 (Task 2) | tests/14-no-plaintext-guard.test.cjs: broadened `sk-/fc-[A-Za-z0-9_-]{20,}` classes + positive (`sk-proj-*`) and negative control assertions; repo scan still green | |
+| IR-02 | Importing cli.ts runs the CLI and pollutes its unit tests | **FIX** | Plan 14-16 (Task 3) | sdk/src/cli.test.ts import-without-side-effects assertion; direct-entry guard via `pathToFileURL(process.argv[1])`; bin/oto-sdk.js spawn path verified unchanged | |
+
+**Verification blockers → plans:** Gap 1 (array/nested plaintext) → 14-15 (+ dist repro in 14-19); Gap 2 (empty keyfile) → 14-13 (+ dist repro in 14-19); Gap 3 (malformed-config erasure) → 14-14 (+ dist repro in 14-19).
+
+## Terminal Convergence Contract (mirrored in plan 14-19, Task 3)
+
+Phase 14 completes ONLY when ALL of:
+
+1. **Fresh independent verification** (oto-verifier) reports `passed` with **4/4 requirements** (SECR-01, SECR-02, SECR-03, SECR-04) satisfied.
+2. **A fresh code review** reports **zero unresolved Critical findings**.
+3. **Every Warning is explicitly FIX / ACCEPT / DEFER with evidence** — this file kept current; any new finding gets a row before the phase can close.
+4. **Focused Phase 14 tests pass:** `node --test --test-reporter=dot tests/14-*.test.cjs` exits 0, AND the enumerated Phase 14 SDK suite list (plan 14-19 Task 3 Part 2) exits 0, AND `npx tsc --noEmit` (from sdk/) exits 0.
+5. **Full SDK suite introduces no failures beyond the recorded baseline** (14-SDK-BASELINE.txt, captured pre-gap-closure by plan 14-16; compared machine-checkably in 14-SDK-BASELINE-DELTA.txt: no newly-failing test file, no failure-count increase in already-failing files). Advisory planning-time numbers (2026-07-12): ~267 failed / ~1228 passed across ~41 failed files — the captured baseline is authoritative.
+
+**Wave gating:** within the plan set, Wave N+1 MUST NOT begin until every Wave N plan's verification passes. Plan 14-19 (Wave 4) hard-gates on 14-13..14-18 SUMMARY success.
+
+**Bounded convergence:** no more than **two** further plan-review revision cycles are permitted (this replan is cycle 1 of the bound). If the blocker count does not decrease between consecutive cycles, **STOP** and report the unresolved contradiction to the developer rather than generating another gap-plan loop.
+
+---
+*Phase: 14-key-storage-reconciliation — created during the 2026-07-12 gap-closure replan*
