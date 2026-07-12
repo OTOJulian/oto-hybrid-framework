@@ -2,13 +2,13 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: verifying
-stopped_at: Completed 14-12-PLAN.md
-last_updated: "2026-07-12T02:02:23.312Z"
-last_activity: 2026-07-12 -- Completed Phase 14 execution; ready for verification
+status: gaps_found
+stopped_at: Phase 14 verification gaps found
+last_updated: "2026-07-12T02:27:06Z"
+last_activity: 2026-07-12 -- Phase 14 verification found 3 gaps
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 0
   total_plans: 12
   completed_plans: 12
   percent: 100
@@ -26,17 +26,17 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 14 (key-storage-reconciliation) — EXECUTING
+Phase: 14 (key-storage-reconciliation) — GAPS FOUND
 Plan: 12 of 12
-Status: Ready for verification
-Last activity: 2026-07-12 -- Completed Phase 14 execution; ready for verification
+Status: Gaps found — ready to plan gap closure
+Last activity: 2026-07-12 -- Phase 14 verification found 3 gaps
 
 Progress: [██████████] 100%
 
 ## Next Command
 
 ```bash
-/oto-plan-phase 14
+/oto-plan-phase 14 --gaps
 ```
 
 Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15 carries research flags (`CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution, transport ADR).
@@ -111,7 +111,7 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 ## Session Continuity
 
 Last session: 2026-07-10T23:22:14.544Z
-Stopped at: Completed 14-12-PLAN.md
+Stopped at: Phase 14 verification gaps found
 Resume file: None
 
 ### Quick Tasks Completed

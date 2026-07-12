@@ -154,7 +154,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
-| 14. Key Storage Reconciliation | v0.5.0 | 12/12 | Complete   | 2026-07-12 |
+| 14. Key Storage Reconciliation | v0.5.0 | 12/12 | Gaps found (round 4) | - |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 0/TBD | Not started | - |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
