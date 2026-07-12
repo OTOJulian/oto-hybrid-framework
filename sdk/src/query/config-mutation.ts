@@ -218,7 +218,6 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
   if (!integrationCheck.ok) {
     throw new GSDError(integrationCheck.message, ErrorClassification.Validation);
   }
-  if (parsedValue === true) warnIfNoKeyDetected(keyPath);
 
   // Phase 14 gap-closure (SECR-03): keyfile any legacy string BEFORE overwriting it;
   // fail closed if self-heal cannot complete.
@@ -233,6 +232,9 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
       );
     }
   }
+
+  // WR-02: warn only after migration — a just-migrated key must not trigger "no key detected".
+  if (parsedValue === true) warnIfNoKeyDetected(keyPath);
 
   // D8: Context value validation (match CJS config.cjs:357-359)
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
