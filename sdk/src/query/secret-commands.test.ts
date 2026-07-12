@@ -18,7 +18,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { Readable } from 'node:stream';
+import { PassThrough, Readable } from 'node:stream';
 import { ErrorClassification, GSDError } from '../errors.js';
 import { writeKeyfile } from './secrets.js';
 import {
@@ -44,6 +44,16 @@ function piped(value: string): Readable & { isTTY?: boolean } {
   const stream = Readable.from([value]) as Readable & { isTTY?: boolean };
   stream.isTTY = false;
   return stream;
+}
+
+function tty(chunks: string[] = []): Readable & { isTTY?: boolean } {
+  const stream = Readable.from(chunks) as Readable & { isTTY?: boolean };
+  stream.isTTY = true;
+  return stream;
+}
+
+function fakeStderr(): NodeJS.WriteStream {
+  return new PassThrough() as unknown as NodeJS.WriteStream;
 }
 
 beforeEach(() => {
@@ -87,6 +97,19 @@ describe('readSecretInput', () => {
       message: 'API key contains whitespace — aborting',
       classification: ErrorClassification.Validation,
     });
+  });
+
+  it('rejects TTY EOF as a cancelled API key entry instead of hanging', async () => {
+    await expect(readSecretInput(tty(), fakeStderr())).rejects.toMatchObject({
+      message: 'API key entry cancelled',
+      classification: ErrorClassification.Interruption,
+    });
+  }, 250);
+
+  it('resolves a TTY line without a later close rejection', async () => {
+    await expect(
+      readSecretInput(tty(['sk-test-abcdef123456\n']), fakeStderr()),
+    ).resolves.toBe('sk-test-abcdef123456');
   });
 });
 

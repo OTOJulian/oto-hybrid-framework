@@ -52,14 +52,22 @@ export async function readSecretInput(
       const muted = rl as typeof rl & { _writeToOutput: (value: string) => void };
 
       stderr.write('Enter API key (input hidden): ');
-      muted._writeToOutput = () => {};
+      // NOTE: _writeToOutput is a Node readline INTERNAL (undocumented). Guarded so a
+      // future Node release removing it degrades to visible echo rather than a crash.
+      if (typeof muted._writeToOutput === 'function') muted._writeToOutput = () => {};
 
       const onError = (error: Error) => {
         rl.close();
         reject(error);
       };
       stdin.once('error', onError);
+      const onClose = () => {
+        stdin.removeListener('error', onError);
+        reject(new GSDError('API key entry cancelled', ErrorClassification.Interruption));
+      };
+      rl.once('close', onClose);
       rl.once('line', (line) => {
+        rl.removeListener('close', onClose);
         stdin.removeListener('error', onError);
         stderr.write('\n');
         rl.close();
