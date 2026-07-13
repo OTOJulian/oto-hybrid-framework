@@ -573,8 +573,8 @@ export function createRegistry(
     for (const cmd of QUERY_MUTATION_COMMANDS) {
       const original = registry.getHandler(cmd);
       if (original) {
-        registry.register(cmd, async (args: string[], projectDir: string) => {
-          const result = await original(args, projectDir);
+        registry.register(cmd, async (args: string[], projectDir: string, workstream?: string) => {
+          const result = await original(args, projectDir, workstream);
           try {
             const event = buildMutationEvent(mutationSessionId, cmd, args, result);
             eventStream.emitEvent(event);
