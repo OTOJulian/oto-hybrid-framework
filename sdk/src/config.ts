@@ -154,14 +154,39 @@ async function loadUserDefaults(): Promise<Record<string, unknown>> {
   }
 }
 
-// Phase 14 gap-closure (SECR-01, Gap 2): loader contract is boolean-only for
-// integration flags on EVERY return path — including the ~/.gsd fallbacks.
-// Never write the scrubbed result back to ~/.gsd (D-08: that file is read-only for oto).
 function scrubIntegrationStrings(obj: Record<string, unknown>): Record<string, unknown> {
+  // OTO Phase 14 gap-closure (WR-05 / SECR-01): the loader contract is
+  // boolean-only for integration flags on the EFFECTIVE view. Migration
+  // normally coerces non-booleans, but if its rewrite fails the raw value
+  // would escape — normalize every present non-boolean to Boolean(value).
+  // (Non-empty string → true, '' → false, object/array → true, null/0 → false.)
+  // This also applies on the ~/.gsd fallback paths; never persist this view.
   for (const k of ['exa_search', 'brave_search', 'firecrawl'] as const) {
-    if (typeof obj[k] === 'string') obj[k] = true;
+    if (Object.prototype.hasOwnProperty.call(obj, k) && typeof obj[k] !== 'boolean') {
+      obj[k] = Boolean(obj[k]);
+    }
   }
   return obj;
+}
+
+function deepMergeConfig(
+  base: Record<string, unknown>,
+  overlay: Record<string, unknown>,
+): Record<string, unknown> {
+  const result = { ...base };
+  for (const key of Object.keys(overlay)) {
+    const overlayValue = overlay[key];
+    if (overlayValue !== null && typeof overlayValue === 'object' && !Array.isArray(overlayValue)) {
+      const baseValue = base[key];
+      const nestedBase = baseValue !== null && typeof baseValue === 'object' && !Array.isArray(baseValue)
+        ? baseValue as Record<string, unknown>
+        : {};
+      result[key] = deepMergeConfig(nestedBase, overlayValue as Record<string, unknown>);
+    } else {
+      result[key] = overlayValue;
+    }
+  }
+  return result;
 }
 
 export async function loadConfig(projectDir: string, workstream?: string): Promise<GSDConfig> {
@@ -177,21 +202,36 @@ export async function loadConfig(projectDir: string, workstream?: string): Promi
   }
 
   let raw: string;
+  let rawPath = configPath;
+  let rootRaw: string | null = null;
   let projectConfigFound = false;
+  let workstreamConfigFound = false;
   try {
     raw = await readFile(configPath, 'utf-8');
     projectConfigFound = true;
+    workstreamConfigFound = workstream !== undefined;
   } catch {
     // If workstream config missing, fall back to root config
     if (workstream) {
       try {
         raw = await readFile(rootConfigPath, 'utf-8');
+        rawPath = rootConfigPath;
         projectConfigFound = true;
       } catch {
         raw = '';
       }
     } else {
       raw = '';
+    }
+  }
+
+  // A present workstream config overlays (rather than replaces) the root
+  // config, matching the CJS loader's executable semantics (WR-09).
+  if (workstreamConfigFound) {
+    try {
+      rootRaw = await readFile(rootConfigPath, 'utf-8');
+    } catch {
+      rootRaw = null;
     }
   }
 
@@ -218,15 +258,29 @@ export async function loadConfig(projectDir: string, workstream?: string): Promi
     parsed = JSON.parse(trimmed);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Failed to parse config at ${configPath}: ${msg}`);
+    throw new Error(`Failed to parse config at ${rawPath}: ${msg}`);
   }
 
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    throw new Error(`Config at ${configPath} must be a JSON object`);
+    throw new Error(`Config at ${rawPath} must be a JSON object`);
   }
 
   // Phase 14 gap-closure (SECR-01): loader contract is boolean-only for integration flags.
   scrubIntegrationStrings(parsed);
+
+  if (rootRaw !== null && rootRaw.trim() !== '') {
+    let rootParsed: Record<string, unknown>;
+    try {
+      rootParsed = JSON.parse(rootRaw);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`Failed to parse config at ${rootConfigPath}: ${msg}`);
+    }
+    if (typeof rootParsed !== 'object' || rootParsed === null || Array.isArray(rootParsed)) {
+      throw new Error(`Config at ${rootConfigPath} must be a JSON object`);
+    }
+    parsed = deepMergeConfig(scrubIntegrationStrings(rootParsed), parsed);
+  }
 
   // Project config exists — user-level defaults are ignored (CJS parity).
   // `buildNewProjectConfig` already baked them into config.json at /gsd:new-project.
