@@ -37,6 +37,29 @@ import {
 import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 import type { QueryHandler } from './utils.js';
 
+// Phase 14 gap-closure (CR-02 / SECR-01/02): config-new-project accepts
+// only documented keys from its materialized defaults plus its three
+// new-project-only compatibility keys.
+export const NEW_PROJECT_CHOICE_KEYS = new Set([
+  'model_profile',
+  'commit_docs',
+  'parallelization',
+  'search_gitignored',
+  'brave_search',
+  'firecrawl',
+  'exa_search',
+  'git',
+  'workflow',
+  'hooks',
+  'project_code',
+  'phase_naming',
+  'agent_skills',
+  'features',
+  'mode',
+  'granularity',
+  'depth',
+]);
+
 /**
  * Write config JSON atomically via temp file + rename to prevent
  * partial writes on process interruption.
@@ -394,20 +417,36 @@ export const configNewProject: QueryHandler = async (args, projectDir, workstrea
   }
 
   // Parse user choices
-  let userChoices: Record<string, unknown> = {};
+  let parsedChoices: unknown = {};
   if (args[0] && args[0].trim() !== '') {
     try {
-      userChoices = JSON.parse(args[0]) as Record<string, unknown>;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      throw new GSDError(`Invalid JSON for config-new-project: ${msg}`, ErrorClassification.Validation);
+      parsedChoices = JSON.parse(args[0]);
+    } catch {
+      // Phase 14 gap-closure (CR-02): V8 JSON.parse errors quote input
+      // snippets — a fixed message prevents echoing secret bytes embedded in
+      // malformed choices JSON. Mirrors oto/bin/lib/config.cjs.
+      throw new GSDError(
+        'Invalid config-new-project choices: malformed JSON (input not echoed)',
+        ErrorClassification.Validation,
+      );
     }
   }
 
-  // Ensure .planning directory exists
-  const planningDir = paths.planning;
-  if (!existsSync(planningDir)) {
-    await mkdir(planningDir, { recursive: true });
+  if (parsedChoices === null || typeof parsedChoices !== 'object' || Array.isArray(parsedChoices)) {
+    throw new GSDError(
+      'Invalid config-new-project choices: expected a JSON object',
+      ErrorClassification.Validation,
+    );
+  }
+  const userChoices = parsedChoices as Record<string, unknown>;
+
+  for (const key of Object.keys(userChoices)) {
+    if (!NEW_PROJECT_CHOICE_KEYS.has(key)) {
+      throw new GSDError(
+        `Invalid config-new-project choice key: ${key} — not a recognized new-project setting`,
+        ErrorClassification.Validation,
+      );
+    }
   }
 
   // D11: Load global defaults from ~/.gsd/defaults.json if present
@@ -501,7 +540,7 @@ export const configNewProject: QueryHandler = async (args, projectDir, workstrea
   };
 
   // Phase 14 gap-closure (SECR-02): validate merged integration values before write (CR-01).
-  reconcileNewProjectIntegrations(config, userChoices);
+  reconcileNewProjectIntegrations(config, userChoices, undefined, globalDefaults);
   for (const integration of Object.values(INTEGRATIONS)) {
     if (integration.configKey in config && typeof config[integration.configKey] !== 'boolean') {
       throw new GSDError(
@@ -511,6 +550,10 @@ export const configNewProject: QueryHandler = async (args, projectDir, workstrea
     }
   }
 
+  const planningDir = paths.planning;
+  if (!existsSync(planningDir)) {
+    await mkdir(planningDir, { recursive: true });
+  }
   await atomicWriteConfig(paths.config, config);
 
   return { data: { created: true, path: paths.config } };

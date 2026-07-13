@@ -45,6 +45,10 @@ export const INTEGRATIONS = {
   },
 } as const;
 
+const INTEGRATION_CONFIG_KEYS = new Set<string>(
+  Object.values(INTEGRATIONS).map((integration) => integration.configKey),
+);
+
 export type IntegrationSlug = keyof typeof INTEGRATIONS;
 type Integration = (typeof INTEGRATIONS)[IntegrationSlug];
 type IntegrationMatch = Integration & { slug: IntegrationSlug };
@@ -243,49 +247,139 @@ export function warnIfNoKeyDetected(configKey: string, baseDir?: string): void {
  * keyfile-wins conflict policy (D-02); other non-booleans are coerced via
  * Boolean(value). Mutates `merged` in place.
  */
+/** Phase 14 gap-closure (CR-02): first offending nested dot-path or null.
+ *  Empty strings included. The VALUE is never returned. Mirrors
+ *  findNestedIntegrationString in oto/bin/lib/secrets.cjs. */
+export function findNestedIntegrationString(
+  node: Record<string, unknown>,
+  prefix: string,
+): string | null {
+  if (!node || typeof node !== 'object') return null;
+  for (const [key, value] of Object.entries(node)) {
+    const keyPath = prefix ? `${prefix}.${key}` : key;
+    if (INTEGRATION_CONFIG_KEYS.has(key) && typeof value === 'string') return keyPath;
+    if (value && typeof value === 'object') {
+      const nested = findNestedIntegrationString(value as Record<string, unknown>, keyPath);
+      if (nested) return nested;
+    }
+  }
+  return null;
+}
+
+/**
+ * Two-phase new-project reconciliation mirroring oto/bin/lib/secrets.cjs.
+ * Phase A throws Validation errors after a side-effect-free deep scan and
+ * caller/default classification. Phase B compensates every attempted write
+ * before throwing an Execution error. D-08 keeps ~/.gsd defaults read-only.
+ */
 export function reconcileNewProjectIntegrations(
   merged: Record<string, unknown>,
   userChoices: Record<string, unknown>,
   baseDir?: string,
+  rawDefaults: Record<string, unknown> = {},
 ): { migrated: string[] } {
   const choices = userChoices ?? {};
-  const migrated: string[] = [];
 
-  for (const slug of Object.keys(INTEGRATIONS) as IntegrationSlug[]) {
-    const integration = INTEGRATIONS[slug];
-    const value = merged[integration.configKey];
-    if (typeof value === 'boolean') continue;
+  // Phase A: complete validation and classification with no reconcile writes.
+  for (const [key, value] of Object.entries(merged)) {
+    if (!value || typeof value !== 'object') continue;
+    const offender = findNestedIntegrationString(value as Record<string, unknown>, key);
+    if (offender) {
+      throw new GSDError(
+        `${offender}: integration API keys are not allowed in config — booleans only; set keys via /oto-settings-integrations (or 'oto-sdk query secret-set <integration>')`,
+        ErrorClassification.Validation,
+      );
+    }
+  }
 
-    const callerOwned =
+  for (const integration of Object.values(INTEGRATIONS)) {
+    if (
       Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
-      typeof choices[integration.configKey] !== 'boolean';
-    if (callerOwned) {
-      // D-05: sanitized rejection — message never includes the value.
-      const validation = validateIntegrationValue(integration.configKey, value);
+      typeof choices[integration.configKey] !== 'boolean'
+    ) {
+      const validation = validateIntegrationValue(
+        integration.configKey,
+        merged[integration.configKey],
+      );
       if (!validation.ok) {
         throw new GSDError(validation.message, ErrorClassification.Validation);
       }
+    }
+  }
+
+  const candidates: Array<{
+    slug: IntegrationSlug;
+    integration: Integration;
+    value: string;
+    existing: KeyfileValue | null;
+    conflict: boolean;
+  }> = [];
+  for (const slug of Object.keys(INTEGRATIONS) as IntegrationSlug[]) {
+    const integration = INTEGRATIONS[slug];
+    const callerOwned = Object.prototype.hasOwnProperty.call(choices, integration.configKey);
+    const rawDefault = rawDefaults[integration.configKey];
+    const value =
+      typeof rawDefault === 'string' && rawDefault !== ''
+        ? rawDefault
+        : !callerOwned &&
+            typeof merged[integration.configKey] === 'string' &&
+            merged[integration.configKey] !== ''
+          ? (merged[integration.configKey] as string)
+          : null;
+    if (value === null) continue;
+
+    const existing = readKeyfile(slug, baseDir);
+    candidates.push({
+      slug,
+      integration,
+      value,
+      existing,
+      conflict: Boolean(existing && existing.value !== value),
+    });
+  }
+
+  // Phase B: keyfile commit with compensation.
+  const attempted: typeof candidates = [];
+  for (const candidate of candidates) {
+    if (candidate.conflict) {
+      process.stderr.write(
+        `${candidate.integration.configKey}: keyfile ~/.oto/${candidate.integration.keyfileName} (${maskSecret(candidate.existing!.value)}) kept; config string (${maskSecret(candidate.value)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
+      );
       continue;
     }
 
-    if (typeof value === 'string' && value !== '') {
-      // Trusted global-default string — same conflict policy as
-      // migrateLegacyIntegrationKeys: an existing keyfile wins (D-02).
-      const existing = readKeyfile(slug, baseDir);
-      if (existing && existing.value !== value) {
-        process.stderr.write(
-          `${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(value)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
-        );
-      } else {
-        writeKeyfile(slug, value, baseDir);
-        process.stderr.write(
-          `migrated ${integration.configKey} API key from global defaults to ~/.oto/${integration.keyfileName} (0600)\n`,
-        );
+    attempted.push(candidate);
+    try {
+      writeKeyfile(candidate.slug, candidate.value, baseDir);
+      process.stderr.write(
+        `migrated ${candidate.integration.configKey} API key from global defaults to ~/.oto/${candidate.integration.keyfileName} (0600)\n`,
+      );
+    } catch {
+      for (const prior of attempted.reverse()) {
+        try {
+          if (prior.existing) writeKeyfile(prior.slug, prior.existing.value, baseDir);
+          else deleteKeyfile(prior.slug, baseDir);
+        } catch { /* best-effort compensation; preserve the sanitized failure */ }
       }
+      throw new GSDError(
+        `${candidate.integration.configKey}: keyfile write failed — nothing was written (fix ~/.oto permissions and retry)`,
+        ErrorClassification.Execution,
+      );
+    }
+  }
+
+  const migrated = candidates.map(({ integration }) => integration.configKey);
+  const migratedSet = new Set(migrated);
+  for (const integration of Object.values(INTEGRATIONS)) {
+    if (
+      Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
+      typeof choices[integration.configKey] === 'boolean'
+    ) {
+      merged[integration.configKey] = choices[integration.configKey];
+    } else if (migratedSet.has(integration.configKey)) {
       merged[integration.configKey] = true;
-      migrated.push(integration.configKey);
     } else {
-      merged[integration.configKey] = Boolean(value);
+      merged[integration.configKey] = Boolean(merged[integration.configKey]);
     }
   }
 
