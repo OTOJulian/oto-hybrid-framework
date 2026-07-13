@@ -2,7 +2,11 @@
  * Unit tests for QueryRegistry, extractField, and createRegistry factory.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { GSDEventStream } from '../event-stream.js';
 import { QueryRegistry, extractField, resolveQueryArgv } from './registry.js';
 import { createRegistry, QUERY_MUTATION_COMMANDS } from './index.js';
 import type { QueryResult } from './utils.js';
@@ -164,6 +168,66 @@ describe('createRegistry', () => {
 });
 
 // ─── resolveQueryArgv ───────────────────────────────────────────────────────
+
+describe('event wrapper preserves workstream (WR-03)', () => {
+  let tmpRoot: string;
+  let projectDir: string;
+  let rootConfigPath: string;
+  let workstreamConfigPath: string;
+
+  beforeEach(() => {
+    tmpRoot = mkdtempSync(join(tmpdir(), 'oto-registry-workstream-'));
+    projectDir = join(tmpRoot, 'project');
+    rootConfigPath = join(projectDir, '.oto', 'config.json');
+    workstreamConfigPath = join(projectDir, '.oto', 'workstreams', 'ws1', 'config.json');
+    mkdirSync(join(projectDir, '.oto', 'workstreams', 'ws1'), { recursive: true });
+    writeFileSync(rootConfigPath, '{"model_profile":"balanced"}\n');
+    writeFileSync(workstreamConfigPath, '{}\n');
+    vi.stubEnv('HOME', join(tmpRoot, 'home'));
+    vi.stubEnv('EXA_API_KEY', '');
+    vi.stubEnv('BRAVE_API_KEY', '');
+    vi.stubEnv('FIRECRAWL_API_KEY', '');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    rmSync(tmpRoot, { recursive: true, force: true });
+  });
+
+  it('routes event-enabled config mutations to the requested workstream', async () => {
+    const eventStream = new GSDEventStream();
+    const emitEvent = vi.spyOn(eventStream, 'emitEvent');
+    const registry = createRegistry(eventStream, 'wr-03-session');
+    const originalRoot = readFileSync(rootConfigPath, 'utf8');
+
+    await registry.dispatch('config-set', ['model_profile', 'quality'], projectDir, 'ws1');
+
+    expect(readFileSync(rootConfigPath, 'utf8')).toBe(originalRoot);
+    expect(JSON.parse(readFileSync(workstreamConfigPath, 'utf8'))).toMatchObject({
+      model_profile: 'quality',
+    });
+    expect(emitEvent).toHaveBeenCalledTimes(1);
+    expect(emitEvent).toHaveBeenCalledWith(expect.objectContaining({
+      command: 'config-set',
+      sessionId: 'wr-03-session',
+    }));
+  });
+
+  it('continues routing an unscoped event-enabled mutation to root config', async () => {
+    const eventStream = new GSDEventStream();
+    const emitEvent = vi.spyOn(eventStream, 'emitEvent');
+    const registry = createRegistry(eventStream, 'wr-03-root-session');
+    const originalWorkstream = readFileSync(workstreamConfigPath, 'utf8');
+
+    await registry.dispatch('config-set', ['model_profile', 'quality'], projectDir);
+
+    expect(JSON.parse(readFileSync(rootConfigPath, 'utf8'))).toMatchObject({
+      model_profile: 'quality',
+    });
+    expect(readFileSync(workstreamConfigPath, 'utf8')).toBe(originalWorkstream);
+    expect(emitEvent).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('resolveQueryArgv', () => {
   it('matches longest dotted prefix (state.update + args)', () => {
