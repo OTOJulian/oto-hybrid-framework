@@ -1,17 +1,17 @@
 ---
-oto_state_version: 1.0
+gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: ready_to_plan
-stopped_at: Phase 14 fresh verification gaps found (1/4); bounded-convergence stop condition triggered
-last_updated: "2026-07-13T02:18:06Z"
-last_activity: 2026-07-12 -- Phase 14 gap-closure execution finished; fresh review found 3 Criticals and verifier scored 1/4
+status: planning
+stopped_at: Phase 15 context gathered
+last_updated: "2026-07-13T18:59:50.230Z"
+last_activity: 2026-07-13
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 19
   completed_plans: 19
-  percent: 33
+  percent: 100
 ---
 
 # Project State
@@ -110,9 +110,9 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-10T23:22:14.544Z
-Stopped at: Phase 14 verification gaps found
-Resume file: None
+Last session: 2026-07-13T18:59:50.224Z
+Stopped at: Phase 15 context gathered
+Resume file: .oto/phases/15-exa-mcp-registration-all-three-runtimes/15-CONTEXT.md
 
 ### Quick Tasks Completed
 
