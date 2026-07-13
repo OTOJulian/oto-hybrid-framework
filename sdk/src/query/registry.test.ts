@@ -77,8 +77,20 @@ describe('QueryRegistry', () => {
 
     const result = await registry.dispatch('test-cmd', ['arg1'], '/tmp');
 
-    expect(handler).toHaveBeenCalledWith(['arg1'], '/tmp');
+    expect(handler).toHaveBeenCalledWith(['arg1'], '/tmp', undefined);
     expect(result).toEqual({ data: { value: 'arg1' } });
+  });
+
+  it('dispatch forwards an explicit workstream to the handler', async () => {
+    const registry = new QueryRegistry();
+    const handler = vi.fn(async (args: string[], _projectDir: string): Promise<QueryResult> => {
+      return { data: { value: args[0] } };
+    });
+    registry.register('test-cmd', handler);
+
+    await registry.dispatch('test-cmd', ['arg1'], '/tmp', 'ws1');
+
+    expect(handler).toHaveBeenCalledWith(['arg1'], '/tmp', 'ws1');
   });
 
   it('dispatch throws GSDError for unregistered command', async () => {

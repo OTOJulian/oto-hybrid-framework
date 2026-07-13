@@ -11,11 +11,14 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { PassThrough, Readable } from 'node:stream';
 import {
   configEnsureSection,
   configSet,
   configSetModelProfile,
 } from './config-mutation.js';
+import { secretClear, secretSet } from './secret-commands.js';
+import { keyfilePath, writeKeyfile } from './secrets.js';
 
 let tmpRoot: string;
 let tmpHome: string;
@@ -26,6 +29,16 @@ let configPath: string;
 function seedConfig(bytes: string): void {
   mkdirSync(configDir, { recursive: true });
   writeFileSync(configPath, bytes, 'utf8');
+}
+
+function piped(value: string): Readable & { isTTY?: boolean } {
+  const stream = Readable.from([value]) as Readable & { isTTY?: boolean };
+  stream.isTTY = false;
+  return stream;
+}
+
+function fakeStderr(): NodeJS.WriteStream {
+  return new PassThrough() as unknown as NodeJS.WriteStream;
 }
 
 beforeEach(() => {
@@ -143,5 +156,61 @@ describe('config mutations fail closed', () => {
     );
 
     expect(readdirSync(configDir).filter((name) => name.includes('.tmp.'))).toEqual([]);
+  });
+});
+
+describe('secret commands fail closed on malformed config', () => {
+  it('secret-set removes an orphaned keyfile when enabling the flag fails', async () => {
+    const original = '{bad json';
+    seedConfig(original);
+
+    await expect(
+      secretSet(
+        ['exa'],
+        projectDir,
+        undefined,
+        piped('sk-failclosed-abcd1234\n'),
+        fakeStderr(),
+      ),
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/failed to enable exa_search.*keyfile restored/),
+    });
+
+    expect(readFileSync(configPath, 'utf8')).toBe(original);
+    expect(existsSync(keyfilePath('exa'))).toBe(false);
+  });
+
+  it('secret-set restores a pre-existing keyfile when enabling the flag fails', async () => {
+    const original = '{bad json';
+    const prior = 'sk-prior-key-9999wxyz';
+    seedConfig(original);
+    writeKeyfile('exa', prior);
+
+    await expect(
+      secretSet(
+        ['exa'],
+        projectDir,
+        undefined,
+        piped('sk-failclosed-abcd1234\n'),
+        fakeStderr(),
+      ),
+    ).rejects.toThrow('failed to enable exa_search');
+
+    expect(readFileSync(configPath, 'utf8')).toBe(original);
+    expect(readFileSync(keyfilePath('exa'), 'utf8')).toBe(`${prior}\n`);
+  });
+
+  it('secret-clear preserves a pre-existing keyfile when disabling the flag fails', async () => {
+    const original = '{bad json';
+    const prior = 'sk-prior-key-9999wxyz';
+    seedConfig(original);
+    writeKeyfile('exa', prior);
+
+    await expect(secretClear(['exa'], projectDir)).rejects.toThrow(
+      'config.json is malformed JSON — config not modified',
+    );
+
+    expect(readFileSync(configPath, 'utf8')).toBe(original);
+    expect(readFileSync(keyfilePath('exa'), 'utf8')).toBe(`${prior}\n`);
   });
 });
