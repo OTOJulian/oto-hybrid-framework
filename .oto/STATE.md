@@ -1,5 +1,5 @@
 ---
-gsd_state_version: 1.0
+oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
@@ -28,8 +28,8 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 Phase: 14 (key-storage-reconciliation) — GAPS FOUND, bounded convergence stopped
 Plan: 19 of 19 executed; fresh verification scored 1/4
-Status: Developer decision required — do not auto-generate another gap-plan loop
-Last activity: 2026-07-13 - Completed quick task 260713-ffa: Recalibrate review machinery severity and convergence for Claude 5 / GPT-5.6 model generation
+Status: developer triage applied 2026-07-13: parser-leak fixed, 2 Criticals deferred with owners, warnings dispositioned; awaiting fresh verification.
+Last activity: 2026-07-13 - Completed quick task 260713-fym: Phase 14 developer triage — parser leak fixed, owned deferrals and warning dispositions recorded
 
 Progress: [██████████] 100% plan execution; phase not verified
 
@@ -85,6 +85,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 ### Pending Todos
 
 - **Phase 16 pre-task (WR-04, deferred from Phase 14 review):** the settings workflow persists comma-separated agent skills as ONE quoted string (`oto/workflows/settings-integrations.md` agent-skills step); consumers treat it as a single nonexistent skill path. Phase 16 (agent guidance — owns the agent_skills consumers) must parse/trim/validate each name, persist a JSON array, and add an end-to-end two-skill injection test. Tracked in `.oto/phases/14-key-storage-reconciliation/14-DISPOSITIONS.md`.
+- **Phase 15 pre-task (FRESH-CR-02, deferred from Phase 14 fresh review):** own per-runtime config-dir resolution plus the `/oto-settings-integrations` per-runtime status surface across Claude, Codex, Gemini, and custom config directories.
+- **Phase 16 pre-task (FRESH-CR-03, deferred from Phase 14 fresh review):** alongside WR-04, own effective root-to-workstream secret-status flags and root-layer legacy migration, including inherited booleans and legacy-string post-state.
 
 ### Blockers/Concerns
 
@@ -127,3 +129,4 @@ Resume file: None
 | 260709-lln | Make Codex SessionStart hook detection deterministic via installer-registered --codex argv flag | 2026-07-09 | 1fce5a7 |  | [260709-lln-make-codex-sessionstart-hook-detection-d](./quick/260709-lln-make-codex-sessionstart-hook-detection-d/) |
 | 260709-ob4 | Fix oto-sdk model profile validator to accept 'inherit' | 2026-07-09 | 0318f65 |  | [260709-ob4-fix-oto-sdk-model-profile-validator-to-a](./quick/260709-ob4-fix-oto-sdk-model-profile-validator-to-a/) |
 | 260713-ffa | Recalibrate review machinery severity and convergence for Claude 5 / GPT-5.6 model generation | 2026-07-13 | 8379506 |  | [260713-ffa-recalibrate-review-machinery-severity-an](./quick/260713-ffa-recalibrate-review-machinery-severity-an/) |
+| 260713-fym | Phase 14 developer triage: fix parser secret-fragment disclosure; defer two Criticals with Phase 15/16 owners; disposition six warnings; fix STATE marker and status; run required verification | 2026-07-13 | 606b7a9 |  | [260713-fym-phase-14-developer-triage-fix-parser-sec](./quick/260713-fym-phase-14-developer-triage-fix-parser-sec/) |
