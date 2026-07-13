@@ -45,3 +45,164 @@ Exit code: 1
 Post-state: config bytes remain exactly `{bad json`; the pre-seeded keyfile remains present with byte-identical prior content.
 Output: malformed JSON; config not modified.
 GAP3-SECRETCLEAR: PASS
+
+## Four-Part Terminal Gate
+
+Part 1 command: `node --test --test-reporter=dot tests/14-*.test.cjs`
+Part 1 result: exit 0; all focused Phase 14 CJS tests passed.
+
+Part 2 command: `cd sdk && npx vitest run` with the 14 Phase 14 files enumerated in 14-19-PLAN.md.
+Part 2 result: exit 0; 14 files passed; 271 tests passed; 0 failed.
+
+Part 3 command: `cd sdk && npx tsc --noEmit`
+Part 3 result: exit 0.
+
+Part 4 command: `cd sdk && npx vitest run > /tmp/vitest-final-raw.txt 2>&1 || true`
+Part 4 final summary: 40 failed files, 48 passed files, 88 total; 267 failed tests, 1287 passed tests, 1554 total.
+
+## Baseline Union Summary
+
+Baseline run 1: 41 failed files, 40 passed files; 268 failed tests, 1227 passed tests.
+Baseline run 2: 41 failed files, 40 passed files; 268 failed tests, 1227 passed tests.
+Authoritative baseline union: 41 failed files with the per-file maxima below.
+
+## Baseline Failed Files (union)
+
+src/context-engine.test.ts | max_failed=12
+src/e2e.integration.test.ts | max_failed=3
+src/golden/golden.integration.test.ts | max_failed=16
+src/golden/read-only-parity.integration.test.ts | max_failed=19
+src/init-e2e.integration.test.ts | max_failed=1
+src/phase-runner.integration.test.ts | max_failed=5
+src/query/check-auto-mode.test.ts | max_failed=3
+src/query/check-completion.test.ts | max_failed=3
+src/query/check-decision-coverage.test.ts | max_failed=4
+src/query/check-gates.test.ts | max_failed=3
+src/query/check-verification-status.test.ts | max_failed=5
+src/query/commit.test.ts | max_failed=4
+src/query/config-gates.test.ts | max_failed=2
+src/query/decomposed-handlers.test.ts | max_failed=7
+src/query/detect-phase-type.test.ts | max_failed=5
+src/query/init-complex.test.ts | max_failed=15
+src/query/init-progress-precedence.test.ts | max_failed=6
+src/query/init.test.ts | max_failed=13
+src/query/intel.test.ts | max_failed=2
+src/query/phase-lifecycle.test.ts | max_failed=35
+src/query/phase-list-queries.test.ts | max_failed=4
+src/query/phase-ready.test.ts | max_failed=1
+src/query/phase.test.ts | max_failed=14
+src/query/profile.test.ts | max_failed=1
+src/query/progress.test.ts | max_failed=2
+src/query/registry.test.ts | max_failed=1
+src/query/requirements-extract-from-plans.test.ts | max_failed=1
+src/query/roadmap-update-plan-progress.test.ts | max_failed=3
+src/query/roadmap.test.ts | max_failed=16
+src/query/route-next-action.test.ts | max_failed=2
+src/query/skills.test.ts | max_failed=3
+src/query/state-mutation.test.ts | max_failed=21
+src/query/state.test.ts | max_failed=17
+src/query/sub-repos-root.integration.test.ts | max_failed=2
+src/query/template.test.ts | max_failed=4
+src/query/uat.test.ts | max_failed=1
+src/query/verify.test.ts | max_failed=3
+src/query/workspace.test.ts | max_failed=1
+src/query/workstream.test.ts | max_failed=2
+src/workflow-agent-skills-consistency.test.ts | max_failed=1
+src/ws-transport.test.ts | max_failed=5
+
+## Final Failed Files
+
+src/context-engine.test.ts | failed=12
+src/e2e.integration.test.ts | failed=3
+src/golden/golden.integration.test.ts | failed=16
+src/golden/read-only-parity.integration.test.ts | failed=19
+src/init-e2e.integration.test.ts | failed=1
+src/phase-runner.integration.test.ts | failed=5
+src/query/check-auto-mode.test.ts | failed=3
+src/query/check-completion.test.ts | failed=3
+src/query/check-decision-coverage.test.ts | failed=4
+src/query/check-gates.test.ts | failed=3
+src/query/check-verification-status.test.ts | failed=5
+src/query/commit.test.ts | failed=4
+src/query/config-gates.test.ts | failed=2
+src/query/decomposed-handlers.test.ts | failed=7
+src/query/detect-phase-type.test.ts | failed=5
+src/query/init-complex.test.ts | failed=15
+src/query/init-progress-precedence.test.ts | failed=6
+src/query/init.test.ts | failed=13
+src/query/intel.test.ts | failed=2
+src/query/phase-lifecycle.test.ts | failed=35
+src/query/phase-list-queries.test.ts | failed=4
+src/query/phase-ready.test.ts | failed=1
+src/query/phase.test.ts | failed=14
+src/query/profile.test.ts | failed=1
+src/query/progress.test.ts | failed=2
+src/query/requirements-extract-from-plans.test.ts | failed=1
+src/query/roadmap-update-plan-progress.test.ts | failed=3
+src/query/roadmap.test.ts | failed=16
+src/query/route-next-action.test.ts | failed=2
+src/query/skills.test.ts | failed=3
+src/query/state-mutation.test.ts | failed=21
+src/query/state.test.ts | failed=17
+src/query/sub-repos-root.integration.test.ts | failed=2
+src/query/template.test.ts | failed=4
+src/query/uat.test.ts | failed=1
+src/query/verify.test.ts | failed=3
+src/query/workspace.test.ts | failed=1
+src/query/workstream.test.ts | failed=2
+src/workflow-agent-skills-consistency.test.ts | failed=1
+src/ws-transport.test.ts | failed=5
+
+## Per-File Comparison
+
+Every finally failing file appears in the baseline union, and every final failure count is within the recorded maximum:
+
+src/context-engine.test.ts | final_failed=12 | baseline_max=12 | WITHIN
+src/e2e.integration.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/golden/golden.integration.test.ts | final_failed=16 | baseline_max=16 | WITHIN
+src/golden/read-only-parity.integration.test.ts | final_failed=19 | baseline_max=19 | WITHIN
+src/init-e2e.integration.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/phase-runner.integration.test.ts | final_failed=5 | baseline_max=5 | WITHIN
+src/query/check-auto-mode.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/query/check-completion.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/query/check-decision-coverage.test.ts | final_failed=4 | baseline_max=4 | WITHIN
+src/query/check-gates.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/query/check-verification-status.test.ts | final_failed=5 | baseline_max=5 | WITHIN
+src/query/commit.test.ts | final_failed=4 | baseline_max=4 | WITHIN
+src/query/config-gates.test.ts | final_failed=2 | baseline_max=2 | WITHIN
+src/query/decomposed-handlers.test.ts | final_failed=7 | baseline_max=7 | WITHIN
+src/query/detect-phase-type.test.ts | final_failed=5 | baseline_max=5 | WITHIN
+src/query/init-complex.test.ts | final_failed=15 | baseline_max=15 | WITHIN
+src/query/init-progress-precedence.test.ts | final_failed=6 | baseline_max=6 | WITHIN
+src/query/init.test.ts | final_failed=13 | baseline_max=13 | WITHIN
+src/query/intel.test.ts | final_failed=2 | baseline_max=2 | WITHIN
+src/query/phase-lifecycle.test.ts | final_failed=35 | baseline_max=35 | WITHIN
+src/query/phase-list-queries.test.ts | final_failed=4 | baseline_max=4 | WITHIN
+src/query/phase-ready.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/query/phase.test.ts | final_failed=14 | baseline_max=14 | WITHIN
+src/query/profile.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/query/progress.test.ts | final_failed=2 | baseline_max=2 | WITHIN
+src/query/registry.test.ts | final_failed=0 | baseline_max=1 | CLEARED
+src/query/requirements-extract-from-plans.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/query/roadmap-update-plan-progress.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/query/roadmap.test.ts | final_failed=16 | baseline_max=16 | WITHIN
+src/query/route-next-action.test.ts | final_failed=2 | baseline_max=2 | WITHIN
+src/query/skills.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/query/state-mutation.test.ts | final_failed=21 | baseline_max=21 | WITHIN
+src/query/state.test.ts | final_failed=17 | baseline_max=17 | WITHIN
+src/query/sub-repos-root.integration.test.ts | final_failed=2 | baseline_max=2 | WITHIN
+src/query/template.test.ts | final_failed=4 | baseline_max=4 | WITHIN
+src/query/uat.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/query/verify.test.ts | final_failed=3 | baseline_max=3 | WITHIN
+src/query/workspace.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/query/workstream.test.ts | final_failed=2 | baseline_max=2 | WITHIN
+src/workflow-agent-skills-consistency.test.ts | final_failed=1 | baseline_max=1 | WITHIN
+src/ws-transport.test.ts | final_failed=5 | baseline_max=5 | WITHIN
+
+## Adjudication
+
+NONE
+
+There were zero new failing files and zero union files above their recorded maximum, so no isolated offender reruns were required and no file was excluded as a flake.
+
+NO NEW FAILURES: PASS
