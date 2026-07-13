@@ -4,6 +4,12 @@ import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
+describe('CLI module import', () => {
+  it('does not set process.exitCode while being imported', () => {
+    expect(process.exitCode ?? 0).toBe(0);
+  });
+});
+
 describe('parseCliArgs', () => {
   it('parses run <prompt> with defaults', () => {
     const result = parseCliArgs(['run', 'build auth']);
