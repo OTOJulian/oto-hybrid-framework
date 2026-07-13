@@ -9,7 +9,7 @@ import { parseArgs } from 'node:util';
 import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { GSD } from './index.js';
 import { CLITransport } from './cli-transport.js';
 import { WSTransport } from './ws-transport.js';
@@ -586,6 +586,11 @@ export async function main(argv = process.argv.slice(2)) {
         }
     }
 }
-// ─── Auto-run when invoked directly ──────────────────────────────────────────
-main();
+// ─── Auto-run only when invoked directly (IR-02) ─────────────────────────
+// bin/oto-sdk.js spawns this file as process.argv[1]; importing it (tests,
+// programmatic use) must not parse argv or set process.exitCode.
+const isDirectEntry = process.argv[1] !== undefined
+    && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isDirectEntry)
+    main();
 //# sourceMappingURL=cli.js.map

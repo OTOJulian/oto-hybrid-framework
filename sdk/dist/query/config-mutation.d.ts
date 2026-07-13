@@ -17,6 +17,7 @@
  * ```
  */
 import type { QueryHandler } from './utils.js';
+export declare const NEW_PROJECT_CHOICE_KEYS: Set<string>;
 /**
  * Check whether a config key path is valid.
  *

@@ -75,13 +75,32 @@ export declare function warnIfNoKeyDetected(configKey: string, baseDir?: string)
  * keyfile-wins conflict policy (D-02); other non-booleans are coerced via
  * Boolean(value). Mutates `merged` in place.
  */
-export declare function reconcileNewProjectIntegrations(merged: Record<string, unknown>, userChoices: Record<string, unknown>, baseDir?: string): {
+/** Phase 14 gap-closure (CR-02): first offending nested dot-path or null.
+ *  Empty strings included. The VALUE is never returned. Mirrors
+ *  findNestedIntegrationString in oto/bin/lib/secrets.cjs. */
+export declare function findNestedIntegrationString(node: Record<string, unknown>, prefix: string): string | null;
+/**
+ * Two-phase new-project reconciliation mirroring oto/bin/lib/secrets.cjs.
+ * Phase A throws Validation errors after a side-effect-free deep scan and
+ * caller/default classification. Phase B compensates every attempted write
+ * before throwing an Execution error. D-08 keeps ~/.gsd defaults read-only.
+ */
+export declare function reconcileNewProjectIntegrations(merged: Record<string, unknown>, userChoices: Record<string, unknown>, baseDir?: string, rawDefaults?: Record<string, unknown>): {
     migrated: string[];
 };
 export interface MigrationResult {
     migrated: string[];
     conflicts: string[];
 }
-export declare function migrateLegacyIntegrationKeys(configPath: string, baseDir?: string): Promise<MigrationResult>;
+/**
+ * Migrate legacy integration strings while holding the config mutator lock.
+ *
+ * The shared SDK lock force-acquires after roughly two seconds against a live
+ * lock (existing state-mutation semantics). Callers already inside that lock
+ * must pass `alreadyLocked` to join the transaction without double-acquiring.
+ */
+export declare function migrateLegacyIntegrationKeys(configPath: string, baseDir?: string, opts?: {
+    alreadyLocked?: boolean;
+}): Promise<MigrationResult>;
 export {};
 //# sourceMappingURL=secrets.d.ts.map
