@@ -492,8 +492,8 @@ export function createRegistry(eventStream, correlationSessionId) {
         for (const cmd of QUERY_MUTATION_COMMANDS) {
             const original = registry.getHandler(cmd);
             if (original) {
-                registry.register(cmd, async (args, projectDir) => {
-                    const result = await original(args, projectDir);
+                registry.register(cmd, async (args, projectDir, workstream) => {
+                    const result = await original(args, projectDir, workstream);
                     try {
                         const event = buildMutationEvent(mutationSessionId, cmd, args, result);
                         eventStream.emitEvent(event);

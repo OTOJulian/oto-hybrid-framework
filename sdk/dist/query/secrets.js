@@ -6,11 +6,12 @@
  * committed config stores booleans while API keys live in env vars or 0600
  * keyfiles under ~/.oto.
  */
-import { chmodSync, existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync, } from 'node:fs';
+import { chmodSync, closeSync, constants, existsSync, lstatSync, mkdirSync, openSync, readFileSync, unlinkSync, writeSync, } from 'node:fs';
 import { readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { ErrorClassification, GSDError } from '../errors.js';
+import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 export const INTEGRATIONS = {
     exa: {
         configKey: 'exa_search',
@@ -31,6 +32,7 @@ export const INTEGRATIONS = {
         label: 'Firecrawl',
     },
 };
+const INTEGRATION_CONFIG_KEYS = new Set(Object.values(INTEGRATIONS).map((integration) => integration.configKey));
 export function integrationForConfigKey(configKey) {
     for (const slug of Object.keys(INTEGRATIONS)) {
         const integration = INTEGRATIONS[slug];
@@ -56,20 +58,63 @@ export function writeKeyfile(slug, value, baseDir) {
     const base = keyfileBase(baseDir);
     const target = keyfilePath(slug, base);
     mkdirSync(base, { recursive: true, mode: 0o700 });
-    writeFileSync(target, String(value) + '\n', { mode: 0o600 });
+    // Phase 14 gap-closure (WR-07 / SECR-01): never write through a
+    // symlink or non-regular file, and tighten a pre-existing loose mode
+    // BEFORE the new secret bytes land (heal-before-truncation).
+    let st = null;
+    try {
+        st = lstatSync(target);
+    }
+    catch { /* ENOENT — fresh create below */ }
+    if (st) {
+        if (!st.isFile()) {
+            throw new GSDError(`refusing to write ${target}: not a regular file — remove it and retry`, ErrorClassification.Execution);
+        }
+        if ((st.mode & 0o077) !== 0)
+            chmodSync(target, 0o600);
+    }
+    const flags = constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC
+        | (constants.O_NOFOLLOW || 0);
+    const fd = openSync(target, flags, 0o600);
+    try {
+        writeSync(fd, String(value) + '\n');
+    }
+    finally {
+        closeSync(fd);
+    }
     chmodSync(target, 0o600);
 }
 export function readKeyfile(slug, baseDir) {
     const target = keyfilePath(slug, baseDir);
-    if (!existsSync(target))
+    // Phase 14 gap-closure (WR-07): lstat and refuse non-regular files
+    // BEFORE any chmod — chmodSync would dereference a planted symlink.
+    let st;
+    try {
+        st = lstatSync(target);
+    }
+    catch {
+        return null; // ENOENT — no keyfile
+    }
+    if (!st.isFile()) {
+        process.stderr.write(`refusing to read ${target}: not a regular file — remove it and re-set via /oto-settings-integrations\n`);
         return null;
+    }
+    // D-12 heal FIRST (CR-01 ordering): tighten permissions before content
+    // is read, so an empty loose-mode keyfile is still healed.
     let healed = false;
-    if ((statSync(target).mode & 0o077) !== 0) {
+    if ((st.mode & 0o077) !== 0) {
         chmodSync(target, 0o600);
         healed = true;
         process.stderr.write(`fixed permissions on ${target} (now 0600)\n`);
     }
-    return { value: readFileSync(target, 'utf8').trim(), healed };
+    const value = readFileSync(target, 'utf8').trim();
+    // Phase 14 gap-closure (CR-01 / SECR-03): an empty/whitespace-only
+    // keyfile is not a credential — report it absent so migration overwrites
+    // it instead of treating it as an authoritative conflicting keyfile, and
+    // so status reports "no key detected" instead of an enabled-unset key.
+    if (value === '')
+        return null;
+    return { value, healed };
 }
 export function deleteKeyfile(slug, baseDir) {
     const target = keyfilePath(slug, baseDir);
@@ -150,40 +195,110 @@ export function warnIfNoKeyDetected(configKey, baseDir) {
  * keyfile-wins conflict policy (D-02); other non-booleans are coerced via
  * Boolean(value). Mutates `merged` in place.
  */
-export function reconcileNewProjectIntegrations(merged, userChoices, baseDir) {
+/** Phase 14 gap-closure (CR-02): first offending nested dot-path or null.
+ *  Empty strings included. The VALUE is never returned. Mirrors
+ *  findNestedIntegrationString in oto/bin/lib/secrets.cjs. */
+export function findNestedIntegrationString(node, prefix) {
+    if (!node || typeof node !== 'object')
+        return null;
+    for (const [key, value] of Object.entries(node)) {
+        const keyPath = prefix ? `${prefix}.${key}` : key;
+        if (INTEGRATION_CONFIG_KEYS.has(key) && typeof value === 'string')
+            return keyPath;
+        if (value && typeof value === 'object') {
+            const nested = findNestedIntegrationString(value, keyPath);
+            if (nested)
+                return nested;
+        }
+    }
+    return null;
+}
+/**
+ * Two-phase new-project reconciliation mirroring oto/bin/lib/secrets.cjs.
+ * Phase A throws Validation errors after a side-effect-free deep scan and
+ * caller/default classification. Phase B compensates every attempted write
+ * before throwing an Execution error. D-08 keeps ~/.gsd defaults read-only.
+ */
+export function reconcileNewProjectIntegrations(merged, userChoices, baseDir, rawDefaults = {}) {
     const choices = userChoices ?? {};
-    const migrated = [];
-    for (const slug of Object.keys(INTEGRATIONS)) {
-        const integration = INTEGRATIONS[slug];
-        const value = merged[integration.configKey];
-        if (typeof value === 'boolean')
+    // Phase A: complete validation and classification with no reconcile writes.
+    for (const [key, value] of Object.entries(merged)) {
+        if (!value || typeof value !== 'object')
             continue;
-        const callerOwned = Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
-            typeof choices[integration.configKey] !== 'boolean';
-        if (callerOwned) {
-            // D-05: sanitized rejection — message never includes the value.
-            const validation = validateIntegrationValue(integration.configKey, value);
+        const offender = findNestedIntegrationString(value, key);
+        if (offender) {
+            throw new GSDError(`${offender}: integration API keys are not allowed in config — booleans only; set keys via /oto-settings-integrations (or 'oto-sdk query secret-set <integration>')`, ErrorClassification.Validation);
+        }
+    }
+    for (const integration of Object.values(INTEGRATIONS)) {
+        if (Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
+            typeof choices[integration.configKey] !== 'boolean') {
+            const validation = validateIntegrationValue(integration.configKey, merged[integration.configKey]);
             if (!validation.ok) {
                 throw new GSDError(validation.message, ErrorClassification.Validation);
             }
+        }
+    }
+    const candidates = [];
+    for (const slug of Object.keys(INTEGRATIONS)) {
+        const integration = INTEGRATIONS[slug];
+        const callerOwned = Object.prototype.hasOwnProperty.call(choices, integration.configKey);
+        const rawDefault = rawDefaults[integration.configKey];
+        const value = typeof rawDefault === 'string' && rawDefault !== ''
+            ? rawDefault
+            : !callerOwned &&
+                typeof merged[integration.configKey] === 'string' &&
+                merged[integration.configKey] !== ''
+                ? merged[integration.configKey]
+                : null;
+        if (value === null)
+            continue;
+        const existing = readKeyfile(slug, baseDir);
+        candidates.push({
+            slug,
+            integration,
+            value,
+            existing,
+            conflict: Boolean(existing && existing.value !== value),
+        });
+    }
+    // Phase B: keyfile commit with compensation.
+    const attempted = [];
+    for (const candidate of candidates) {
+        if (candidate.conflict) {
+            process.stderr.write(`${candidate.integration.configKey}: keyfile ~/.oto/${candidate.integration.keyfileName} (${maskSecret(candidate.existing.value)}) kept; config string (${maskSecret(candidate.value)}) dropped — re-set via /oto-settings-integrations if wrong\n`);
             continue;
         }
-        if (typeof value === 'string' && value !== '') {
-            // Trusted global-default string — same conflict policy as
-            // migrateLegacyIntegrationKeys: an existing keyfile wins (D-02).
-            const existing = readKeyfile(slug, baseDir);
-            if (existing && existing.value !== value) {
-                process.stderr.write(`${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(value)}) dropped — re-set via /oto-settings-integrations if wrong\n`);
+        attempted.push(candidate);
+        try {
+            writeKeyfile(candidate.slug, candidate.value, baseDir);
+            process.stderr.write(`migrated ${candidate.integration.configKey} API key from global defaults to ~/.oto/${candidate.integration.keyfileName} (0600)\n`);
+        }
+        catch {
+            for (const prior of attempted.reverse()) {
+                try {
+                    if (prior.existing)
+                        writeKeyfile(prior.slug, prior.existing.value, baseDir);
+                    else
+                        deleteKeyfile(prior.slug, baseDir);
+                }
+                catch { /* best-effort compensation; preserve the sanitized failure */ }
             }
-            else {
-                writeKeyfile(slug, value, baseDir);
-                process.stderr.write(`migrated ${integration.configKey} API key from global defaults to ~/.oto/${integration.keyfileName} (0600)\n`);
-            }
+            throw new GSDError(`${candidate.integration.configKey}: keyfile write failed — nothing was written (fix ~/.oto permissions and retry)`, ErrorClassification.Execution);
+        }
+    }
+    const migrated = candidates.map(({ integration }) => integration.configKey);
+    const migratedSet = new Set(migrated);
+    for (const integration of Object.values(INTEGRATIONS)) {
+        if (Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
+            typeof choices[integration.configKey] === 'boolean') {
+            merged[integration.configKey] = choices[integration.configKey];
+        }
+        else if (migratedSet.has(integration.configKey)) {
             merged[integration.configKey] = true;
-            migrated.push(integration.configKey);
         }
         else {
-            merged[integration.configKey] = Boolean(value);
+            merged[integration.configKey] = Boolean(merged[integration.configKey]);
         }
     }
     return { migrated };
@@ -203,52 +318,70 @@ async function atomicWriteConfig(configPath, config) {
         await writeFile(configPath, content, 'utf8');
     }
 }
-export async function migrateLegacyIntegrationKeys(configPath, baseDir) {
-    let config;
-    try {
-        const parsed = JSON.parse(await readFile(configPath, 'utf8'));
-        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+/**
+ * Migrate legacy integration strings while holding the config mutator lock.
+ *
+ * The shared SDK lock force-acquires after roughly two seconds against a live
+ * lock (existing state-mutation semantics). Callers already inside that lock
+ * must pass `alreadyLocked` to join the transaction without double-acquiring.
+ */
+export async function migrateLegacyIntegrationKeys(configPath, baseDir, opts = {}) {
+    const migrateBody = async () => {
+        let config;
+        try {
+            const parsed = JSON.parse(await readFile(configPath, 'utf8'));
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                return { migrated: [], conflicts: [] };
+            }
+            config = parsed;
+        }
+        catch {
             return { migrated: [], conflicts: [] };
         }
-        config = parsed;
-    }
-    catch {
-        return { migrated: [], conflicts: [] };
-    }
-    const migrated = [];
-    const conflicts = [];
-    let movedString = false;
-    for (const slug of Object.keys(INTEGRATIONS)) {
-        const integration = INTEGRATIONS[slug];
-        if (!Object.prototype.hasOwnProperty.call(config, integration.configKey))
-            continue;
-        const current = config[integration.configKey];
-        if (typeof current === 'boolean')
-            continue;
-        if (typeof current === 'string' && current !== '') {
-            const existing = readKeyfile(slug, baseDir);
-            if (existing && existing.value !== current) {
-                conflicts.push(integration.configKey);
-                process.stderr.write(`${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(current)}) dropped — re-set via /oto-settings-integrations if wrong\n`);
+        const migrated = [];
+        const conflicts = [];
+        let movedString = false;
+        for (const slug of Object.keys(INTEGRATIONS)) {
+            const integration = INTEGRATIONS[slug];
+            if (!Object.prototype.hasOwnProperty.call(config, integration.configKey))
+                continue;
+            const current = config[integration.configKey];
+            if (typeof current === 'boolean')
+                continue;
+            if (typeof current === 'string' && current !== '') {
+                const existing = readKeyfile(slug, baseDir);
+                if (existing && existing.value !== current) {
+                    conflicts.push(integration.configKey);
+                    process.stderr.write(`${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(current)}) dropped — re-set via /oto-settings-integrations if wrong\n`);
+                }
+                else {
+                    writeKeyfile(slug, current, baseDir);
+                    process.stderr.write(`migrated ${integration.configKey} API key from config.json to ~/.oto/${integration.keyfileName} (0600)\n`);
+                }
+                config[integration.configKey] = true;
+                movedString = true;
             }
             else {
-                writeKeyfile(slug, current, baseDir);
-                process.stderr.write(`migrated ${integration.configKey} API key from config.json to ~/.oto/${integration.keyfileName} (0600)\n`);
+                config[integration.configKey] = Boolean(current);
             }
-            config[integration.configKey] = true;
-            movedString = true;
+            migrated.push(integration.configKey);
         }
-        else {
-            config[integration.configKey] = Boolean(current);
+        if (migrated.length === 0)
+            return { migrated, conflicts };
+        await atomicWriteConfig(configPath, config);
+        if (movedString) {
+            process.stderr.write('note: this key may exist in git history — consider rotating it at the provider\n');
         }
-        migrated.push(integration.configKey);
-    }
-    if (migrated.length === 0)
         return { migrated, conflicts };
-    await atomicWriteConfig(configPath, config);
-    if (movedString) {
-        process.stderr.write('note: this key may exist in git history — consider rotating it at the provider\n');
+    };
+    if (opts.alreadyLocked)
+        return migrateBody();
+    const lockPath = await acquireStateLock(configPath);
+    try {
+        return await migrateBody();
     }
-    return { migrated, conflicts };
+    finally {
+        await releaseStateLock(lockPath);
+    }
 }
 //# sourceMappingURL=secrets.js.map

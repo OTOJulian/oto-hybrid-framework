@@ -26,6 +26,28 @@ import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
 import { INTEGRATIONS, integrationForConfigKey, maskSecret, migrateLegacyIntegrationKeys, reconcileNewProjectIntegrations, validateIntegrationValue, warnIfNoKeyDetected, } from './secrets.js';
 import { acquireStateLock, releaseStateLock } from './state-mutation.js';
+// Phase 14 gap-closure (CR-02 / SECR-01/02): config-new-project accepts
+// only documented keys from its materialized defaults plus its three
+// new-project-only compatibility keys.
+export const NEW_PROJECT_CHOICE_KEYS = new Set([
+    'model_profile',
+    'commit_docs',
+    'parallelization',
+    'search_gitignored',
+    'brave_search',
+    'firecrawl',
+    'exa_search',
+    'git',
+    'workflow',
+    'hooks',
+    'project_code',
+    'phase_naming',
+    'agent_skills',
+    'features',
+    'mode',
+    'granularity',
+    'depth',
+]);
 /**
  * Write config JSON atomically via temp file + rename to prevent
  * partial writes on process interruption.
@@ -45,6 +67,41 @@ async function atomicWriteConfig(configPath, config) {
         catch { /* already gone */ }
         await writeFile(configPath, content, 'utf-8');
     }
+}
+/**
+ * Read config.json for a read-modify-write mutation.
+ *
+ * Phase 14 gap-closure (CR-03 / SECR-04): start from an empty object ONLY
+ * when the file does not exist (ENOENT — first write on a fresh project).
+ * Every other failure — unreadable file, malformed JSON, or a
+ * non-plain-object root — throws so the mutation fails CLOSED instead of
+ * silently replacing the user's config with a near-empty object.
+ *
+ * The malformed-JSON message deliberately omits the parse error: Node's
+ * JSON.parse errors can quote file content, and a malformed config may
+ * still contain legacy key material.
+ */
+async function readConfigForMutation(configPath) {
+    let raw;
+    try {
+        raw = await readFile(configPath, 'utf-8');
+    }
+    catch (err) {
+        if (err?.code === 'ENOENT')
+            return {};
+        throw new GSDError(`cannot read config at ${configPath} — config not modified (fix permissions and retry)`, ErrorClassification.Execution);
+    }
+    let parsed;
+    try {
+        parsed = JSON.parse(raw);
+    }
+    catch {
+        throw new GSDError(`config.json is malformed JSON — config not modified (fix ${configPath} and retry)`, ErrorClassification.Execution);
+    }
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new GSDError(`config.json root must be a JSON object — config not modified (fix ${configPath} and retry)`, ErrorClassification.Execution);
+    }
+    return parsed;
 }
 // ─── VALID_CONFIG_KEYS ────────────────────────────────────────────────────
 // Imported from ./config-schema.js — single source of truth, kept in sync
@@ -198,20 +255,7 @@ export const configSet = async (args, projectDir, workstream) => {
     if (!integrationCheck.ok) {
         throw new GSDError(integrationCheck.message, ErrorClassification.Validation);
     }
-    // Phase 14 gap-closure (SECR-03): keyfile any legacy string BEFORE overwriting it;
-    // fail closed if self-heal cannot complete.
     const integrationKey = integrationForConfigKey(keyPath) !== null;
-    if (integrationKey) {
-        try {
-            await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config);
-        }
-        catch {
-            throw new GSDError(`${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`, ErrorClassification.Execution);
-        }
-    }
-    // WR-02: warn only after migration — a just-migrated key must not trigger "no key detected".
-    if (parsedValue === true)
-        warnIfNoKeyDetected(keyPath);
     // D8: Context value validation (match CJS config.cjs:357-359)
     const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
     if (keyPath === 'context' && !VALID_CONTEXT_VALUES.includes(String(parsedValue))) {
@@ -222,14 +266,17 @@ export const configSet = async (args, projectDir, workstream) => {
     const lockPath = await acquireStateLock(paths.config);
     let previousValue;
     try {
-        let config = {};
-        try {
-            const raw = await readFile(paths.config, 'utf-8');
-            config = JSON.parse(raw);
+        if (integrationKey) {
+            // Phase 14 gap-closure (WR-01): migration and mutation are one
+            // transaction under the config lock; avoid a nested acquisition.
+            try {
+                await migrateLegacyIntegrationKeys(paths.config, undefined, { alreadyLocked: true });
+            }
+            catch {
+                throw new GSDError(`${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`, ErrorClassification.Execution);
+            }
         }
-        catch {
-            // Start with empty config if file doesn't exist or is malformed
-        }
+        const config = await readConfigForMutation(paths.config);
         previousValue = getValueAtPath(config, keyPath);
         setConfigValue(config, keyPath, parsedValue);
         await atomicWriteConfig(paths.config, config);
@@ -237,6 +284,9 @@ export const configSet = async (args, projectDir, workstream) => {
     finally {
         await releaseStateLock(lockPath);
     }
+    // WR-02 ordering preserved: warn only after migration and lock release.
+    if (parsedValue === true)
+        warnIfNoKeyDetected(keyPath);
     // Match CJS JSON: `JSON.stringify` omits keys whose value is `undefined`
     const data = {
         updated: true,
@@ -274,14 +324,7 @@ export const configSetModelProfile = async (args, projectDir, workstream) => {
     const lockPath = await acquireStateLock(paths.config);
     let previousProfile = 'balanced';
     try {
-        let config = {};
-        try {
-            const raw = await readFile(paths.config, 'utf-8');
-            config = JSON.parse(raw);
-        }
-        catch {
-            // Start with empty config
-        }
+        const config = await readConfigForMutation(paths.config);
         const prev = typeof config.model_profile === 'string' ? config.model_profile.toLowerCase().trim() : '';
         previousProfile = VALID_PROFILES.includes(prev) ? prev : 'balanced';
         config.model_profile = normalized;
@@ -318,20 +361,26 @@ export const configNewProject = async (args, projectDir, workstream) => {
         return { data: { created: false, reason: 'already_exists' } };
     }
     // Parse user choices
-    let userChoices = {};
+    let parsedChoices = {};
     if (args[0] && args[0].trim() !== '') {
         try {
-            userChoices = JSON.parse(args[0]);
+            parsedChoices = JSON.parse(args[0]);
         }
-        catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            throw new GSDError(`Invalid JSON for config-new-project: ${msg}`, ErrorClassification.Validation);
+        catch {
+            // Phase 14 gap-closure (CR-02): V8 JSON.parse errors quote input
+            // snippets — a fixed message prevents echoing secret bytes embedded in
+            // malformed choices JSON. Mirrors oto/bin/lib/config.cjs.
+            throw new GSDError('Invalid config-new-project choices: malformed JSON (input not echoed)', ErrorClassification.Validation);
         }
     }
-    // Ensure .planning directory exists
-    const planningDir = paths.planning;
-    if (!existsSync(planningDir)) {
-        await mkdir(planningDir, { recursive: true });
+    if (parsedChoices === null || typeof parsedChoices !== 'object' || Array.isArray(parsedChoices)) {
+        throw new GSDError('Invalid config-new-project choices: expected a JSON object', ErrorClassification.Validation);
+    }
+    const userChoices = parsedChoices;
+    for (const key of Object.keys(userChoices)) {
+        if (!NEW_PROJECT_CHOICE_KEYS.has(key)) {
+            throw new GSDError(`Invalid config-new-project choice key: ${key} — not a recognized new-project setting`, ErrorClassification.Validation);
+        }
     }
     // D11: Load global defaults from ~/.gsd/defaults.json if present
     const homeDir = homedir();
@@ -421,11 +470,15 @@ export const configNewProject = async (args, projectDir, workstream) => {
         },
     };
     // Phase 14 gap-closure (SECR-02): validate merged integration values before write (CR-01).
-    reconcileNewProjectIntegrations(config, userChoices);
+    reconcileNewProjectIntegrations(config, userChoices, undefined, globalDefaults);
     for (const integration of Object.values(INTEGRATIONS)) {
         if (integration.configKey in config && typeof config[integration.configKey] !== 'boolean') {
             throw new GSDError(`${integration.configKey}: non-boolean value blocked before write`, ErrorClassification.Execution);
         }
+    }
+    const planningDir = paths.planning;
+    if (!existsSync(planningDir)) {
+        await mkdir(planningDir, { recursive: true });
     }
     await atomicWriteConfig(paths.config, config);
     return { data: { created: true, path: paths.config } };
@@ -447,14 +500,7 @@ export const configEnsureSection = async (args, projectDir, workstream) => {
         throw new GSDError('Usage: config-ensure-section <section>', ErrorClassification.Validation);
     }
     const paths = planningPaths(projectDir, workstream);
-    let config = {};
-    try {
-        const raw = await readFile(paths.config, 'utf-8');
-        config = JSON.parse(raw);
-    }
-    catch {
-        // Start with empty config
-    }
+    const config = await readConfigForMutation(paths.config);
     if (!(sectionName in config)) {
         config[sectionName] = {};
     }
