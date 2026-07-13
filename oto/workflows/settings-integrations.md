@@ -42,28 +42,31 @@ Read all files referenced by the invoking prompt's execution_context before star
 <process>
 
 <step name="ensure_and_load_config">
-Resolve the active workstream, then ensure config exists via the idempotent
-`config-new-project` (returns `already_exists` when present). Every subsequent
-oto-sdk command MUST include the guarded expansion
+Resolve the active workstream through the canonical session-aware resolver,
+then resolve the root-aware config path and ensure config exists via the
+idempotent `config-new-project` (returns `already_exists` when present). Never
+read pointer files directly or assume a particular planning-root name. Every
+subsequent oto-sdk command MUST include the guarded expansion
 `${WS_ARGS[@]+"${WS_ARGS[@]}"}` (portable under bash 3.2 with `set -u` when
 the array is empty — never expand the array without the `WS_ARGS[@]+` guard).
-Flat vs workstream routing per #2282:
+Flat vs workstream routing per #2282 and WR-02:
 
 ```bash
+OTO_TOOLS="${OTO_TOOLS:-$HOME/.claude/oto/bin/oto-tools.cjs}"
+# Canonical session-aware/root-aware resolution (WR-02): oto-tools resolves
+# --ws > OTO_WORKSTREAM > session-scoped pointer > shared pointer at dispatch.
+WS=$(node "$OTO_TOOLS" workstream get --raw 2>/dev/null || echo none)
 WS_ARGS=()
-if [[ -f .oto/active-workstream ]]; then
-  WS=$(tr -d '\n\r' < .oto/active-workstream)
+if [[ -n "$WS" && "$WS" != "none" ]]; then
   WS_ARGS=(--ws "$WS")
-  OTO_CONFIG_PATH=".oto/workstreams/${WS}/config.json"
-else
-  WS=""
-  OTO_CONFIG_PATH=".oto/config.json"
 fi
+OTO_CONFIG_PATH=$(node "$OTO_TOOLS" config-path ${WS_ARGS[@]+"${WS_ARGS[@]}"})
 oto-sdk query config-new-project ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 
-Store `$OTO_CONFIG_PATH` and `WS_ARGS`. Every subsequent read/write is
-threaded through `${WS_ARGS[@]+"${WS_ARGS[@]}"}` so it targets this config.
+Store `$OTO_CONFIG_PATH` and `WS_ARGS`. The tool resolves the project planning
+root, including migrated roots, while every subsequent read/write is threaded
+through `${WS_ARGS[@]+"${WS_ARGS[@]}"}` so it targets this config.
 </step>
 
 <step name="read_status">
