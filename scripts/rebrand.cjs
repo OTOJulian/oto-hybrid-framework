@@ -15,7 +15,8 @@ async function main() {
       out: { type: 'string', default: '.oto-rebrand-out/' },
       force: { type: 'boolean', default: false },
       owner: { type: 'string', default: 'OTOJulian' },
-      map: { type: 'string', default: 'rename-map.json' }
+      map: { type: 'string', default: 'rename-map.json' },
+      'reports-dir': { type: 'string' }
     },
     strict: true
   });
@@ -40,7 +41,8 @@ async function main() {
       out: mode === 'apply' ? path.resolve(values.out) : undefined,
       force: values.force,
       owner: values.owner,
-      mapPath: path.resolve(values.map)
+      mapPath: path.resolve(values.map),
+      reportsDir: values['reports-dir'] ? path.resolve(values['reports-dir']) : undefined
     });
     process.exit(result.exitCode);
   } catch (error) {
