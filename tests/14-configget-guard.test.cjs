@@ -17,6 +17,9 @@ const { spawnSync } = require('node:child_process');
 const REPO_ROOT = path.resolve(__dirname, '..');
 const OTO_TOOLS = path.join(REPO_ROOT, 'oto/bin/lib/oto-tools.cjs');
 const MARKER = 'sk-test-guard-0123456789';
+const PARSE_MARKER_FRAGMENT = 'SYNTH_MARK';
+const PARSE_MARKER_PREFIX = 'SYNTH_MARKER';
+const PARSE_MARKER = 'SYNTH_MARKER_do_not_echo_123456789';
 
 function seedFixture(t, config = {}) {
   const project = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-configget-project-'));
@@ -77,6 +80,24 @@ test('config-get fails closed cleanly for an integration key when migration fail
   assert.doesNotMatch(output, /EEXIST/);
   assert.doesNotMatch(output, / at .*core\.cjs|config\.cjs:\d+/);
   assert.doesNotMatch(output, new RegExp(MARKER));
+});
+
+test('config-get does not disclose malformed-config secret fragments', (t) => {
+  const fixture = seedFixture(t);
+  fs.writeFileSync(fixture.configPath, `{"exa_search": ${PARSE_MARKER}}`);
+
+  const result = runConfig(fixture, 'config-get', 'exa_search');
+  const output = combinedOutput(result);
+
+  assert.notEqual(result.status, 0);
+  assert.doesNotMatch(result.stdout, new RegExp(PARSE_MARKER_FRAGMENT));
+  assert.doesNotMatch(result.stderr, new RegExp(PARSE_MARKER_FRAGMENT));
+  assert.doesNotMatch(result.stdout, new RegExp(PARSE_MARKER_PREFIX));
+  assert.doesNotMatch(result.stderr, new RegExp(PARSE_MARKER_PREFIX));
+  assert.doesNotMatch(result.stdout, new RegExp(PARSE_MARKER));
+  assert.doesNotMatch(result.stderr, new RegExp(PARSE_MARKER));
+  assert.match(output, /malformed JSON/i);
+  assert.equal(output.includes(fixture.configPath), true);
 });
 
 test('config-get prints boolean integration flags without masking', (t) => {

@@ -190,9 +190,8 @@ export async function loadConfig(projectDir, workstream) {
     try {
         parsed = JSON.parse(trimmed);
     }
-    catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        throw new Error(`Failed to parse config at ${rawPath}: ${msg}`);
+    catch {
+        throw new Error(`Malformed JSON in config file at ${rawPath}`);
     }
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
         throw new Error(`Config at ${rawPath} must be a JSON object`);
@@ -204,9 +203,8 @@ export async function loadConfig(projectDir, workstream) {
         try {
             rootParsed = JSON.parse(rootRaw);
         }
-        catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            throw new Error(`Failed to parse config at ${rootConfigPath}: ${msg}`);
+        catch {
+            throw new Error(`Malformed JSON in config file at ${rootConfigPath}`);
         }
         if (typeof rootParsed !== 'object' || rootParsed === null || Array.isArray(rootParsed)) {
             throw new Error(`Config at ${rootConfigPath} must be a JSON object`);

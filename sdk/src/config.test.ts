@@ -118,12 +118,13 @@ describe('loadConfig', () => {
   // ─── Negative tests ─────────────────────────────────────────────────────
 
   it('throws on malformed JSON', async () => {
+    const configPath = join(tmpDir, '.oto', 'config.json');
     await writeFile(
-      join(tmpDir, '.oto', 'config.json'),
+      configPath,
       '{bad json',
     );
 
-    await expect(loadConfig(tmpDir)).rejects.toThrow(/Failed to parse config/);
+    await expect(loadConfig(tmpDir)).rejects.toThrow(`Malformed JSON in config file at ${configPath}`);
   });
 
   it('throws when config is not an object (array)', async () => {

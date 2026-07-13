@@ -492,7 +492,7 @@ function cmdConfigGet(cwd, keyPath, raw, defaultValue) {
     }
   } catch (err) {
     if (err.message.startsWith('No config.json')) throw err;
-    error('Failed to read config.json: ' + err.message);
+    error('Malformed JSON in config file at ' + configPath);
   }
 
   // Traverse dot-notation path (e.g., "workflow.auto_advance")
