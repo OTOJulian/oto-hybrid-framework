@@ -1,0 +1,468 @@
+# Phase 14 SDK Baseline
+
+## Summary
+
+Captured: 2026-07-13T00:51:37.904Z
+HEAD: 665bb1d3337373ce5854f6715eeb1e0bde31aa3c
+
+Run 1: Test Files  41 failed | 40 passed (81)
+Run 1: Tests  268 failed | 1227 passed (1495)
+Run 2: Test Files  41 failed | 40 passed (81)
+Run 2: Tests  268 failed | 1227 passed (1495)
+
+Planning-session advisory (2026-07-12): approximately 41 failed files / 267 failed tests / 1228 passed tests.
+Captured result: both runs reported 41 failed files / 268 failed tests / 1227 passed tests. The authoritative captured baseline is therefore +1 failed and -1 passed versus the advisory count.
+Plan 14-19 must compare against the union below and adjudicate apparent offenders with isolated reruns.
+
+## Failed Files (union)
+
+src/context-engine.test.ts | max_failed=12 | runs=1,2
+src/e2e.integration.test.ts | max_failed=3 | runs=1,2
+src/golden/golden.integration.test.ts | max_failed=16 | runs=1,2
+src/golden/read-only-parity.integration.test.ts | max_failed=19 | runs=1,2
+src/init-e2e.integration.test.ts | max_failed=1 | runs=1,2
+src/phase-runner.integration.test.ts | max_failed=5 | runs=1,2
+src/query/check-auto-mode.test.ts | max_failed=3 | runs=1,2
+src/query/check-completion.test.ts | max_failed=3 | runs=1,2
+src/query/check-decision-coverage.test.ts | max_failed=4 | runs=1,2
+src/query/check-gates.test.ts | max_failed=3 | runs=1,2
+src/query/check-verification-status.test.ts | max_failed=5 | runs=1,2
+src/query/commit.test.ts | max_failed=4 | runs=1,2
+src/query/config-gates.test.ts | max_failed=2 | runs=1,2
+src/query/decomposed-handlers.test.ts | max_failed=7 | runs=1,2
+src/query/detect-phase-type.test.ts | max_failed=5 | runs=1,2
+src/query/init-complex.test.ts | max_failed=15 | runs=1,2
+src/query/init-progress-precedence.test.ts | max_failed=6 | runs=1,2
+src/query/init.test.ts | max_failed=13 | runs=1,2
+src/query/intel.test.ts | max_failed=2 | runs=1,2
+src/query/phase-lifecycle.test.ts | max_failed=35 | runs=1,2
+src/query/phase-list-queries.test.ts | max_failed=4 | runs=1,2
+src/query/phase-ready.test.ts | max_failed=1 | runs=1,2
+src/query/phase.test.ts | max_failed=14 | runs=1,2
+src/query/profile.test.ts | max_failed=1 | runs=1,2
+src/query/progress.test.ts | max_failed=2 | runs=1,2
+src/query/registry.test.ts | max_failed=1 | runs=1,2
+src/query/requirements-extract-from-plans.test.ts | max_failed=1 | runs=1,2
+src/query/roadmap-update-plan-progress.test.ts | max_failed=3 | runs=1,2
+src/query/roadmap.test.ts | max_failed=16 | runs=1,2
+src/query/route-next-action.test.ts | max_failed=2 | runs=1,2
+src/query/skills.test.ts | max_failed=3 | runs=1,2
+src/query/state-mutation.test.ts | max_failed=21 | runs=1,2
+src/query/state.test.ts | max_failed=17 | runs=1,2
+src/query/sub-repos-root.integration.test.ts | max_failed=2 | runs=1,2
+src/query/template.test.ts | max_failed=4 | runs=1,2
+src/query/uat.test.ts | max_failed=1 | runs=1,2
+src/query/verify.test.ts | max_failed=3 | runs=1,2
+src/query/workspace.test.ts | max_failed=1 | runs=1,2
+src/query/workstream.test.ts | max_failed=2 | runs=1,2
+src/workflow-agent-skills-consistency.test.ts | max_failed=1 | runs=1,2
+src/ws-transport.test.ts | max_failed=5 | runs=1,2
+
+## Flake Drift
+
+NONE
+
+## Raw Tail Run 1
+
++   "config_exists": true,
++   "roadmap_exists": true,
++   "state_exists": true,
++   "state_raw": "---
++ gsd_state_version: 1.0
++ milestone: v0.5.0
++ milestone_name: Exa Search Integration
++ status: executing
++ stopped_at: Phase 14 gap-closure replanned (bounded convergence contract) — plans 14-13..14-19 pending execution
++ last_updated: \"2026-07-12T17:11:45.880Z\"
++ last_activity: 2026-07-12 -- Phase 14 gap-closure plans revised into bounded convergence contract (7 plans, 4 waves)
++ progress:
++   total_phases: 3
++   completed_phases: 0
++   total_plans: 19
++   completed_plans: 12
++   percent: 63
++ ---
++
++ # Project State
++
++ ## Project Reference
++
++ See: .oto/PROJECT.md (updated 2026-07-10)
++
++ **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
++
++ **Current focus:** Phase 14 — key-storage-reconciliation
++
++ ## Current Position
++
++ Phase: 14 (key-storage-reconciliation) — GAPS FOUND, gap-closure plans pending
++ Plan: 12 of 19 complete (gap-closure plans 14-13..14-19 not yet executed)
++ Status: Ready to execute gap-closure waves (Wave 1: 14-13/14/16/17 → Wave 2: 14-15 → Wave 3: 14-18 → Wave 4: 14-19 terminal gate)
++ Last activity: 2026-07-12 -- Gap-closure plans revised into bounded convergence contract; all 15 review findings dispositioned in 14-DISPOSITIONS.md
++
++ Progress: [██████░░░░] 63%
++
++ ## Next Command
++
++ ```bash
++ /oto-execute-phase 14
++ ```
++
++ Phase 14 is NOT complete: it closes only per the convergence contract in 14-DISPOSITIONS.md / 14-19-PLAN.md (fresh verifier 4/4, fresh review zero unresolved Criticals, four-part test gate, full-SDK-suite no worse than 14-SDK-BASELINE.txt; ≤2 further revision cycles).
++
++ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15 carries research flags (`CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution, transport ADR).
++
++ ## Performance Metrics
++
++ **Velocity (v0.4.0 reference):**
++
++ - v0.4.0: 12 plans across 3 phases; recent plan durations 8/6/7/4/3/18/36 min
++
++ **v0.5.0:**
++
++ | Phase | Plans | Total | Avg/Plan |
++ |-------|-------|-------|----------|
++ | - | - | - | - |
++
++ *Updated after each plan completion*
++ | Phase 14 P01 | 8 min | 2 tasks | 5 files |
++ | Phase 14 P02 | 8 min | 2 tasks | 7 files |
++ | Phase 14 P03 | 14 min | 2 tasks | 34 files |
++ | Phase 14 P04 | 39min | 3 tasks | 2 files |
++
++ ## Accumulated Context
++
++ ### Roadmap Evolution
++
++ - 2026-07-10: v0.5.0 roadmap created. Three phases (14-16) per research's strict dependency chain — key storage reconciliation (SECR-01..04) → MCP registration across all three runtimes (MCP-01..09 + HARD-02) → agent guidance + hardening (GUID-01..05 + HARD-01/03/04/05). 23/23 requirements mapped, no orphans, no duplicates. HARD-02 mapped to Phase 15 (its adapter round-trip family tests Phase 15 code and is the TOML-corruption hard gate; Phase 14's validation/no-plaintext test families land there and complete under HARD-02). Phases number from 14 (above the highest existing folder, 13); existing phase directories are never renamed/moved/deleted.
++ - 2026-05-26: v0.4.0 shipped (phases 11-13; SDK port, query registry, dogfood `.oto/` migration). Archives: `.oto/milestones/v0.4.0-*`.
++
++ ### Decisions
++
++ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
++
++ - v0.5.0 phases number from 14 (above highest existing phase folder, 13); never collide with accumulated v0.1.0-v0.4.0 directories.
++ - Transport/auth ADR (launcher-stdio vs remote HTTP) must be recorded at the top of Phase 15 before registration code lands; research recommends launcher-stdio.
++ - Key-storage fix covers all three integrations (`exa_search`, `brave_search`, `firecrawl`) with the shared mechanism, not just Exa.
++ - Sync hygiene is a cross-cutting v0.5.0 constraint: new logic in oto-only files where possible; shared-file diffs small and commented; `oto sync --dry-run` verified at milestone close (HARD-05).
++ - All installer changes go in the live `bin/lib/` installer; `oto/bin/install.js` is a vestigial GSD reference.
++ - [Phase 14]: CJS integration flags accept booleans only; API keys live in environment variables or 0600 ~/.oto keyfiles. — Prevents tracked config from persisting secret material.
++ - [Phase 14]: Legacy config conflicts preserve the existing keyfile and drop the config string with masked notices. — A deliberately created keyfile is the safer source of truth.
++ - [Phase 14]: SDK integration validation runs before the config lock or write — Non-boolean values never reach tracked config.
++ - [Phase 14]: Both SDK read paths invoke best-effort legacy migration — Legacy strings self-heal without blocking normal reads.
++ - [Phase 14]: Secret values enter through stdin or a muted TTY prompt only; argv and handler output remain plaintext-free. — Prevents keys from leaking through shell history, process listings, logs, or agent transcripts.
++ - [Phase 14]: Native query handlers may provide optional raw display text while preserving structured data for programmatic consumers. — Lets human-facing status commands render exact masked lines without breaking registry callers.
++ - [Phase 14]: Settings Set/Replace delegates key entry to the user's hidden terminal prompt; the workflow never receives secret material. — Keeps keys out of chat, argv, shell history, and tracked config.
++ - [Phase 14]: The no-plaintext regression guard scans exactly git-tracked .oto files. — Protects the remote exfiltration surface without fixture false positives.
++
++ ### Pending Todos
++
++ - **Phase 16 pre-task (WR-04, deferred from Phase 14 review):** the settings workflow persists comma-separated agent skills as ONE quoted string (`oto/workflows/settings-integrations.md` agent-skills step); consumers treat it as a single nonexistent skill path. Phase 16 (agent guidance — owns the agent_skills consumers) must parse/trim/validate each name, persist a JSON array, and add an end-to-end two-skill injection test. Tracked in `.oto/phases/14-key-storage-reconciliation/14-DISPOSITIONS.md`.
++
++ ### Blockers/Concerns
++
++ - Active secret-hygiene defect (research-confirmed): `/oto-settings-integrations` writes raw API-key strings into git-tracked `.oto/config.json`, and the live SDK write path has no masking. Phase 14 fixes this first; avoid touching integration keys via settings until then.
++
++ ## Deferred Items
++
++ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are pre-v0.4.0 historical noise carried in the open-artifact audit, plus one follow-up surfaced by Phase 12 verification:
++
++ | Category | Item | Status | Note |
++ |----------|------|--------|------|
++ | debug | knowledge-base | unknown | Stale debug session from 2026-05-05 (pre-v0.4.0); has a `resolved/` subdir. Close or archive via `/oto-debug` cleanup. |
++ | quick_task | 260505-bxx-port-gsds-codex-command-to-skill-adapter | committed | Already shipped (commit f56522c); audit flags it only because the quick-task dir lacks a STATE file. |
++ | quick_task | 260505-cxx-exclude-runtime-worktrees-from-migrate | committed | Already shipped (commit 69f8969). |
++ | quick_task | 260506-axx-expose-migrate-through-public-cli | committed | Already shipped (commit df7aba5). |
++ | quick_task | 260506-bxx-skip-gitignored-migrate-artifacts | committed | Already shipped (commit 4230d59). |
++ | context_question | Phase 02 (02-CONTEXT.md) | stale | v0.3.0-era discuss question left flagged; phase shipped and verified. |
++ | context_question | Phase 11 (11-CONTEXT.md) | stale | Discuss questions answered during planning; phase shipped and verified. |
++ | follow-up | init.cjs `.planning/` leak + milestone.complete marker | open | `oto/bin/lib/init.cjs:554` returns `task_dir: .planning/quick/…` (SDK handler correct); `oto-sdk query milestone.complete` rewrote the STATE.md frontmatter marker to `gsd_state_version` (restored manually). Both are ported CJS/SDK tooling still emitting GSD-era identifiers — fix via `/oto-quick`. |
++ | follow-up | config-mutation.ts:349 global defaults path reads `~/.gsd/defaults.json` while CJS `config.cjs:66` reads `~/.oto/defaults.json` | open | GSD-era path divergence found during Phase 14; out of D-08 scope (keyfiles only) — fix via `/oto-quick` alongside the other GSD-era identifier cleanups |
++
++ ## Session Continuity
++
++ Last session: 2026-07-10T23:22:14.544Z
++ Stopped at: Phase 14 verification gaps found
++ Resume file: None
++
++ ### Quick Tasks Completed
++
++ | # | Description | Date | Commit | Status | Directory |
++ |---|-------------|------|--------|--------|-----------|
++ | 260505-bxx | Port GSD's Codex command-to-skill adapter into oto's installer (Codex `$oto-*` invocation parity) | 2026-05-05 | f56522c |  | [260505-bxx-port-gsds-codex-command-to-skill-adapter](./quick/260505-bxx-port-gsds-codex-command-to-skill-adapter/) |
++ | 260505-cxx | Exclude runtime agent worktrees from `/oto-migrate` dry-run and apply scope | 2026-05-05 | 69f8969 |  | [260505-cxx-exclude-runtime-worktrees-from-migrate](./quick/260505-cxx-exclude-runtime-worktrees-from-migrate/) |
++ | 260506-axx | Expose `/oto:migrate` through the public `oto migrate` CLI path | 2026-05-06 | df7aba5 |  | [260506-axx-expose-migrate-through-public-cli](./quick/260506-axx-expose-migrate-through-public-cli/) |
++ | 260506-bxx | Skip untracked gitignored generated artifacts during `/oto-migrate` | 2026-05-06 | 4230d59 |  | [260506-bxx-skip-gitignored-migrate-artifacts](./quick/260506-bxx-skip-gitignored-migrate-artifacts/) |
++ | 260616-muv | Add oto-sdk PATH self-healing in wireOtoSdk and an `oto doctor` check | 2026-06-16 | 549d6c7 |  | [260616-muv-add-oto-sdk-path-self-healing-in-wireoto](./quick/260616-muv-add-oto-sdk-path-self-healing-in-wireoto/) |
++ | 260709-fav | Rewrite README.md to remove all mention of GSD and Superpowers, describing oto generically as its own framework | 2026-07-09 | bd5aeeb |  | [260709-fav-rewrite-readme-md-to-remove-all-mention-](./quick/260709-fav-rewrite-readme-md-to-remove-all-mention-/) |
++ | 260709-j0v | Remove vendored foundation-frameworks/ snapshots: tests to fixtures + opt-in corpus clone, folder deleted | 2026-07-09 | cd8d211 | Verified | [260709-j0v-remove-vendored-foundation-frameworks-sn](./quick/260709-j0v-remove-vendored-foundation-frameworks-sn/) |
++ | 260709-ks5 | Fix Codex SessionStart hook JSON schema mismatch (envelope output) + validate-commit stderr block reasons | 2026-07-09 | 8806d1e | Verified | [260709-ks5-fix-codex-sessionstart-hook-json-schema-](./quick/260709-ks5-fix-codex-sessionstart-hook-json-schema-/) |
++ | 260709-lln | Make Codex SessionStart hook detection deterministic via installer-registered --codex argv flag | 2026-07-09 | 1fce5a7 |  | [260709-lln-make-codex-sessionstart-hook-detection-d](./quick/260709-lln-make-codex-sessionstart-hook-detection-d/) |
++ | 260709-ob4 | Fix oto-sdk model profile validator to accept 'inherit' | 2026-07-09 | 0318f65 |  | [260709-ob4-fix-oto-sdk-model-profile-validator-to-a](./quick/260709-ob4-fix-oto-sdk-model-profile-validator-to-a/) |
++ ",
+  }
+
+ ❯ src/golden/read-only-parity.integration.test.ts:89:28
+     87|     const registry = createRegistry();
+     88|     const sdkResult = await registry.dispatch('state.load', [], REPO_R…
+     89|     expect(sdkResult.data).toEqual(gsdOutput);
+       |                            ^
+     90|   });
+     91| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[262/268]⎯
+
+ FAIL  |integration| src/golden/read-only-parity.integration.test.ts > state.get golden parity > matches full STATE.md when no field (same as `state get` with no section)
+ FAIL  |integration| src/golden/read-only-parity.integration.test.ts > state.get golden parity > matches single frontmatter field when `state get <field>`
+Error: gsd-tools failed (exit 1): Error: STATE.md not found
+
+ ❯ src/golden/capture.ts:39:13
+     37|           const stderrStr = stderr?.toString() ?? '';
+     38|           reject(
+     39|             new Error(
+       |             ^
+     40|               `gsd-tools failed (exit ${code}): ${stderrStr || (err in…
+     41|             ),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[263/268]⎯
+
+ FAIL  |integration| src/query/sub-repos-root.integration.test.ts > issue #2623 — sub_repos project-root resolution through query dispatch > findProjectRoot(app) resolves to the parent workspace that owns .planning/
+AssertionError: expected '/var/folders/sh/b81x8yx935zfwjl0sv2z8…' to be '/var/folders/sh/b81x8yx935zfwjl0sv2z8…' // Object.is equality
+
+Expected: "/var/folders/sh/b81x8yx935zfwjl0sv2z84mm0000gn/T/gsd-2623-OOBigk"
+Received: "/var/folders/sh/b81x8yx935zfwjl0sv2z84mm0000gn/T/gsd-2623-OOBigk/app"
+
+ ❯ src/query/sub-repos-root.integration.test.ts:51:37
+     49| 
+     50|   it('findProjectRoot(app) resolves to the parent workspace that owns …
+     51|     expect(findProjectRoot(appDir)).toBe(workspace);
+       |                                     ^
+     52|   });
+     53| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[264/268]⎯
+
+ FAIL  |integration| src/query/sub-repos-root.integration.test.ts > issue #2623 — sub_repos project-root resolution through query dispatch > init.new-milestone dispatched with resolved root reports project_exists:true
+AssertionError: expected '/var/folders/sh/b81x8yx935zfwjl0sv2z8…' to be '/var/folders/sh/b81x8yx935zfwjl0sv2z8…' // Object.is equality
+
+Expected: "/var/folders/sh/b81x8yx935zfwjl0sv2z84mm0000gn/T/gsd-2623-idtyGP"
+Received: "/var/folders/sh/b81x8yx935zfwjl0sv2z84mm0000gn/T/gsd-2623-idtyGP/app"
+
+ ❯ src/query/sub-repos-root.integration.test.ts:57:22
+     55|     // Simulate the CLI path: user starts inside the sub_repo.
+     56|     const resolved = findProjectRoot(appDir);
+     57|     expect(resolved).toBe(workspace);
+       |                      ^
+     58| 
+     59|     const registry = createRegistry();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[265/268]⎯
+
+
+ Test Files  41 failed | 40 passed (81)
+      Tests  268 failed | 1227 passed (1495)
+   Start at  20:50:04
+   Duration  3.55s (transform 2.60s, setup 0ms, collect 9.03s, tests 15.69s, environment 7ms, prepare 3.96s)
+
+## Raw Tail Run 2
+
+"ws-1.0"
+
++ Received: 
+undefined
+
+ ❯ src/query/state.test.ts:377:28
+    375|     const data = result.data as Record<string, unknown>;
+    376| 
+    377|     expect(data.milestone).toBe('ws-1.0');
+       |                            ^
+    378|     expect(data.milestone_name).toBe('Workstream Marker');
+    379|     expect(data.status).toBe('planning');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[254/268]⎯
+
+ FAIL  |unit| src/query/template.test.ts > templateSelect > returns "summary" when PLAN exists but no SUMMARY
+AssertionError: expected 'plan' to be 'summary' // Object.is equality
+
+Expected: "summary"
+Received: "plan"
+
+ ❯ src/query/template.test.ts:43:27
+     41|     const result = await templateSelect(['9'], tmpDir);
+     42|     const data = result.data as Record<string, unknown>;
+     43|     expect(data.template).toBe('summary');
+       |                           ^
+     44|   });
+     45| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[255/268]⎯
+
+ FAIL  |unit| src/query/template.test.ts > templateSelect > returns "verification" when all plans have summaries
+AssertionError: expected 'plan' to be 'verification' // Object.is equality
+
+Expected: "verification"
+Received: "plan"
+
+ ❯ src/query/template.test.ts:52:27
+     50|     const result = await templateSelect(['9'], tmpDir);
+     51|     const data = result.data as Record<string, unknown>;
+     52|     expect(data.template).toBe('verification');
+       |                           ^
+     53|   });
+     54| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[256/268]⎯
+
+ FAIL  |unit| src/query/template.test.ts > event emission wiring > emits StateMutation event for state.update dispatch
+Error: ENOENT: no such file or directory, open '/var/folders/sh/b81x8yx935zfwjl0sv2z84mm0000gn/T/gsd-template-test-1783903811107-ej8rvehab2c/.oto/STATE.md'
+ ❯ readModifyWriteStateMd src/query/state-mutation.ts:282:5
+    280|     const synced = await syncStateFrontmatter(modified, projectDir);
+    281|     const normalized = normalizeMd(synced);
+    282|     await writeFile(statePath, normalized, 'utf-8');
+       |     ^
+    283|     return normalized;
+    284|   } finally {
+ ❯ stateUpdate src/query/state-mutation.ts:336:3
+ ❯ src/query/index.ts:577:26
+ ❯ src/query/template.test.ts:141:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[257/268]⎯
+
+ FAIL  |unit| src/query/template.test.ts > event emission wiring > emits ConfigMutation event for config-set dispatch
+Error: ENOENT: no such file or directory, open '/var/folders/sh/b81x8yx935zfwjl0sv2z84mm0000gn/T/gsd-template-test-1783903811119-gv2vqziz9tl/.oto/config.json'
+ ❯ atomicWriteConfig src/query/config-mutation.ts:53:5
+     51|     // D5: Rename-failure fallback — clean up temp, fall back to direc…
+     52|     try { await unlink(tmpPath); } catch { /* already gone */ }
+     53|     await writeFile(configPath, content, 'utf-8');
+       |     ^
+     54|   }
+     55| }
+ ❯ configSet src/query/config-mutation.ts:263:5
+ ❯ src/query/index.ts:577:26
+ ❯ src/query/template.test.ts:159:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[258/268]⎯
+
+ FAIL  |unit| src/query/uat.test.ts > auditUat > returns empty results when no UAT files
+GSDError: No phases directory found in planning directory
+ ❯ auditUat src/query/uat.ts:236:11
+    234|   const paths = planningPaths(projectDir, workstream);
+    235|   if (!existsSync(paths.phases)) {
+    236|     throw new GSDError('No phases directory found in planning director…
+       |           ^
+    237|   }
+    238| 
+ ❯ src/query/uat.test.ts:68:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[259/268]⎯
+
+ FAIL  |unit| src/query/verify.test.ts > verifyPhaseCompleteness > returns complete when all plans have matching summaries
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected: 
+true
+
++ Received: 
+undefined
+
+ ❯ src/query/verify.test.ts:247:27
+    245|     const result = await verifyPhaseCompleteness(['9'], tmpDir);
+    246|     const data = result.data as Record<string, unknown>;
+    247|     expect(data.complete).toBe(true);
+       |                           ^
+    248|     expect(data.plan_count).toBe(2);
+    249|     expect(data.summary_count).toBe(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[260/268]⎯
+
+ FAIL  |unit| src/query/verify.test.ts > verifyPhaseCompleteness > returns incomplete when plan is missing summary
+AssertionError: expected undefined to be false // Object.is equality
+
+- Expected: 
+false
+
++ Received: 
+undefined
+
+ ❯ src/query/verify.test.ts:260:27
+    258|     const result = await verifyPhaseCompleteness(['9'], tmpDir);
+    259|     const data = result.data as Record<string, unknown>;
+    260|     expect(data.complete).toBe(false);
+       |                           ^
+    261|     expect(data.incomplete_plans).toContain('09-02');
+    262|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[261/268]⎯
+
+ FAIL  |unit| src/query/verify.test.ts > verifyPhaseCompleteness > returns warning for orphan summary
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ src/query/verify.test.ts:272:49
+    270|     const result = await verifyPhaseCompleteness(['9'], tmpDir);
+    271|     const data = result.data as Record<string, unknown>;
+    272|     expect((data.orphan_summaries as string[])).toContain('09-99');
+       |                                                 ^
+    273|     expect((data.warnings as string[]).some(w => w.includes('09-99')))…
+    274|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[262/268]⎯
+
+ FAIL  |unit| src/query/workspace.test.ts > workspacePlanningPaths > returns default .planning/ when no context provided
+AssertionError: expected '/my/project/.oto' to contain '.planning'
+
+Expected: ".planning"
+Received: "/my/project/.oto"
+
+ ❯ src/query/workspace.test.ts:52:28
+     50|   it('returns default .planning/ when no context provided', () => {
+     51|     const paths = workspacePlanningPaths(projectDir);
+     52|     expect(paths.planning).toContain('.planning');
+       |                            ^
+     53|     expect(paths.planning).not.toContain('workstreams');
+     54|     expect(paths.planning).not.toContain('projects');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[263/268]⎯
+
+ FAIL  |unit| src/query/workstream.test.ts > workstreamCreate > creates workstream directory tree
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/query/workstream.test.ts:50:26
+     48|     const r = await workstreamCreate(['test-ws'], tmpDir);
+     49|     const data = r.data as Record<string, unknown>;
+     50|     expect(data.created).toBe(true);
+       |                          ^
+     51|   });
+     52| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[264/268]⎯
+
+ FAIL  |unit| src/query/workstream.test.ts > workstreamSet root STATE.md mirror sync (#2618 gap 2) > rewrites root .planning/STATE.md to mirror the new workstream STATE.md on switch
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected: 
+true
+
++ Received: 
+undefined
+
+ ❯ src/query/workstream.test.ts:112:22
+    110|     const r = await workstreamSet(['active-ws'], tmpDir);
+    111|     const data = r.data as Record<string, unknown>;
+    112|     expect(data.set).toBe(true);
+       |                      ^
+    113|     expect(data.active).toBe('active-ws');
+    114| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[265/268]⎯
+
+
+ Test Files  41 failed | 40 passed (81)
+      Tests  268 failed | 1227 passed (1495)
+   Start at  20:50:10
+   Duration  3.36s (transform 2.06s, setup 0ms, collect 8.73s, tests 15.53s, environment 7ms, prepare 3.70s)
+
