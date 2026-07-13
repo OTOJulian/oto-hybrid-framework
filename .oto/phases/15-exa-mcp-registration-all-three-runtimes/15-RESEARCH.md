@@ -461,24 +461,28 @@ test('15 codex mcp: external [mcp_servers.exa] refuses and leaves input untouche
 | A5 | Stdin-EOF exit behavior holds under `npx` wrapping on other platforms (verified on macOS/node 22 against the extracted bundle directly) | Pattern 6 | Pre-warm timeout fires spuriously on some platform; timeout + non-fatal handling already required by D-03's "surface failures" intent |
 | A6 | `oto-sdk query workstream get` / `config-path` SDK commands accept the same flags (`--raw`) the workflow currently passes to `oto-tools` | Pattern 7 | Workflow rewrite needs a small flag-shim or output adjustment; verify during planning (registry entries confirmed to exist, flag surface not audited) |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **D-15 "symlinks followed" vs Phase 14 WR-07 symlink refusal (must be reconciled in the plan)**
+   - **RESOLVED:** Adopted as recommended — read/detect follows symlinks (stat-follow, regular readable non-empty target); write keeps lstat + O_NOFOLLOW refusal. Implemented in Plan 15-02; recorded in ADR-16.
    - What we know: D-15 (locked) says a keyfile resolving *through* symlinks to a regular readable non-empty file IS usable. Phase 14's `readKeyfile` (both CJS and SDK) lstat-refuses any non-regular file — a symlink currently means "no key" — and `writeKeyfile` uses O_NOFOLLOW (WR-07 FIX, with an ACCEPTED residual TOCTOU).
    - What's unclear: whether D-15 intends to relax the *read* path (likely — a symlink into a password-manager-managed file is the legit use case) or only defines the detection wording.
    - Recommendation: implement D-15 as written for READ/DETECT (stat-follow, target must be a regular readable file, trimmed non-empty) in all three sites (CJS, SDK, launcher), while WRITE keeps lstat + O_NOFOLLOW refusal (the WR-07 threat was write-through-symlink). Record the delta in the plan and add symlink-to-regular/symlink-to-dir/dangling-symlink test cases per FRESH-WR-04. If the planner reads D-15 differently, this needs a one-line user confirmation before code lands.
 
 2. **Consent persistence file** *(discretion area — recommendation only)*
+   - **RESOLVED:** Adopted — dedicated `~/.oto/mcp-consent.json` keyed integration → runtime → answer + timestamp. Implemented in Plan 15-08.
    - What we know: D-07 says "`~/.oto` state / install-state." `~/.oto/defaults.json` exists as a concept (validated by `loadDefaults`, read by `config.cjs`), `.install.json` is per-runtime and rewritten wholesale each install.
    - What's unclear: nothing blocking; pure placement choice.
    - Recommendation: new `~/.oto/mcp-consent.json` keyed by integration → runtime → yes/no (+ timestamp). Per-runtime answers implement D-06/D-07 exactly; `.install.json` additionally records what was *written* (fingerprint), keeping "what the user chose" and "what oto did" separate.
 
 3. **Claude target when `--config-dir` flag is used without `CLAUDE_CONFIG_DIR`**
+   - **RESOLVED:** Adopted — `.claude.json` path resolves from the `CLAUDE_CONFIG_DIR` env var only (never the `--config-dir` flag), matching what Claude Code itself reads. Implemented in Plan 15-05.
    - What we know: `resolveConfigDir` honors flag > env > default for the *config dir*; but Claude Code itself only relocates `.claude.json` via the env var — a flag-only custom install writes runtime files to the custom dir while the real Claude process (without the env var) still reads `$HOME/.claude.json`.
    - What's unclear: which target best serves the FRESH-CR-02 "custom Claude config-dir installs failed" reproduction.
    - Recommendation: resolve the `.claude.json` path from `CLAUDE_CONFIG_DIR` env (matching what Claude Code itself will read), NOT from the `--config-dir` flag; when the flag is set without the env var, register into `$CLAUDE_CONFIG_DIR`-unset behavior (`$HOME/.claude.json`) and note it in the install report. Status must use the same resolution so D-09's cross-check stays truthful. Tests pin both branches.
 
 4. **Pre-warm failure policy** *(one-line decision for the plan)*
+   - **RESOLVED:** Adopted — register despite pre-warm failure, with a clear one-line warning. Implemented in Plan 15-08.
    - What we know: D-03 wants failures surfaced at install time. Unclear: on pre-warm failure (offline), still write the registration or skip?
    - Recommendation: still register (consent was given; the launcher fails with the same message per-session and npx will succeed once online), print a clear one-line warning. Skipping would silently contradict the persisted "yes."
 
