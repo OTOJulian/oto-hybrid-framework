@@ -318,11 +318,17 @@ function _deepMergeConfig(base, overlay) {
   return result;
 }
 
-// OTO Phase 14 gap-closure (SECR-01): loader contract is boolean-only for integration flags.
 function _scrubIntegrationStrings(obj) {
   if (!obj || typeof obj !== 'object') return obj;
+  // OTO Phase 14 gap-closure (WR-05 / SECR-01): the loader contract is
+  // boolean-only for integration flags on the EFFECTIVE view. Migration
+  // normally coerces non-booleans, but if its rewrite fails the raw value
+  // would escape — normalize every present non-boolean to Boolean(value).
+  // (Non-empty string → true, '' → false, object/array → true, null/0 → false.)
   for (const k of ['exa_search', 'brave_search', 'firecrawl']) {
-    if (typeof obj[k] === 'string') obj[k] = true;
+    if (Object.prototype.hasOwnProperty.call(obj, k) && typeof obj[k] !== 'boolean') {
+      obj[k] = Boolean(obj[k]);
+    }
   }
   return obj;
 }

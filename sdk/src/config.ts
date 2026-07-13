@@ -154,12 +154,17 @@ async function loadUserDefaults(): Promise<Record<string, unknown>> {
   }
 }
 
-// Phase 14 gap-closure (SECR-01, Gap 2): loader contract is boolean-only for
-// integration flags on EVERY return path — including the ~/.gsd fallbacks.
-// Never write the scrubbed result back to ~/.gsd (D-08: that file is read-only for oto).
 function scrubIntegrationStrings(obj: Record<string, unknown>): Record<string, unknown> {
+  // OTO Phase 14 gap-closure (WR-05 / SECR-01): the loader contract is
+  // boolean-only for integration flags on the EFFECTIVE view. Migration
+  // normally coerces non-booleans, but if its rewrite fails the raw value
+  // would escape — normalize every present non-boolean to Boolean(value).
+  // (Non-empty string → true, '' → false, object/array → true, null/0 → false.)
+  // This also applies on the ~/.gsd fallback paths; never persist this view.
   for (const k of ['exa_search', 'brave_search', 'firecrawl'] as const) {
-    if (typeof obj[k] === 'string') obj[k] = true;
+    if (Object.prototype.hasOwnProperty.call(obj, k) && typeof obj[k] !== 'boolean') {
+      obj[k] = Boolean(obj[k]);
+    }
   }
   return obj;
 }
