@@ -29,7 +29,7 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 Phase: 14 (key-storage-reconciliation) — GAPS FOUND, bounded convergence stopped
 Plan: 19 of 19 executed; fresh verification scored 1/4
 Status: developer triage applied 2026-07-13: parser-leak fixed, 2 Criticals deferred with owners, warnings dispositioned; awaiting fresh verification.
-Last activity: 2026-07-13 - Completed quick task 260713-fym: Phase 14 developer triage — parser leak fixed, owned deferrals and warning dispositions recorded
+Last activity: 2026-07-13 - Completed quick task 260713-in8: propagated review-machinery recalibration (260713-ffa) to ~/.codex runtime root; ~/.gemini skipped (no oto install)
 
 Progress: [██████████] 100% plan execution; phase not verified
 
@@ -130,3 +130,4 @@ Resume file: None
 | 260709-ob4 | Fix oto-sdk model profile validator to accept 'inherit' | 2026-07-09 | 0318f65 |  | [260709-ob4-fix-oto-sdk-model-profile-validator-to-a](./quick/260709-ob4-fix-oto-sdk-model-profile-validator-to-a/) |
 | 260713-ffa | Recalibrate review machinery severity and convergence for Claude 5 / GPT-5.6 model generation | 2026-07-13 | 8379506 |  | [260713-ffa-recalibrate-review-machinery-severity-an](./quick/260713-ffa-recalibrate-review-machinery-severity-an/) |
 | 260713-fym | Phase 14 developer triage: fix parser secret-fragment disclosure; defer two Criticals with Phase 15/16 owners; disposition six warnings; fix STATE marker and status; run required verification | 2026-07-13 | 606b7a9 |  | [260713-fym-phase-14-developer-triage-fix-parser-sec](./quick/260713-fym-phase-14-developer-triage-fix-parser-sec/) |
+| 260713-in8 | Propagate review-machinery recalibration (260713-ffa) to Codex runtime root; Gemini skipped (no oto install) | 2026-07-13 | 7aaf84f |  | [260713-in8-propagate-review-machinery-recalibration](./quick/260713-in8-propagate-review-machinery-recalibration/) |
