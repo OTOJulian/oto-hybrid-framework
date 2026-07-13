@@ -127,7 +127,19 @@ Notes: Every 14-REVIEW.md finding (CR-01..03, WR-01..10, IR-01..02) is dispositi
   3. The registration exposes exactly `web_search_exa`, `web_fetch_exa`, and `web_search_advanced_exa`, and re-running install or registration never duplicates entries
   4. Uninstall removes only oto-fingerprinted registrations, skipping and reporting user-owned `exa` entries; `/oto-settings-integrations` summary shows per-runtime registration status (claude / codex / gemini)
   5. `npm test` includes passing `node:test` coverage for adapter merge/unmerge round-trips, boolean config validation, and the no-plaintext-key-in-tracked-files guard (all three HARD-02 test families)
-**Plans**: TBD
+**Plans**: 10 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — ADR-16 transport decision (launcher-stdio) + structural/content test
+- [ ] 15-02-PLAN.md — D-15 key-usability rule in CJS + SDK secrets helpers; bare-existsSync defect sites fixed (FRESH-WR-04)
+- [ ] 15-03-PLAN.md — Self-contained launcher oto/hooks/oto-exa-mcp.js (pin @3.2.1, 3-tool arg, env-only key) via build-hooks channel
+- [ ] 15-04-PLAN.md — Codex OTO-marker [mcp_servers.exa] block + adapter hooks + byte-identical round-trip (HARD-02 hard gate)
+- [ ] 15-05-PLAN.md — Claude mergeMcp/unmergeMcp on resolved .claude.json (env-based CLAUDE_CONFIG_DIR resolution)
+- [ ] 15-06-PLAN.md — Gemini mergeMcp/unmergeMcp (stdio shape, no url/httpUrl, enableAgents-independent)
+- [ ] 15-07-PLAN.md — install.cjs dispatch + .install.json mcp fingerprints + install/uninstall lifecycle round-trips (MCP-07/08)
+- [ ] 15-08-PLAN.md — Consent gate: flags, ~/.oto/mcp-consent.json persistence, TTY prompt default No, empty-stdin pre-warm (MCP-01)
+- [ ] 15-09-PLAN.md — Status classifier + oto doctor coherence + oto-sdk query mcp-status (MCP-09, FRESH-CR-02)
+- [ ] 15-10-PLAN.md — settings-integrations workflow (status, register/unregister, D-16 scope confirm) + live e2e checkpoint
 
 Notes: HARD-02's boolean-validation and no-plaintext-guard test families naturally land alongside Phase 14's code; the requirement completes here with the adapter round-trip family (research's hard gate against Codex TOML corruption). Research flags for planning-time verification: `CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution behavior, and the transport ADR (research recommends launcher-stdio `oto/hooks/oto-exa-mcp.js` for uniform secret indirection, remote HTTP as the documented alternative). All installer changes go in the live `bin/lib/` installer, not the vestigial `oto/bin/install.js`.
 
