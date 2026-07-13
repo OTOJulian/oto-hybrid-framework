@@ -23,6 +23,7 @@ import { readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { ErrorClassification, GSDError } from '../errors.js';
+import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 
 export const INTEGRATIONS = {
   exa: {
@@ -403,61 +404,80 @@ export interface MigrationResult {
   conflicts: string[];
 }
 
+/**
+ * Migrate legacy integration strings while holding the config mutator lock.
+ *
+ * The shared SDK lock force-acquires after roughly two seconds against a live
+ * lock (existing state-mutation semantics). Callers already inside that lock
+ * must pass `alreadyLocked` to join the transaction without double-acquiring.
+ */
 export async function migrateLegacyIntegrationKeys(
   configPath: string,
   baseDir?: string,
+  opts: { alreadyLocked?: boolean } = {},
 ): Promise<MigrationResult> {
-  let config: Record<string, unknown>;
-  try {
-    const parsed: unknown = JSON.parse(await readFile(configPath, 'utf8'));
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+  const migrateBody = async (): Promise<MigrationResult> => {
+    let config: Record<string, unknown>;
+    try {
+      const parsed: unknown = JSON.parse(await readFile(configPath, 'utf8'));
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { migrated: [], conflicts: [] };
+      }
+      config = parsed as Record<string, unknown>;
+    } catch {
       return { migrated: [], conflicts: [] };
     }
-    config = parsed as Record<string, unknown>;
-  } catch {
-    return { migrated: [], conflicts: [] };
-  }
 
-  const migrated: string[] = [];
-  const conflicts: string[] = [];
-  let movedString = false;
+    const migrated: string[] = [];
+    const conflicts: string[] = [];
+    let movedString = false;
 
-  for (const slug of Object.keys(INTEGRATIONS) as IntegrationSlug[]) {
-    const integration = INTEGRATIONS[slug];
-    if (!Object.prototype.hasOwnProperty.call(config, integration.configKey)) continue;
+    for (const slug of Object.keys(INTEGRATIONS) as IntegrationSlug[]) {
+      const integration = INTEGRATIONS[slug];
+      if (!Object.prototype.hasOwnProperty.call(config, integration.configKey)) continue;
 
-    const current = config[integration.configKey];
-    if (typeof current === 'boolean') continue;
+      const current = config[integration.configKey];
+      if (typeof current === 'boolean') continue;
 
-    if (typeof current === 'string' && current !== '') {
-      const existing = readKeyfile(slug, baseDir);
-      if (existing && existing.value !== current) {
-        conflicts.push(integration.configKey);
-        process.stderr.write(
-          `${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(current)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
-        );
+      if (typeof current === 'string' && current !== '') {
+        const existing = readKeyfile(slug, baseDir);
+        if (existing && existing.value !== current) {
+          conflicts.push(integration.configKey);
+          process.stderr.write(
+            `${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(current)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
+          );
+        } else {
+          writeKeyfile(slug, current, baseDir);
+          process.stderr.write(
+            `migrated ${integration.configKey} API key from config.json to ~/.oto/${integration.keyfileName} (0600)\n`,
+          );
+        }
+        config[integration.configKey] = true;
+        movedString = true;
       } else {
-        writeKeyfile(slug, current, baseDir);
-        process.stderr.write(
-          `migrated ${integration.configKey} API key from config.json to ~/.oto/${integration.keyfileName} (0600)\n`,
-        );
+        config[integration.configKey] = Boolean(current);
       }
-      config[integration.configKey] = true;
-      movedString = true;
-    } else {
-      config[integration.configKey] = Boolean(current);
+      migrated.push(integration.configKey);
     }
-    migrated.push(integration.configKey);
+
+    if (migrated.length === 0) return { migrated, conflicts };
+
+    await atomicWriteConfig(configPath, config);
+    if (movedString) {
+      process.stderr.write(
+        'note: this key may exist in git history — consider rotating it at the provider\n',
+      );
+    }
+
+    return { migrated, conflicts };
+  };
+
+  if (opts.alreadyLocked) return migrateBody();
+
+  const lockPath = await acquireStateLock(configPath);
+  try {
+    return await migrateBody();
+  } finally {
+    await releaseStateLock(lockPath);
   }
-
-  if (migrated.length === 0) return { migrated, conflicts };
-
-  await atomicWriteConfig(configPath, config);
-  if (movedString) {
-    process.stderr.write(
-      'note: this key may exist in git history — consider rotating it at the provider\n',
-    );
-  }
-
-  return { migrated, conflicts };
 }

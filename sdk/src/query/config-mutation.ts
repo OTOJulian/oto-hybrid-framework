@@ -287,22 +287,7 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
     throw new GSDError(integrationCheck.message, ErrorClassification.Validation);
   }
 
-  // Phase 14 gap-closure (SECR-03): keyfile any legacy string BEFORE overwriting it;
-  // fail closed if self-heal cannot complete.
   const integrationKey = integrationForConfigKey(keyPath) !== null;
-  if (integrationKey) {
-    try {
-      await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config);
-    } catch {
-      throw new GSDError(
-        `${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`,
-        ErrorClassification.Execution,
-      );
-    }
-  }
-
-  // WR-02: warn only after migration — a just-migrated key must not trigger "no key detected".
-  if (parsedValue === true) warnIfNoKeyDetected(keyPath);
 
   // D8: Context value validation (match CJS config.cjs:357-359)
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
@@ -318,6 +303,18 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
   const lockPath = await acquireStateLock(paths.config);
   let previousValue: unknown;
   try {
+    if (integrationKey) {
+      // Phase 14 gap-closure (WR-01): migration and mutation are one
+      // transaction under the config lock; avoid a nested acquisition.
+      try {
+        await migrateLegacyIntegrationKeys(paths.config, undefined, { alreadyLocked: true });
+      } catch {
+        throw new GSDError(
+          `${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`,
+          ErrorClassification.Execution,
+        );
+      }
+    }
     const config = await readConfigForMutation(paths.config);
 
     previousValue = getValueAtPath(config, keyPath);
@@ -326,6 +323,9 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
   } finally {
     await releaseStateLock(lockPath);
   }
+
+  // WR-02 ordering preserved: warn only after migration and lock release.
+  if (parsedValue === true) warnIfNoKeyDetected(keyPath);
 
   // Match CJS JSON: `JSON.stringify` omits keys whose value is `undefined`
   const data: Record<string, unknown> = {
