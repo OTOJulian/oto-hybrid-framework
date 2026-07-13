@@ -82,22 +82,63 @@ function writeKeyfile(slug, value, baseDir) {
   const base = keyfileBase(baseDir);
   const target = keyfilePath(slug, base);
   fs.mkdirSync(base, { recursive: true, mode: 0o700 });
-  fs.writeFileSync(target, String(value) + '\n', { mode: 0o600 });
+
+  // OTO Phase 14 gap-closure (WR-07 / SECR-01): never write through a
+  // symlink or non-regular file, and tighten a pre-existing loose mode
+  // BEFORE the new secret bytes land (heal-before-truncation).
+  let st = null;
+  try { st = fs.lstatSync(target); } catch { /* ENOENT — fresh create below */ }
+  if (st) {
+    if (!st.isFile()) {
+      throw new Error(`refusing to write ${target}: not a regular file — remove it and retry`);
+    }
+    if ((st.mode & 0o077) !== 0) fs.chmodSync(target, 0o600);
+  }
+
+  const flags = fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_TRUNC
+    | (fs.constants.O_NOFOLLOW || 0);
+  const fd = fs.openSync(target, flags, 0o600);
+  try {
+    fs.writeSync(fd, String(value) + '\n');
+  } finally {
+    fs.closeSync(fd);
+  }
   fs.chmodSync(target, 0o600);
 }
 
 function readKeyfile(slug, baseDir) {
   const target = keyfilePath(slug, baseDir);
-  if (!fs.existsSync(target)) return null;
 
+  // OTO Phase 14 gap-closure (WR-07): lstat and refuse non-regular files
+  // BEFORE any chmod — chmodSync would dereference a planted symlink.
+  let st;
+  try {
+    st = fs.lstatSync(target);
+  } catch {
+    return null; // ENOENT — no keyfile
+  }
+  if (!st.isFile()) {
+    process.stderr.write(`refusing to read ${target}: not a regular file — remove it and re-set via /oto-settings-integrations\n`);
+    return null;
+  }
+
+  // D-12 heal FIRST (CR-01 ordering): tighten permissions before content
+  // is read, so an empty loose-mode keyfile is still healed.
   let healed = false;
-  if ((fs.statSync(target).mode & 0o077) !== 0) {
+  if ((st.mode & 0o077) !== 0) {
     fs.chmodSync(target, 0o600);
     healed = true;
     process.stderr.write(`fixed permissions on ${target} (now 0600)\n`);
   }
 
-  return { value: fs.readFileSync(target, 'utf8').trim(), healed };
+  const value = fs.readFileSync(target, 'utf8').trim();
+  // OTO Phase 14 gap-closure (CR-01 / SECR-03): an empty/whitespace-only
+  // keyfile is not a credential — report it absent so migration overwrites
+  // it instead of treating it as an authoritative conflicting keyfile, and
+  // so status reports "no key detected" instead of an enabled-unset key.
+  if (value === '') return null;
+
+  return { value, healed };
 }
 
 function deleteKeyfile(slug, baseDir) {
