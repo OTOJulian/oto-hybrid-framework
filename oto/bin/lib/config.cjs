@@ -322,43 +322,45 @@ function cmdConfigEnsureSection(cwd, raw) {
  * the happy path. But note that `error()` will still `exit(1)` out of the process.
  */
 function setConfigValue(cwd, keyPath, parsedValue) {
+  return withPlanningLock(cwd, () => setConfigValueInLock(cwd, keyPath, parsedValue));
+}
+
+function setConfigValueInLock(cwd, keyPath, parsedValue) {
   const configPath = path.join(planningDir(cwd), 'config.json');
 
-  return withPlanningLock(cwd, () => {
-    // Load existing config or start with empty object
-    let config = {};
-    try {
-      if (fs.existsSync(configPath)) {
-        config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      }
-    } catch {
-      // OTO Phase 14 gap-closure (CR-03 / SECR-04): never interpolate the
-      // read/parse error — JSON.parse messages can quote file content, and a
-      // malformed config may still contain legacy key material.
-      error('Failed to read config.json: file is malformed or unreadable — config not modified (fix ' + configPath + ' and retry)');
+  // Load existing config or start with empty object
+  let config = {};
+  try {
+    if (fs.existsSync(configPath)) {
+      config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
     }
+  } catch {
+    // OTO Phase 14 gap-closure (CR-03 / SECR-04): never interpolate the
+    // read/parse error — JSON.parse messages can quote file content, and a
+    // malformed config may still contain legacy key material.
+    error('Failed to read config.json: file is malformed or unreadable — config not modified (fix ' + configPath + ' and retry)');
+  }
 
-    // Set nested value using dot notation (e.g., "workflow.research")
-    const keys = keyPath.split('.');
-    let current = config;
-    for (let i = 0; i < keys.length - 1; i++) {
-      const key = keys[i];
-      if (current[key] === undefined || typeof current[key] !== 'object') {
-        current[key] = {};
-      }
-      current = current[key];
+  // Set nested value using dot notation (e.g., "workflow.research")
+  const keys = keyPath.split('.');
+  let current = config;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (current[key] === undefined || typeof current[key] !== 'object') {
+      current[key] = {};
     }
-    const previousValue = current[keys[keys.length - 1]]; // Capture previous value before overwriting
-    current[keys[keys.length - 1]] = parsedValue;
+    current = current[key];
+  }
+  const previousValue = current[keys[keys.length - 1]]; // Capture previous value before overwriting
+  current[keys[keys.length - 1]] = parsedValue;
 
-    // Write back
-    try {
-      atomicWriteFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
-      return { updated: true, key: keyPath, value: parsedValue, previousValue };
-    } catch (err) {
-      error('Failed to write config.json: ' + err.message);
-    }
-  });
+  // Write back
+  try {
+    atomicWriteFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    return { updated: true, key: keyPath, value: parsedValue, previousValue };
+  } catch (err) {
+    error('Failed to write config.json: ' + err.message);
+  }
 }
 
 /**
@@ -392,14 +394,6 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
   if (isSecretKey(keyPath)) {
     const validation = validateIntegrationValue(keyPath, parsedValue);
     if (!validation.ok) error(validation.message); // D-05: hard reject, nothing written
-    // Gap-closure: keyfile any legacy string BEFORE overwriting it; fail closed if migration cannot complete.
-    try {
-      migrateLegacyIntegrationKeys(path.join(planningDir(cwd), 'config.json'));
-    } catch {
-      error(`${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`);
-    }
-    // WR-02: warn only after migration — a just-migrated key must not trigger "no key detected".
-    if (parsedValue === true) warnIfNoKeyDetected(keyPath);
   }
 
   const VALID_CONTEXT_VALUES = ['dev', 'research', 'review'];
@@ -425,7 +419,27 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
     }
   }
 
-  const setConfigValueResult = setConfigValue(cwd, keyPath, parsedValue);
+  let setConfigValueResult;
+  if (isSecretKey(keyPath)) {
+    setConfigValueResult = withPlanningLock(cwd, () => {
+      // OTO Phase 14 gap-closure (WR-01): migration and mutation are one
+      // transaction under the planning directory lock.
+      try {
+        migrateLegacyIntegrationKeys(
+          path.join(planningDir(cwd), 'config.json'),
+          undefined,
+          { alreadyLocked: true },
+        );
+      } catch {
+        error(`${keyPath}: legacy key migration failed — config not modified (fix ~/.oto permissions and retry)`);
+      }
+      return setConfigValueInLock(cwd, keyPath, parsedValue);
+    });
+    // WR-02 ordering preserved: warn only after migration and lock release.
+    if (parsedValue === true) warnIfNoKeyDetected(keyPath);
+  } else {
+    setConfigValueResult = setConfigValue(cwd, keyPath, parsedValue);
+  }
 
   // Integration values are boolean-only as of Phase 14; masking retained defensively for any legacy value echo.
   if (isSecretKey(keyPath) && (typeof parsedValue !== 'boolean' || typeof setConfigValueResult.previousValue === 'string')) {
@@ -454,8 +468,14 @@ function cmdConfigGet(cwd, keyPath, raw, defaultValue) {
   // OTO Phase 14 gap-closure (SECR-03, Gap 3): self-heal on read, but never let a
   // failed migration crash the read surface — fail closed ONLY for sensitive keys.
   let migrationFailed = false;
-  try { migrateLegacyIntegrationKeys(configPath); } catch { migrationFailed = true; }
-  if (migrationFailed && isSecretKey(keyPath)) {
+  let migrationSkipped = false;
+  try {
+    const migration = migrateLegacyIntegrationKeys(configPath);
+    migrationSkipped = Boolean(migration && migration.skipped);
+  } catch {
+    migrationFailed = true;
+  }
+  if ((migrationFailed || migrationSkipped) && isSecretKey(keyPath)) {
     error(`${keyPath}: legacy key migration failed — value withheld (fix ~/.oto permissions and retry)`);
   }
   const hasDefault = defaultValue !== undefined;

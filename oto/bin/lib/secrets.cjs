@@ -203,7 +203,70 @@ function atomicWrite(target, content) {
   }
 }
 
-function migrateLegacyIntegrationKeys(configPath, baseDir) {
+// OTO Phase 14 gap-closure (WR-01 / SECR-03/04): legacy migration must
+// contend on the same directory lock as ordinary CJS config writers.
+const _heldConfigLocks = new Set();
+let _configLockCleanupRegistered = false;
+
+function registerConfigLockCleanup() {
+  if (_configLockCleanupRegistered) return;
+  _configLockCleanupRegistered = true;
+  process.on('exit', () => {
+    for (const lockPath of _heldConfigLocks) {
+      try { fs.unlinkSync(lockPath); } catch { /* already released */ }
+    }
+    _heldConfigLocks.clear();
+  });
+}
+
+function withConfigDirLock(configPath, fn, opts = {}) {
+  const lockPath = path.join(path.dirname(configPath), '.lock');
+  const timeoutMs = opts.timeoutMs ?? 10000;
+  const retryDelay = 100;
+  const start = Date.now();
+
+  try { fs.mkdirSync(path.dirname(configPath), { recursive: true }); } catch { /* ok */ }
+
+  let acquired = false;
+  while (Date.now() - start < timeoutMs) {
+    try {
+      fs.writeFileSync(lockPath, JSON.stringify({
+        pid: process.pid,
+        acquired: new Date().toISOString(),
+      }), { flag: 'wx' });
+      acquired = true;
+      break;
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+
+      try {
+        if (Date.now() - fs.statSync(lockPath).mtimeMs > 30000) {
+          fs.unlinkSync(lockPath);
+          continue;
+        }
+      } catch { continue; }
+
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, retryDelay);
+    }
+  }
+
+  if (!acquired) {
+    if (opts.onTimeout === 'skip') return { skipped: true };
+    throw new Error('config lock timeout: ' + lockPath);
+  }
+
+  registerConfigLockCleanup();
+  _heldConfigLocks.add(lockPath);
+  try {
+    return fn();
+  } finally {
+    _heldConfigLocks.delete(lockPath);
+    try { fs.unlinkSync(lockPath); } catch { /* already released */ }
+  }
+}
+
+function migrateLegacyIntegrationKeys(configPath, baseDir, opts = {}) {
+  const migrateBody = () => {
   let config;
   try {
     config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -252,6 +315,15 @@ function migrateLegacyIntegrationKeys(configPath, baseDir) {
     );
   }
   return { migrated, conflicts };
+  };
+
+  if (opts.alreadyLocked) return migrateBody();
+  const result = withConfigDirLock(configPath, migrateBody, {
+    timeoutMs: 2000,
+    onTimeout: 'skip',
+  });
+  if (result && result.skipped) return { migrated: [], skipped: true };
+  return result;
 }
 
 // OTO Phase 14 gap-closure (CR-02 / SECR-01/02): integration-key strings are
@@ -415,6 +487,7 @@ module.exports = {
   detectKeySource,
   validateIntegrationValue,
   warnIfNoKeyDetected,
+  withConfigDirLock,
   migrateLegacyIntegrationKeys,
   findNestedIntegrationString,
   reconcileNewProjectIntegrations,
