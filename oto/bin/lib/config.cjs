@@ -288,8 +288,11 @@ function setConfigValue(cwd, keyPath, parsedValue) {
       if (fs.existsSync(configPath)) {
         config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
       }
-    } catch (err) {
-      error('Failed to read config.json: ' + err.message);
+    } catch {
+      // OTO Phase 14 gap-closure (CR-03 / SECR-04): never interpolate the
+      // read/parse error — JSON.parse messages can quote file content, and a
+      // malformed config may still contain legacy key material.
+      error('Failed to read config.json: file is malformed or unreadable — config not modified (fix ' + configPath + ' and retry)');
     }
 
     // Set nested value using dot notation (e.g., "workflow.research")
