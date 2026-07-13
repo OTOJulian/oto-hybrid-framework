@@ -669,6 +669,8 @@ Planner prompt:
 - {PATTERNS_PATH} (Pattern Map — analog files and code excerpts, if exists)
 - {verification_path} (Verification Gaps - if --gaps)
 - {uat_path} (UAT Gaps - if --gaps)
+- {phase_dir}/{phase_num}-REVIEW.md (Prior review findings — if --gaps and exists)
+- {phase_dir}/{phase_num}-DISPOSITIONS.md (Prior finding dispositions — if --gaps and exists)
 - {reviews_path} (Cross-AI Review Feedback - if --reviews)
 - {UI_SPEC_PATH} (UI Design Contract — visual/interaction specs, if exists)
 - {SPIKE_FINDINGS_PATH} (Spike Findings — validated patterns, constraints, landmines from experiments, if exists)
@@ -683,6 +685,14 @@ ${CONTEXT_WINDOW >= 500000 ? `
 ` : ''}
 </files_to_read>
 
+${MODE === 'gap_closure' ? `
+<gap_mode_dispositions>
+**Gap-closure disposition awareness (MANDATORY in --gaps mode):**
+- You MUST read the phase's prior REVIEW.md and DISPOSITIONS.md if they exist before creating any gap plans.
+- Findings dispositioned ACCEPT or DEFER MUST NOT generate new plans — only findings marked FIX (or undispositioned) are eligible for gap plans.
+- The subsequent re-review scope is limited to files changed by the gap plans — state this scope in the gap plans so the re-reviewer honors it.
+</gap_mode_dispositions>
+` : ''}
 ${AGENT_SKILLS_PLANNER}
 
 **Phase requirement IDs (every ID MUST appear in a plan's `requirements` field):** {phase_req_ids}

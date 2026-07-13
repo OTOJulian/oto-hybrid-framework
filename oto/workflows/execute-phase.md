@@ -1368,7 +1368,7 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 |--------|--------|
 | `passed` | → update_roadmap |
 | `human_needed` | Present items for human testing, get approval or feedback |
-| `gaps_found` | Present gap summary, offer `/oto-plan-phase {phase} --gaps ${OTO_WS}` |
+| `gaps_found` | Present gap summary; check gap-cycle count first (see "If gaps_found" below) — offer `/oto-plan-phase {phase} --gaps ${OTO_WS}` only if bounded-convergence conditions allow |
 
 **If human_needed:**
 
@@ -1433,6 +1433,14 @@ Items saved to `{phase_num}-HUMAN-UAT.md` — they will appear in `/oto-progress
 **If user reports issues:** Proceed to gap closure as currently implemented.
 
 **If gaps_found:**
+
+**Bounded convergence contract — check BEFORE offering another gap cycle:**
+
+Count prior gap-closure cycles for this phase: count plans with `gap_closure: true` in the phase directory and/or re-verification history entries in `{phase_num}-VERIFICATION.md`. Then:
+
+- **If 2 gap-closure cycles have already run**, OR **the blocker count did not decrease between the last two verifications**: do NOT offer another `--gaps` cycle. Instead, create or update `{phase_dir}/{phase_num}-DISPOSITIONS.md` — every unresolved finding marked **FIX**, **ACCEPT**, or **DEFER** with evidence — and present the unresolved findings for developer triage. STOP; a developer decision is required before any further gap work.
+- **Otherwise** (0 or 1 prior cycles and blockers decreasing): present the gap summary below and offer `/oto-plan-phase {X} --gaps ${OTO_WS}` as usual.
+
 ```
 ## ⚠ Phase {X}: {Name} — Gaps Found
 
@@ -1453,7 +1461,7 @@ Also: `cat {phase_dir}/{phase_num}-VERIFICATION.md` — full report
 Also: `/oto-verify-work {X} ${OTO_WS}` — manual testing first
 ```
 
-Gap closure cycle: `/oto-plan-phase {X} --gaps ${OTO_WS}` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/oto-execute-phase {X} --gaps-only ${OTO_WS}` → verifier re-runs.
+Gap closure cycle: `/oto-plan-phase {X} --gaps ${OTO_WS}` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/oto-execute-phase {X} --gaps-only ${OTO_WS}` → verifier re-runs. Maximum 2 gap-closure cycles per phase; after that, or if blockers stop decreasing between verifications, the loop terminates in DISPOSITIONS.md-based developer triage — never auto-generate a third cycle.
 </step>
 
 <step name="update_roadmap">
