@@ -54,6 +54,51 @@ async function atomicWriteConfig(configPath: string, config: Record<string, unkn
   }
 }
 
+/**
+ * Read config.json for a read-modify-write mutation.
+ *
+ * Phase 14 gap-closure (CR-03 / SECR-04): start from an empty object ONLY
+ * when the file does not exist (ENOENT — first write on a fresh project).
+ * Every other failure — unreadable file, malformed JSON, or a
+ * non-plain-object root — throws so the mutation fails CLOSED instead of
+ * silently replacing the user's config with a near-empty object.
+ *
+ * The malformed-JSON message deliberately omits the parse error: Node's
+ * JSON.parse errors can quote file content, and a malformed config may
+ * still contain legacy key material.
+ */
+async function readConfigForMutation(configPath: string): Promise<Record<string, unknown>> {
+  let raw: string;
+  try {
+    raw = await readFile(configPath, 'utf-8');
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException)?.code === 'ENOENT') return {};
+    throw new GSDError(
+      `cannot read config at ${configPath} — config not modified (fix permissions and retry)`,
+      ErrorClassification.Execution,
+    );
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new GSDError(
+      `config.json is malformed JSON — config not modified (fix ${configPath} and retry)`,
+      ErrorClassification.Execution,
+    );
+  }
+
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new GSDError(
+      `config.json root must be a JSON object — config not modified (fix ${configPath} and retry)`,
+      ErrorClassification.Execution,
+    );
+  }
+
+  return parsed as Record<string, unknown>;
+}
+
 // ─── VALID_CONFIG_KEYS ────────────────────────────────────────────────────
 // Imported from ./config-schema.js — single source of truth, kept in sync
 // with get-shit-done/bin/lib/config-schema.cjs by a CI parity test (#2653).
@@ -250,13 +295,7 @@ export const configSet: QueryHandler = async (args, projectDir, workstream) => {
   const lockPath = await acquireStateLock(paths.config);
   let previousValue: unknown;
   try {
-    let config: Record<string, unknown> = {};
-    try {
-      const raw = await readFile(paths.config, 'utf-8');
-      config = JSON.parse(raw) as Record<string, unknown>;
-    } catch {
-      // Start with empty config if file doesn't exist or is malformed
-    }
+    const config = await readConfigForMutation(paths.config);
 
     previousValue = getValueAtPath(config, keyPath);
     setConfigValue(config, keyPath, parsedValue);
@@ -312,13 +351,7 @@ export const configSetModelProfile: QueryHandler = async (args, projectDir, work
   const lockPath = await acquireStateLock(paths.config);
   let previousProfile = 'balanced';
   try {
-    let config: Record<string, unknown> = {};
-    try {
-      const raw = await readFile(paths.config, 'utf-8');
-      config = JSON.parse(raw) as Record<string, unknown>;
-    } catch {
-      // Start with empty config
-    }
+    const config = await readConfigForMutation(paths.config);
 
     const prev =
       typeof config.model_profile === 'string' ? config.model_profile.toLowerCase().trim() : '';
@@ -502,13 +535,7 @@ export const configEnsureSection: QueryHandler = async (args, projectDir, workst
   }
 
   const paths = planningPaths(projectDir, workstream);
-  let config: Record<string, unknown> = {};
-  try {
-    const raw = await readFile(paths.config, 'utf-8');
-    config = JSON.parse(raw) as Record<string, unknown>;
-  } catch {
-    // Start with empty config
-  }
+  const config = await readConfigForMutation(paths.config);
 
   if (!(sectionName in config)) {
     config[sectionName] = {};

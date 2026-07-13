@@ -51,10 +51,19 @@ export async function readSecretInput(
       const rl = createInterface({ input: stdin, output: stderr, terminal: true });
       const muted = rl as typeof rl & { _writeToOutput: (value: string) => void };
 
+      // WR-08 (fail closed): _writeToOutput is a Node readline INTERNAL. If a
+      // future Node release removes it, we can no longer suppress terminal echo —
+      // refuse interactive entry instead of silently echoing the key.
+      if (typeof muted._writeToOutput !== 'function') {
+        rl.close();
+        reject(new GSDError(
+          'secure key entry unavailable: this Node build does not support echo suppression — pipe the key via stdin instead (e.g. `pbpaste | oto-sdk query secret-set exa`)',
+          ErrorClassification.Execution,
+        ));
+        return;
+      }
       stderr.write('Enter API key (input hidden): ');
-      // NOTE: _writeToOutput is a Node readline INTERNAL (undocumented). Guarded so a
-      // future Node release removing it degrades to visible echo rather than a crash.
-      if (typeof muted._writeToOutput === 'function') muted._writeToOutput = () => {};
+      muted._writeToOutput = () => {};
 
       const onError = (error: Error) => {
         rl.close();
