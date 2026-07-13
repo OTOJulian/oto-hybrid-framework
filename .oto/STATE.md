@@ -29,7 +29,7 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 Phase: 14 (key-storage-reconciliation) — GAPS FOUND, bounded convergence stopped
 Plan: 19 of 19 executed; fresh verification scored 1/4
 Status: Developer decision required — do not auto-generate another gap-plan loop
-Last activity: 2026-07-12 -- Original verifier gaps closed, but fresh review/verifier reproduced 3 new Criticals and 6 undispositioned Warnings
+Last activity: 2026-07-13 - Completed quick task 260713-ffa: Recalibrate review machinery severity and convergence for Claude 5 / GPT-5.6 model generation
 
 Progress: [██████████] 100% plan execution; phase not verified
 
@@ -126,3 +126,4 @@ Resume file: None
 | 260709-ks5 | Fix Codex SessionStart hook JSON schema mismatch (envelope output) + validate-commit stderr block reasons | 2026-07-09 | 8806d1e | Verified | [260709-ks5-fix-codex-sessionstart-hook-json-schema-](./quick/260709-ks5-fix-codex-sessionstart-hook-json-schema-/) |
 | 260709-lln | Make Codex SessionStart hook detection deterministic via installer-registered --codex argv flag | 2026-07-09 | 1fce5a7 |  | [260709-lln-make-codex-sessionstart-hook-detection-d](./quick/260709-lln-make-codex-sessionstart-hook-detection-d/) |
 | 260709-ob4 | Fix oto-sdk model profile validator to accept 'inherit' | 2026-07-09 | 0318f65 |  | [260709-ob4-fix-oto-sdk-model-profile-validator-to-a](./quick/260709-ob4-fix-oto-sdk-model-profile-validator-to-a/) |
+| 260713-ffa | Recalibrate review machinery severity and convergence for Claude 5 / GPT-5.6 model generation | 2026-07-13 | 8379506 |  | [260713-ffa-recalibrate-review-machinery-severity-an](./quick/260713-ffa-recalibrate-review-machinery-severity-an/) |
