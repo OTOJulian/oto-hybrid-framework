@@ -1,0 +1,47 @@
+## Gap Reproductions
+
+All reproductions used a fresh temporary HOME and project directory with EXA_API_KEY, BRAVE_API_KEY, and FIRECRAWL_API_KEY set to empty strings.
+
+### GAP1-CJS
+Command: `node /private/tmp/oto-phase14-19/oto/bin/lib/oto-tools.cjs config-new-project '[{"exa_search":"sk-gap1-marker-0123456789"}]'`
+Exit code: 1
+Post-state: project `.oto` absent; marker absent from every project file.
+Output: `Error: Invalid config-new-project choices: expected a JSON object, got an array`
+GAP1-CJS: PASS
+
+### GAP1-SDK
+Command: `node /private/tmp/oto-phase14-19/bin/oto-sdk.js query config-new-project '[{"exa_search":"sk-gap1-marker-0123456789"}]'`
+Exit code: 10
+Post-state: project `.oto` absent; marker absent from every project file.
+Output: `Error: Invalid config-new-project choices: expected a JSON object`
+GAP1-SDK: PASS
+
+### GAP2-SDK
+Command: `node /private/tmp/oto-phase14-19/bin/oto-sdk.js query secret-status exa`
+Exit code: 0
+Post-state: zero-byte keyfile healed to the legacy value; config `exa_search` is boolean `true`; output contains `key from ~/.oto/exa_api_key (****6789)` and does not contain `((unset))`.
+Mode command: `node -e "process.exit(((require('fs').statSync(process.argv[1]).mode & 0o777) === 0o600) ? 0 : 1)" "$HOME/.oto/exa_api_key"`
+Mode command exit code: 0
+Output: permission healing and migration notices followed by `Exa: enabled — key from ~/.oto/exa_api_key (****6789)`.
+GAP2-SDK: PASS
+
+### GAP3-CONFIGSET
+Command: `node /private/tmp/oto-phase14-19/bin/oto-sdk.js query config-set model_profile quality`
+Exit code: 1
+Post-state: config bytes remain exactly `{bad json`.
+Output: malformed JSON; config not modified.
+GAP3-CONFIGSET: PASS
+
+### GAP3-SECRETSET
+Command: `printf 'sk-gap3-key-abcd1234\n' | node /private/tmp/oto-phase14-19/bin/oto-sdk.js query secret-set exa`
+Exit code: 1
+Post-state: config bytes remain exactly `{bad json`; `$HOME/.oto/exa_api_key` is absent.
+Output: enable failed; keyfile restored; malformed JSON; config not modified.
+GAP3-SECRETSET: PASS
+
+### GAP3-SECRETCLEAR
+Command: `node /private/tmp/oto-phase14-19/bin/oto-sdk.js query secret-clear exa`
+Exit code: 1
+Post-state: config bytes remain exactly `{bad json`; the pre-seeded keyfile remains present with byte-identical prior content.
+Output: malformed JSON; config not modified.
+GAP3-SECRETCLEAR: PASS
