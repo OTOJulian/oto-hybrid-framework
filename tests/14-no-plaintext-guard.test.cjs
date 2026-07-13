@@ -68,6 +68,53 @@ function assertNoSensitiveMatches(findings) {
   );
 }
 
+function regexMatches(regex, value) {
+  regex.lastIndex = 0;
+  return regex.test(value);
+}
+
+test('token-shape regex controls', async (t) => {
+  await t.test('provider prefixes accept separator-containing token bodies', () => {
+    const tokens = [
+      'sk-proj-AbC123_def-456789012345678901234567',
+      'sk-ant-api03-XXXXXXXXXXXXXXXXXXXXXXXXXX',
+      'fc-abc_123-XYZ7890123456789012345',
+    ];
+
+    for (const token of tokens) {
+      assert.equal(
+        regexMatches(PROVIDER_PREFIX_TOKEN, token),
+        true,
+        `${token} must match the provider-token guard`,
+      );
+    }
+  });
+
+  await t.test('provider prefixes reject short tokens and unrelated hyphenated prose', () => {
+    const controls = [
+      'sk-short_123',
+      'task-123',
+      'well-known-longer-than-twenty-chars-word',
+    ];
+
+    for (const control of controls) {
+      assert.equal(
+        regexMatches(PROVIDER_PREFIX_TOKEN, control),
+        false,
+        `${control} must not match the provider-token guard`,
+      );
+    }
+  });
+
+  await t.test('key-shaped fields accept separator-rich values but reject booleans', () => {
+    assert.equal(
+      regexMatches(KEY_SHAPED_FIELD, '"exa_api_key": "AbC-123_def-4567890123"'),
+      true,
+    );
+    assert.equal(regexMatches(KEY_SHAPED_FIELD, '"api_key": "true"'), false);
+  });
+});
+
 test('repo integration config keys are absent or boolean-typed', () => {
   const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
 
