@@ -12,6 +12,8 @@ It is built for a single developer who likes GSD's spec-driven workflow but does
 
 ## Current State
 
+**v0.5.0 in progress — Phase 14 (Key Storage Reconciliation) complete 2026-07-13.** Integration API keys now live only in `~/.oto/<integration>_api_key` (mode 0600) or env vars; committed `.oto/config.json` holds booleans only, enforced in both CJS and SDK write paths with self-healing migration for legacy string values. Verified 4/4 (SECR-01..04) post-triage; two dispositioned deferrals are owned by Phase 15 (per-runtime config-dir resolution) and Phase 16 (workstream secret-status parity).
+
 **v0.4.0 (SDK + Dogfood) shipped on 2026-05-26.** v0.3.0 shipped 2026-05-18; v0.2.0 on 2026-05-07; v0.1.0 on 2026-05-04; v0.1.1 was an interim Codex parity tag (2026-05-05) superseded by v0.2.0.
 
 v0.4.0 made oto's own command surface work natively and ended the GSD/oto split-brain:
@@ -171,4 +173,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-07-10 — v0.5.0 (Exa Search Integration) milestone started*
+*Last updated: 2026-07-13 — Phase 14 (Key Storage Reconciliation) complete; verified 4/4*
