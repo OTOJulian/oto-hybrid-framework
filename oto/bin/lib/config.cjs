@@ -36,6 +36,29 @@ const CONFIG_KEY_SUGGESTIONS = {
   'plan_checker': 'workflow.plan_check',
 };
 
+// OTO Phase 14 gap-closure (CR-02 / SECR-01/02): config-new-project
+// accepts only the materialized config's documented top-level keys. Keeping
+// this set next to the builder gives the argv guard and builder one schema.
+const NEW_PROJECT_CHOICE_KEYS = new Set([
+  'model_profile',
+  'commit_docs',
+  'parallelization',
+  'search_gitignored',
+  'brave_search',
+  'firecrawl',
+  'exa_search',
+  'git',
+  'workflow',
+  'hooks',
+  'project_code',
+  'phase_naming',
+  'agent_skills',
+  'claude_md_path',
+  'mode',
+  'granularity',
+  'depth',
+]);
+
 function validateKnownConfigKeyPath(keyPath) {
   const suggested = CONFIG_KEY_SUGGESTIONS[keyPath];
   if (suggested) {
@@ -169,7 +192,7 @@ function buildNewProjectConfig(userChoices) {
   };
 
   // OTO Phase 14 gap-closure (SECR-02): validate merged integration values before any write.
-  const reconcile = reconcileNewProjectIntegrations(merged, choices);
+  const reconcile = reconcileNewProjectIntegrations(merged, choices, undefined, userDefaults);
   if (!reconcile.ok) error(reconcile.message); // D-05: hard reject, nothing written
   return merged;
 }
@@ -198,12 +221,35 @@ function cmdConfigNewProject(cwd, choicesJson, raw) {
   if (choicesJson && choicesJson.trim() !== '') {
     try {
       userChoices = JSON.parse(choicesJson);
-    } catch (err) {
-      error('Invalid JSON for config-new-project: ' + err.message);
+    } catch {
+      // OTO Phase 14 gap-closure (CR-02 / SECR-01): V8 JSON.parse error
+      // messages quote input snippets — interpolating the parse error here
+      // would echo secret bytes embedded in malformed choices JSON. Fixed
+      // message only; the input is never echoed.
+      error('Invalid config-new-project choices: malformed JSON (input not echoed)');
     }
   }
 
-  // Ensure .oto directory exists
+  // OTO Phase 14 gap-closure (CR-02 / SECR-01/02): choices must be a plain
+  // JSON object — arrays/primitives spread index properties into the merged
+  // config (e.g. [{"exa_search":"…"}] lands at 0.exa_search).
+  if (userChoices === null || typeof userChoices !== 'object' || Array.isArray(userChoices)) {
+    error(
+      'Invalid config-new-project choices: expected a JSON object, got ' +
+        (userChoices === null ? 'null' : Array.isArray(userChoices) ? 'an array' : 'a ' + typeof userChoices),
+    );
+  }
+
+  // CR-02: unknown top-level keys reject by NAME only (a typo'd integration
+  // key carrying a secret must never persist; the value is never echoed).
+  for (const key of Object.keys(userChoices)) {
+    if (!NEW_PROJECT_CHOICE_KEYS.has(key)) {
+      error(`Invalid config-new-project choice key: ${key} — not a recognized new-project setting`);
+    }
+  }
+
+  const config = buildNewProjectConfig(userChoices);
+
   try {
     if (!fs.existsSync(planningBase)) {
       fs.mkdirSync(planningBase, { recursive: true });
@@ -211,8 +257,6 @@ function cmdConfigNewProject(cwd, choicesJson, raw) {
   } catch (err) {
     error('Failed to create .oto directory: ' + err.message);
   }
-
-  const config = buildNewProjectConfig(userChoices);
 
   try {
     atomicWriteFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
@@ -232,7 +276,13 @@ function ensureConfigFile(cwd) {
   const planningBase = planningDir(cwd);
   const configPath = path.join(planningBase, 'config.json');
 
-  // Ensure .oto directory exists
+  // Check if config already exists
+  if (fs.existsSync(configPath)) {
+    return { created: false, reason: 'already_exists' };
+  }
+
+  const config = buildNewProjectConfig({});
+
   try {
     if (!fs.existsSync(planningBase)) {
       fs.mkdirSync(planningBase, { recursive: true });
@@ -240,13 +290,6 @@ function ensureConfigFile(cwd) {
   } catch (err) {
     error('Failed to create .oto directory: ' + err.message);
   }
-
-  // Check if config already exists
-  if (fs.existsSync(configPath)) {
-    return { created: false, reason: 'already_exists' };
-  }
-
-  const config = buildNewProjectConfig({});
 
   try {
     atomicWriteFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
@@ -536,6 +579,7 @@ function cmdConfigPath(cwd) {
 
 module.exports = {
   VALID_CONFIG_KEYS,
+  NEW_PROJECT_CHOICE_KEYS,
   cmdConfigEnsureSection,
   cmdConfigSet,
   cmdConfigGet,

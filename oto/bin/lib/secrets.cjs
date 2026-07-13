@@ -254,58 +254,124 @@ function migrateLegacyIntegrationKeys(configPath, baseDir) {
   return { migrated, conflicts };
 }
 
+// OTO Phase 14 gap-closure (CR-02 / SECR-01/02): integration-key strings are
+// never legitimate BELOW the top level of a config about to be written —
+// INCLUDING the empty string (an empty nested value is still a smuggling
+// vector and never valid config). Returns the first offending dot-path
+// (e.g. "0.exa_search", "git.exa_search") or null. The VALUE is never
+// returned — callers must keep messages sanitized.
+function findNestedIntegrationString(node, prefix) {
+  if (!node || typeof node !== 'object') return null;
+  for (const [key, value] of Object.entries(node)) {
+    const keyPath = prefix ? prefix + '.' + key : key;
+    if (SECRET_CONFIG_KEYS.has(key) && typeof value === 'string') return keyPath;
+    if (value && typeof value === 'object') {
+      const nested = findNestedIntegrationString(value, keyPath);
+      if (nested) return nested;
+    }
+  }
+  return null;
+}
+
 /**
- * Validate/migrate the integration fields of a fully merged new-project
- * config BEFORE any write (Phase 14 gap-closure, CR-01 / SECR-02).
+ * Validate and reconcile the integration fields of a fully merged
+ * new-project config in two phases (CR-02 / WR-06 / SECR-01/02).
  *
- * - Caller-supplied non-boolean (present in userChoices): hard reject with
- *   the sanitized D-05 message — returns { ok:false, message }; the value is
- *   never echoed.
- * - Trusted global-default string (from ~/.oto/defaults.json, NOT owned by
- *   userChoices): migrate to a 0600 keyfile (keyfile-wins on conflict, D-02)
- *   and set the config field to boolean true. The oto-owned defaults.json is
- *   then best-effort healed so re-migration doesn't repeat.
- * - Any other non-boolean: coerced via Boolean(value).
- *
- * This helper NEVER touches the foreign GSD install's state dir (D-08 —
- * that directory is read-only for oto; only oto-owned paths are written).
- *
- * Mutates `merged` in place. Returns { ok:true, migrated } on success.
+ * Phase A validates every caller value, recursively scans the merged config,
+ * and classifies raw-default migrations without writing. Phase B writes the
+ * classified keyfiles with compensation, then finalizes booleans and heals
+ * oto-owned defaults. A caller boolean controls config while a raw legacy
+ * string retains independent migration provenance.
  */
-function reconcileNewProjectIntegrations(merged, userChoices, baseDir) {
+function reconcileNewProjectIntegrations(merged, userChoices, baseDir, rawDefaults = {}) {
   const choices = userChoices || {};
-  const migrated = [];
 
+  // Phase A: complete validation and classification with no reconcile writes.
+  for (const [key, value] of Object.entries(merged)) {
+    if (!value || typeof value !== 'object') continue;
+    const offender = findNestedIntegrationString(value, key);
+    if (offender) {
+      return {
+        ok: false,
+        message: `${offender}: integration API keys are not allowed in config — booleans only; set keys via /oto-settings-integrations (or 'oto-sdk query secret-set <integration>')`,
+      };
+    }
+  }
+
+  for (const { configKey } of Object.values(INTEGRATIONS)) {
+    if (
+      Object.prototype.hasOwnProperty.call(choices, configKey) &&
+      typeof choices[configKey] !== 'boolean'
+    ) {
+      return validateIntegrationValue(configKey, merged[configKey]);
+    }
+  }
+
+  const candidates = [];
   for (const [slug, integration] of Object.entries(INTEGRATIONS)) {
-    const value = merged[integration.configKey];
-    if (typeof value === 'boolean') continue;
+    const callerOwned = Object.prototype.hasOwnProperty.call(choices, integration.configKey);
+    const rawDefault = rawDefaults && rawDefaults[integration.configKey];
+    const value =
+      typeof rawDefault === 'string' && rawDefault !== ''
+        ? rawDefault
+        : !callerOwned && typeof merged[integration.configKey] === 'string' && merged[integration.configKey] !== ''
+          ? merged[integration.configKey]
+          : null;
+    if (value === null) continue;
 
-    const callerOwned =
-      Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
-      typeof choices[integration.configKey] !== 'boolean';
-    if (callerOwned) {
-      // D-05: sanitized rejection — message never includes the value.
-      return validateIntegrationValue(integration.configKey, value);
+    const existing = readKeyfile(slug, baseDir);
+    candidates.push({
+      slug,
+      integration,
+      value,
+      existing,
+      conflict: Boolean(existing && existing.value !== value),
+    });
+  }
+
+  // Phase B: commit keyfiles. Any failure restores all targets attempted in
+  // this run, including a partially-created failing target.
+  const attempted = [];
+  for (const candidate of candidates) {
+    if (candidate.conflict) {
+      process.stderr.write(
+        `${candidate.integration.configKey}: keyfile ~/.oto/${candidate.integration.keyfileName} (${maskSecret(candidate.existing.value)}) kept; config string (${maskSecret(candidate.value)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
+      );
+      continue;
     }
 
-    if (typeof value === 'string' && value) {
-      // Trusted global-default string — same conflict policy as
-      // migrateLegacyIntegrationKeys: an existing keyfile wins (D-02).
-      const existing = readKeyfile(slug, baseDir);
-      if (existing && existing.value !== value) {
-        process.stderr.write(
-          `${integration.configKey}: keyfile ~/.oto/${integration.keyfileName} (${maskSecret(existing.value)}) kept; config string (${maskSecret(value)}) dropped — re-set via /oto-settings-integrations if wrong\n`,
-        );
-      } else {
-        writeKeyfile(slug, value, baseDir);
-        process.stderr.write(
-          `migrated ${integration.configKey} API key from global defaults to ~/.oto/${integration.keyfileName} (0600)\n`,
-        );
+    attempted.push(candidate);
+    try {
+      writeKeyfile(candidate.slug, candidate.value, baseDir);
+      process.stderr.write(
+        `migrated ${candidate.integration.configKey} API key from global defaults to ~/.oto/${candidate.integration.keyfileName} (0600)\n`,
+      );
+    } catch {
+      for (const prior of attempted.reverse()) {
+        try {
+          if (prior.existing) writeKeyfile(prior.slug, prior.existing.value, baseDir);
+          else deleteKeyfile(prior.slug, baseDir);
+        } catch { /* best-effort compensation; preserve the sanitized failure */ }
       }
+      return {
+        ok: false,
+        message: `${candidate.integration.configKey}: keyfile write failed — nothing was written (fix ~/.oto permissions and retry)`,
+      };
+    }
+  }
+
+  const migrated = candidates.map(({ integration }) => integration.configKey);
+  const migratedSet = new Set(migrated);
+  for (const integration of Object.values(INTEGRATIONS)) {
+    if (
+      Object.prototype.hasOwnProperty.call(choices, integration.configKey) &&
+      typeof choices[integration.configKey] === 'boolean'
+    ) {
+      merged[integration.configKey] = choices[integration.configKey];
+    } else if (migratedSet.has(integration.configKey)) {
       merged[integration.configKey] = true;
-      migrated.push(integration.configKey);
     } else {
-      merged[integration.configKey] = Boolean(value);
+      merged[integration.configKey] = Boolean(merged[integration.configKey]);
     }
   }
 
@@ -350,5 +416,6 @@ module.exports = {
   validateIntegrationValue,
   warnIfNoKeyDetected,
   migrateLegacyIntegrationKeys,
+  findNestedIntegrationString,
   reconcileNewProjectIntegrations,
 };
