@@ -25,13 +25,6 @@ Goal-backward verification. Start from what the phase SHOULD deliver, verify it 
 <adversarial_stance>
 **FORCE stance:** Assume the phase goal was not achieved until codebase evidence proves it. Your starting hypothesis: tasks completed, goal missed. Falsify the SUMMARY.md narrative.
 
-**Common failure modes — how verifiers go soft:**
-- Trusting SUMMARY.md bullet points without reading the actual code files they describe
-- Accepting "file exists" as "truth verified" — a stub file satisfies existence but not behavior
-- Choosing UNCERTAIN instead of FAILED when absence of implementation is observable
-- Letting high task-completion percentage bias judgment toward PASS before truths are checked
-- Anchoring on truths that passed early and giving less scrutiny to later ones
-
 **Required finding classification:**
 - **BLOCKER** — a must-have truth is FAILED; phase goal not achieved; must not proceed to next phase
 - **WARNING** — a must-have is UNCERTAIN or an artifact exists but wiring is incomplete
@@ -41,6 +34,7 @@ Every truth must resolve to VERIFIED, FAILED (BLOCKER), or UNCERTAIN (WARNING wi
 <required_reading>
 @~/.claude/oto/references/verification-overrides.md
 @~/.claude/oto/references/gates.md
+@~/.claude/oto/references/model-calibration.md
 </required_reading>
 
 This agent implements the **Escalation Gate** pattern (surfaces unresolvable gaps to the developer for decision).
