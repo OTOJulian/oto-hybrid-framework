@@ -2,16 +2,16 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
+status: ready_to_plan
 stopped_at: Phase 14 fresh verification gaps found (1/4); bounded-convergence stop condition triggered
 last_updated: "2026-07-13T02:18:06Z"
 last_activity: 2026-07-12 -- Phase 14 gap-closure execution finished; fresh review found 3 Criticals and verifier scored 1/4
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 19
   completed_plans: 19
-  percent: 100
+  percent: 33
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 14 (key-storage-reconciliation) — GAPS FOUND, bounded convergence stopped
-Plan: 19 of 19 executed; fresh verification scored 1/4
-Status: developer triage applied 2026-07-13: parser-leak fixed, 2 Criticals deferred with owners, warnings dispositioned; awaiting fresh verification.
-Last activity: 2026-07-13 - Completed quick task 260713-izl: rebrand dry-run test reports redirected to tmpdirs, stale tracked reports deleted — npm test now leaves the tree clean
+Phase: 15
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-13
 
 Progress: [██████████] 100% plan execution; phase not verified
 
@@ -49,7 +49,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 14 | 19 | - | - |
 
 *Updated after each plan completion*
 | Phase 14 P01 | 8 min | 2 tasks | 5 files |

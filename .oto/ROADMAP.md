@@ -107,13 +107,13 @@ Plans:
 - [x] 14-10-PLAN.md — Gap closure: CJS loader keeps fileData pristine so a failed migration can never destroy the stored credential (Gap 1)
 - [x] 14-11-PLAN.md — Gap closure: guarded config-get migration (fail-open/fail-closed), boolean echo, migrate-before-warn, workflow default guard (Gap 3, WR-01/02/03; WR-05 deferred)
 - [x] 14-12-PLAN.md — Gap closure: SDK loader fallback scrub, configSet warn ordering, TTY EOF handling, sdk/dist rebuild (Gap 2, WR-02/04)
-- [ ] 14-13-PLAN.md — Gap closure (Wave 1): empty/whitespace keyfiles treated as absent (heal-first ordering) + symlink-safe keyfile read/write (CR-01, WR-07)
-- [ ] 14-14-PLAN.md — Gap closure (Wave 1): SDK mutators fail closed on malformed config (ENOENT-only); event-wrapper workstream preservation; fail-closed hidden input; registry spy (CR-03, WR-03, WR-08, WR-10)
-- [ ] 14-15-PLAN.md — Gap closure (Wave 2): config-new-project shape guard + key allowlist + nested (incl. empty-string) rejection; two-phase reconcile with provenance + compensation; mkdir after validation (CR-02, WR-06)
-- [ ] 14-16-PLAN.md — Gap closure (Wave 1): full-SDK-suite baseline capture; loader non-boolean scrub both layers; SDK root→workstream inheritance; cli.ts import guard (WR-05, WR-09, IR-02)
-- [ ] 14-17-PLAN.md — Gap closure (Wave 1): settings workflow canonical session/root-aware workstream resolution + contract tests; no-plaintext token-scan broadening (WR-02, IR-01)
-- [ ] 14-18-PLAN.md — Gap closure (Wave 3): lock-protected migration transactions in both layers + multi-process interleave regressions (WR-01)
-- [ ] 14-19-PLAN.md — Gap closure (Wave 4, terminal): single sdk/dist rebuild; all-gaps real-process reproductions; four-part gate (focused CJS/SDK + tsc + baseline delta); bounded convergence contract
+- [x] 14-13-PLAN.md — Gap closure (Wave 1): empty/whitespace keyfiles treated as absent (heal-first ordering) + symlink-safe keyfile read/write (CR-01, WR-07)
+- [x] 14-14-PLAN.md — Gap closure (Wave 1): SDK mutators fail closed on malformed config (ENOENT-only); event-wrapper workstream preservation; fail-closed hidden input; registry spy (CR-03, WR-03, WR-08, WR-10)
+- [x] 14-15-PLAN.md — Gap closure (Wave 2): config-new-project shape guard + key allowlist + nested (incl. empty-string) rejection; two-phase reconcile with provenance + compensation; mkdir after validation (CR-02, WR-06)
+- [x] 14-16-PLAN.md — Gap closure (Wave 1): full-SDK-suite baseline capture; loader non-boolean scrub both layers; SDK root→workstream inheritance; cli.ts import guard (WR-05, WR-09, IR-02)
+- [x] 14-17-PLAN.md — Gap closure (Wave 1): settings workflow canonical session/root-aware workstream resolution + contract tests; no-plaintext token-scan broadening (WR-02, IR-01)
+- [x] 14-18-PLAN.md — Gap closure (Wave 3): lock-protected migration transactions in both layers + multi-process interleave regressions (WR-01)
+- [x] 14-19-PLAN.md — Gap closure (Wave 4, terminal): single sdk/dist rebuild; all-gaps real-process reproductions; four-part gate (focused CJS/SDK + tsc + baseline delta); bounded convergence contract
 
 Notes: Every 14-REVIEW.md finding (CR-01..03, WR-01..10, IR-01..02) is dispositioned in 14-DISPOSITIONS.md; phase completion is governed by the bounded convergence contract recorded there and in 14-19-PLAN.md. Research flags this phase as standard-pattern (skip research-phase) — all four sites of the dual-typing defect are pinpointed with line numbers. Scope decision from research: fix all three integrations (`exa_search`, `brave_search`, `firecrawl`) with the shared mechanism, not just Exa. Sync hygiene applies: keep shared-file diffs (`config.cjs`, `secrets.cjs`, `settings-integrations.md`) small and commented.
 
@@ -161,7 +161,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 11. oto-sdk package port + PATH wiring | v0.4.0 | 4/4 | Complete | 2026-05-25 |
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
-| 14. Key Storage Reconciliation | v0.5.0 | 12/12 | Gaps found (round 4) | - |
+| 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 0/TBD | Not started | - |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
