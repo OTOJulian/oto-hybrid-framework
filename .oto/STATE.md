@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 14 gap-closure replanned (bounded convergence contract) — plans 14-13..14-19 pending execution
-last_updated: "2026-07-12T17:11:45.880Z"
-last_activity: 2026-07-12 -- Phase 14 gap-closure plans revised into bounded convergence contract (7 plans, 4 waves)
+stopped_at: Phase 14 fresh verification gaps found (1/4); bounded-convergence stop condition triggered
+last_updated: "2026-07-13T02:18:06Z"
+last_activity: 2026-07-12 -- Phase 14 gap-closure execution finished; fresh review found 3 Criticals and verifier scored 1/4
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 19
-  completed_plans: 12
-  percent: 63
+  completed_plans: 19
+  percent: 100
 ---
 
 # Project State
@@ -26,20 +26,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 14 (key-storage-reconciliation) — GAPS FOUND, gap-closure plans pending
-Plan: 12 of 19 complete (gap-closure plans 14-13..14-19 not yet executed)
-Status: Ready to execute gap-closure waves (Wave 1: 14-13/14/16/17 → Wave 2: 14-15 → Wave 3: 14-18 → Wave 4: 14-19 terminal gate)
-Last activity: 2026-07-12 -- Gap-closure plans revised into bounded convergence contract; all 15 review findings dispositioned in 14-DISPOSITIONS.md
+Phase: 14 (key-storage-reconciliation) — GAPS FOUND, bounded convergence stopped
+Plan: 19 of 19 executed; fresh verification scored 1/4
+Status: Developer decision required — do not auto-generate another gap-plan loop
+Last activity: 2026-07-12 -- Original verifier gaps closed, but fresh review/verifier reproduced 3 new Criticals and 6 undispositioned Warnings
 
-Progress: [██████░░░░] 63%
+Progress: [██████████] 100% plan execution; phase not verified
 
 ## Next Command
 
-```bash
-/oto-execute-phase 14
-```
-
-Phase 14 is NOT complete: it closes only per the convergence contract in 14-DISPOSITIONS.md / 14-19-PLAN.md (fresh verifier 4/4, fresh review zero unresolved Criticals, four-part test gate, full-SDK-suite no worse than 14-SDK-BASELINE.txt; ≤2 further revision cycles).
+Phase 14 is NOT complete. The fresh convergence review reports 3 unresolved Criticals and 6 undispositioned Warnings; fresh verification is `gaps_found` at 1/4. The bounded-convergence stop condition in 14-DISPOSITIONS.md / 14-19-PLAN.md has triggered because the blocker count did not decrease. Do not auto-generate another gap-plan loop; a developer decision is required.
 
 Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15 carries research flags (`CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution, transport ADR).
 

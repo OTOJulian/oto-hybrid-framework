@@ -1,198 +1,207 @@
 ---
 phase: 14-key-storage-reconciliation
-verified: "2026-07-12T02:27:06Z"
-verified_at: "2026-07-12T02:27:06Z"
+verified: "2026-07-13T02:18:06Z"
+verified_at: "2026-07-13T02:18:06Z"
+verifier: "Codex (fresh independent oto-verifier)"
 status: gaps_found
-score: "0/4"
+score: "1/4"
+head: "cdda36cd0c249747ca6a299ac481a7f0cac59efe"
 overrides_applied: 0
 requirements:
   SECR-01: blocked
-  SECR-02: blocked
+  SECR-02: passed
   SECR-03: blocked
   SECR-04: blocked
 re_verification:
   previous_status: gaps_found
-  previous_score: "2/4"
+  previous_score: "0/4"
   gaps_closed:
-    - "CJS loadConfig now preserves a legacy credential when migration fails during an unrelated dirty write"
-    - "SDK loadConfig now scrubs integration strings on both pre-project fallback returns"
-    - "CJS config-get now fails open for unrelated keys and fails closed with a sanitized message for integration keys"
+    - "Array-shaped config-new-project input is rejected by CJS and SDK before the project .oto directory is created"
+    - "Zero-byte keyfiles are treated as absent and legacy strings migrate to usable 0600 keyfiles"
+    - "Malformed-config SDK config-set, secret-set, and secret-clear fail closed while preserving config bytes and keyfile state"
   gaps_remaining: []
   regressions: []
   new_gaps:
-    - "Empty or whitespace-only keyfiles discard a valid legacy credential during migration"
-    - "Array-shaped config-new-project choices persist nested plaintext through both write paths"
-    - "SDK config mutators and secret commands overwrite malformed config instead of failing closed"
+    - "Malformed-config parser errors disclose secret fragments through CJS config-get and SDK loadConfig consumers"
+    - "The shared settings workflow hardcodes the Claude default install path and does not resolve Codex, Gemini, or custom config directories"
+    - "Workstream secret-status bypasses inherited root flags and root-layer legacy migration"
+review_convergence:
+  fresh_review_status: issues_found
+  unresolved_critical: 3
+  undispositioned_warnings: 6
+  convergence_contract: failed
+  stop_condition: "Prior verifier blocker count 3; fresh review Critical count 3. The bounded contract requires stopping on a non-decreasing blocker count rather than automatically generating another gap-plan loop."
 gaps:
-  - truth: "No integration API key can be persisted in committed config through either write path"
+  - truth: "Secret-bearing malformed config errors never echo key bytes"
     status: failed
     reason: >-
-      Both CJS and SDK config-new-project accept an array-shaped JSON value such as
-      [{"exa_search":"<marker>"}]. Object spread copies its numeric property into
-      config.json while reconciliation checks only top-level integration fields.
-      Both commands exit 0 and persist the marker at 0.exa_search.
+      CJS config-get and both selected/root SDK loadConfig parse paths interpolate
+      JSON.parse error details. Fresh real-process probes printed the synthetic
+      marker fragment SYNTHETICS to stderr.
     artifacts:
       - path: "oto/bin/lib/config.cjs"
-        issue: "cmdConfigNewProject accepts any JSON root; buildNewProjectConfig spreads arrays and validates only top-level integration fields"
-      - path: "sdk/src/query/config-mutation.ts"
-        issue: "configNewProject casts any JSON root to Record and mirrors the same array-spread bypass"
-      - path: "oto/bin/lib/secrets.cjs"
-        issue: "reconcileNewProjectIntegrations inspects only the three top-level fields"
-      - path: "sdk/src/query/secrets.ts"
-        issue: "SDK reconciler mirrors the top-level-only check"
-    missing:
-      - "Require caller choices to be a non-null plain object, never an array or primitive, before any merge or side effect"
-      - "Reject integration-key strings at any nested location before writing config"
-      - "Add real-process CJS and SDK regressions for arrays, primitives, null, and nested integration fields, asserting no file or byte change"
-  - truth: "A legacy integration string self-heals to a usable 0600 keyfile with a boolean left in config"
+        issue: "cmdConfigGet appends err.message to its read/parse failure"
+      - path: "sdk/src/config.ts"
+        issue: "loadConfig interpolates parser details for selected and inherited root config"
+      - path: "sdk/dist/config.js"
+        issue: "The shipped build contains both disclosure paths"
+  - truth: "/oto-settings-integrations works across Claude, Codex, Gemini, and custom config directories"
     status: failed
     reason: >-
-      readKeyfile returns an object for a zero-byte or whitespace-only file. Migration
-      treats that empty value as an authoritative conflicting keyfile, drops the valid
-      legacy string, writes true to config, and leaves the keyfile empty. The only usable
-      credential is lost, and secret-status reports enabled with ((unset)).
+      The workflow defaults OTO_TOOLS to $HOME/.claude/oto/bin/oto-tools.cjs.
+      Exact-block probes succeeded for a default Claude install, but Codex-only,
+      Gemini-only, and CLAUDE_CONFIG_DIR installs emitted MODULE_NOT_FOUND,
+      resolved an empty OTO_CONFIG_PATH, and continued to a misleading final SDK
+      success.
     artifacts:
-      - path: "oto/bin/lib/secrets.cjs"
-        issue: "readKeyfile returns trimmed empty content as present; migrateLegacyIntegrationKeys takes the keyfile-wins conflict branch"
-      - path: "sdk/src/query/secrets.ts"
-        issue: "SDK read and migration logic mirrors the empty-keyfile data-loss path"
-      - path: "sdk/src/query/secret-commands.ts"
-        issue: "secretStatus treats the empty keyfile as a source and renders an enabled but unset credential"
-    missing:
-      - "Treat trimmed-empty keyfiles as absent or invalid"
-      - "During migration, replace an empty keyfile with the valid legacy value and enforce mode 0600"
-      - "Add CJS and SDK tests for zero-byte and whitespace-only files across migration, detection, warning, and status paths"
-  - truth: "Secret set and clear fail closed without destroying existing project configuration"
+      - path: "oto/workflows/settings-integrations.md"
+        issue: "Runtime-shared workflow hardcodes the default Claude config root"
+      - path: "tests/14-settings-workflow-contract.test.cjs"
+        issue: "Existing tests inject OTO_TOOLS and do not exercise installed defaults"
+  - truth: "Workstream status reflects the effective root-to-workstream config and self-heals every effective legacy layer"
     status: failed
     reason: >-
-      SDK configSet, configSetModelProfile, and configEnsureSection catch missing-file,
-      read, and JSON-parse failures together and continue from an empty object. With a
-      malformed config, each command exits 0 and replaces the original bytes. secret-set
-      reduces the file to exa_search:true; secret-clear reduces it to exa_search:false and
-      deletes the keyfile while also reporting success.
+      secret-status migrates and reads only the workstream leaf config. With root
+      exa_search true and an empty workstream it reported disabled while shipped
+      loadConfig returned true. With a root legacy string it reported disabled/no
+      key, left the root file string-typed, and created no keyfile.
     artifacts:
-      - path: "sdk/src/query/config-mutation.ts"
-        issue: "Three mutators swallow all read/parse failures and use an empty object"
       - path: "sdk/src/query/secret-commands.ts"
-        issue: "secretSet and secretClear delegate to configSet, so destination preflight cannot detect malformed JSON"
-      - path: "sdk/dist/query/config-mutation.js"
-        issue: "The shipped build contains the same destructive fallback"
-    missing:
-      - "Start from an empty object only on ENOENT; reject malformed JSON, read errors, arrays, null, and other non-plain roots"
-      - "Preserve config bytes and keyfile state on every rejected mutation"
-      - "Add byte-preservation tests for all three mutators plus secret-set and secret-clear"
+        issue: "secretStatus uses planningPaths(...workstream).config only"
+      - path: "sdk/dist/query/secret-commands.js"
+        issue: "The shipped command mirrors the leaf-only behavior"
+      - path: "oto/workflows/settings-integrations.md"
+        issue: "Workflow decisions and confirmation trust the incorrect status result"
 ---
 
 # Phase 14: Key Storage Reconciliation Verification Report
 
-**Phase Goal:** Integration API keys live only in `~/.oto/<integration>_api_key` (mode 0600) or environment variables; committed `.oto/config.json` holds booleans only, enforced in both write paths with self-healing migration.
+**Phase goal:** Integration API keys exist only in environment variables or mode-0600 `~/.oto` keyfiles; committed config holds booleans only; legacy strings self-heal safely; secret mutations are transactional; and `/oto-settings-integrations` works across supported runtimes and workstreams.
 
-**Verified:** 2026-07-12T02:27:06Z
-**Status:** gaps_found
-**Re-verification:** Yes, after all 12 plans were merged
+**Verified:** 2026-07-13T02:18:06Z
+**Status:** `gaps_found`
+**Score:** **1/4** requirements satisfied
 
 ## Verdict
 
-The previous three verification gaps are closed, and the ordinary supported path works. In an isolated real-process round trip, `secret-set exa` accepted stdin, created a mode-0600 keyfile, set `exa_search: true`, displayed only `****1234`, rejected an argv key with exit 10, and `secret-clear exa` removed the keyfile and restored the flag to `false`.
+The three blocker families from the previous verifier are genuinely closed, and all fresh focused gates pass. That evidence is not sufficient for phase completion: every Critical from the fresh review reproduced independently against the current shipped surfaces.
 
-The phase goal is still not achieved. Three distinct edge cases were reproduced independently against the current CJS and built SDK surfaces:
-
-1. Array-shaped new-project choices place plaintext in committed config through both write implementations.
-2. An empty keyfile wins migration and destroys the only valid legacy credential.
-3. SDK mutations and secret commands replace malformed config while returning success.
-
-These are observable data-disclosure or data-loss paths, not documentation-only concerns. All four SECR requirements remain blocked.
+The phase remains incomplete. Malformed config can echo secret fragments, the settings workflow is not portable across supported runtime install roots, and workstream status ignores inherited root state and root-layer migration. Only SECR-02 is fully satisfied.
 
 ## Goal Achievement
 
-### Observable Truths
-
-| # | Roadmap truth | Status | Evidence |
+| # | Roadmap truth | Verdict | Fresh evidence |
 |---|---|---|---|
-| 1 | Setting an Exa key uses stdin, creates a 0600 keyfile, leaves a boolean flag, and no key material exists in tracked files | FAILED | The ordinary secret-set path passes, but both config-new-project writers accept an array and persist plaintext at `0.exa_search`, so the no-key-material invariant is false. |
-| 2 | Strings for `exa_search`, `brave_search`, and `firecrawl` are rejected through both write paths | FAILED | Direct top-level writes are rejected, but array-shaped caller choices bypass the fully-merged-config gate in both implementations and exit 0. |
-| 3 | Legacy strings self-heal to usable keyfiles with booleans left in config | FAILED | With an empty or whitespace-only keyfile, both migrations drop the valid string, write `true`, and leave zero usable key bytes. |
-| 4 | Users can safely set, replace, clear, and inspect masked status through the workflow | FAILED | Happy-path CRUD passes, but malformed config is silently replaced on set/clear; clear also deletes the keyfile. Empty-keyfile status falsely reports `enabled` with `((unset))`. |
+| 1 | Stdin key entry creates a 0600 keyfile, leaves a boolean flag, and no key material reaches tracked config | **FAILED** | The ordinary path and old Gap 2 probe pass, but a root legacy string remains tracked when workstream `secret-status` is used, and malformed-config errors can echo secret fragments. |
+| 2 | String values for all three integration flags are rejected through both write paths | **PASSED** | Fresh CJS and SDK real-process probes rejected `exa_search`, `brave_search`, and `firecrawl` strings, preserved config bytes, emitted the boolean-only pointer, and did not echo the supplied marker. The array-shaped new-project bypass is also closed. |
+| 3 | Every effective legacy string self-heals to a usable 0600 keyfile with a boolean left in config | **FAILED** | The empty-keyfile case now heals, but workstream `secret-status` leaves a root legacy string unchanged and creates no keyfile. |
+| 4 | Set/replace/clear/status is safe and works through `/oto-settings-integrations` across supported runtimes/workstreams | **FAILED** | The workflow entry fails path resolution on Codex-only, Gemini-only, and custom-dir installs; workstream status reports the wrong effective flag; malformed loader errors disclose secret fragments. |
 
-**Score:** 0/4 roadmap truths verified.
+## Previous-Gap Regression Check
 
-### Previous-Gap Regression Check
-
-| Previous gap | Current result |
+| Previous blocker | Fresh result |
 |---|---|
-| CJS loader dirty-write destroyed a credential after failed migration | CLOSED — `14-loader-credential-survival` and `14-migration-hardening` pass; `fileData` remains pristine and only the effective view is scrubbed. |
-| SDK loader fallback returned a string from legacy defaults | CLOSED — both fallbacks call `scrubIntegrationStrings`; current `src` and built `dist` tests return booleans. |
-| Unguarded CJS config-get migration crashed unrelated reads | CLOSED — non-sensitive reads fail open; sensitive reads return the sanitized `value withheld` error. |
+| Array-shaped config-new-project persisted nested plaintext | **CLOSED.** CJS exited 1 and SDK exited 10; neither created the project `.oto` directory or echoed the marker. |
+| Empty keyfile discarded a valid legacy string | **CLOSED.** SDK status exited 0; config became boolean `true`; keyfile contained the legacy value at mode 0600; output showed only `****6789`. |
+| Malformed SDK config mutation erased config/keyfile state | **CLOSED.** `config-set`, `secret-set`, and `secret-clear` each exited 1; config bytes stayed exactly `{bad json`; set removed its attempted keyfile and clear preserved the prior keyfile. |
 
-## Artifact and Wiring Audit
+These closures match the six `GAP*: PASS` lines in `14-SDK-BASELINE-DELTA.txt`, but were reproduced fresh rather than accepted from the summary.
 
-- PLAN inventory: 58 declared truths, 33 artifacts, and 30 key links across 12 plans.
-- `oto-sdk query verify.artifacts`: **33/33 artifacts passed** existence and substantive checks.
-- `oto-sdk query verify.key-links`: 17/30 automatic matches. The 13 reported failures were plan-metadata parser false negatives caused by double-escaped regexes or annotated `from:` paths; manual tracing confirmed **30/30 structural links**.
-- Structural wiring is therefore present. The failures are behavioral holes inside wired implementations.
+## Fresh Critical Reproductions
 
-| Artifact group | Structural status | Behavioral status |
+### Critical 1 — Malformed-config secret disclosure
+
+Fixture bytes: `{"exa_search": SYNTHETICSECRET1234567890}`.
+
+| Surface | Exit | Result |
+|---|---:|---|
+| CJS `config-get exa_search` | 1 | **FAILED:** stderr contained `..."_search": SYNTHETICS"...`. |
+| SDK dist `resolve-model gsd-planner` (selected config) | 1 | **FAILED:** `loadConfig` error contained the same marker fragment. |
+| SDK dist `resolve-model gsd-planner --ws ws1` (malformed inherited root, valid leaf) | 1 | **FAILED:** inherited-root parse error contained the marker fragment. |
+| SDK dist `config-get exa_search` control | 10 | **PASSED:** fixed `Malformed config.json at <path>` message; no marker fragment. |
+
+This localizes the SDK disclosure to `loadConfig` consumers while confirming the direct SDK config-get guard is already sanitized.
+
+### Critical 2 — Claude-only workflow tool path
+
+The exact workflow entry block was executed with a real installed `oto-tools.cjs` present only in the runtime/config directory under test and with no `OTO_TOOLS` override.
+
+| Simulated install | Tool actually installed at | Result |
 |---|---|---|
-| `oto/bin/lib/secrets.cjs`, `sdk/src/query/secrets.ts` | WIRED | FAILED for empty-keyfile migration and source detection |
-| `oto/bin/lib/config.cjs`, `sdk/src/query/config-mutation.ts` | WIRED | FAILED for array-shaped new-project input; SDK also fails closed incorrectly on malformed config |
-| `sdk/src/query/secret-commands.ts` | WIRED | Happy path passes; malformed-config set/clear and empty-keyfile status fail |
-| `oto/bin/lib/core.cjs`, `sdk/src/config.ts`, `sdk/src/query/config-query.ts` | WIRED | Previous verification gaps closed |
-| `oto/workflows/settings-integrations.md`, command wrapper, contract tests | WIRED | Ordinary path works; underlying command defects remain reachable |
+| Default Claude | `$HOME/.claude/oto/bin/oto-tools.cjs` | **PASS:** config-path resolved; entry completed. |
+| Codex-only | `$CODEX_HOME/oto/bin/oto-tools.cjs` | **FAIL:** hardcoded Claude module missing; config-path status 1; `OTO_CONFIG_PATH` empty. |
+| Gemini-only | `$GEMINI_CONFIG_DIR/oto/bin/oto-tools.cjs` | **FAIL:** same `MODULE_NOT_FOUND` and empty path. |
+| Custom Claude dir | `$CLAUDE_CONFIG_DIR/oto/bin/oto-tools.cjs` | **FAIL:** env override ignored; same failure. |
 
-## Data-Flow Checks
+In all three failing cases the block continued to `oto-sdk query config-new-project` and ended with SDK status 0, so the workflow can appear successful despite failed canonical path/workstream resolution.
 
-| Flow | Result |
+### Critical 3 — Workstream status bypasses root inheritance/migration
+
+| Fixture | `secret-status exa --ws ws1` | Authoritative/post-state |
+|---|---|---|
+| Root `{exa_search:true}`, workstream `{}`, valid keyfile | `Exa: disabled — key from ~/.oto/exa_api_key (****6789)` | Shipped `loadConfig(project, "ws1")` returned `exa_search:true`. |
+| Root legacy Exa string, workstream `{}`, no keyfile | `Exa: disabled — no key detected` | Root remained the plaintext string; no keyfile was created. |
+
+The status surface is therefore inconsistent with the effective loader and does not satisfy read-time self-healing for the root layer under a workstream.
+
+## Source and Shipped-Artifact Audit
+
+| Area | Source finding | Shipped finding |
+|---|---|---|
+| CJS config-get | `oto/bin/lib/config.cjs` appends `err.message` | Direct CJS CLI reproduction leaks marker fragment. |
+| SDK config loading | `sdk/src/config.ts` interpolates parse errors for selected and root config | `sdk/dist/config.js` contains both branches and leaked through the wrapper. |
+| Settings workflow | Runtime-shared workflow defaults to `$HOME/.claude/...` | Installed-path simulations fail for Codex, Gemini, and custom dirs. |
+| Workstream status | `sdk/src/query/secret-commands.ts` migrates/reads only the leaf config | `sdk/dist/query/secret-commands.js` has the same leaf-only calls. |
+| Dist parity | `npm run build` completed | `git diff --exit-code -- sdk/dist` exited 0; the shipped dist matches current source. |
+
+## Requirement Verdicts
+
+| Requirement | Verdict | Evidence |
+|---|---|---|
+| **SECR-01** | **BLOCKED** | Ordinary keyfile storage passes, but workstream status can leave a root legacy key in tracked config, and malformed-config errors disclose secret fragments. |
+| **SECR-02** | **PASSED** | Both CJS and SDK reject strings for all three integration keys without changing config or echoing the value; array/nested new-project bypasses are closed. |
+| **SECR-03** | **BLOCKED** | Empty-keyfile and loader cases pass, but the workstream status read path neither migrates nor effectively reads the inherited root layer. |
+| **SECR-04** | **BLOCKED** | CRUD happy paths are transactional, but the shared workflow is not runtime/config-dir portable and its workstream status/confirmation is incorrect. |
+
+## Test and Build Evidence
+
+| Command | Fresh result |
 |---|---|
-| stdin -> `secret-set` -> 0600 keyfile -> boolean config -> masked status -> clear | PASS |
-| array JSON choices -> object spread -> numeric property in tracked config | FAIL — plaintext persists at `0.exa_search` in CJS and SDK |
-| legacy string + empty keyfile -> conflict handling -> config rewrite | FAIL — string is discarded, config becomes `true`, keyfile remains empty |
-| malformed config -> SDK mutation catch -> `{}` -> atomic write | FAIL — original bytes are replaced and the command exits 0 |
+| `node --test --test-reporter=dot tests/14-*.test.cjs` | Exit 0; **99/99 passed**. |
+| Enumerated 14-file Phase 14 SDK Vitest gate | Exit 0; **14/14 files, 271/271 tests passed**. |
+| `cd sdk && npx tsc --noEmit` | Exit 0. |
+| `cd sdk && npm run build` | Exit 0. |
+| `git diff --exit-code -- sdk/dist` | Exit 0; source/dist synchronized. |
+| Fresh full `cd sdk && npx vitest run` | Expected nonzero overall: **40 failed / 48 passed files; 266 failed / 1288 passed tests**. Machine comparison found **0 candidate offenders** against the 41-file/two-run union baseline, so the baseline-relative gate passes. |
 
-## Behavioral Evidence
+The green focused suites and baseline-relative full-suite result are supporting evidence only. They do not cover or override the three reproduced Critical behaviors.
 
-| Check | Result |
-|---|---|
-| CJS empty-keyfile migration | Exit 0; config `exa_search` became `true`; keyfile stayed 0 bytes; result recorded a conflict |
-| SDK empty-keyfile migration | Same result as CJS; subsequent status printed `Exa: enabled — key from ~/.oto/exa_api_key ((unset))` |
-| CJS array-shaped config-new-project | Exit 0; top-level flag boolean; nested plaintext marker persisted |
-| SDK array-shaped config-new-project | Exit 0; same nested plaintext persistence in the built CLI |
-| SDK config-set on `{bad json` | Exit 0; file replaced with only `{ "model_profile": "quality" }` |
-| SDK secret-set on `{bad json` | Exit 0; file replaced with only `{ "exa_search": true }`; 0600 keyfile created |
-| SDK secret-clear on `{bad json` | Exit 0; file replaced with only `{ "exa_search": false }`; keyfile deleted |
-| Repository `.oto/config.json` type probe | All three integration fields are currently booleans (`false`) |
+## Review-Convergence Assessment
 
-## Requirements Coverage
+| Contract item | Status | Evidence |
+|---|---|---|
+| 1. Fresh independent verification passes 4/4 | **FAILED** | This report is `gaps_found`, score 1/4. |
+| 2. Fresh review has zero unresolved Criticals | **FAILED** | Fresh `14-REVIEW.md` reports 3 Criticals; all three reproduced. |
+| 3. Every Warning is FIX / ACCEPT / DEFER with evidence | **FAILED** | The fresh review has 6 new Warnings; `14-DISPOSITIONS.md` covers historical findings only and has no rows for them. |
+| 4. Focused CJS/SDK tests and typecheck pass | **PASSED** | 99/99 CJS, 271/271 SDK, and TypeScript exit 0. |
+| 5. No persistent full-SDK regression beyond baseline | **PASSED** | Fresh run has zero candidate offenders versus the captured union/maxima. |
 
-All PLAN requirement IDs resolve to `.oto/REQUIREMENTS.md`. The union is exactly SECR-01 through SECR-04; there are no orphan Phase 14 requirements.
+The bounded stop condition is now material: the prior verifier had three blockers and the fresh review still has three unresolved Criticals. Because the blocker count did not decrease, the contract says to stop and report the contradiction rather than automatically generating another open-ended gap-plan cycle.
 
-| Requirement | Source plans | Status | Evidence |
-|---|---|---|---|
-| SECR-01 | 01, 02, 03, 04, 05, 06, 07, 08, 10, 12 | BLOCKED | Both write paths can commit a nested plaintext Exa key through array choices. |
-| SECR-02 | 01, 02, 05, 07, 11, 12 | BLOCKED | The fully merged new-project config is not boolean-only; caller-controlled nested `exa_search` strings survive. |
-| SECR-03 | 01, 02, 04, 07, 08, 10, 11 | BLOCKED | Empty or whitespace-only keyfiles cause destructive conflict handling instead of migration to a usable keyfile. |
-| SECR-04 | 03, 04, 06, 09, 11, 12 | BLOCKED | Secret set/clear can report success while replacing malformed config, and status can report an empty keyfile as enabled. |
+The six fresh Warnings also require explicit disposition before closure: cross-layer lock identity, unlocked SDK `configEnsureSection`, CJS array-root false success, unusable keyfile availability detection, global keyfile effects from workstream Replace/Clear, and new-project rollback after final config-write failure.
 
-## Test Evidence
+## Required Remediation
 
-- `node --test --test-reporter=dot tests/14-*.test.cjs`: **54/54 passed**.
-- Seven focused SDK suites: **211/212 passed**. The sole failure is the stale registry spy at `sdk/src/query/registry.test.ts:80`, which expects two handler arguments although dispatch correctly supplies the third `workstream` argument as `undefined`.
-- `npx tsc --noEmit`: **passed**.
-- Existing tests contain no array-root new-project cases, no empty/whitespace keyfile migration/status cases, and no malformed-config byte-preservation cases for SDK mutators or secret commands. Their green results do not cover the reproduced blockers.
-- No TODO/FIXME/placeholder implementation markers were found in the Phase 14 production files.
+1. Replace parser-detail interpolation with fixed path-only messages in CJS `cmdConfigGet` and both SDK `loadConfig` parse branches; add CJS/source/dist real-process marker-absence regressions.
+2. Make settings workflow tool resolution runtime-neutral and config-dir-aware, then execute the unmodified installed entry block for Claude, Codex, Gemini, and custom directories without injecting `OTO_TOOLS`.
+3. Make `secret-status` migrate root and leaf layers and derive flags from the same root-under-workstream effective merge as `loadConfig`; test inherited true, explicit workstream overrides, and root legacy-string post-state.
+4. Add FIX / ACCEPT / DEFER rows with evidence for all six fresh Warnings.
 
-## Deferred and Human Verification
+## Next-Step Guidance
 
-No blocker is specifically covered by Phase 15 or Phase 16 roadmap criteria, so none is deferred. No human verification is needed to classify this result: all blockers are deterministic and reproduced programmatically. The prior interactive hidden-prompt checkpoint remains valid normal-path evidence but cannot override these failures.
-
-## Gaps Summary
-
-1. Reject non-plain new-project input and recursively block nested integration-key strings before any side effect.
-2. Treat empty keyfiles as absent/invalid and migrate the valid legacy value into them.
-3. Make SDK mutators distinguish ENOENT from parse/read failures and preserve both config bytes and keyfile state on rejection.
-
-Re-run targeted gap planning with `/oto-plan-phase 14 --gaps`, then independently re-verify the same real-process probes.
+**Do not run `/oto-execute-phase 14` or `/oto-secure-phase 14`, and do not automatically create another unconstrained gap-plan loop.** The bounded convergence stop condition has fired. Return the three Critical reproductions and six undispositioned Warnings to the developer for an explicit decision on the final permitted revision cycle. If that cycle is authorized, revise one bounded plan set covering all three Criticals plus the complete Warning disposition matrix, then execute and re-run fresh review and verification.
 
 ---
 
-_Verified: 2026-07-12T02:27:06Z_
-_Verifier: Codex (oto-verifier)_
+_Verified: 2026-07-13T02:18:06Z_
+_Verifier: Codex (fresh independent oto-verifier)_
