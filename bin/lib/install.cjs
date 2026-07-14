@@ -13,6 +13,7 @@ const {
   removeMarkerBlock,
 } = require('./marker.cjs');
 const { readState, writeState } = require('./install-state.cjs');
+const { buildLauncherPath, buildMcpStateRecord } = require('./mcp-register.cjs');
 const { detectPresentRuntimes } = require('./runtime-detect.cjs');
 const { version: OTO_VERSION } = require('../../package.json');
 
@@ -338,6 +339,42 @@ async function installRuntime(adapter, opts = {}) {
     }
   }
 
+  // OTO Phase 15 (MCP-07/08): MCP registration dispatch — see decisions/ADR-16.
+  let mcpState = priorState && priorState.mcp ? priorState.mcp : undefined;
+  const exaMcpAction = opts.exaMcp || null;
+  const mcpEnv = opts.env || process.env;
+  if (exaMcpAction === 'register' && typeof adapter.mergeMcp === 'function') {
+    const result = await adapter.mergeMcp({
+      configDir,
+      env: mcpEnv,
+      otoVersion: OTO_VERSION,
+      launcherPath: buildLauncherPath(configDir),
+      priorEntry: priorState?.mcp?.exa?.entry ?? null,
+    });
+    if (result.registered) {
+      mcpState = buildMcpStateRecord({ target: result.target, entry: result.entry });
+      console.log(`oto: registered exa MCP server for ${adapter.name} (${result.target})`);
+    } else if (result.refused) {
+      console.log(
+        `oto: exa MCP registration skipped for ${adapter.name} — existing entry is not oto-managed ` +
+        `(${result.refused.reason}); resolve manually or run /oto-settings-integrations`
+      );
+    }
+  } else if (exaMcpAction === 'unregister' && typeof adapter.unmergeMcp === 'function') {
+    const result = await adapter.unmergeMcp({
+      configDir,
+      env: mcpEnv,
+      otoVersion: OTO_VERSION,
+      priorEntry: priorState?.mcp?.exa?.entry ?? null,
+    });
+    if (result.removed || result.skipped?.reason === 'absent') mcpState = undefined;
+    console.log(
+      result.removed
+        ? `oto: unregistered exa MCP server for ${adapter.name}`
+        : `oto: exa MCP entry left in place for ${adapter.name} (${result.skipped?.reason})`
+    );
+  }
+
   // COMMIT POINT: the state file is written only after all install I/O succeeds.
   writeState(statePath, {
     version: 1,
@@ -352,6 +389,7 @@ async function installRuntime(adapter, opts = {}) {
       close_marker: CLOSE_MARKER,
     },
     hooks: { version: OTO_VERSION },
+    ...(mcpState ? { mcp: mcpState } : {}),
   });
 
   const ctx = { runtime: adapter.name, configDir, statePath, filesCopied: fileEntries.length };
@@ -408,6 +446,23 @@ async function uninstallRuntime(adapter, opts = {}) {
       if (unmerged !== existing) {
         await fsp.writeFile(settingsPath, unmerged);
       }
+    }
+  }
+
+  // OTO Phase 15 (MCP-08): consume the stored fingerprint before removeTree deletes install state.
+  if (state.mcp?.exa && typeof adapter.unmergeMcp === 'function') {
+    const result = await adapter.unmergeMcp({
+      configDir,
+      env: opts.env || process.env,
+      otoVersion: state.oto_version,
+      priorEntry: state.mcp.exa.entry,
+    });
+    if (result.removed) {
+      console.log(`oto: unregistered exa MCP server for ${adapter.name}`);
+    } else if (result.skipped?.reason === 'drifted') {
+      console.log('oto: exa entry was modified since oto registered it — left in place.');
+    } else {
+      console.log(`oto: exa MCP entry left in place for ${adapter.name} (${result.skipped?.reason})`);
     }
   }
 
