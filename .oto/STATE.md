@@ -3,15 +3,15 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-07-14T01:11:05.275Z"
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-07-14T01:19:03.371Z"
 last_activity: 2026-07-14
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 29
-  completed_plans: 20
-  percent: 69
+  completed_plans: 21
+  percent: 72
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
-Plan: 2 of 10
+Plan: 3 of 10
 Status: Ready to execute
 Last activity: 2026-07-14
 
-Progress: [███████░░░] 69%
+Progress: [███████░░░] 72%
 
 ## Next Command
 
@@ -57,6 +57,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 14 P03 | 14 min | 2 tasks | 34 files |
 | Phase 14 P04 | 39min | 3 tasks | 2 files |
 | Phase 15 P01 | 8 min | 2 tasks | 2 files |
+| Phase 15 P02 | 5 min | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 14]: Settings Set/Replace delegates key entry to the user's hidden terminal prompt; the workflow never receives secret material. — Keeps keys out of chat, argv, shell history, and tracked config.
 - [Phase 14]: The no-plaintext regression guard scans exactly git-tracked .oto files. — Protects the remote exfiltration surface without fixture false positives.
 - [Phase 15]: Exa MCP uses a shipped launcher-stdio process pinned to exa-mcp-server@3.2.1 with an exact three-tool positional argument and no credentials in runtime configuration. — One launcher gives Claude Code, Codex, and Gemini the same environment-first or regular-keyfile secret resolution and deterministic tool surface.
+- [Phase 15]: D-15 read paths follow symlinks only to regular non-empty files without chmod-healing targets. — Supports password-manager-managed files while rejecting dangling and non-regular objects.
+- [Phase 15]: WR-07 write paths retain lstat and O_NOFOLLOW symlink refusal. — Read usability does not weaken the established write-through-symlink boundary.
+- [Phase 15]: All key availability gates use detectKeySource rather than bare filesystem existence. — Empty and dangling keyfiles must not enable integrations or registration.
 
 ### Pending Todos
 
@@ -112,8 +116,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T01:10:40.497Z
-Stopped at: Completed 15-01-PLAN.md
+Last session: 2026-07-14T01:18:48.542Z
+Stopped at: Completed 15-02-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed
