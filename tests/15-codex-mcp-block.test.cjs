@@ -2,6 +2,9 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 
 const {
   MCP_BEGIN,
@@ -10,6 +13,7 @@ const {
   mergeMcpBlock,
   unmergeMcpBlock,
 } = require('../bin/lib/codex-toml.cjs');
+const codexAdapter = require('../bin/lib/runtime-codex.cjs');
 
 const FIX_USER_TOML = `# user comment
 model = "gpt-5.3-codex"
@@ -81,4 +85,88 @@ test('MCP-04 launcher path uses JSON string quoting without corrupting TOML line
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+test('MCP-04 adapter fresh write creates config.toml and returns its fingerprint', async (t) => {
+  const configDir = makeTempConfigDir(t);
+  const target = path.join(configDir, 'config.toml');
+  const result = await codexAdapter.mergeMcp({ configDir, ...MCP_CTX });
+
+  assert.deepEqual(result, {
+    registered: true,
+    refused: null,
+    entry: getMcpBlockInner(fs.readFileSync(target, 'utf8')),
+    target,
+  });
+  assert.equal((fs.readFileSync(target, 'utf8').match(/BEGIN OTO MCP/g) || []).length, 1);
+});
+
+test('MCP-04 adapter re-merge is idempotent with exactly one block', async (t) => {
+  const configDir = makeTempConfigDir(t);
+  await codexAdapter.mergeMcp({ configDir, ...MCP_CTX });
+  const once = fs.readFileSync(path.join(configDir, 'config.toml'), 'utf8');
+  const result = await codexAdapter.mergeMcp({ configDir, ...MCP_CTX });
+  const twice = fs.readFileSync(path.join(configDir, 'config.toml'), 'utf8');
+
+  assert.equal(result.registered, true);
+  assert.equal(twice, once);
+  assert.equal((twice.match(/BEGIN OTO MCP/g) || []).length, 1);
+});
+
+test('MCP-04 adapter fingerprint-matched unmerge restores user content byte-identically', async (t) => {
+  const configDir = makeTempConfigDir(t);
+  const target = path.join(configDir, 'config.toml');
+  fs.writeFileSync(target, FIX_USER_TOML);
+  const merged = await codexAdapter.mergeMcp({ configDir, ...MCP_CTX });
+  const result = await codexAdapter.unmergeMcp({ configDir, priorEntry: merged.entry });
+
+  assert.deepEqual(result, { removed: true, skipped: null, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), FIX_USER_TOML);
+});
+
+test('MCP-04 adapter drifted unmerge leaves edited block in place and reports one line', async (t) => {
+  const configDir = makeTempConfigDir(t);
+  const target = path.join(configDir, 'config.toml');
+  const merged = await codexAdapter.mergeMcp({ configDir, ...MCP_CTX });
+  const edited = fs.readFileSync(target, 'utf8').replace('command = "node"', 'command = "custom-node"');
+  fs.writeFileSync(target, edited);
+  const writes = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    writes.push(String(chunk));
+    return true;
+  };
+
+  let result;
+  try {
+    result = await codexAdapter.unmergeMcp({ configDir, priorEntry: merged.entry });
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+
+  assert.deepEqual(result, { removed: false, skipped: { reason: 'drifted' }, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), edited);
+  assert.deepEqual(writes, ['oto: exa entry was modified since oto registered it — left in place.\n']);
+});
+
+test('MCP-04 adapter refuses user-owned exa without changing config.toml', async (t) => {
+  const configDir = makeTempConfigDir(t);
+  const target = path.join(configDir, 'config.toml');
+  const input = '# user owned\n[mcp_servers.exa]\ncommand = "custom-exa"\n';
+  fs.writeFileSync(target, input);
+  const result = await codexAdapter.mergeMcp({ configDir, ...MCP_CTX });
+
+  assert.deepEqual(result, {
+    registered: false,
+    refused: { reason: 'user-owned' },
+    entry: null,
+    target,
+  });
+  assert.equal(fs.readFileSync(target, 'utf8'), input);
+});
+
+function makeTempConfigDir(t) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-codex-mcp-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  return dir;
 }
