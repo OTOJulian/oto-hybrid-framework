@@ -38,6 +38,7 @@ import {
   configSet, configSetModelProfile, configNewProject, configEnsureSection,
 } from './config-mutation.js';
 import { secretSet, secretClear, secretStatus } from './secret-commands.js';
+import { mcpStatus } from './mcp-status.js';
 import { commit, checkCommit } from './commit.js';
 import { templateFill, templateSelect } from './template.js';
 import { verifyPlanStructure, verifyPhaseCompleteness, verifyArtifacts, verifyCommits, verifyReferences, verifySummary, verifyPathExists } from './verify.js';
@@ -140,6 +141,7 @@ export const QUERY_MUTATION_COMMANDS = new Set<string>([
   'frontmatter.set', 'frontmatter.merge', 'frontmatter.validate', 'frontmatter validate',
   'config-set', 'config-set-model-profile', 'config-new-project', 'config-ensure-section',
   'secret-set', 'secret-clear', 'secret-status',
+  'mcp-status',
   'commit', 'check-commit', 'commit-to-subrepo',
   'template.fill', 'template.select', 'template select',
   'validate.health', 'validate health',
@@ -344,6 +346,7 @@ export function createRegistry(
   registry.register('secret-set', secretSet);
   registry.register('secret-clear', secretClear);
   registry.register('secret-status', secretStatus);
+  registry.register('mcp-status', mcpStatus);
 
   // Git commit handlers
   registry.register('commit', commit);
