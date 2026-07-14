@@ -188,3 +188,94 @@ for (const adapter of ADAPTERS) {
     assert.deepEqual(readState(statePath).mcp.exa, registered);
   });
 }
+
+const CLAUDE_INCOMPATIBLE_LIFECYCLE_FIXTURES = [
+  { name: 'array-container', text: '{"mcpServers":["user-entry"],"keep":true}' },
+  { name: 'string-container', text: '{"mcpServers":"user-entry","keep":true}' },
+  { name: 'null-root', text: 'null' },
+  { name: 'array-root', text: '[]' },
+  { name: 'primitive-root', text: '42' },
+];
+
+const GEMINI_TOLERATED_LIFECYCLE_FIXTURES = [
+  { name: 'array-container', text: '{"mcpServers":["user-entry"],"keep":true}' },
+  { name: 'string-container', text: '{"mcpServers":"user-entry","keep":true}' },
+  { name: 'array-root', text: '[]' },
+];
+
+const GEMINI_THROWING_ROOT_FIXTURES = [
+  { name: 'null-root', text: 'null' },
+  { name: 'primitive-root', text: '42' },
+];
+
+for (const fixture of CLAUDE_INCOMPATIBLE_LIFECYCLE_FIXTURES) {
+  test(`claude lifecycle refuses ${fixture.name} without recording MCP state or touching bytes`, async (t) => {
+    const { configDir, opts } = tempRuntime(t, claudeAdapter);
+    const target = targetPath(claudeAdapter, configDir);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, fixture.text);
+    const output = [];
+    const originalLog = console.log;
+    console.log = (...args) => output.push(args.join(' '));
+    try {
+      await installRuntime(claudeAdapter, { ...opts, exaMcp: 'register' });
+    } finally {
+      console.log = originalLog;
+    }
+
+    const state = readState(path.join(configDir, 'oto', '.install.json'));
+    assert.equal(state.mcp, undefined);
+    assert.deepEqual(validateState(state), []);
+    assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+    assert.match(output.join('\n'), /exa MCP registration skipped/);
+  });
+}
+
+// Byte-identity is asserted at adapter level (Task 1); at lifecycle level mergeSettings legitimately rewrites settings.json first (outside CR-01), so the contract here is semantic preservation + refusal + no fingerprint.
+for (const fixture of GEMINI_TOLERATED_LIFECYCLE_FIXTURES) {
+  test(`gemini lifecycle refuses ${fixture.name} semantically without recording MCP state`, async (t) => {
+    const { configDir, opts } = tempRuntime(t, geminiAdapter);
+    const target = targetPath(geminiAdapter, configDir);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, fixture.text);
+    const output = [];
+    const originalLog = console.log;
+    console.log = (...args) => output.push(args.join(' '));
+    try {
+      await installRuntime(geminiAdapter, { ...opts, exaMcp: 'register' });
+    } finally {
+      console.log = originalLog;
+    }
+
+    const state = readState(path.join(configDir, 'oto', '.install.json'));
+    assert.equal(state.mcp, undefined);
+    assert.deepEqual(validateState(state), []);
+    const text = fs.readFileSync(target, 'utf8');
+    const settings = JSON.parse(text);
+    if (fixture.name === 'array-container') {
+      assert.deepEqual(settings.mcpServers, ['user-entry']);
+      assert.equal(settings.keep, true);
+    } else if (fixture.name === 'string-container') {
+      assert.equal(settings.mcpServers, 'user-entry');
+      assert.equal(settings.keep, true);
+    } else {
+      assert.deepEqual(settings, []);
+    }
+    assert.equal(text.includes('"exa"'), false);
+    assert.match(output.join('\n'), /exa MCP registration skipped/);
+  });
+}
+
+// Known behavior (outside CR-01): install.cjs dispatches mergeSettings on settings.json before the MCP dispatch; null/primitive roots throw there (pre-existing). Pinned: no state file, bytes untouched. Adapter-level mergeMcp no-throw for these shapes is covered in tests/15-gemini-mcp-merge.test.cjs.
+for (const fixture of GEMINI_THROWING_ROOT_FIXTURES) {
+  test(`gemini lifecycle ${fixture.name} aborts in pre-existing mergeSettings without writing state (known behavior, outside CR-01)`, async (t) => {
+    const { configDir, opts } = tempRuntime(t, geminiAdapter);
+    const target = targetPath(geminiAdapter, configDir);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, fixture.text);
+
+    await assert.rejects(installRuntime(geminiAdapter, { ...opts, exaMcp: 'register' }));
+    assert.equal(fs.existsSync(path.join(configDir, 'oto', '.install.json')), false);
+    assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+  });
+}
