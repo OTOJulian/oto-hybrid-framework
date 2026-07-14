@@ -32,12 +32,31 @@ function fixture(runtime: RuntimeName, create = true) {
   };
 }
 
-function seedState(configDir: string, entry: unknown) {
+function seedState(
+  configDir: string,
+  entry: unknown,
+  runtime: RuntimeName = 'claude',
+  overrides: Record<string, unknown> = {},
+) {
   const stateDir = join(configDir, 'oto');
   mkdirSync(stateDir, { recursive: true });
   writeFileSync(join(stateDir, '.install.json'), JSON.stringify({
+    version: 1,
+    oto_version: '0.5.0',
+    installed_at: '2026-07-14T00:00:00.000Z',
+    runtime,
+    config_dir: configDir,
+    files: [],
+    instruction_file: { path: 'CLAUDE.md' },
     mcp: { exa: { entry, target: '/target', registered_at: 'now' } },
+    ...overrides,
   }));
+}
+
+function seedRawState(configDir: string, contents: string) {
+  const stateDir = join(configDir, 'oto');
+  mkdirSync(stateDir, { recursive: true });
+  writeFileSync(join(stateDir, '.install.json'), contents);
 }
 
 function seedLive(runtime: RuntimeName, target: string, entry: unknown) {
@@ -78,7 +97,7 @@ describe('SDK MCP status mirror', () => {
     const { target } = resolveRuntimeMcpTarget('claude', ctx);
     const entry = { type: 'stdio', command: 'node', args: ['/launcher'] };
     seedLive('claude', target, entry);
-    seedState(ctx.configDir, entry);
+    seedState(ctx.configDir, entry, 'claude');
     expect(classifyExaRegistration('claude', ctx).status).toBe('oto-managed');
   });
 
@@ -93,13 +112,13 @@ describe('SDK MCP status mirror', () => {
     const ctx = fixture('gemini');
     const { target } = resolveRuntimeMcpTarget('gemini', ctx);
     seedLive('gemini', target, { command: 'new-node' });
-    seedState(ctx.configDir, { command: 'old-node' });
+    seedState(ctx.configDir, { command: 'old-node' }, 'gemini');
     expect(classifyExaRegistration('gemini', ctx).status).toBe('drifted');
   });
 
   it('classifies missing-but-expected', () => {
     const ctx = fixture('codex');
-    seedState(ctx.configDir, '[mcp_servers.exa]\ncommand = "node"');
+    seedState(ctx.configDir, '[mcp_servers.exa]\ncommand = "node"', 'codex');
     expect(classifyExaRegistration('codex', ctx).status).toBe('missing-but-expected');
   });
 
@@ -118,5 +137,56 @@ describe('SDK MCP status mirror', () => {
     })).toEqual([
       'oto: exa MCP server is registered but no usable Exa API key was detected — run /oto-settings-integrations',
     ]);
+  });
+});
+
+describe('WR-01 fail-closed fingerprint validation', () => {
+  const entry = { type: 'stdio', command: 'node', args: ['/launcher'] };
+
+  it('rejects an incomplete MCP-only install state', () => {
+    const ctx = fixture('claude');
+    const { target } = resolveRuntimeMcpTarget('claude', ctx);
+    seedLive('claude', target, entry);
+    seedRawState(ctx.configDir, JSON.stringify({
+      mcp: { exa: { entry, target: '/target', registered_at: 'now' } },
+    }));
+
+    expect(classifyExaRegistration('claude', ctx).status).toBe('user-owned');
+  });
+
+  it('rejects an invalid top-level version', () => {
+    const ctx = fixture('claude');
+    const { target } = resolveRuntimeMcpTarget('claude', ctx);
+    seedLive('claude', target, entry);
+    seedState(ctx.configDir, entry, 'claude', { version: 99 });
+
+    expect(classifyExaRegistration('claude', ctx).status).toBe('user-owned');
+  });
+
+  it('rejects an invalid MCP record', () => {
+    const ctx = fixture('claude');
+    const { target } = resolveRuntimeMcpTarget('claude', ctx);
+    seedLive('claude', target, entry);
+    seedState(ctx.configDir, entry, 'claude', {
+      mcp: { exa: { entry: 42, registered_at: 'now' } },
+    });
+
+    expect(classifyExaRegistration('claude', ctx).status).toBe('user-owned');
+  });
+
+  it('rejects malformed JSON', () => {
+    const ctx = fixture('claude');
+    const { target } = resolveRuntimeMcpTarget('claude', ctx);
+    seedLive('claude', target, entry);
+    seedRawState(ctx.configDir, '{ not json');
+
+    expect(classifyExaRegistration('claude', ctx).status).toBe('user-owned');
+  });
+
+  it('does not treat invalid state without a live entry as expected', () => {
+    const ctx = fixture('claude');
+    seedState(ctx.configDir, entry, 'claude', { version: 99 });
+
+    expect(classifyExaRegistration('claude', ctx).status).toBe('not-registered');
   });
 });
