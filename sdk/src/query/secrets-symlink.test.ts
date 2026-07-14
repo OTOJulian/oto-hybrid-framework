@@ -49,16 +49,16 @@ afterEach(() => {
 });
 
 describe('symlink-safe keyfile handling', () => {
-  it('refuses a symlink without reading or re-moding its victim', () => {
+  it('follows a symlink to a regular file without re-moding its victim', () => {
     const { victim } = createSymlinkFixture();
     const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(
       (() => true) as typeof process.stderr.write,
     );
 
-    expect(readKeyfile('exa', base)).toBeNull();
+    expect(readKeyfile('exa', base)).toEqual({ value: 'victim-content', healed: false });
     expect(readFileSync(victim, 'utf8')).toBe('victim-content');
     expect(statSync(victim).mode & 0o777).toBe(0o644);
-    expect(stderr).toHaveBeenCalledWith(expect.stringContaining('not a regular file'));
+    expect(stderr).not.toHaveBeenCalled();
   });
 
   it('refuses a symlink without overwriting its victim', () => {
@@ -73,7 +73,7 @@ describe('symlink-safe keyfile handling', () => {
   it('fails migration closed when the destination keyfile is a symlink', async () => {
     const { victim } = createSymlinkFixture();
     const configPath = writeConfig({
-      exa_search: 'sk-legacy-gap2-0123456789',
+      exa_search: 'victim-content',
     });
     const before = readFileSync(configPath, 'utf8');
 

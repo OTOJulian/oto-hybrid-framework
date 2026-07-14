@@ -14,6 +14,7 @@ import {
   readFileSync,
   rmSync,
   statSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -170,6 +171,65 @@ describe('key source detection and validation', () => {
     expect(capturedOutput(stderr)).toContain(
       'no Firecrawl API key detected (FIRECRAWL_API_KEY or ~/.oto/firecrawl_api_key)',
     );
+  });
+});
+
+describe('D-15 key usability', () => {
+  it('uses a trimmed non-empty environment key and ignores whitespace-only env values', () => {
+    vi.stubEnv('EXA_API_KEY', '  key123  ');
+    expect(detectKeySource('exa', tmpBase).source).toBe('env');
+
+    vi.stubEnv('EXA_API_KEY', ' \t ');
+    expect(detectKeySource('exa', tmpBase).source).toBeNull();
+  });
+
+  it('detects non-empty regular files but rejects empty and whitespace-only files', () => {
+    vi.stubEnv('EXA_API_KEY', '');
+    const target = keyfilePath('exa', tmpBase);
+
+    writeFileSync(target, 'sk-abc');
+    expect(detectKeySource('exa', tmpBase).source).toBe('keyfile');
+    writeFileSync(target, '');
+    expect(detectKeySource('exa', tmpBase).source).toBeNull();
+    writeFileSync(target, ' \n\t');
+    expect(detectKeySource('exa', tmpBase).source).toBeNull();
+  });
+
+  it('follows a symlink to a regular non-empty file without changing its mode', () => {
+    vi.stubEnv('EXA_API_KEY', '');
+    const linked = join(tmpBase, 'password-manager-key');
+    writeFileSync(linked, 'sk-linked\n', { mode: 0o644 });
+    chmodSync(linked, 0o644);
+    symlinkSync(linked, keyfilePath('exa', tmpBase));
+
+    expect(detectKeySource('exa', tmpBase).source).toBe('keyfile');
+    expect(statSync(linked).mode & 0o777).toBe(0o644);
+  });
+
+  it('rejects symlinks to directories and dangling symlinks with one-line notices', () => {
+    vi.stubEnv('EXA_API_KEY', '');
+    const target = keyfilePath('exa', tmpBase);
+    const directory = join(tmpBase, 'directory');
+    mkdirSync(directory);
+    symlinkSync(directory, target);
+    const stderr = captureStderr();
+
+    expect(detectKeySource('exa', tmpBase).source).toBeNull();
+    expect(capturedOutput(stderr)).toContain('not a regular file');
+    rmSync(target);
+    stderr.mockClear();
+    symlinkSync(join(tmpBase, 'missing'), target);
+    expect(detectKeySource('exa', tmpBase).source).toBeNull();
+    expect(capturedOutput(stderr)).toContain('dangling symlink');
+  });
+
+  it('keeps WR-07 write refusal for symlink destinations', () => {
+    const linked = join(tmpBase, 'victim');
+    writeFileSync(linked, 'unchanged');
+    symlinkSync(linked, keyfilePath('exa', tmpBase));
+
+    expect(() => writeKeyfile('exa', 'replacement', tmpBase)).toThrow(/not a regular file/);
+    expect(readFileSync(linked, 'utf8')).toBe('unchanged');
   });
 });
 
