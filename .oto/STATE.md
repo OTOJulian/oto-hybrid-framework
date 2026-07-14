@@ -112,6 +112,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - **Phase 16 pre-task (WR-04, deferred from Phase 14 review):** the settings workflow persists comma-separated agent skills as ONE quoted string (`oto/workflows/settings-integrations.md` agent-skills step); consumers treat it as a single nonexistent skill path. Phase 16 (agent guidance — owns the agent_skills consumers) must parse/trim/validate each name, persist a JSON array, and add an end-to-end two-skill injection test. Tracked in `.oto/phases/14-key-storage-reconciliation/14-DISPOSITIONS.md`.
 - **Phase 15 pre-task (FRESH-CR-02, deferred from Phase 14 fresh review):** own per-runtime config-dir resolution plus the `/oto-settings-integrations` per-runtime status surface across Claude, Codex, Gemini, and custom config directories.
 - **Phase 16 pre-task (FRESH-CR-03, deferred from Phase 14 fresh review):** alongside WR-04, own effective root-to-workstream secret-status flags and root-layer legacy migration, including inherited booleans and legacy-string post-state.
+- **Post-Phase 15 tooling quick task:** `oto-sdk query verify.codebase-drift` still targets removed `get-shit-done/bin/gsd-tools.cjs`, so the non-blocking drift gate skips with `sdk-exception`. Fix the OTO-native helper routing and add a JSON-contract regression via `/oto-quick`. Tracked in `.oto/todos/pending/2026-07-14-fix-codebase-drift-stale-gsd-helper-path.md`.
 
 ### Blockers/Concerns
 
