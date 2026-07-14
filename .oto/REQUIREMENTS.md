@@ -24,7 +24,7 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 - [x] **MCP-06**: Registration exposes exactly the pinned tool set (`web_search_exa`, `web_fetch_exa`, `web_search_advanced_exa`) — no deprecated or sales-oriented tools
 - [x] **MCP-07**: Registration is idempotent (re-install and re-run never duplicate entries) and conditional on a detected key
 - [x] **MCP-08**: Uninstall removes only oto-fingerprinted registrations; user-owned `exa` entries are skipped and reported
-- [ ] **MCP-09**: `/oto-settings-integrations` summary shows per-runtime registration status (claude / codex / gemini)
+- [x] **MCP-09**: `/oto-settings-integrations` summary shows per-runtime registration status (claude / codex / gemini)
 
 ### Agent Guidance (GUID)
 
@@ -85,7 +85,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MCP-06 | Phase 15 | Complete |
 | MCP-07 | Phase 15 | Complete |
 | MCP-08 | Phase 15 | Complete |
-| MCP-09 | Phase 15 | Pending |
+| MCP-09 | Phase 15 | Complete |
 | HARD-02 | Phase 15 | Complete |
 | GUID-01 | Phase 16 | Pending |
 | GUID-02 | Phase 16 | Pending |
