@@ -8,8 +8,11 @@ if (major < 22) {
 }
 
 const path = require('node:path');
+const os = require('node:os');
 const { parseCliArgs, ArgError } = require('./lib/args.cjs');
-const { installRuntime, uninstallRuntime, installAll, uninstallAll, wireOtoSdk } = require('./lib/install.cjs');
+const { installRuntime, uninstallRuntime, uninstallAll, wireOtoSdk } = require('./lib/install.cjs');
+const { decideExaMcpAction, preWarmExaMcp } = require('./lib/mcp-consent.cjs');
+const { detectPresentRuntimes } = require('./lib/runtime-detect.cjs');
 const { version: OTO_VERSION } = require('../package.json');
 
 const ADAPTERS = {
@@ -23,8 +26,7 @@ const HELP_TEXT = `oto v${OTO_VERSION} - install / uninstall the oto AI-CLI fram
 USAGE
   oto install --claude [--config-dir <dir>]  Claude Code (v0.1.0 happy path)
   oto install --codex  [--config-dir <dir>]  Codex (best-effort until Phase 8)
-  oto install --gemini [--config-dir <dir>]
-      install for Gemini CLI (best-effort until Phase 8)
+  oto install --gemini [--config-dir <dir>] (best-effort until Phase 8)
   oto install --all                           install to all detected runtimes
   oto uninstall --claude|--codex|--gemini     uninstall a runtime
   oto uninstall --all [--purge]               remove all; purge stale files
@@ -44,6 +46,7 @@ FLAGS
   --config-dir <dir>   target a config dir (single-runtime only)
   --force,  -f         overwrite without prompts
   --purge              uninstall: also remove stale oto-* files
+  --register-exa-mcp / --unregister-exa-mcp  scripted Exa MCP consent
   --verbose, -v        print intermediate progress lines
   --help, -h           show this help
 
@@ -113,12 +116,36 @@ async function main(argv) {
 
   try {
     if (parsed.action === 'install') {
-      if (parsed.all) {
-        await installAll(Object.values(ADAPTERS), opts);
-      } else {
-        for (const rt of parsed.runtimes) {
-          await installRuntime(ADAPTERS[rt], opts);
+      const targetedRuntimes = parsed.all
+        ? detectPresentRuntimes(os.homedir())
+        : parsed.runtimes;
+      if (parsed.all && targetedRuntimes.length === 0) {
+        process.stderr.write('--all: no runtimes detected (none of ~/.claude, ~/.codex, ~/.gemini exist)\n');
+        const error = new Error('no runtimes detected');
+        error.exitCode = 4;
+        throw error;
+      }
+
+      // OTO Phase 15 (D-05..D-08): one consent decision covers the entire
+      // install command, then its per-runtime actions flow into the adapters.
+      const decisions = await decideExaMcpAction({
+        runtimes: targetedRuntimes,
+        parsed,
+        env: process.env,
+      });
+      if (Object.values(decisions).some((decision) => decision.action === 'register')) {
+        const warm = preWarmExaMcp();
+        if (!warm.ok) {
+          console.warn('oto: warning — could not pre-warm exa-mcp-server (offline?); registration proceeds, first session will retry');
         }
+      }
+
+      for (const rt of targetedRuntimes) {
+        await installRuntime(ADAPTERS[rt], {
+          ...opts,
+          env: process.env,
+          exaMcp: decisions[rt].action,
+        });
       }
       wireOtoSdk(opts);
     } else if (parsed.all) {

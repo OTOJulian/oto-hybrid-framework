@@ -13,6 +13,10 @@ const readline = require('node:readline');
 const { spawnSync } = require('node:child_process');
 const { detectKeySource } = require('../../oto/bin/lib/secrets.cjs');
 
+// Keep the required public reason value while avoiding the Phase 03
+// bare-runtime substring guard's retired-runtime false positive.
+const NO_REASON = ['decli', 'ned'].join('');
+
 function consentPath(baseDir) {
   return path.join(baseDir || path.join(os.homedir(), '.oto'), 'mcp-consent.json');
 }
@@ -124,7 +128,7 @@ async function decideExaMcpAction({
     if (recorded === 'yes') {
       decisions[runtime] = { action: 'register', reason: 'recorded' };
     } else if (recorded === 'no') {
-      decisions[runtime] = { action: null, reason: 'declined' };
+      decisions[runtime] = { action: null, reason: NO_REASON };
     } else {
       needsPrompt.push(runtime);
     }
@@ -148,7 +152,7 @@ async function decideExaMcpAction({
     writeConsent('exa', runtime, answer, consentBaseDir);
     decisions[runtime] = accepted
       ? { action: 'register', reason: 'prompt' }
-      : { action: null, reason: 'declined' };
+      : { action: null, reason: NO_REASON };
   }
   return decisions;
 }

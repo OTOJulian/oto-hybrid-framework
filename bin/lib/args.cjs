@@ -91,8 +91,14 @@ function parseCliArgs(argv) {
     configDir: values['config-dir'] ? path.resolve(expandTilde(values['config-dir'])) : null,
     force: values.force,
     purge: values.purge,
-    registerExaMcp: values['register-exa-mcp'],
-    unregisterExaMcp: values['unregister-exa-mcp'],
+    ...(
+      values['register-exa-mcp'] || values['unregister-exa-mcp']
+        ? {
+            registerExaMcp: values['register-exa-mcp'],
+            unregisterExaMcp: values['unregister-exa-mcp'],
+          }
+        : {}
+    ),
     verbose: values.verbose,
     help: values.help,
   };
