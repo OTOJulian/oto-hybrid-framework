@@ -43,6 +43,29 @@ function validateState(state) {
       errors.push('state.hooks.version must be string');
     }
   }
+  // OTO Phase 15 (MCP-08): optional mcp section records registration fingerprints consumed by uninstall + status.
+  if (state.mcp !== undefined) {
+    if (!state.mcp || typeof state.mcp !== 'object' || Array.isArray(state.mcp)) {
+      errors.push('state.mcp must be object');
+    } else {
+      for (const [name, record] of Object.entries(state.mcp)) {
+        if (!record || typeof record !== 'object' || Array.isArray(record)) {
+          errors.push(`state.mcp.${name} must be object`);
+          continue;
+        }
+        if (typeof record.target !== 'string' || record.target.length === 0) {
+          errors.push(`state.mcp.${name}.target must be a non-empty string`);
+        }
+        if (typeof record.registered_at !== 'string') {
+          errors.push(`state.mcp.${name}.registered_at must be string`);
+        }
+        const entryIsObject = record.entry !== null && typeof record.entry === 'object' && !Array.isArray(record.entry);
+        if (!entryIsObject && typeof record.entry !== 'string') {
+          errors.push(`state.mcp.${name}.entry must be object or string`);
+        }
+      }
+    }
+  }
   return errors;
 }
 
