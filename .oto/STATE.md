@@ -2,16 +2,16 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
-stopped_at: Completed 15-09-PLAN.md
-last_updated: "2026-07-14T02:28:18.275Z"
+status: verifying
+stopped_at: Completed 15-10-PLAN.md
+last_updated: "2026-07-14T16:00:15.119Z"
 last_activity: 2026-07-14
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 29
-  completed_plans: 28
-  percent: 97
+  completed_plans: 29
+  percent: 100
 ---
 
 # Project State
@@ -26,12 +26,12 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
+Phase: 15 (exa-mcp-registration-all-three-runtimes) — VERIFYING
 Plan: 10 of 10
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-14
 
-Progress: [██████████] 97%
+Progress: [██████████] 100%
 
 ## Next Command
 
@@ -65,6 +65,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 15 P07 | 14 min | 3 tasks | 4 files |
 | Phase 15 P08 | 9 min | 2 tasks | 4 files |
 | Phase 15 P09 | 10 min | 3 tasks | 14 files |
+| Phase 15 P10 | 13h 31m | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 15]: Gemini Exa entries contain only command and args, with exact parsed entries used as ownership fingerprints. — Avoids the SSE URL trap and preserves user-owned or drifted entries.
 - [Phase 15]: Persist consent separately from install fingerprints — Keeps user intent independent from mutation ownership evidence
 - [Phase 15]: Resolve all install targets before consent — Guarantees one prompt and one decision map per install command
+- [Phase 15]: Settings renders native MCP status verbatim and gates actions from the structured runtime array. — Keeps user-facing output truthful while making action availability machine-driven.
+- [Phase 15]: Replace and Clear require separate default-No confirmation after global key-scope disclosure. — Prevents uninformed mutation of the credential shared by root and workstreams.
+- [Phase 15]: Native SDK workstream routing preserves session-scoped pointer semantics from the CJS resolver. — The mandated SDK migration must not regress concurrent-session isolation.
 
 ### Pending Todos
 
@@ -131,8 +135,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T02:28:18.272Z
-Stopped at: Completed 15-09-PLAN.md
+Last session: 2026-07-14T15:59:55.135Z
+Stopped at: Completed 15-10-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed

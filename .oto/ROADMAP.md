@@ -139,7 +139,7 @@ Plans:
 - [x] 15-07-PLAN.md — install.cjs dispatch + .install.json mcp fingerprints + install/uninstall lifecycle round-trips (MCP-07/08)
 - [x] 15-08-PLAN.md — Consent gate: flags, ~/.oto/mcp-consent.json persistence, TTY prompt default No, empty-stdin pre-warm (MCP-01)
 - [x] 15-09-PLAN.md — Status classifier + oto doctor coherence + oto-sdk query mcp-status (MCP-09, FRESH-CR-02)
-- [ ] 15-10-PLAN.md — settings-integrations workflow (status, register/unregister, D-16 scope confirm) + live e2e checkpoint
+- [x] 15-10-PLAN.md — settings-integrations workflow (status, register/unregister, D-16 scope confirm) + live e2e checkpoint
 
 Notes: HARD-02's boolean-validation and no-plaintext-guard test families naturally land alongside Phase 14's code; the requirement completes here with the adapter round-trip family (research's hard gate against Codex TOML corruption). Research flags for planning-time verification: `CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution behavior, and the transport ADR (research recommends launcher-stdio `oto/hooks/oto-exa-mcp.js` for uniform secret indirection, remote HTTP as the documented alternative). All installer changes go in the live `bin/lib/` installer, not the vestigial `oto/bin/install.js`.
 
@@ -174,7 +174,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
-| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 9/10 | In Progress|  |
+| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 10/10 | Complete   | 2026-07-14 |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
 ---
