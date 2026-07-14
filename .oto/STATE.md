@@ -1,17 +1,17 @@
 ---
-gsd_state_version: 1.0
+oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Completed 15-10-PLAN.md
-last_updated: "2026-07-14T18:39:16.469Z"
-last_activity: 2026-07-14 -- Phase 15 planning complete
+stopped_at: Completed 15-11-PLAN.md
+last_updated: "2026-07-14T19:23:29.032Z"
+last_activity: 2026-07-14 -- Completed 15-11-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 31
-  completed_plans: 29
-  percent: 94
+  completed_plans: 30
+  percent: 97
 ---
 
 # Project State
@@ -26,18 +26,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 15 (exa-mcp-registration-all-three-runtimes) — VERIFYING
-Plan: 10 of 10
+Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
+Plan: 11 of 12
 Status: Ready to execute
-Last activity: 2026-07-14 -- Phase 15 planning complete
+Last activity: 2026-07-14 -- Completed 15-11-PLAN.md
 
-Progress: [██████████] 100%
+Progress: [██████████] 97%
 
 ## Next Command
 
-Phase 14 is NOT complete. The fresh convergence review reports 3 unresolved Criticals and 6 undispositioned Warnings; fresh verification is `gaps_found` at 1/4. The bounded-convergence stop condition in 14-DISPOSITIONS.md / 14-19-PLAN.md has triggered because the blocker count did not decrease. Do not auto-generate another gap-plan loop; a developer decision is required.
-
-Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15 carries research flags (`CLAUDE_CONFIG_DIR` → `~/.claude.json` resolution, transport ADR).
+Execute Phase 15 Plan 15-12 to close WR-01, then rerun fresh review and independent verification for the two-plan gap-closure scope.
 
 ## Performance Metrics
 
@@ -66,6 +64,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 15 P08 | 9 min | 2 tasks | 4 files |
 | Phase 15 P09 | 10 min | 3 tasks | 14 files |
 | Phase 15 P10 | 13h 31m | 2 tasks | 8 files |
+| Phase 15 P11 | 8 min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -135,8 +134,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T15:59:55.135Z
-Stopped at: Completed 15-10-PLAN.md
+Last session: 2026-07-14T19:23:29.029Z
+Stopped at: Completed 15-11-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed
