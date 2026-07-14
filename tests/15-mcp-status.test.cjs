@@ -162,3 +162,25 @@ test('coherence is quiet for a usable registered configuration', () => {
     statuses: [{ status: 'drifted' }],
   }), []);
 });
+
+test('invalid install state never establishes oto ownership (WR-01 pin)', async (t) => {
+  for (const runtime of Object.keys(ADAPTERS)) {
+    const ctx = fixture(t, runtime);
+    const live = await seedLive(runtime, ctx);
+    const stateDir = path.join(ctx.configDir, 'oto');
+    fs.mkdirSync(stateDir, { recursive: true });
+    fs.writeFileSync(path.join(stateDir, '.install.json'), JSON.stringify({
+      mcp: {
+        exa: {
+          entry: live.entry,
+          target: live.target,
+          registered_at: 'now',
+        },
+      },
+    }));
+
+    assert.equal(classifyExaRegistration(runtime, ctx).status, 'user-owned');
+    removeLive(runtime, live.target);
+    assert.equal(classifyExaRegistration(runtime, ctx).status, 'not-registered');
+  }
+});

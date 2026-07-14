@@ -15,6 +15,7 @@ export declare function resolveRuntimeMcpTarget(runtimeName: RuntimeName, { env,
     configDir: string;
     target: string;
 };
+export declare function validateInstallState(state: unknown): boolean;
 export declare function classifyExaRegistration(runtimeName: RuntimeName, opts?: StatusOptions): RuntimeStatus;
 export declare function checkExaCoherence({ exaSearchEnabled, keySource, statuses, }: {
     exaSearchEnabled: boolean;

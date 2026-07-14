@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -188,5 +189,56 @@ describe('WR-01 fail-closed fingerprint validation', () => {
     seedState(ctx.configDir, entry, 'claude', { version: 99 });
 
     expect(classifyExaRegistration('claude', ctx).status).toBe('not-registered');
+  });
+});
+
+describe('CJS/SDK ownership parity (WR-01)', () => {
+  const cjs = createRequire(import.meta.url)('../../../bin/lib/mcp-register.cjs') as {
+    classifyExaRegistration: (
+      runtime: string,
+      opts: { env: Record<string, string | undefined>; homeDir: string },
+    ) => { status: string };
+  };
+  const runtimes = ['claude', 'codex', 'gemini'] as RuntimeName[];
+  const variants = [
+    'malformed-json',
+    'incomplete-mcp-only',
+    'invalid-top-level-version-99',
+    'invalid-mcp-record',
+  ] as const;
+  const cases = runtimes.flatMap((runtime) => variants.map((variant) => [runtime, variant] as const));
+
+  it.each(cases)('%s rejects %s state identically', (runtime, variant) => {
+    const ctx = fixture(runtime);
+    const { target } = resolveRuntimeMcpTarget(runtime, ctx);
+    const entry = runtime === 'claude'
+      ? { type: 'stdio', command: 'node', args: ['/launcher'] }
+      : runtime === 'gemini'
+        ? { command: 'node', args: ['/launcher'] }
+        : '[mcp_servers.exa]\ncommand = "node"';
+    seedLive(runtime, target, entry);
+
+    if (variant === 'malformed-json') {
+      seedRawState(ctx.configDir, '{ not json');
+    } else if (variant === 'incomplete-mcp-only') {
+      seedRawState(ctx.configDir, JSON.stringify({
+        mcp: { exa: { entry, target: '/target', registered_at: 'now' } },
+      }));
+    } else if (variant === 'invalid-top-level-version-99') {
+      seedState(ctx.configDir, entry, runtime, { version: 99 });
+    } else {
+      seedState(ctx.configDir, entry, runtime, {
+        mcp: { exa: { entry: 42, registered_at: 'now' } },
+      });
+    }
+
+    const sdkStatus = classifyExaRegistration(runtime, ctx).status;
+    const cjsStatus = cjs.classifyExaRegistration(runtime, {
+      env: ctx.env,
+      homeDir: ctx.homeDir,
+    }).status;
+    expect(sdkStatus).toBe('user-owned');
+    expect(cjsStatus).toBe('user-owned');
+    expect(sdkStatus).toBe(cjsStatus);
   });
 });

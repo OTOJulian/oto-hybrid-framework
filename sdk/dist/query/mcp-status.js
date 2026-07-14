@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { isAbsolute, join } from 'node:path';
 import { planningPaths } from './helpers.js';
 import { detectKeySource } from './secrets.js';
 const RUNTIMES = {
@@ -83,10 +83,67 @@ function readLiveEntry(runtimeName, target) {
         return { entry: null, external: false, detail: 'unparseable' };
     }
 }
+// OTO Phase 15 gap closure (WR-01): CJS-equivalent install-state validation (port of bin/lib/install-state.cjs) — fingerprints establish ownership only through schema-valid state.
+function isPlainObject(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+function isSafeRelativePath(p) {
+    return !isAbsolute(p) && !p.split(/[\\/]+/).includes('..');
+}
+export function validateInstallState(state) {
+    if (!isPlainObject(state))
+        return false;
+    if (state.version !== 1)
+        return false;
+    if (typeof state.oto_version !== 'string')
+        return false;
+    if (typeof state.installed_at !== 'string')
+        return false;
+    if (!['claude', 'codex', 'gemini'].includes(state.runtime))
+        return false;
+    if (typeof state.config_dir !== 'string')
+        return false;
+    if (!Array.isArray(state.files))
+        return false;
+    for (const f of state.files) {
+        if (!isPlainObject(f))
+            return false;
+        if (typeof f.path !== 'string' || f.path.length === 0 || !isSafeRelativePath(f.path))
+            return false;
+        if (typeof f.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(f.sha256))
+            return false;
+    }
+    const instruction = state.instruction_file;
+    if (!isPlainObject(instruction))
+        return false;
+    if (typeof instruction.path !== 'string' || instruction.path.length === 0 || !isSafeRelativePath(instruction.path))
+        return false;
+    if (state.hooks !== undefined) {
+        if (!isPlainObject(state.hooks) || typeof state.hooks.version !== 'string')
+            return false;
+    }
+    if (state.mcp !== undefined) {
+        if (!isPlainObject(state.mcp))
+            return false;
+        for (const record of Object.values(state.mcp)) {
+            if (!isPlainObject(record))
+                return false;
+            if (typeof record.target !== 'string' || record.target.length === 0)
+                return false;
+            if (typeof record.registered_at !== 'string')
+                return false;
+            if (!isPlainObject(record.entry) && typeof record.entry !== 'string')
+                return false;
+        }
+    }
+    return true;
+}
 function readFingerprint(configDir) {
     try {
         const state = JSON.parse(readFileSync(join(configDir, 'oto', '.install.json'), 'utf8'));
-        return state?.mcp?.exa?.entry ?? null;
+        if (!validateInstallState(state))
+            return null;
+        return state.mcp?.exa?.entry ?? null;
     }
     catch {
         return null;
