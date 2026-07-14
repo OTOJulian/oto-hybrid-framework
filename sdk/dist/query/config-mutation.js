@@ -24,7 +24,7 @@ import { GSDError, ErrorClassification } from '../errors.js';
 import { VALID_PROFILES, getAgentToModelMapForProfile } from './config-query.js';
 import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
-import { INTEGRATIONS, integrationForConfigKey, maskSecret, migrateLegacyIntegrationKeys, reconcileNewProjectIntegrations, validateIntegrationValue, warnIfNoKeyDetected, } from './secrets.js';
+import { INTEGRATIONS, detectKeySource, integrationForConfigKey, maskSecret, migrateLegacyIntegrationKeys, reconcileNewProjectIntegrations, validateIntegrationValue, warnIfNoKeyDetected, } from './secrets.js';
 import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 // Phase 14 gap-closure (CR-02 / SECR-01/02): config-new-project accepts
 // only documented keys from its materialized defaults plus its three
@@ -393,10 +393,11 @@ export const configNewProject = async (args, projectDir, workstream) => {
     catch {
         // No global defaults — continue with hardcoded defaults only
     }
-    // Detect API key availability (boolean only) — keyfiles live in ~/.oto (Phase 14, D-08)
-    const hasBraveSearch = !!(process.env.BRAVE_API_KEY || existsSync(join(homeDir, '.oto', 'brave_api_key')));
-    const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY || existsSync(join(homeDir, '.oto', 'firecrawl_api_key')));
-    const hasExaSearch = !!(process.env.EXA_API_KEY || existsSync(join(homeDir, '.oto', 'exa_api_key')));
+    // OTO Phase 15 (FRESH-WR-04): canonical usability check — empty/dangling keyfiles are not keys.
+    const keyfileBase = join(homeDir, '.oto');
+    const hasBraveSearch = detectKeySource('brave', keyfileBase).source !== null;
+    const hasFirecrawl = detectKeySource('firecrawl', keyfileBase).source !== null;
+    const hasExaSearch = detectKeySource('exa', keyfileBase).source !== null;
     // Build default config
     const defaults = {
         model_profile: 'balanced',

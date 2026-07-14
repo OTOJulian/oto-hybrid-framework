@@ -27,6 +27,7 @@ import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
 import {
   INTEGRATIONS,
+  detectKeySource,
   integrationForConfigKey,
   maskSecret,
   migrateLegacyIntegrationKeys,
@@ -460,10 +461,11 @@ export const configNewProject: QueryHandler = async (args, projectDir, workstrea
     // No global defaults — continue with hardcoded defaults only
   }
 
-  // Detect API key availability (boolean only) — keyfiles live in ~/.oto (Phase 14, D-08)
-  const hasBraveSearch = !!(process.env.BRAVE_API_KEY || existsSync(join(homeDir, '.oto', 'brave_api_key')));
-  const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY || existsSync(join(homeDir, '.oto', 'firecrawl_api_key')));
-  const hasExaSearch = !!(process.env.EXA_API_KEY || existsSync(join(homeDir, '.oto', 'exa_api_key')));
+  // OTO Phase 15 (FRESH-WR-04): canonical usability check — empty/dangling keyfiles are not keys.
+  const keyfileBase = join(homeDir, '.oto');
+  const hasBraveSearch = detectKeySource('brave', keyfileBase).source !== null;
+  const hasFirecrawl = detectKeySource('firecrawl', keyfileBase).source !== null;
+  const hasExaSearch = detectKeySource('exa', keyfileBase).source !== null;
 
   // Build default config
   const defaults: Record<string, unknown> = {

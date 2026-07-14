@@ -26,6 +26,7 @@ import { resolveModel } from './config-query.js';
 import { planningPaths, normalizePhaseName, phaseTokenMatches, toPosixPath, planningRootName } from './helpers.js';
 import { getMilestoneInfo, extractCurrentMilestone, extractNextMilestoneSection, extractPhasesFromSection, } from './roadmap.js';
 import { withProjectRoot } from './init.js';
+import { detectKeySource } from './secrets.js';
 // ─── Internal helpers ──────────────────────────────────────────────────────
 /**
  * Get model alias string from resolveModel result.
@@ -79,14 +80,11 @@ function deriveStatusFromCheckbox(phaseNum, checkboxStates) {
  */
 export const initNewProject = async (_args, projectDir, workstream) => {
     const config = await loadConfig(projectDir, workstream);
-    // Detect search API key availability from env vars and ~/.gsd/ files
-    const gsdHome = join(homedir(), '.gsd');
-    const hasBraveSearch = !!(process.env.BRAVE_API_KEY ||
-        existsSync(join(gsdHome, 'brave_api_key')));
-    const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY ||
-        existsSync(join(gsdHome, 'firecrawl_api_key')));
-    const hasExaSearch = !!(process.env.EXA_API_KEY ||
-        existsSync(join(gsdHome, 'exa_api_key')));
+    // OTO Phase 15 (FRESH-WR-04): canonical usability check — empty/dangling keyfiles are not keys.
+    const keyfileBase = join(homedir(), '.oto');
+    const hasBraveSearch = detectKeySource('brave', keyfileBase).source !== null;
+    const hasFirecrawl = detectKeySource('firecrawl', keyfileBase).source !== null;
+    const hasExaSearch = detectKeySource('exa', keyfileBase).source !== null;
     // Detect existing code (depth-limited scan, no external tools)
     const codeExtensions = new Set([
         '.ts', '.js', '.py', '.go', '.rs', '.swift', '.java',

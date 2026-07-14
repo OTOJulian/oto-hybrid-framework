@@ -6,7 +6,7 @@
  * committed config stores booleans while API keys live in env vars or 0600
  * keyfiles under ~/.oto.
  */
-import { chmodSync, closeSync, constants, existsSync, lstatSync, mkdirSync, openSync, readFileSync, unlinkSync, writeSync, } from 'node:fs';
+import { chmodSync, closeSync, constants, existsSync, lstatSync, mkdirSync, openSync, readFileSync, statSync, unlinkSync, writeSync, } from 'node:fs';
 import { readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -86,14 +86,30 @@ export function writeKeyfile(slug, value, baseDir) {
 }
 export function readKeyfile(slug, baseDir) {
     const target = keyfilePath(slug, baseDir);
-    // Phase 14 gap-closure (WR-07): lstat and refuse non-regular files
-    // BEFORE any chmod — chmodSync would dereference a planted symlink.
+    // OTO Phase 15 (D-15/FRESH-WR-04): read path follows symlinks to regular
+    // files; write path keeps O_NOFOLLOW (WR-07). See decisions/ADR-16.
     let st;
     try {
         st = lstatSync(target);
     }
     catch {
         return null; // ENOENT — no keyfile
+    }
+    if (st.isSymbolicLink()) {
+        let followed;
+        try {
+            followed = statSync(target);
+        }
+        catch {
+            process.stderr.write(`refusing to read ${target}: dangling symlink — remove it and re-set via /oto-settings-integrations\n`);
+            return null;
+        }
+        if (!followed.isFile()) {
+            process.stderr.write(`refusing to read ${target}: not a regular file — remove it and re-set via /oto-settings-integrations\n`);
+            return null;
+        }
+        const value = readFileSync(target, 'utf8').trim();
+        return value === '' ? null : { value, healed: false };
     }
     if (!st.isFile()) {
         process.stderr.write(`refusing to read ${target}: not a regular file — remove it and re-set via /oto-settings-integrations\n`);
