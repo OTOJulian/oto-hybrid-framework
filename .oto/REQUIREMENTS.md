@@ -18,7 +18,7 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 
 - [ ] **MCP-01**: User is asked for consent before any MCP registration; nothing registers silently and the default is No
 - [x] **MCP-02**: Transport/auth decision (launcher-stdio vs remote HTTP) is recorded as an ADR before registration is implemented
-- [ ] **MCP-03**: Exa MCP server is registered as `exa` in Claude Code user scope (`~/.claude.json`) via additive JSON merge — never by shelling out to `claude mcp add`
+- [x] **MCP-03**: Exa MCP server is registered as `exa` in Claude Code user scope (`~/.claude.json`) via additive JSON merge — never by shelling out to `claude mcp add`
 - [ ] **MCP-04**: Exa MCP server is registered in Codex via an OTO-marker `[mcp_servers.exa]` block in `~/.codex/config.toml`, refusing to write when an external duplicate exists
 - [ ] **MCP-05**: Exa MCP server is registered in Gemini via `mcpServers.exa` in `~/.gemini/settings.json` using the transport shape that avoids the `url`-vs-`httpUrl` SSE trap
 - [x] **MCP-06**: Registration exposes exactly the pinned tool set (`web_search_exa`, `web_fetch_exa`, `web_search_advanced_exa`) — no deprecated or sales-oriented tools
@@ -37,7 +37,7 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 ### Hardening (HARD)
 
 - [ ] **HARD-01**: With no key or server present, research flows complete with zero user-facing errors via the Brave/WebSearch fallback (regression floor)
-- [ ] **HARD-02**: `node:test` coverage exists for adapter merge/unmerge round-trips, boolean config validation, and a no-plaintext-key-in-tracked-files guard
+- [x] **HARD-02**: `node:test` coverage exists for adapter merge/unmerge round-trips, boolean config validation, and a no-plaintext-key-in-tracked-files guard
 - [ ] **HARD-03**: The generated runtime matrix gains an Exa MCP row per runtime, and docs cover setup with qualitative (not hard-coded) rate-limit phrasing
 - [ ] **HARD-04**: An end-to-end check verifies `mcp__exa__*` tools actually reach a tools-restricted subagent (guards the claude-code#13898 regression class)
 - [ ] **HARD-05**: `oto sync --dry-run` conflict-surface check passes at milestone close (this milestone touches GSD-shared files)
@@ -79,14 +79,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SECR-04 | Phase 14 | Complete |
 | MCP-01 | Phase 15 | Pending |
 | MCP-02 | Phase 15 | Complete |
-| MCP-03 | Phase 15 | Pending |
+| MCP-03 | Phase 15 | Complete |
 | MCP-04 | Phase 15 | Pending |
 | MCP-05 | Phase 15 | Pending |
 | MCP-06 | Phase 15 | Complete |
 | MCP-07 | Phase 15 | Complete |
 | MCP-08 | Phase 15 | Pending |
 | MCP-09 | Phase 15 | Pending |
-| HARD-02 | Phase 15 | Pending |
+| HARD-02 | Phase 15 | Complete |
 | GUID-01 | Phase 16 | Pending |
 | GUID-02 | Phase 16 | Pending |
 | GUID-03 | Phase 16 | Pending |

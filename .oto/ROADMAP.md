@@ -134,7 +134,7 @@ Plans:
 - [x] 15-02-PLAN.md — D-15 key-usability rule in CJS + SDK secrets helpers; bare-existsSync defect sites fixed (FRESH-WR-04)
 - [x] 15-03-PLAN.md — Self-contained launcher oto/hooks/oto-exa-mcp.js (pin @3.2.1, 3-tool arg, env-only key) via build-hooks channel
 - [x] 15-04-PLAN.md — Codex OTO-marker [mcp_servers.exa] block + adapter hooks + byte-identical round-trip (HARD-02 hard gate)
-- [ ] 15-05-PLAN.md — Claude mergeMcp/unmergeMcp on resolved .claude.json (env-based CLAUDE_CONFIG_DIR resolution)
+- [x] 15-05-PLAN.md — Claude mergeMcp/unmergeMcp on resolved .claude.json (env-based CLAUDE_CONFIG_DIR resolution)
 - [ ] 15-06-PLAN.md — Gemini mergeMcp/unmergeMcp (stdio shape, no url/httpUrl, enableAgents-independent)
 - [ ] 15-07-PLAN.md — install.cjs dispatch + .install.json mcp fingerprints + install/uninstall lifecycle round-trips (MCP-07/08)
 - [ ] 15-08-PLAN.md — Consent gate: flags, ~/.oto/mcp-consent.json persistence, TTY prompt default No, empty-stdin pre-warm (MCP-01)
@@ -174,7 +174,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
-| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 3/10 | In Progress|  |
+| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 5/10 | In Progress|  |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
 ---
