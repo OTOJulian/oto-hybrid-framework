@@ -2,10 +2,10 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: verifying
-stopped_at: "Phase 15 bounded-convergence stop: local verifier scored 5/10 with 3 blockers; developer decision required"
-last_updated: "2026-07-14T20:45:15Z"
-last_activity: 2026-07-14 -- Phase 15 local verification completed; bounded-convergence stop recorded
+status: ready_to_plan
+stopped_at: "Phase 15 disposition-authorized closure verified at 10/10; ready to plan Phase 16"
+last_updated: "2026-07-14T20:58:53Z"
+last_activity: 2026-07-14 -- Phase 15 scoped closure verification passed; Phase 16 is ready to plan
 progress:
   total_phases: 3
   completed_phases: 2
@@ -22,20 +22,20 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 15 — exa-mcp-registration-all-three-runtimes
+**Current focus:** Phase 16 — agent-guidance-+-hardening
 
 ## Current Position
 
-Phase: 15 (exa-mcp-registration-all-three-runtimes) — VERIFYING
-Plan: 12 of 12
-Status: Developer decision required — fresh local verification is gaps_found at 5/10 with 3 blockers
-Last activity: 2026-07-14 -- Local verifier completed all 10 checks; bounded-convergence stop recorded
+Phase: 16
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-14 -- Phase 15 closure verified at 10/10; CR-01, CR-02, and WR-01 closed; WR-02 deferred
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 15 is NOT complete. The authorized local verifier retry reports `gaps_found` at 5/10 with three blocking findings: Codex logical TOML collision/status handling, Gemini JSONC string corruption, and Gemini partial-install rollback. The blocker count increased, so bounded convergence has stopped. Review `15-DISPOSITIONS.md` and record a developer decision before any more gap planning, implementation, or verification.
+Phase 15 is complete after the developer-authorized scoped closure passed at 10/10. Phase 16 has no CONTEXT.md yet, so the recommended next command is `/oto-discuss-phase 16`.
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Phase 15 is NOT complete. The authorized local verifier retry reports `gaps_foun
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 14 | 19 | - | - |
+| 15 | 12 | - | - |
 
 *Updated after each plan completion*
 | Phase 14 P01 | 8 min | 2 tasks | 5 files |

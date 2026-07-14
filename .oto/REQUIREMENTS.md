@@ -19,7 +19,7 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 - [x] **MCP-01**: User is asked for consent before any MCP registration; nothing registers silently and the default is No
 - [x] **MCP-02**: Transport/auth decision (launcher-stdio vs remote HTTP) is recorded as an ADR before registration is implemented
 - [x] **MCP-03**: Exa MCP server is registered as `exa` in Claude Code user scope (`~/.claude.json`) via additive JSON merge — never by shelling out to `claude mcp add`
-- [ ] **MCP-04**: Exa MCP server is registered in Codex via an OTO-marker `[mcp_servers.exa]` block in `~/.codex/config.toml`, refusing to write when an external duplicate exists
+- [x] **MCP-04**: Exa MCP server is registered in Codex via an OTO-marker `[mcp_servers.exa]` block in `~/.codex/config.toml`, refusing to write when an external duplicate exists
 - [x] **MCP-05**: Exa MCP server is registered in Gemini via `mcpServers.exa` in `~/.gemini/settings.json` using the transport shape that avoids the `url`-vs-`httpUrl` SSE trap
 - [x] **MCP-06**: Registration exposes exactly the pinned tool set (`web_search_exa`, `web_fetch_exa`, `web_search_advanced_exa`) — no deprecated or sales-oriented tools
 - [x] **MCP-07**: Registration is idempotent (re-install and re-run never duplicate entries) and conditional on a detected key
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MCP-01 | Phase 15 | Complete |
 | MCP-02 | Phase 15 | Complete |
 | MCP-03 | Phase 15 | Complete |
-| MCP-04 | Phase 15 | Pending |
+| MCP-04 | Phase 15 | Complete |
 | MCP-05 | Phase 15 | Complete |
 | MCP-06 | Phase 15 | Complete |
 | MCP-07 | Phase 15 | Complete |

@@ -1,34 +1,35 @@
 ---
 phase: 15-exa-mcp-registration-all-three-runtimes
-status: developer_decision_required
-updated: "2026-07-14T20:45:15Z"
+status: closure_verified
+updated: "2026-07-14T20:58:53Z"
 source:
   - 15-REVIEW.md
   - 15-VERIFICATION.md
-verification_score: "5/10"
-blocking_findings: 3
-bounded_convergence: stopped
+verification_score: "10/10"
+blocking_findings: 0
+bounded_convergence: developer_authorized_closure
+closure_commit: "802052797cbe3be65cbf764b8f40b1b73bc6185b"
 ---
 
 # Phase 15 Bounded-Convergence Dispositions
 
-The authorized local verifier retry completed all ten requirement checks and independently reproduced the fresh review findings. The blocker count increased from two in the prior verification to three in the current `5/10` verification. Per the execute-phase bounded-convergence contract, Phase 15 is not complete and no further automatic gap or verification loop may start without a developer decision.
+The developer approved the bounded-convergence dispositions on 2026-07-14: CR-01 **FIX**, CR-02 **FIX**, WR-01 **FIX**, and WR-02 **DEFER** as tracked fixture debt. The authorized closure was implemented in `8020527` and re-verified only against the changed files and the three reproductions from `15-VERIFICATION.md`; no new gap cycle or full phase re-sweep was run.
 
-The dispositions below are proposed by severity and evidence. `FIX` and `DEFER` indicate the recommended route, but implementation remains stopped pending explicit developer approval.
+| ID | Severity | Approved disposition | Result | Closure evidence |
+|---|---|---|---|---|
+| CR-01 | Critical | **FIX** | **CLOSED** | Conservative TOML-key inspection recognizes bare, quoted-parent, quoted-child, dotted-assignment, and inline-table Exa definitions. Ambiguous TOML returns `unparseable`; registration preserves input bytes and records no ownership. CJS lifecycle/status and built SDK status probes pass. |
+| CR-02 | Critical | **FIX** | **CLOSED** | All three unsafe CJS block-comment regex sites now use one fail-closed JSONC helper. When strict JSON needs fallback and block-comment delimiters are present, merge, unmerge, and status refuse without writing. Claude, Gemini register/unregister, CJS status, and SDK status probes pass. |
+| WR-01 | Warning promoted to blocker | **FIX** | **CLOSED** | Gemini dry-runs the exact settings transformation before payload copy or marker injection. Null/primitive-root failures leave no commands, hooks, `GEMINI.md`, or `.install.json`, and preserve `settings.json` bytes. |
+| WR-02 | Warning | **DEFER** | **TRACKED DEBT** | The stale SDK workstream fixtures and missing local Rollup optional package remain outside this closure. The fresh Vitest attempt failed before collection on `@rollup/rollup-darwin-x64`; TypeScript build and direct built-SDK probes passed. |
 
-| ID | Severity | Disposition | Requirements | Evidence | Required closure |
-|---|---|---|---|---|---|
-| CR-01 | Critical | **FIX** | MCP-04, MCP-07, MCP-09 | Valid quoted and dotted Codex Exa definitions are missed; OTO appends a duplicate logical table, Python `tomllib` rejects the result, and both CJS and shipped SDK report `not-registered`. | Detect logical TOML keys across quoted segments, dotted assignments, and inline tables; fail closed on ambiguity; add adapter, lifecycle, CJS-status, and SDK-status regressions. |
-| CR-02 | Critical | **FIX** | MCP-05, MCP-08 | Gemini's regex JSONC fallback deletes literal `/* ... */` text inside unrelated strings during both registration and unregistration. | Replace regex stripping with a string-aware JSONC parser/tokenizer or refuse before writes; add semantic-preservation tests for register, unregister, and status. |
-| WR-01 | Warning promoted to blocker | **FIX** | MCP-08 | A Gemini settings-root failure leaves copied payload and `GEMINI.md` without `.install.json`; state-driven uninstall cannot discover the partial installation. | Preflight Gemini settings before payload/marker mutation or roll back all pre-commit writes; test that failed installs leave no payload, marker, or state. |
-| WR-02 | Warning | **DEFER** | Test/fixture debt | Scoped SDK workstream fixtures still construct unmarked `.planning/` roots and use `gsd_state_version`; production OTO-root behavior is coherent, but the scoped SDK gate remains red. | Repair fixtures in a separately authorized bounded task or include them explicitly in the approved Phase 15 closure scope; restore the local Rollup optional dependency before rerunning Vitest. |
+## Scoped Closure Evidence
 
-## Developer Decision Required
+- RED gate before implementation: 16 focused CJS failures and 4 SDK status-mirror failures reproduced the approved findings.
+- Fresh post-commit closure suite: 135 passed, 0 failed.
+- Adjacent changed-file installer/runtime suite: 27 passed, 0 failed.
+- SDK TypeScript build: passed.
+- Direct freshly built SDK probe: all four Codex spellings reported `user-owned`; ambiguous Gemini JSONC reported `detail: unparseable`.
+- Focused SDK Vitest: blocked before collection by the deferred WR-02 Rollup dependency defect; it was not repaired mid-phase.
+- `INTERVIEW-BRIEF-oto.md` remained untouched.
 
-Choose the authorized next route before any more Phase 15 work:
-
-1. Approve the proposed dispositions and authorize targeted closure planning for CR-01, CR-02, and WR-01, with an explicit decision on whether WR-02 joins that scope.
-2. Change one or more dispositions to ACCEPT or DEFER with rationale and evidence.
-3. Stop Phase 15 and revise milestone scope.
-
-Do not mark Phase 15 complete, start another verifier, or launch another blind gap cycle until this decision is recorded.
+No further Phase 15 gap work is authorized or required by these dispositions.

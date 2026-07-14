@@ -28,7 +28,7 @@ last_shipped_date: 2026-05-26
 **Milestone Goal:** Activate and finish oto's latent Exa integration so research-heavy agents use semantic search with inline content across all three runtimes — per-runtime MCP registration, a fixed key-storage story, extended agent guidance, and shipping-standard tests/matrix/docs.
 
 - [ ] **Phase 14: Key Storage Reconciliation** - Integration API keys live only in the 0600 keyfile or env var; committed config holds booleans only, enforced in both write paths with self-healing migration
-- [ ] **Phase 15: Exa MCP Registration (All Three Runtimes)** - Consent-gated, idempotent, fingerprint-tracked `exa` server registration in Claude Code, Codex, and Gemini via oto's adapters, with round-trip test coverage
+- [x] **Phase 15: Exa MCP Registration (All Three Runtimes)** - Consent-gated, idempotent, fingerprint-tracked `exa` server registration in Claude Code, Codex, and Gemini via oto's adapters, with round-trip test coverage — completed 2026-07-14
 - [ ] **Phase 16: Agent Guidance + Hardening** - Shared runtime-neutral search guidance consumed by five agents, fallback regression floor, subagent e2e check, runtime-matrix row, docs, and sync hygiene
 
 <details>
@@ -176,7 +176,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
-| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 12/12 | Complete   | 2026-07-14 |
+| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 12/12 | Complete    | 2026-07-14 |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
 ---
