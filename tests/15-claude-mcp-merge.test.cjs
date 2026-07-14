@@ -133,3 +133,89 @@ test('mergeMcp refuses unparseable JSON without changing file bytes', async (t) 
   });
   assert.equal(fs.readFileSync(target, 'utf8'), before);
 });
+
+test('Claude MCP round-trip restores the original object graph', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const original = {
+    projects: { '/work/repo': { allowedTools: ['Read', 'Write'] } },
+    onboarding: { complete: true },
+    numStartups: 8,
+    mcpServers: { other: { type: 'http', url: 'https://example.test/mcp' } },
+  };
+  fs.writeFileSync(target, JSON.stringify(original, null, 4) + '\n');
+
+  const merged = await claudeAdapter.mergeMcp(mergeContext(configDir));
+  const result = await claudeAdapter.unmergeMcp({
+    configDir: path.join(configDir, 'ignored-settings-dir'),
+    env: { CLAUDE_CONFIG_DIR: configDir },
+    priorEntry: merged.entry,
+  });
+
+  assert.deepEqual(result, { removed: true, skipped: null, target });
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, 'utf8')), original);
+});
+
+test('Claude MCP drift is reported and the edited entry is left in place', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const merged = await claudeAdapter.mergeMcp(mergeContext(configDir));
+  const state = JSON.parse(fs.readFileSync(target, 'utf8'));
+  state.mcpServers.exa.args = ['/custom/edited-launcher.js'];
+  fs.writeFileSync(target, JSON.stringify(state, null, 2));
+  const before = fs.readFileSync(target, 'utf8');
+
+  const writes = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    writes.push(String(chunk));
+    return true;
+  };
+  let result;
+  try {
+    result = await claudeAdapter.unmergeMcp({
+      env: { CLAUDE_CONFIG_DIR: configDir },
+      priorEntry: merged.entry,
+    });
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+
+  assert.deepEqual(result, { removed: false, skipped: { reason: 'drifted' }, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), before);
+  assert.equal(writes.join(''), 'oto: exa entry was modified since oto registered it — left in place.\n');
+});
+
+test('Claude MCP user-owned unmerge skips a live entry when priorEntry is null', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const userEntry = { type: 'http', url: 'https://mcp.exa.ai/mcp' };
+  fs.writeFileSync(target, JSON.stringify({ mcpServers: { exa: userEntry } }, null, 2));
+  const before = fs.readFileSync(target, 'utf8');
+
+  const originalWrite = process.stderr.write;
+  process.stderr.write = () => true;
+  let result;
+  try {
+    result = await claudeAdapter.unmergeMcp({
+      env: { CLAUDE_CONFIG_DIR: configDir },
+      priorEntry: null,
+    });
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+
+  assert.deepEqual(result, { removed: false, skipped: { reason: 'user-owned' }, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), before);
+});
+
+test('Claude MCP double-merge is byte-identical and idempotent', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const ctx = mergeContext(configDir);
+
+  const first = await claudeAdapter.mergeMcp(ctx);
+  const afterFirst = fs.readFileSync(target, 'utf8');
+  const second = await claudeAdapter.mergeMcp({ ...ctx, priorEntry: first.entry });
+  const afterSecond = fs.readFileSync(target, 'utf8');
+
+  assert.equal(first.registered, true);
+  assert.equal(second.registered, true);
+  assert.equal(afterSecond, afterFirst);
+});
