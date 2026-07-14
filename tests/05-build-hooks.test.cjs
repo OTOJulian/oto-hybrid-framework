@@ -9,6 +9,7 @@ const { spawnSync } = require('node:child_process');
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 const KEEP_HOOKS = [
+  'oto-exa-mcp.js',
   'oto-session-start',
   'oto-statusline.js',
   'oto-context-monitor.js',
@@ -17,7 +18,7 @@ const KEEP_HOOKS = [
   'oto-validate-commit.sh',
 ];
 
-test('phase-05 build-hooks: emits 6 files into oto/hooks/dist with exec bits intact', () => {
+test('phase-05 build-hooks: emits expected files into oto/hooks/dist with exec bits intact', () => {
   const distDir = path.join(REPO_ROOT, 'oto', 'hooks', 'dist');
   fs.rmSync(distDir, { recursive: true, force: true });
 
