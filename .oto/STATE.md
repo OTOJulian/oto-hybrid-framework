@@ -3,17 +3,16 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Completed 15-05-PLAN.md
-last_updated: "2026-07-14T01:40:43.893Z"
+stopped_at: Completed 15-06-PLAN.md
+last_updated: "2026-07-14T01:49:35.352Z"
 last_activity: 2026-07-14
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 29
-  completed_plans: 24
-  percent: 83
+  completed_plans: 25
+  percent: 86
 ---
-
 # Project State
 
 ## Project Reference
@@ -27,11 +26,11 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
-Plan: 6 of 10
+Plan: 7 of 10
 Status: Ready to execute
 Last activity: 2026-07-14
 
-Progress: [████████░░] 83%
+Progress: [█████████░] 86%
 
 ## Next Command
 
@@ -61,6 +60,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 15 P03 | 3 min | 2 tasks | 4 files |
 | Phase 15 P04 | 7 min | 2 tasks | 3 files |
 | Phase 15 P05 | 5 min | 2 tasks | 2 files |
+| Phase 15 P06 | 9 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -94,6 +94,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 15]: Codex MCP unmerge requires an exact inner-block fingerprint match. — User-owned or drifted entries remain untouched.
 - [Phase 15]: Claude MCP registration resolves .claude.json exclusively from CLAUDE_CONFIG_DIR or HOME, independent of the installer settings directory. — Claude Code reads this live state file outside settingsFilename, so registration must follow the runtime environment rather than ctx.configDir.
 - [Phase 15]: Claude state is rewritten only after strict JSON parsing and ownership checks; drifted, user-owned, and unparseable content remains untouched. — Claude's state file contains user history and onboarding data, making additive preservation and fingerprint-gated removal mandatory.
+- [Phase 15]: Gemini MCP registration is separate from mergeSettings, so experimental.enableAgents false cannot suppress Exa registration. — Keeps MCP availability independent from agent-dependent hook settings.
+- [Phase 15]: Gemini Exa entries contain only command and args, with exact parsed entries used as ownership fingerprints. — Avoids the SSE URL trap and preserves user-owned or drifted entries.
 
 ### Pending Todos
 
@@ -123,8 +125,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T01:40:21.665Z
-Stopped at: Completed 15-05-PLAN.md
+Last session: 2026-07-14T01:49:35.348Z
+Stopped at: Completed 15-06-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed
