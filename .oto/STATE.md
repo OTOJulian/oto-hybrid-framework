@@ -3,15 +3,15 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Completed 15-03-PLAN.md
-last_updated: "2026-07-14T01:23:35.547Z"
+stopped_at: Completed 15-04-PLAN.md
+last_updated: "2026-07-14T01:33:49.735Z"
 last_activity: 2026-07-14
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 29
-  completed_plans: 22
-  percent: 76
+  completed_plans: 23
+  percent: 79
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
-Plan: 4 of 10
+Plan: 5 of 10
 Status: Ready to execute
 Last activity: 2026-07-14
 
-Progress: [████████░░] 76%
+Progress: [████████░░] 79%
 
 ## Next Command
 
@@ -59,6 +59,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 15 P01 | 8 min | 2 tasks | 2 files |
 | Phase 15 P02 | 5 min | 2 tasks | 18 files |
 | Phase 15 P03 | 3 min | 2 tasks | 4 files |
+| Phase 15 P04 | 7 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 15]: D-15 read paths follow symlinks only to regular non-empty files without chmod-healing targets. — Supports password-manager-managed files while rejecting dangling and non-regular objects.
 - [Phase 15]: WR-07 write paths retain lstat and O_NOFOLLOW symlink refusal. — Read usability does not weaken the established write-through-symlink boundary.
 - [Phase 15]: All key availability gates use detectKeySource rather than bare filesystem existence. — Empty and dangling keyfiles must not enable integrations or registration.
+- [Phase 15]: Codex MCP registration uses a separate marker block from hooks. — Hook refreshes cannot overwrite the Exa entry.
+- [Phase 15]: Codex MCP unmerge requires an exact inner-block fingerprint match. — User-owned or drifted entries remain untouched.
 
 ### Pending Todos
 
@@ -117,8 +120,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T01:23:35.544Z
-Stopped at: Completed 15-03-PLAN.md
+Last session: 2026-07-14T01:33:33.493Z
+Stopped at: Completed 15-04-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed

@@ -133,7 +133,7 @@ Plans:
 - [x] 15-01-PLAN.md — ADR-16 transport decision (launcher-stdio) + structural/content test
 - [x] 15-02-PLAN.md — D-15 key-usability rule in CJS + SDK secrets helpers; bare-existsSync defect sites fixed (FRESH-WR-04)
 - [x] 15-03-PLAN.md — Self-contained launcher oto/hooks/oto-exa-mcp.js (pin @3.2.1, 3-tool arg, env-only key) via build-hooks channel
-- [ ] 15-04-PLAN.md — Codex OTO-marker [mcp_servers.exa] block + adapter hooks + byte-identical round-trip (HARD-02 hard gate)
+- [x] 15-04-PLAN.md — Codex OTO-marker [mcp_servers.exa] block + adapter hooks + byte-identical round-trip (HARD-02 hard gate)
 - [ ] 15-05-PLAN.md — Claude mergeMcp/unmergeMcp on resolved .claude.json (env-based CLAUDE_CONFIG_DIR resolution)
 - [ ] 15-06-PLAN.md — Gemini mergeMcp/unmergeMcp (stdio shape, no url/httpUrl, enableAgents-independent)
 - [ ] 15-07-PLAN.md — install.cjs dispatch + .install.json mcp fingerprints + install/uninstall lifecycle round-trips (MCP-07/08)
