@@ -52,15 +52,15 @@ function createSymlinkFixture(t) {
   return { root, base, victim, target };
 }
 
-test('readKeyfile refuses a symlink without reading or re-moding its victim', (t) => {
+test('readKeyfile follows a symlink to a regular file without re-moding its victim', (t) => {
   const { base, victim } = createSymlinkFixture(t);
 
   const result = captureStderr(() => readKeyfile('exa', base));
 
-  assert.equal(result.value, null);
+  assert.deepEqual(result.value, { value: 'victim-content', healed: false });
   assert.equal(fs.readFileSync(victim, 'utf8'), 'victim-content');
   assert.equal(fs.statSync(victim).mode & 0o777, 0o644);
-  assert.match(result.output, /not a regular file/);
+  assert.equal(result.output, '');
 });
 
 test('writeKeyfile refuses a symlink without overwriting its victim', (t) => {
