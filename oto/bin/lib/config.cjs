@@ -16,6 +16,7 @@ const {
   maskSecret,
   validateIntegrationValue,
   warnIfNoKeyDetected,
+  detectKeySource,
   migrateLegacyIntegrationKeys,
   reconcileNewProjectIntegrations,
 } = require('./secrets.cjs');
@@ -84,13 +85,11 @@ function buildNewProjectConfig(userChoices) {
   const choices = userChoices || {};
   const homedir = require('os').homedir();
 
-  // Detect API key availability
-  const braveKeyFile = path.join(homedir, '.oto', 'brave_api_key');
-  const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
-  const firecrawlKeyFile = path.join(homedir, '.oto', 'firecrawl_api_key');
-  const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY || fs.existsSync(firecrawlKeyFile));
-  const exaKeyFile = path.join(homedir, '.oto', 'exa_api_key');
-  const hasExaSearch = !!(process.env.EXA_API_KEY || fs.existsSync(exaKeyFile));
+  // OTO Phase 15 (FRESH-WR-04): canonical usability check — empty/dangling
+  // keyfiles are not keys.
+  const hasBraveSearch = detectKeySource('brave').source !== null;
+  const hasFirecrawl = detectKeySource('firecrawl').source !== null;
+  const hasExaSearch = detectKeySource('exa').source !== null;
 
   // Load user-level defaults from ~/.oto/defaults.json if available
   const globalDefaultsPath = path.join(homedir, '.oto', 'defaults.json');

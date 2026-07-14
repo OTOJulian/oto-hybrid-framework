@@ -75,7 +75,7 @@ test('writeKeyfile refuses a symlink without overwriting its victim', (t) => {
 test('migration fails closed when the destination keyfile is a symlink', (t) => {
   const { root, base, victim } = createSymlinkFixture(t);
   const configPath = writeConfig(root, {
-    exa_search: 'sk-legacy-gap2-0123456789',
+    exa_search: 'victim-content',
   });
   const before = fs.readFileSync(configPath, 'utf8');
 
