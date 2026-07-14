@@ -188,3 +188,38 @@ test('Gemini MCP unmerge reports absent without creating settings', async (t) =>
   assert.deepEqual(result, { removed: false, skipped: { reason: 'absent' }, target });
   assert.equal(fs.existsSync(target), false);
 });
+
+test('Gemini mergeSettings and MCP hooks coexist and restore user content', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const original = {
+    theme: 'dark',
+    experimental: { enableAgents: true },
+    hooks: {
+      BeforeTool: [{ matcher: 'user_tool', hooks: [{ type: 'command', command: 'echo user' }] }],
+    },
+    mcpServers: {
+      other: { command: 'other-server', args: ['--stdio'] },
+    },
+  };
+  const settingsCtx = {
+    configDir,
+    otoVersion: '0.5.0',
+    installedAt: '2026-07-14T00:00:00.000Z',
+  };
+  fs.writeFileSync(target, geminiAdapter.mergeSettings(JSON.stringify(original), settingsCtx));
+
+  const mcp = await geminiAdapter.mergeMcp(mergeContext(configDir));
+  const coexist = JSON.parse(fs.readFileSync(target, 'utf8'));
+
+  assert.ok(coexist._oto.hooks.length > 0);
+  assert.ok(coexist.hooks.SessionStart.length > 0);
+  assert.ok(coexist.hooks.BeforeTool.some((entry) => entry.matcher === 'user_tool'));
+  assert.ok(coexist.hooks.BeforeTool.some((entry) => entry.matcher === 'write_file|replace'));
+  assert.deepEqual(coexist.mcpServers.exa, mcp.entry);
+  assert.deepEqual(coexist.mcpServers.other, original.mcpServers.other);
+
+  await geminiAdapter.unmergeMcp({ configDir, priorEntry: mcp.entry });
+  const restoredText = geminiAdapter.unmergeSettings(fs.readFileSync(target, 'utf8'), settingsCtx);
+
+  assert.deepEqual(JSON.parse(restoredText), original);
+});
