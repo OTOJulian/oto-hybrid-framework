@@ -2,10 +2,10 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
-stopped_at: Completed 15-12-PLAN.md
-last_updated: "2026-07-14T19:33:04.111Z"
-last_activity: 2026-07-14 -- Completed 15-12-PLAN.md
+status: verifying
+stopped_at: "Phase 15 bounded-convergence stop: local verifier scored 5/10 with 3 blockers; developer decision required"
+last_updated: "2026-07-14T20:45:15Z"
+last_activity: 2026-07-14 -- Phase 15 local verification completed; bounded-convergence stop recorded
 progress:
   total_phases: 3
   completed_phases: 2
@@ -26,16 +26,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
+Phase: 15 (exa-mcp-registration-all-three-runtimes) — VERIFYING
 Plan: 12 of 12
-Status: Ready for verification
-Last activity: 2026-07-14 -- Completed 15-12-PLAN.md
+Status: Developer decision required — fresh local verification is gaps_found at 5/10 with 3 blockers
+Last activity: 2026-07-14 -- Local verifier completed all 10 checks; bounded-convergence stop recorded
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Run the fresh Phase 15 review and independent verification limited to the Plan 15-11 and 15-12 gap-closure scope.
+Phase 15 is NOT complete. The authorized local verifier retry reports `gaps_found` at 5/10 with three blocking findings: Codex logical TOML collision/status handling, Gemini JSONC string corruption, and Gemini partial-install rollback. The blocker count increased, so bounded convergence has stopped. Review `15-DISPOSITIONS.md` and record a developer decision before any more gap planning, implementation, or verification.
 
 ## Performance Metrics
 
