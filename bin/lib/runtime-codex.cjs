@@ -10,7 +10,13 @@ const {
   convertClaudeToCodexMarkdown,
   generateCodexAgentToml,
 } = require('./codex-transform.cjs');
-const { mergeHooksBlock, unmergeHooksBlock } = require('./codex-toml.cjs');
+const {
+  getMcpBlockInner,
+  mergeHooksBlock,
+  mergeMcpBlock,
+  unmergeHooksBlock,
+  unmergeMcpBlock,
+} = require('./codex-toml.cjs');
 const { loadDefaults, resolveAgentModel } = require('./codex-profile.cjs');
 
 function shellQuote(value) {
@@ -127,6 +133,69 @@ module.exports = {
   },
   unmergeSettings(existingText) {
     return unmergeHooksBlock(existingText);
+  },
+  // OTO Phase 15 (MCP-04): MCP registration hooks — see decisions/ADR-16.
+  async mergeMcp(ctx) {
+    const target = path.join(ctx.configDir, 'config.toml');
+    let existing = '';
+    try {
+      existing = await fsp.readFile(target, 'utf8');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+
+    const result = mergeMcpBlock(existing, {
+      otoVersion: ctx.otoVersion,
+      launcherPath: ctx.launcherPath,
+    });
+    if (result.refused) {
+      return { registered: false, refused: result.refused, entry: null, target };
+    }
+
+    const currentEntry = getMcpBlockInner(existing);
+    if (
+      currentEntry !== null &&
+      currentEntry !== ctx.priorEntry &&
+      currentEntry !== result.entry
+    ) {
+      return {
+        registered: false,
+        refused: { reason: 'user-owned' },
+        entry: null,
+        target,
+      };
+    }
+
+    if (result.text !== existing) await fsp.writeFile(target, result.text);
+    return { registered: true, refused: null, entry: result.entry, target };
+  },
+  async unmergeMcp(ctx) {
+    const target = path.join(ctx.configDir, 'config.toml');
+    let existing;
+    try {
+      existing = await fsp.readFile(target, 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return { removed: false, skipped: { reason: 'absent' }, target };
+      }
+      throw error;
+    }
+
+    const inner = getMcpBlockInner(existing);
+    if (inner === null) {
+      return { removed: false, skipped: { reason: 'absent' }, target };
+    }
+    if (inner === ctx.priorEntry) {
+      await fsp.writeFile(target, unmergeMcpBlock(existing));
+      return { removed: true, skipped: null, target };
+    }
+
+    process.stderr.write('oto: exa entry was modified since oto registered it — left in place.\n');
+    return {
+      removed: false,
+      skipped: { reason: ctx.priorEntry ? 'drifted' : 'user-owned' },
+      target,
+    };
   },
   async emitDerivedFiles(ctx) {
     const configDir = ctx.configDir;
