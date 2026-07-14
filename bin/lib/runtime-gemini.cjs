@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs');
 const path = require('node:path');
 const {
   convertClaudeToGeminiAgent,
@@ -26,6 +27,83 @@ function parseSettings(text) {
       throw new Error(`mergeSettings: cannot parse settings.json: ${error.message}`);
     }
   }
+}
+
+function stableStringify(value) {
+  if (Array.isArray(value)) {
+    return JSON.stringify(value.map((item) => JSON.parse(stableStringify(item))));
+  }
+  if (value && typeof value === 'object') {
+    const sorted = {};
+    for (const key of Object.keys(value).sort()) {
+      sorted[key] = JSON.parse(stableStringify(value[key]));
+    }
+    return JSON.stringify(sorted);
+  }
+  return JSON.stringify(value);
+}
+
+function entriesEqual(a, b) {
+  if (a === undefined || b === undefined) return a === b;
+  return stableStringify(a) === stableStringify(b);
+}
+
+function buildExaEntry(launcherPath) {
+  return { command: 'node', args: [launcherPath] };
+}
+
+async function mergeMcp(ctx) {
+  const target = path.join(ctx.configDir, 'settings.json');
+  const existingText = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
+  const settings = parseSettings(existingText || '{}');
+  const entry = buildExaEntry(ctx.launcherPath);
+  const existing = settings.mcpServers?.exa;
+
+  if (existing !== undefined &&
+      !entriesEqual(existing, ctx.priorEntry) &&
+      !entriesEqual(existing, entry)) {
+    return {
+      registered: false,
+      refused: { reason: 'user-owned', existing },
+      entry: null,
+      target,
+    };
+  }
+
+  if (!entriesEqual(existing, entry)) {
+    settings.mcpServers = settings.mcpServers || {};
+    settings.mcpServers.exa = entry;
+    fs.mkdirSync(ctx.configDir, { recursive: true });
+    fs.writeFileSync(target, JSON.stringify(settings, null, 2) + '\n');
+  }
+
+  return { registered: true, refused: null, entry, target };
+}
+
+async function unmergeMcp(ctx) {
+  const target = path.join(ctx.configDir, 'settings.json');
+  if (!fs.existsSync(target)) {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
+
+  const settings = parseSettings(fs.readFileSync(target, 'utf8'));
+  const existing = settings.mcpServers?.exa;
+  if (existing === undefined) {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
+
+  if (!ctx.priorEntry || !entriesEqual(existing, ctx.priorEntry)) {
+    process.stderr.write('oto: exa entry was modified since oto registered it — left in place.\n');
+    return {
+      removed: false,
+      skipped: { reason: ctx.priorEntry ? 'drifted' : 'user-owned' },
+      target,
+    };
+  }
+
+  delete settings.mcpServers.exa;
+  fs.writeFileSync(target, JSON.stringify(settings, null, 2) + '\n');
+  return { removed: true, skipped: null, target };
 }
 
 function entryHasOtoCommand(entry, marker) {
@@ -209,6 +287,9 @@ module.exports = {
   transformSkill: (content, meta) => content,
   mergeSettings,
   unmergeSettings,
+  // OTO Phase 15 (MCP-05): separate hook — MCP registration must not couple to the enableAgents early-return (see RESEARCH Pitfall 8). Stdio shape: no url/httpUrl.
+  mergeMcp,
+  unmergeMcp,
   onPreInstall(ctx) {
     const { findUpstreamMarkers } = require('./marker.cjs');
     const found = findUpstreamMarkers(path.join(ctx.configDir, 'GEMINI.md'));
