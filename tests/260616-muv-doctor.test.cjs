@@ -7,7 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 // doctor.cjs is not yet created — require will throw during RED phase
-const { checkOtoSdk } = require('../bin/lib/doctor.cjs');
+const { checkOtoSdk, checkExaMcp } = require('../bin/lib/doctor.cjs');
 
 // ---------------------------------------------------------------------------
 // Helpers (same pattern as sdk-wiring.test.cjs)
@@ -171,6 +171,31 @@ test('doctor: shadowed verdict when non-oto executable precedes managed link', {
       const result = checkOtoSdk({ repoRoot });
       assert.equal(result.verdict, 'shadowed');
     });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('doctor: Exa MCP check reports each runtime and shared coherence warning', () => {
+  const root = makeTempDir();
+  try {
+    const env = {
+      CLAUDE_CONFIG_DIR: path.join(root, 'claude-missing'),
+      CODEX_HOME: path.join(root, 'codex-missing'),
+      GEMINI_CONFIG_DIR: path.join(root, 'gemini-missing'),
+    };
+    const result = checkExaMcp({
+      env,
+      homeDir: path.join(root, 'home-missing'),
+      exaSearchEnabled: true,
+      keySource: null,
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.statuses.length, 3);
+    assert.ok(result.lines.some((line) => line.includes('exa MCP [claude]: not-installed')));
+    assert.deepEqual(result.warnings, [
+      'oto: exa_search is enabled but the exa MCP server is not registered in any runtime — run /oto-settings-integrations',
+    ]);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

@@ -3,6 +3,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { findOtoSdkOnPath, isManagedOtoSdkTarget } = require('./install.cjs');
+const { loadConfig } = require('../../oto/bin/lib/core.cjs');
+const { detectKeySource } = require('../../oto/bin/lib/secrets.cjs');
+const {
+  classifyExaRegistration,
+  checkExaCoherence,
+} = require('./mcp-register.cjs');
 
 /**
  * checkOtoSdk(opts) → DoctorResult
@@ -91,7 +97,35 @@ function checkOtoSdk(opts = {}) {
   }
 }
 
+// OTO Phase 15 (D-10): MCP coherence — shared helper with the settings status surface.
+function checkExaMcp(opts = {}) {
+  const statuses = ['claude', 'codex', 'gemini'].map((runtime) =>
+    classifyExaRegistration(runtime, opts)
+  );
+  let exaSearchEnabled = opts.exaSearchEnabled;
+  if (exaSearchEnabled === undefined) {
+    try {
+      exaSearchEnabled = loadConfig(opts.cwd || process.cwd()).exa_search === true;
+    } catch {
+      exaSearchEnabled = false;
+    }
+  }
+  const keySource = opts.keySource !== undefined
+    ? opts.keySource
+    : detectKeySource('exa', opts.keyfileBase).source;
+  const warnings = checkExaCoherence({ exaSearchEnabled, keySource, statuses });
+  const lines = statuses.map(({ runtime, status, target }) =>
+    `exa MCP [${runtime}]: ${status} (${target})`
+  );
+  return { kind: 'exa-mcp', ok: warnings.length === 0, statuses, warnings, lines };
+}
+
 function printResult(result) {
+  if (result.kind === 'exa-mcp') {
+    for (const line of result.lines) process.stdout.write(`${line}\n`);
+    for (const warning of result.warnings) process.stderr.write(`${warning}\n`);
+    return;
+  }
   const { verdict, reason, path: sdkPath, shimSrc, sdkCliPath, sdkDistMissing } = result;
 
   if (verdict === 'healthy') {
@@ -138,7 +172,9 @@ async function main(argv, repoRoot) {
   }
   const result = checkOtoSdk({ repoRoot: repoRoot || path.join(__dirname, '..', '..') });
   printResult(result);
-  return result.verdict === 'healthy' ? 0 : 1;
+  const exaResult = checkExaMcp();
+  printResult(exaResult);
+  return result.verdict === 'healthy' && exaResult.ok ? 0 : 1;
 }
 
-module.exports = { checkOtoSdk, main };
+module.exports = { checkOtoSdk, checkExaMcp, main };
