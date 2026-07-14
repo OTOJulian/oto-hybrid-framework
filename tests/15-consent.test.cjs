@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const { parseCliArgs, ArgError } = require('../bin/lib/args.cjs');
 const consentModulePath = path.join(__dirname, '..', 'bin', 'lib', 'mcp-consent.cjs');
@@ -277,4 +278,29 @@ test('15 consent: pre-warm uses exact pinned argv and empty stdin without real n
   assert.equal(calls[0].options.input, '');
   assert.equal(calls[0].options.timeout, 4321);
   assert.equal(calls[0].options.encoding, 'utf8');
+});
+
+test('15 consent installer: one full-runtime decision call is wired before the install loop', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'bin', 'install.js'), 'utf8');
+  assert.equal((source.match(/await decideExaMcpAction\(/g) || []).length, 1);
+  assert.match(source, /runtimes:\s*targetedRuntimes/);
+  assert.match(source, /exaMcp:\s*decisions\[rt\]\.action/);
+  assert.ok(source.indexOf('await decideExaMcpAction(') < source.indexOf('for (const rt of targetedRuntimes)'));
+});
+
+test('15 consent installer: non-TTY no-key install completes without prompting or hanging', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-15-consent-install-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const configDir = path.join(root, 'claude');
+  const env = { ...process.env, HOME: root };
+  delete env.EXA_API_KEY;
+  const result = spawnSync(
+    process.execPath,
+    ['bin/install.js', 'install', '--claude', '--config-dir', configDir],
+    { cwd: path.join(__dirname, '..'), env, input: '', encoding: 'utf8', timeout: 30000 },
+  );
+  assert.equal(result.error, undefined);
+  assert.equal(result.status, 0, result.stderr);
+  assert.doesNotMatch(result.stdout + result.stderr, /Register the Exa MCP server/);
+  assert.doesNotMatch(result.stdout + result.stderr, /skipped \(non-interactive\)/);
 });
