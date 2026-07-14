@@ -72,7 +72,7 @@ function ensureAndLoadConfigBlock() {
 function runWorkflowResolution(fixture, extraEnv = {}) {
   const script = [
     'set -u',
-    'oto-sdk() { :; }',
+    'oto-sdk() { node "$OTO_SDK" "$@"; }',
     ensureAndLoadConfigBlock(),
     'printf "WS=%s\\nCONFIG=%s\\nARGS=%s\\n" "$WS" "$OTO_CONFIG_PATH" "${WS_ARGS[*]-}"',
   ].join('\n');
@@ -80,7 +80,7 @@ function runWorkflowResolution(fixture, extraEnv = {}) {
     cwd: fixture.project,
     env: {
       ...cleanEnv(fixture.home),
-      OTO_TOOLS: TOOLS_BIN,
+      OTO_SDK: SDK_BIN,
       ...extraEnv,
     },
     encoding: 'utf8',
@@ -247,6 +247,8 @@ test('workflow resolution is canonical and contains no direct pointer reads', ()
   assert.ok(ensureStep, 'ensure_and_load_config step must exist');
   assert.match(ensureStep[1], /workstream get --raw/);
   assert.match(ensureStep[1], /config-path/);
+  assert.ok(!ensureStep[1].includes('OTO_TOOLS'));
+  assert.ok(!ensureStep[1].includes('oto-tools.cjs'));
   assert.ok(!ensureStep[1].includes('.oto/config.json'));
   assert.ok(!content.includes('active-workstream'));
   assert.ok((content.match(/WS_ARGS\[@\]\+/g) || []).length >= 12);
@@ -256,6 +258,22 @@ test('workflow resolution is canonical and contains no direct pointer reads', ()
       !line.includes('WS_ARGS[@]+'),
   );
   assert.deepEqual(unguarded, []);
+});
+
+test('workflow contract: MCP status, consent actions, and global secret scope are explicit', () => {
+  const content = fs.readFileSync(WORKFLOW_PATH, 'utf8');
+
+  assert.ok(!content.includes('OTO_TOOLS'), 'workflow must not depend on a runtime-specific oto-tools path');
+  assert.ok(content.includes('oto-sdk query mcp-status'), 'workflow must query live per-runtime MCP status');
+  assert.ok(content.includes('--register-exa-mcp'), 'workflow must expose settings-driven registration');
+  assert.ok(content.includes('--unregister-exa-mcp'), 'workflow must expose settings-driven unregistration');
+  assert.ok(
+    content.includes('This key is shared by the root project and all workstreams'),
+    'Replace/Clear must disclose global keyfile scope',
+  );
+  assert.match(content, /No \(default\)/, 'secret mutation confirmation must default to No');
+  assert.match(content, /user-owned[\s\S]*resolve manually/, 'user-owned entries must refuse takeover');
+  assert.match(content, /not-installed[\s\S]*not offer/, 'absent runtimes must not receive registration actions');
 });
 
 test('wrapper contract: keyfile/boolean storage, no plaintext-in-config claim', () => {

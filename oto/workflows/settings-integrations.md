@@ -52,15 +52,24 @@ the array is empty — never expand the array without the `WS_ARGS[@]+` guard).
 Flat vs workstream routing per #2282 and WR-02:
 
 ```bash
-OTO_TOOLS="${OTO_TOOLS:-$HOME/.claude/oto/bin/oto-tools.cjs}"
-# Canonical session-aware/root-aware resolution (WR-02): oto-tools resolves
-# --ws > OTO_WORKSTREAM > session-scoped pointer > shared pointer at dispatch.
-WS=$(node "$OTO_TOOLS" workstream get --raw 2>/dev/null || echo none)
+# OTO Phase 15: native SDK handlers return structured JSON even with --raw.
+WS_RESULT=$(oto-sdk query workstream get --raw 2>/dev/null || printf '{"active":null}')
+WS=$(printf '%s' "$WS_RESULT" | node -e '
+let input = "";
+process.stdin.on("data", chunk => input += chunk);
+process.stdin.on("end", () => {
+  try { process.stdout.write(JSON.parse(input).active || "none"); }
+  catch { process.stdout.write("none"); }
+});')
 WS_ARGS=()
 if [[ -n "$WS" && "$WS" != "none" ]]; then
   WS_ARGS=(--ws "$WS")
 fi
-OTO_CONFIG_PATH=$(node "$OTO_TOOLS" config-path ${WS_ARGS[@]+"${WS_ARGS[@]}"})
+OTO_CONFIG_RESULT=$(oto-sdk query config-path ${WS_ARGS[@]+"${WS_ARGS[@]}"})
+OTO_CONFIG_PATH=$(printf '%s' "$OTO_CONFIG_RESULT" | node -e '
+let input = "";
+process.stdin.on("data", chunk => input += chunk);
+process.stdin.on("end", () => process.stdout.write(JSON.parse(input).path));')
 oto-sdk query config-new-project ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 
@@ -90,6 +99,27 @@ Firecrawl: disabled — no key detected
 When an environment variable wins over a keyfile, preserve the command's
 shadowed-keyfile note. Determine whether an integration is keyed from this
 reported source, never from the config flag alone.
+
+<!-- OTO Phase 15: live Exa MCP registration status (MCP-09 / D-11). -->
+Then query every runtime's live registration state:
+
+```bash
+MCP_STATUS=$(oto-sdk query mcp-status ${WS_ARGS[@]+"${WS_ARGS[@]}"})
+MCP_RUNTIMES=$(oto-sdk query mcp-status --pick runtimes ${WS_ARGS[@]+"${WS_ARGS[@]}"})
+```
+
+Show `$MCP_STATUS` verbatim. Its pre-formatted output contains one line for
+each runtime and then any coherence warnings, for example:
+
+```text
+exa MCP [claude]: oto-managed (/Users/me/.claude.json)
+exa MCP [codex]: not-registered (/Users/me/.codex/config.toml)
+exa MCP [gemini]: not-installed (/Users/me/.gemini/settings.json)
+oto: exa_search is enabled but the exa MCP server is not registered in any runtime — run /oto-settings-integrations
+```
+
+Use the structured `$MCP_RUNTIMES` array when constructing actions. Never
+infer runtime availability from a directory path or from the Exa key alone.
 </step>
 
 <step name="section_1_search_integrations">
@@ -147,6 +177,32 @@ For each "Set" or "Replace", NEVER ask for the key in chat and NEVER place it
 in a command argument. Tell the user to run the integration's command
 themselves using this exact prompt (substitute the selected slug):
 
+Before **Replace**, display exactly (substitute the selected slug):
+
+```text
+This key is shared by the root project and all workstreams — replacing it affects every context that uses <slug>.
+```
+
+Then require an explicit confirmation with **No as the default**:
+
+```text
+AskUserQuestion([
+  {
+    question: "Replace this globally shared key?",
+    header: "Confirm Replace",
+    multiSelect: false,
+    options: [
+      { label: "No (default)", description: "Leave the global key unchanged" },
+      { label: "Yes, replace", description: "Continue to the hidden terminal prompt" }
+    ]
+  }
+])
+```
+
+Only a positive `Yes, replace` response may proceed to `secret-set`. A No
+response or an empty/dismissed response returns to the integration menu
+without running any secret command.
+
 ```text
 Run this yourself (the ! prefix runs it in your terminal; the key is
 entered at a hidden prompt and never appears in this conversation):
@@ -175,16 +231,86 @@ After the user replies `done`, run
 show its single masked line verbatim. After `skip`, leave the integration
 unchanged.
 
-For "Clear", run `oto-sdk query secret-clear <slug> ${WS_ARGS[@]+"${WS_ARGS[@]}"}` directly because no
-secret material is involved. Show the command's one-line result verbatim,
-including its `env still set — integration remains available` notice when an
-environment variable continues to provide the key.
+For **Clear**, first display exactly (substitute the selected slug):
+
+```text
+This key is shared by the root project and all workstreams — clearing it affects every context that uses <slug>.
+```
+
+Require a separate explicit confirmation with **No as the default**:
+
+```text
+AskUserQuestion([
+  {
+    question: "Clear this globally shared key?",
+    header: "Confirm Clear",
+    multiSelect: false,
+    options: [
+      { label: "No (default)", description: "Leave the global key and flags unchanged" },
+      { label: "Yes, clear", description: "Remove the global keyfile and reconcile enabled flags" }
+    ]
+  }
+])
+```
+
+Only after `Yes, clear`, run
+`oto-sdk query secret-clear <slug> ${WS_ARGS[@]+"${WS_ARGS[@]}"}`. Show the
+command's one-line result verbatim, including its
+`env still set — integration remains available` notice when an environment
+variable continues to provide the key.
+
+After a completed Clear, reconcile boolean enable flags without reading key
+bytes. Check the root layer with
+`oto-sdk query config-get <config_key>` and, when a workstream is active, its
+layer with
+`oto-sdk query config-get <config_key> ${WS_ARGS[@]+"${WS_ARGS[@]}"}`. Also
+obtain the other detected workstream names from
+`oto-sdk query workstream list --pick workstreams` and check each with
+`oto-sdk query config-get <config_key> --ws <workstream>`. If any layer still
+reports `true`, show the coherence warning from a fresh
+`oto-sdk query mcp-status ${WS_ARGS[@]+"${WS_ARGS[@]}"}` and offer to disable
+that layer with `oto-sdk query config-set <config_key> false` plus the matching
+`--ws <workstream>` when applicable. Do not silently alter another layer.
 
 Write the non-secret local-search choice as before:
 
 ```bash
 oto-sdk query config-set search_gitignored true|false ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
+</step>
+
+<step name="section_1b_exa_mcp_registration">
+<!-- OTO Phase 15: settings-driven register-later path (D-05 / D-11 / D-13). -->
+Build this menu from the structured result of
+`oto-sdk query mcp-status --pick runtimes ${WS_ARGS[@]+"${WS_ARGS[@]}"}`:
+
+- For `not-installed`, show status only and **do not offer** Register or
+  Unregister. OTO does not pre-register absent runtimes.
+- For `user-owned`, display: `The existing exa entry is user-owned, not
+  oto-managed; oto will not overwrite it — resolve manually before
+  registering.` Do not offer Register or Unregister.
+- For `not-registered`, offer Register.
+- For `oto-managed`, `drifted`, or `missing-but-expected`, offer Unregister.
+  For `drifted`, also explain that fingerprint protection may leave the
+  modified entry in place.
+
+For Register, run the selected detected runtime through the installer's shared
+consent path (substitute only `claude`, `codex`, or `gemini`):
+
+```bash
+oto install --<runtime> --register-exa-mcp
+```
+
+For Unregister, run:
+
+```bash
+oto install --<runtime> --unregister-exa-mcp
+```
+
+After either action, re-run
+`oto-sdk query mcp-status ${WS_ARGS[@]+"${WS_ARGS[@]}"}` and show every new
+status/warning line verbatim before returning to the menu. Registration and
+unregistration commands never carry API-key bytes.
 </step>
 
 <step name="section_2_review_models">
