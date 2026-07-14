@@ -18,9 +18,12 @@
 
 import {
   existsSync, readdirSync, readFileSync, writeFileSync,
-  mkdirSync, renameSync, rmdirSync, unlinkSync,
+  mkdirSync, renameSync, rmdirSync, unlinkSync, realpathSync,
 } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 
 import { planningRootName, toPosixPath, stateExtractField } from './helpers.js';
 import { GSDError, ErrorClassification } from '../errors.js';
@@ -33,6 +36,24 @@ const planningRoot = (projectDir: string) =>
 
 const workstreamsDir = (projectDir: string) =>
   join(planningRoot(projectDir), 'workstreams');
+
+const WORKSTREAM_SESSION_ENV_KEYS = [
+  'OTO_SESSION_KEY',
+  'CODEX_THREAD_ID',
+  'CLAUDE_SESSION_ID',
+  'CLAUDE_CODE_SSE_PORT',
+  'OPENCODE_SESSION_ID',
+  'GEMINI_SESSION_ID',
+  'CURSOR_SESSION_ID',
+  'WINDSURF_SESSION_ID',
+  'TERM_SESSION_ID',
+  'WT_SESSION',
+  'TMUX_PANE',
+  'ZELLIJ_SESSION_NAME',
+] as const;
+
+let cachedControllingTtyToken: string | null = null;
+let didProbeControllingTtyToken = false;
 
 function wsPlanningPaths(projectDir: string, name: string) {
   const base = join(planningRoot(projectDir), 'workstreams', name);
@@ -58,17 +79,85 @@ function filterSummaryFiles(files: string[]): string[] {
   return files.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
 }
 
-function getActiveWorkstream(projectDir: string): string | null {
-  const filePath = join(planningRoot(projectDir), 'active-workstream');
+function sanitizeWorkstreamSessionToken(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const token = String(value).trim()
+    .replace(/[^a-zA-Z0-9._-]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return token ? token.slice(0, 160) : null;
+}
+
+function probeControllingTtyToken(): string | null {
+  if (didProbeControllingTtyToken) return cachedControllingTtyToken;
+  didProbeControllingTtyToken = true;
+  if (!process.stdin?.isTTY) return cachedControllingTtyToken;
+
+  try {
+    const ttyPath = execFileSync('tty', [], {
+      encoding: 'utf8',
+      stdio: ['inherit', 'pipe', 'ignore'],
+    }).trim();
+    if (ttyPath && ttyPath !== 'not a tty') {
+      const token = sanitizeWorkstreamSessionToken(ttyPath.replace(/^\/dev\//, ''));
+      if (token) cachedControllingTtyToken = `tty-${token}`;
+    }
+  } catch { /* no controlling terminal */ }
+  return cachedControllingTtyToken;
+}
+
+function getWorkstreamSessionKey(): string | null {
+  for (const envKey of WORKSTREAM_SESSION_ENV_KEYS) {
+    const token = sanitizeWorkstreamSessionToken(process.env[envKey]);
+    if (token) return `${envKey.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${token}`;
+  }
+
+  for (const envKey of ['TTY', 'SSH_TTY'] as const) {
+    const token = sanitizeWorkstreamSessionToken(process.env[envKey]);
+    if (token) return `tty-${token.replace(/^dev_/, '')}`;
+  }
+  return probeControllingTtyToken();
+}
+
+function getSessionScopedWorkstreamFile(projectDir: string): {
+  dirPath: string;
+  filePath: string;
+} | null {
+  const sessionKey = getWorkstreamSessionKey();
+  if (!sessionKey) return null;
+
+  let planningAbs: string;
+  try {
+    planningAbs = realpathSync.native(planningRoot(projectDir));
+  } catch {
+    planningAbs = resolve(planningRoot(projectDir));
+  }
+  const projectId = createHash('sha1').update(planningAbs).digest('hex').slice(0, 16);
+  const dirPath = join(tmpdir(), 'oto-workstream-sessions', projectId);
+  return { dirPath, filePath: join(dirPath, sessionKey) };
+}
+
+function clearActiveWorkstreamPointer(filePath: string, cleanupDirPath?: string): void {
+  try { unlinkSync(filePath); } catch { /* already absent */ }
+  if (!cleanupDirPath) return;
+  try {
+    if (readdirSync(cleanupDirPath).length === 0) rmdirSync(cleanupDirPath);
+  } catch { /* sibling sessions or missing directory */ }
+}
+
+function readActiveWorkstreamPointer(
+  filePath: string,
+  projectDir: string,
+  cleanupDirPath?: string,
+): string | null {
   try {
     const name = readFileSync(filePath, 'utf-8').trim();
     if (!name || !/^[a-zA-Z0-9_-]+$/.test(name)) {
-      try { unlinkSync(filePath); } catch { /* already gone */ }
+      clearActiveWorkstreamPointer(filePath, cleanupDirPath);
       return null;
     }
     const wsDir = join(workstreamsDir(projectDir), name);
     if (!existsSync(wsDir)) {
-      try { unlinkSync(filePath); } catch { /* already gone */ }
+      clearActiveWorkstreamPointer(filePath, cleanupDirPath);
       return null;
     }
     return name;
@@ -77,15 +166,25 @@ function getActiveWorkstream(projectDir: string): string | null {
   }
 }
 
+function getActiveWorkstream(projectDir: string): string | null {
+  const session = getSessionScopedWorkstreamFile(projectDir);
+  if (session) {
+    return readActiveWorkstreamPointer(session.filePath, projectDir, session.dirPath);
+  }
+  return readActiveWorkstreamPointer(join(planningRoot(projectDir), 'active-workstream'), projectDir);
+}
+
 function setActiveWorkstream(projectDir: string, name: string | null): void {
-  const filePath = join(planningRoot(projectDir), 'active-workstream');
+  const session = getSessionScopedWorkstreamFile(projectDir);
+  const filePath = session?.filePath ?? join(planningRoot(projectDir), 'active-workstream');
   if (!name) {
-    try { unlinkSync(filePath); } catch { /* already gone */ }
+    clearActiveWorkstreamPointer(filePath, session?.dirPath);
     return;
   }
   if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
     throw new Error('Invalid workstream name: must be alphanumeric, hyphens, and underscores only');
   }
+  if (session) mkdirSync(session.dirPath, { recursive: true });
   writeFileSync(filePath, name + '\n', 'utf-8');
 }
 

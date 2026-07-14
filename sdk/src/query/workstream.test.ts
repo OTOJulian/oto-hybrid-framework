@@ -7,8 +7,8 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-import { readFile } from 'node:fs/promises';
-import { workstreamList, workstreamCreate, workstreamSet } from './workstream.js';
+import { access, readFile } from 'node:fs/promises';
+import { workstreamList, workstreamCreate, workstreamGet, workstreamSet } from './workstream.js';
 
 describe('workstreamList', () => {
   let tmpDir: string;
@@ -121,5 +121,39 @@ describe('workstreamSet root STATE.md mirror sync (#2618 gap 2)', () => {
     expect(rootStateAfter).toContain('status: executing');
     expect(rootStateAfter).not.toContain('milestone: v0.stale');
     expect(rootStateAfter).not.toContain('Stale Mirror');
+  });
+});
+
+describe('workstream session-scoped pointer parity', () => {
+  let tmpDir: string;
+  let previousThreadId: string | undefined;
+
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), 'oto-ws-session-'));
+    await mkdir(join(tmpDir, '.oto', 'workstreams', 'ws1'), { recursive: true });
+    previousThreadId = process.env.CODEX_THREAD_ID;
+    process.env.CODEX_THREAD_ID = `sdk-workstream-${Date.now()}-${Math.random()}`;
+  });
+
+  afterEach(async () => {
+    await workstreamSet(['--clear'], tmpDir);
+    if (previousThreadId === undefined) delete process.env.CODEX_THREAD_ID;
+    else process.env.CODEX_THREAD_ID = previousThreadId;
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it('sets and gets the active workstream through the CODEX_THREAD_ID pointer', async () => {
+    const selected = await workstreamSet(['ws1'], tmpDir);
+    expect(selected.data).toMatchObject({ active: 'ws1', set: true });
+
+    await expect(access(join(tmpDir, '.oto', 'active-workstream'))).rejects.toThrow();
+    await expect(workstreamGet([], tmpDir)).resolves.toMatchObject({
+      data: { active: 'ws1', mode: 'workstream' },
+    });
+
+    process.env.CODEX_THREAD_ID = `${process.env.CODEX_THREAD_ID}-other`;
+    await expect(workstreamGet([], tmpDir)).resolves.toMatchObject({
+      data: { active: null, mode: 'workstream' },
+    });
   });
 });
