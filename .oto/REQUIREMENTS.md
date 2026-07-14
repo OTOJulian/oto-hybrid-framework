@@ -16,7 +16,7 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 
 ### MCP Registration (MCP)
 
-- [ ] **MCP-01**: User is asked for consent before any MCP registration; nothing registers silently and the default is No
+- [x] **MCP-01**: User is asked for consent before any MCP registration; nothing registers silently and the default is No
 - [x] **MCP-02**: Transport/auth decision (launcher-stdio vs remote HTTP) is recorded as an ADR before registration is implemented
 - [x] **MCP-03**: Exa MCP server is registered as `exa` in Claude Code user scope (`~/.claude.json`) via additive JSON merge — never by shelling out to `claude mcp add`
 - [ ] **MCP-04**: Exa MCP server is registered in Codex via an OTO-marker `[mcp_servers.exa]` block in `~/.codex/config.toml`, refusing to write when an external duplicate exists
@@ -77,7 +77,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SECR-02 | Phase 14 | Complete |
 | SECR-03 | Phase 14 | Complete |
 | SECR-04 | Phase 14 | Complete |
-| MCP-01 | Phase 15 | Pending |
+| MCP-01 | Phase 15 | Complete |
 | MCP-02 | Phase 15 | Complete |
 | MCP-03 | Phase 15 | Complete |
 | MCP-04 | Phase 15 | Pending |

@@ -3,15 +3,15 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Completed 15-07-PLAN.md
-last_updated: "2026-07-14T02:04:40.684Z"
+stopped_at: Completed 15-08-PLAN.md
+last_updated: "2026-07-14T02:15:49.903Z"
 last_activity: 2026-07-14
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 29
-  completed_plans: 26
-  percent: 90
+  completed_plans: 27
+  percent: 93
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
-Plan: 8 of 10
+Plan: 9 of 10
 Status: Ready to execute
 Last activity: 2026-07-14
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 93%
 
 ## Next Command
 
@@ -63,6 +63,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 15 P05 | 5 min | 2 tasks | 2 files |
 | Phase 15 P06 | 9 min | 2 tasks | 2 files |
 | Phase 15 P07 | 14 min | 3 tasks | 4 files |
+| Phase 15 P08 | 9 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 15]: Claude state is rewritten only after strict JSON parsing and ownership checks; drifted, user-owned, and unparseable content remains untouched. — Claude's state file contains user history and onboarding data, making additive preservation and fingerprint-gated removal mandatory.
 - [Phase 15]: Gemini MCP registration is separate from mergeSettings, so experimental.enableAgents false cannot suppress Exa registration. — Keeps MCP availability independent from agent-dependent hook settings.
 - [Phase 15]: Gemini Exa entries contain only command and args, with exact parsed entries used as ownership fingerprints. — Avoids the SSE URL trap and preserves user-owned or drifted entries.
+- [Phase 15]: Persist consent separately from install fingerprints — Keeps user intent independent from mutation ownership evidence
+- [Phase 15]: Resolve all install targets before consent — Guarantees one prompt and one decision map per install command
 
 ### Pending Todos
 
@@ -127,8 +130,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T02:04:40.681Z
-Stopped at: Completed 15-07-PLAN.md
+Last session: 2026-07-14T02:15:08.590Z
+Stopped at: Completed 15-08-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed

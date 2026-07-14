@@ -137,7 +137,7 @@ Plans:
 - [x] 15-05-PLAN.md — Claude mergeMcp/unmergeMcp on resolved .claude.json (env-based CLAUDE_CONFIG_DIR resolution)
 - [x] 15-06-PLAN.md — Gemini mergeMcp/unmergeMcp (stdio shape, no url/httpUrl, enableAgents-independent)
 - [x] 15-07-PLAN.md — install.cjs dispatch + .install.json mcp fingerprints + install/uninstall lifecycle round-trips (MCP-07/08)
-- [ ] 15-08-PLAN.md — Consent gate: flags, ~/.oto/mcp-consent.json persistence, TTY prompt default No, empty-stdin pre-warm (MCP-01)
+- [x] 15-08-PLAN.md — Consent gate: flags, ~/.oto/mcp-consent.json persistence, TTY prompt default No, empty-stdin pre-warm (MCP-01)
 - [ ] 15-09-PLAN.md — Status classifier + oto doctor coherence + oto-sdk query mcp-status (MCP-09, FRESH-CR-02)
 - [ ] 15-10-PLAN.md — settings-integrations workflow (status, register/unregister, D-16 scope confirm) + live e2e checkpoint
 
@@ -174,7 +174,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
-| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 7/10 | In Progress|  |
+| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 8/10 | In Progress|  |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
 ---
