@@ -130,7 +130,7 @@ Notes: Every 14-REVIEW.md finding (CR-01..03, WR-01..10, IR-01..02) is dispositi
 **Plans**: 10 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — ADR-16 transport decision (launcher-stdio) + structural/content test
+- [x] 15-01-PLAN.md — ADR-16 transport decision (launcher-stdio) + structural/content test
 - [ ] 15-02-PLAN.md — D-15 key-usability rule in CJS + SDK secrets helpers; bare-existsSync defect sites fixed (FRESH-WR-04)
 - [ ] 15-03-PLAN.md — Self-contained launcher oto/hooks/oto-exa-mcp.js (pin @3.2.1, 3-tool arg, env-only key) via build-hooks channel
 - [ ] 15-04-PLAN.md — Codex OTO-marker [mcp_servers.exa] block + adapter hooks + byte-identical round-trip (HARD-02 hard gate)
@@ -174,7 +174,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 12. Query registry + workflow consumption | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
-| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 0/TBD | Not started | - |
+| 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 1/10 | In Progress|  |
 | 16. Agent Guidance + Hardening | v0.5.0 | 0/TBD | Not started | - |
 
 ---

@@ -1,17 +1,17 @@
 ---
-gsd_state_version: 1.0
+oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 15 context gathered
-last_updated: "2026-07-13T20:11:35.871Z"
-last_activity: 2026-07-13 -- Phase 15 planning complete
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-07-14T01:11:05.275Z"
+last_activity: 2026-07-14
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 29
-  completed_plans: 19
-  percent: 66
+  completed_plans: 20
+  percent: 69
 ---
 
 # Project State
@@ -22,16 +22,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 14 — key-storage-reconciliation
+**Current focus:** Phase 15 — exa-mcp-registration-all-three-runtimes
 
 ## Current Position
 
-Phase: 15
-Plan: Not started
+Phase: 15 (exa-mcp-registration-all-three-runtimes) — EXECUTING
+Plan: 2 of 10
 Status: Ready to execute
-Last activity: 2026-07-13 -- Phase 15 planning complete
+Last activity: 2026-07-14
 
-Progress: [██████████] 100% plan execution; phase not verified
+Progress: [███████░░░] 69%
 
 ## Next Command
 
@@ -56,6 +56,7 @@ Phase 14 is flagged standard-pattern by research (skip research-phase); Phase 15
 | Phase 14 P02 | 8 min | 2 tasks | 7 files |
 | Phase 14 P03 | 14 min | 2 tasks | 34 files |
 | Phase 14 P04 | 39min | 3 tasks | 2 files |
+| Phase 15 P01 | 8 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 14]: Native query handlers may provide optional raw display text while preserving structured data for programmatic consumers. — Lets human-facing status commands render exact masked lines without breaking registry callers.
 - [Phase 14]: Settings Set/Replace delegates key entry to the user's hidden terminal prompt; the workflow never receives secret material. — Keeps keys out of chat, argv, shell history, and tracked config.
 - [Phase 14]: The no-plaintext regression guard scans exactly git-tracked .oto files. — Protects the remote exfiltration surface without fixture false positives.
+- [Phase 15]: Exa MCP uses a shipped launcher-stdio process pinned to exa-mcp-server@3.2.1 with an exact three-tool positional argument and no credentials in runtime configuration. — One launcher gives Claude Code, Codex, and Gemini the same environment-first or regular-keyfile secret resolution and deterministic tool surface.
 
 ### Pending Todos
 
@@ -110,9 +112,9 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-13T18:59:50.224Z
-Stopped at: Phase 15 context gathered
-Resume file: .oto/phases/15-exa-mcp-registration-all-three-runtimes/15-CONTEXT.md
+Last session: 2026-07-14T01:10:40.497Z
+Stopped at: Completed 15-01-PLAN.md
+Resume file: None
 
 ### Quick Tasks Completed
 
