@@ -2,6 +2,8 @@
 
 const BEGIN = '# === BEGIN OTO HOOKS ===';
 const END = '# === END OTO HOOKS ===';
+const MCP_BEGIN = '# === BEGIN OTO MCP ===';
+const MCP_END = '# === END OTO MCP ===';
 
 function parseTomlBracketHeader(line) {
   const trimmed = String(line || '').trim();
@@ -29,13 +31,65 @@ function hasMixedLegacyHooks(text) {
   return /^\s*\[hooks\.[^\]]+\]\s*$/m.test(outsideOto) && /^\s*\[\[hooks\]\]\s*$/m.test(outsideOto);
 }
 
-function stripBlock(text) {
+function stripBlock(text, begin = BEGIN, end = END) {
   const source = String(text || '');
-  const start = source.indexOf(BEGIN);
-  const end = source.indexOf(END);
-  if (start === -1 || end === -1 || end < start) return source;
-  const after = end + END.length;
-  return (source.slice(0, start).trimEnd() + '\n\n' + source.slice(after).trimStart()).trim() + '\n';
+  const start = source.indexOf(begin);
+  const finish = source.indexOf(end, start + begin.length);
+  if (start === -1 || finish === -1 || finish < start) return source;
+
+  let before = source.slice(0, start);
+  let after = source.slice(finish + end.length);
+  // Blocks emitted by oto own one separator newline on each side. Removing only
+  // those bytes makes merge -> unmerge preserve the user's text exactly.
+  if (before.endsWith('\n')) before = before.slice(0, -1);
+  if (after.startsWith('\n')) after = after.slice(1);
+  return before + after;
+}
+
+function hasExternalMcpServer(text) {
+  const outsideOto = stripBlock(text, MCP_BEGIN, MCP_END);
+  return getTomlLineRecords(outsideOto).some(
+    (record) => record.tableHeader?.name === 'mcp_servers.exa'
+  );
+}
+
+function emitMcpBlock(ctx = {}) {
+  return [
+    MCP_BEGIN,
+    `# managed by oto v${ctx.otoVersion || 'unknown'}`,
+    '[mcp_servers.exa]',
+    'command = "node"',
+    `args = [${JSON.stringify(ctx.launcherPath)}]`,
+    MCP_END,
+  ].join('\n');
+}
+
+function getMcpBlockInner(text) {
+  const source = String(text || '');
+  const start = source.indexOf(MCP_BEGIN);
+  const finish = source.indexOf(MCP_END, start + MCP_BEGIN.length);
+  if (start === -1 || finish === -1 || finish < start) return null;
+
+  let inner = source.slice(start + MCP_BEGIN.length, finish);
+  if (inner.startsWith('\n')) inner = inner.slice(1);
+  if (inner.endsWith('\n')) inner = inner.slice(0, -1);
+  return inner;
+}
+
+function mergeMcpBlock(existingText, ctx = {}) {
+  const existing = String(existingText || '');
+  if (hasExternalMcpServer(existing)) {
+    return { text: existingText, refused: { reason: 'user-owned' }, entry: null };
+  }
+
+  const base = stripBlock(existing, MCP_BEGIN, MCP_END);
+  const block = emitMcpBlock(ctx);
+  const text = base ? `${base}\n${block}\n` : `${block}\n`;
+  return { text, refused: null, entry: getMcpBlockInner(text) };
+}
+
+function unmergeMcpBlock(existingText) {
+  return stripBlock(existingText, MCP_BEGIN, MCP_END);
 }
 
 function stripCodexHooksFeatureAssignments(text) {
@@ -107,6 +161,12 @@ function unmergeHooksBlock(existingText) {
 }
 
 module.exports = {
+  MCP_BEGIN,
+  MCP_END,
+  getMcpBlockInner,
+  hasExternalMcpServer,
+  mergeMcpBlock,
+  unmergeMcpBlock,
   mergeHooksBlock,
   unmergeHooksBlock,
   parseTomlBracketHeader,
