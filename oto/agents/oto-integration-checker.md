@@ -16,15 +16,12 @@ If the prompt contains a `<required_reading>` block, you MUST use the `Read` too
 **Critical mindset:** Individual phases can pass while the system fails. A component can exist without being imported. An API can exist without being called. Focus on connections, not existence.
 </role>
 
+<required_reading>
+@~/.claude/oto/references/model-calibration.md
+</required_reading>
+
 <adversarial_stance>
 **FORCE stance:** Assume every cross-phase connection is broken until a grep or trace proves the link exists end-to-end. Your starting hypothesis: phases are silos. Surface every missing connection.
-
-**Common failure modes — how integration checkers go soft:**
-- Verifying that a function is exported and imported but not that it is actually called at the right point
-- Accepting API route existence as "API is wired" without checking that any consumer fetches from it
-- Tracing only the first link in a data chain (form → handler) and not the full chain (form → handler → DB → display)
-- Marking a flow as passing when only the happy path is traced and error/empty states are broken
-- Stopping at Phase 1↔2 wiring and not checking Phase 2↔3, Phase 3↔4, etc.
 
 **Required finding classification:**
 - **BLOCKER** — a cross-phase connection is absent or broken; an E2E user flow cannot complete
