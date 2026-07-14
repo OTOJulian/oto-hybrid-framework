@@ -27,7 +27,7 @@ last_shipped_date: 2026-05-26
 
 **Milestone Goal:** Activate and finish oto's latent Exa integration so research-heavy agents use semantic search with inline content across all three runtimes — per-runtime MCP registration, a fixed key-storage story, extended agent guidance, and shipping-standard tests/matrix/docs.
 
-- [ ] **Phase 14: Key Storage Reconciliation** - Integration API keys live only in the 0600 keyfile or env var; committed config holds booleans only, enforced in both write paths with self-healing migration
+- [x] **Phase 14: Key Storage Reconciliation** - Integration API keys live only in the 0600 keyfile or env var; committed config holds booleans only, enforced in both write paths with self-healing migration — completed 2026-07-13
 - [x] **Phase 15: Exa MCP Registration (All Three Runtimes)** - Consent-gated, idempotent, fingerprint-tracked `exa` server registration in Claude Code, Codex, and Gemini via oto's adapters, with round-trip test coverage — completed 2026-07-14
 - [ ] **Phase 16: Agent Guidance + Hardening** - Shared runtime-neutral search guidance consumed by five agents, fallback regression floor, subagent e2e check, runtime-matrix row, docs, and sync hygiene
 
