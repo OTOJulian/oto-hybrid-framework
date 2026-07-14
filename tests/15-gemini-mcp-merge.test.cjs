@@ -223,3 +223,65 @@ test('Gemini mergeSettings and MCP hooks coexist and restore user content', asyn
 
   assert.deepEqual(JSON.parse(restoredText), original);
 });
+
+const INCOMPATIBLE_FIXTURES = [
+  { name: 'array container', text: '{"mcpServers":["user-entry"],"keep":true}' },
+  { name: 'string container', text: '{"mcpServers":"user-entry","keep":true}' },
+  { name: 'null container', text: '{"mcpServers":null,"keep":true}' },
+  { name: 'null root', text: 'null' },
+  { name: 'array root', text: '[]' },
+  { name: 'primitive root', text: '42' },
+  { name: 'string root', text: '"user-text"' },
+];
+
+for (const fixture of INCOMPATIBLE_FIXTURES) {
+  test(`Gemini MCP refuses incompatible ${fixture.name} without changing bytes`, async (t) => {
+    const { configDir, target } = tempConfig(t);
+    fs.writeFileSync(target, fixture.text);
+
+    const result = await geminiAdapter.mergeMcp(mergeContext(configDir));
+
+    assert.deepEqual(result, {
+      registered: false,
+      refused: { reason: 'incompatible-shape' },
+      entry: null,
+      target,
+    });
+    assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+  });
+
+  test(`Gemini MCP unmerge skips incompatible ${fixture.name} without changing bytes`, async (t) => {
+    const { configDir, target } = tempConfig(t);
+    fs.writeFileSync(target, fixture.text);
+
+    const result = await geminiAdapter.unmergeMcp({
+      configDir,
+      priorEntry: { command: 'node', args: ['/x'] },
+    });
+
+    assert.deepEqual(result, { removed: false, skipped: { reason: 'absent' }, target });
+    assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+  });
+}
+
+test('Gemini MCP refuses unparseable settings and unmerge skips without changing bytes', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const before = '{ not json';
+  fs.writeFileSync(target, before);
+
+  const mergeResult = await geminiAdapter.mergeMcp(mergeContext(configDir));
+  assert.deepEqual(mergeResult, {
+    registered: false,
+    refused: { reason: 'unparseable' },
+    entry: null,
+    target,
+  });
+  assert.equal(fs.readFileSync(target, 'utf8'), before);
+
+  const unmergeResult = await geminiAdapter.unmergeMcp({
+    configDir,
+    priorEntry: { command: 'node', args: ['/x'] },
+  });
+  assert.deepEqual(unmergeResult, { removed: false, skipped: { reason: 'absent' }, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), before);
+});

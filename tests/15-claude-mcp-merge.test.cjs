@@ -219,3 +219,43 @@ test('Claude MCP double-merge is byte-identical and idempotent', async (t) => {
   assert.equal(second.registered, true);
   assert.equal(afterSecond, afterFirst);
 });
+
+const INCOMPATIBLE_FIXTURES = [
+  { name: 'array container', text: '{"mcpServers":["user-entry"],"keep":true}' },
+  { name: 'string container', text: '{"mcpServers":"user-entry","keep":true}' },
+  { name: 'null container', text: '{"mcpServers":null,"keep":true}' },
+  { name: 'null root', text: 'null' },
+  { name: 'array root', text: '[]' },
+  { name: 'primitive root', text: '42' },
+  { name: 'string root', text: '"user-text"' },
+];
+
+for (const fixture of INCOMPATIBLE_FIXTURES) {
+  test(`Claude MCP refuses incompatible ${fixture.name} without changing bytes`, async (t) => {
+    const { configDir, target } = tempConfig(t);
+    fs.writeFileSync(target, fixture.text);
+
+    const result = await claudeAdapter.mergeMcp(mergeContext(configDir));
+
+    assert.deepEqual(result, {
+      registered: false,
+      refused: { reason: 'incompatible-shape' },
+      entry: null,
+      target,
+    });
+    assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+  });
+
+  test(`Claude MCP unmerge skips incompatible ${fixture.name} without changing bytes`, async (t) => {
+    const { configDir, target } = tempConfig(t);
+    fs.writeFileSync(target, fixture.text);
+
+    const result = await claudeAdapter.unmergeMcp({
+      env: { CLAUDE_CONFIG_DIR: configDir },
+      priorEntry: { command: 'node', args: ['/x'] },
+    });
+
+    assert.deepEqual(result, { removed: false, skipped: { reason: 'absent' }, target });
+    assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+  });
+}
