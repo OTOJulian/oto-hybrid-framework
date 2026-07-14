@@ -1,6 +1,9 @@
 'use strict';
 
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
+const { expandTilde } = require('./args.cjs');
 
 // Hook-fleet contract. Keep in sync with 05-RESEARCH.md Pattern 2 / Code Example 1.
 // validate-commit: PreToolUse / Bash because exit-2 blocking needs PreToolUse
@@ -158,6 +161,107 @@ function unmergeSettings(existingText, ctx = {}) {
   return JSON.stringify(settings, null, 2) + '\n';
 }
 
+// OTO Phase 15 (MCP-03): MCP hooks target .claude.json (NOT settingsFilename)
+// — resolution is env-based, see decisions/ADR-16 + claude-code#14313.
+function claudeJsonPath(env = {}, homeDir = os.homedir()) {
+  const configuredDir = env.CLAUDE_CONFIG_DIR;
+  return path.join(configuredDir ? expandTilde(configuredDir) : homeDir, '.claude.json');
+}
+
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) =>
+      `${JSON.stringify(key)}:${stableStringify(value[key])}`
+    ).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function entriesEqual(left, right) {
+  return stableStringify(left) === stableStringify(right);
+}
+
+function buildExaEntry(launcherPath) {
+  return { type: 'stdio', command: 'node', args: [launcherPath] };
+}
+
+function readClaudeJson(target) {
+  try {
+    return fs.readFileSync(target, 'utf8');
+  } catch (error) {
+    if (error.code === 'ENOENT') return '{}';
+    throw error;
+  }
+}
+
+function writeClaudeJson(target, value) {
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.writeFileSync(target, JSON.stringify(value, null, 2));
+}
+
+async function mergeMcp(ctx = {}) {
+  const target = claudeJsonPath(ctx.env || process.env);
+  const existingText = readClaudeJson(target);
+  let claudeState;
+  try {
+    claudeState = JSON.parse(existingText);
+  } catch {
+    return {
+      registered: false,
+      refused: { reason: 'unparseable' },
+      entry: null,
+      target,
+    };
+  }
+
+  const desired = buildExaEntry(ctx.launcherPath);
+  const existing = claudeState.mcpServers?.exa;
+  if (
+    existing !== undefined &&
+    !entriesEqual(existing, desired) &&
+    !entriesEqual(existing, ctx.priorEntry)
+  ) {
+    return {
+      registered: false,
+      refused: { reason: 'user-owned', existing },
+      entry: null,
+      target,
+    };
+  }
+
+  if (!claudeState.mcpServers || typeof claudeState.mcpServers !== 'object' || Array.isArray(claudeState.mcpServers)) {
+    claudeState.mcpServers = {};
+  }
+  claudeState.mcpServers.exa = desired;
+  writeClaudeJson(target, claudeState);
+  return { registered: true, refused: null, entry: desired, target };
+}
+
+async function unmergeMcp(ctx = {}) {
+  const target = claudeJsonPath(ctx.env || process.env);
+  let claudeState;
+  try {
+    claudeState = JSON.parse(readClaudeJson(target));
+  } catch {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
+
+  const existing = claudeState.mcpServers?.exa;
+  if (existing === undefined) {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
+  if (ctx.priorEntry && entriesEqual(existing, ctx.priorEntry)) {
+    delete claudeState.mcpServers.exa;
+    writeClaudeJson(target, claudeState);
+    return { removed: true, skipped: null, target };
+  }
+
+  const reason = ctx.priorEntry ? 'drifted' : 'user-owned';
+  process.stderr.write('oto: exa entry was modified since oto registered it — left in place.\n');
+  return { removed: false, skipped: { reason }, target };
+}
+
 module.exports = {
   name: 'claude',
   configDirEnvVar: 'CLAUDE_CONFIG_DIR',
@@ -197,6 +301,9 @@ module.exports = {
   transformSkill: (content, meta) => content,
   mergeSettings,
   unmergeSettings,
+  mergeMcp,
+  unmergeMcp,
+  claudeJsonPath,
   onPreInstall(ctx) {
     const { findUpstreamMarkers } = require('./marker.cjs');
     const found = findUpstreamMarkers(path.join(ctx.configDir, 'CLAUDE.md'));
