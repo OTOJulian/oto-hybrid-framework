@@ -22,6 +22,119 @@ function getTomlLineRecords(text) {
   }));
 }
 
+function stripTomlComment(line) {
+  let quote = null;
+  let escaped = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (quote === '"') {
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === quote) quote = null;
+      continue;
+    }
+    if (quote === "'") {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'") quote = char;
+    else if (char === '#') return { text: line.slice(0, index), confident: true };
+  }
+  return { text: line, confident: quote === null && !escaped };
+}
+
+function parseTomlKeyPath(raw) {
+  const source = String(raw || '').trim();
+  const segments = [];
+  let index = 0;
+  while (index < source.length) {
+    while (/\s/.test(source[index] || '')) index += 1;
+    let value = '';
+    const quote = source[index];
+    if (quote === '"' || quote === "'") {
+      index += 1;
+      let closed = false;
+      while (index < source.length) {
+        const char = source[index];
+        if (char === quote) {
+          closed = true;
+          index += 1;
+          break;
+        }
+        if (quote === '"' && char === '\\') return null;
+        value += char;
+        index += 1;
+      }
+      if (!closed) return null;
+    } else {
+      const match = source.slice(index).match(/^[A-Za-z0-9_-]+/);
+      if (!match) return null;
+      value = match[0];
+      index += value.length;
+    }
+    segments.push(value);
+    while (/\s/.test(source[index] || '')) index += 1;
+    if (index === source.length) break;
+    if (source[index] !== '.') return null;
+    index += 1;
+  }
+  return segments.length ? segments : null;
+}
+
+function findAssignment(line) {
+  let quote = null;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (quote) {
+      if (char === quote && (quote === "'" || line[index - 1] !== '\\')) quote = null;
+    } else if (char === '"' || char === "'") quote = char;
+    else if (char === '=') return index;
+  }
+  return -1;
+}
+
+function inspectExternalMcpServer(text) {
+  const outsideOto = stripBlock(text, MCP_BEGIN, MCP_END);
+  if (/'''|"""/.test(outsideOto)) return { external: false, confident: false };
+
+  for (const rawLine of outsideOto.split(/\r?\n/)) {
+    const comment = stripTomlComment(rawLine);
+    if (!comment.confident) return { external: false, confident: false };
+    const line = comment.text.trim();
+    if (!line) continue;
+
+    if (line.startsWith('[')) {
+      const array = line.startsWith('[[');
+      const close = array ? ']]' : ']';
+      if (!line.endsWith(close)) return { external: false, confident: false };
+      const inner = line.slice(array ? 2 : 1, array ? -2 : -1);
+      const path = parseTomlKeyPath(inner);
+      if (!path) return { external: false, confident: false };
+      if (path[0] === 'mcp_servers' && path[1] === 'exa') {
+        return { external: true, confident: true };
+      }
+      continue;
+    }
+
+    const equals = findAssignment(line);
+    if (equals === -1) continue;
+    const path = parseTomlKeyPath(line.slice(0, equals));
+    if (!path) return { external: false, confident: false };
+    if (path[0] !== 'mcp_servers') continue;
+    if (path[1] === 'exa') return { external: true, confident: true };
+    if (path.length === 1) {
+      const rhs = line.slice(equals + 1).trim();
+      if (!rhs.startsWith('{') || !rhs.endsWith('}')) {
+        return { external: false, confident: false };
+      }
+      if (/(?:^|[{,])\s*(?:exa|"exa"|'exa')\s*=/.test(rhs)) {
+        return { external: true, confident: true };
+      }
+    }
+  }
+  return { external: false, confident: true };
+}
+
 function hasMixedLegacyHooks(text) {
   // Detect coexistence of pre-Codex-0.125.0 formats outside the OTO-managed block:
   //   - flat `[[hooks]]` array-of-tables (rejected by Codex 0.125.0+)
@@ -47,10 +160,7 @@ function stripBlock(text, begin = BEGIN, end = END) {
 }
 
 function hasExternalMcpServer(text) {
-  const outsideOto = stripBlock(text, MCP_BEGIN, MCP_END);
-  return getTomlLineRecords(outsideOto).some(
-    (record) => record.tableHeader?.name === 'mcp_servers.exa'
-  );
+  return inspectExternalMcpServer(text).external;
 }
 
 function emitMcpBlock(ctx = {}) {
@@ -78,7 +188,11 @@ function getMcpBlockInner(text) {
 
 function mergeMcpBlock(existingText, ctx = {}) {
   const existing = String(existingText || '');
-  if (hasExternalMcpServer(existing)) {
+  const inspection = inspectExternalMcpServer(existing);
+  if (!inspection.confident) {
+    return { text: existingText, refused: { reason: 'unparseable' }, entry: null };
+  }
+  if (inspection.external) {
     return { text: existingText, refused: { reason: 'user-owned' }, entry: null };
   }
 
@@ -165,6 +279,7 @@ module.exports = {
   MCP_END,
   getMcpBlockInner,
   hasExternalMcpServer,
+  inspectExternalMcpServer,
   mergeMcpBlock,
   unmergeMcpBlock,
   mergeHooksBlock,

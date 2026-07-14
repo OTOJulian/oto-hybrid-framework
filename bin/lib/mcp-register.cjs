@@ -4,9 +4,10 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { expandTilde } = require('./args.cjs');
-const { getMcpBlockInner, hasExternalMcpServer } = require('./codex-toml.cjs');
+const { getMcpBlockInner, inspectExternalMcpServer } = require('./codex-toml.cjs');
 const { readState } = require('./install-state.cjs');
 const { claudeJsonPath } = require('./runtime-claude.cjs');
+const { parseJsoncFailClosed } = require('./jsonc.cjs');
 
 const EXA_SERVER_NAME = 'exa';
 
@@ -53,14 +54,7 @@ function resolveRuntimeMcpTarget(runtimeName, { env = process.env, homeDir = os.
 }
 
 function parseJsonc(text) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    const stripped = text
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/^[ \t]*\/\/.*$/gm, '');
-    return JSON.parse(stripped);
-  }
+  return parseJsoncFailClosed(text);
 }
 
 function readLiveEntry(runtimeName, target) {
@@ -73,9 +67,11 @@ function readLiveEntry(runtimeName, target) {
   }
 
   if (runtimeName === 'codex') {
+    const inspection = inspectExternalMcpServer(text);
     return {
       entry: getMcpBlockInner(text),
-      external: hasExternalMcpServer(text),
+      external: inspection.external,
+      ...(!inspection.confident ? { detail: 'unparseable' } : {}),
     };
   }
 

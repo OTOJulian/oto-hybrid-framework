@@ -97,6 +97,15 @@ test('Gemini MCP user-owned exa is refused without changing file bytes', async (
     target,
   });
   assert.equal(fs.readFileSync(target, 'utf8'), before);
+
+  const withExa = '{\n  "note": "literal /* keep */ text",\n  // force JSONC fallback\n  "mcpServers": { "exa": { "command": "node", "args": ["/x"] } }\n}\n';
+  fs.writeFileSync(target, withExa);
+  const unmerge = await geminiAdapter.unmergeMcp({
+    configDir,
+    priorEntry: { command: 'node', args: ['/x'] },
+  });
+  assert.deepEqual(unmerge, { removed: false, skipped: { reason: 'absent' }, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), withExa);
 });
 
 test('Gemini MCP merge is idempotent when the managed entry already exists', async (t) => {
@@ -283,5 +292,29 @@ test('Gemini MCP refuses unparseable settings and unmerge skips without changing
     priorEntry: { command: 'node', args: ['/x'] },
   });
   assert.deepEqual(unmergeResult, { removed: false, skipped: { reason: 'absent' }, target });
+  assert.equal(fs.readFileSync(target, 'utf8'), before);
+});
+
+test('CR-02 Gemini settings and MCP paths refuse ambiguous block comments before writing', async (t) => {
+  const { configDir, target } = tempConfig(t);
+  const before = '{\n  "note": "literal /* keep */ text",\n  // force JSONC fallback\n  "theme": "dark"\n}\n';
+  fs.writeFileSync(target, before);
+
+  assert.throws(
+    () => geminiAdapter.mergeSettings(before, { configDir, otoVersion: '0.5.0' }),
+    /ambiguous block comment/,
+  );
+  assert.throws(
+    () => geminiAdapter.unmergeSettings(before, { configDir, otoVersion: '0.5.0' }),
+    /ambiguous block comment/,
+  );
+
+  const result = await geminiAdapter.mergeMcp(mergeContext(configDir));
+  assert.deepEqual(result, {
+    registered: false,
+    refused: { reason: 'unparseable' },
+    entry: null,
+    target,
+  });
   assert.equal(fs.readFileSync(target, 'utf8'), before);
 });

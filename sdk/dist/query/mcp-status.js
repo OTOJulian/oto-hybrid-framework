@@ -36,10 +36,16 @@ function parseJsonc(text) {
     try {
         return JSON.parse(text);
     }
-    catch {
-        return JSON.parse(text
-            .replace(/\/\*[\s\S]*?\*\//g, '')
-            .replace(/^[ \t]*\/\/.*$/gm, ''));
+    catch (strictError) {
+        if (/\/\*|\*\//.test(text)) {
+            throw new Error('ambiguous block comment relative to JSON strings');
+        }
+        try {
+            return JSON.parse(text.replace(/^[ \t]*\/\/.*$/gm, ''));
+        }
+        catch {
+            throw strictError;
+        }
     }
 }
 const MCP_BEGIN = '# === BEGIN OTO MCP ===';
@@ -56,13 +62,25 @@ function codexBlockInner(text) {
         inner = inner.slice(0, -1);
     return inner;
 }
-function hasExternalCodexEntry(text) {
+function inspectExternalCodexEntry(text) {
     const start = text.indexOf(MCP_BEGIN);
     const finish = text.indexOf(MCP_END, start + MCP_BEGIN.length);
     const outside = start === -1 || finish === -1
         ? text
         : text.slice(0, start) + text.slice(finish + MCP_END.length);
-    return /^\s*\[\[?\s*mcp_servers\.exa\s*\]?\]\s*$/m.test(outside);
+    const segment = (name) => `(?:${name}|"${name}"|'${name}')`;
+    const mcp = segment('mcp_servers');
+    const exa = segment('exa');
+    const header = new RegExp(`^\\s*\\[\\[?\\s*${mcp}\\s*\\.\\s*${exa}\\s*\\]?\\]\\s*$`, 'm');
+    const dotted = new RegExp(`^\\s*${mcp}\\s*\\.\\s*${exa}\\s*=`, 'm');
+    const inline = new RegExp(`^\\s*${mcp}\\s*=\\s*\\{(?:\\s*${exa}\\s*=|[^\\n]*,\\s*${exa}\\s*=)`, 'm');
+    if (header.test(outside) || dotted.test(outside) || inline.test(outside)) {
+        return { external: true, confident: true };
+    }
+    if (outside.split(/\r?\n/).some((line) => /^\s*\[/.test(line) && !/\]\s*(?:#.*)?$/.test(line))) {
+        return { external: false, confident: false };
+    }
+    return { external: false, confident: true };
 }
 function readLiveEntry(runtimeName, target) {
     let text;
@@ -73,7 +91,12 @@ function readLiveEntry(runtimeName, target) {
         return { entry: null, external: false };
     }
     if (runtimeName === 'codex') {
-        return { entry: codexBlockInner(text), external: hasExternalCodexEntry(text) };
+        const inspection = inspectExternalCodexEntry(text);
+        return {
+            entry: codexBlockInner(text),
+            external: inspection.external,
+            ...(!inspection.confident ? { detail: 'unparseable' } : {}),
+        };
     }
     try {
         const parsed = (runtimeName === 'gemini' ? parseJsonc(text) : JSON.parse(text));

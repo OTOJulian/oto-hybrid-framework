@@ -253,6 +253,9 @@ async function installRuntime(adapter, opts = {}) {
   if (typeof adapter.onPreInstall === 'function') {
     await adapter.onPreInstall(preCtx);
   }
+  if (typeof adapter.preflightInstall === 'function') {
+    await adapter.preflightInstall(preCtx);
+  }
 
   const fileEntries = [];
   for (const srcKey of SRC_KEYS) {

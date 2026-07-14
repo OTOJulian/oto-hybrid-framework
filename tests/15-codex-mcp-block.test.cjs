@@ -56,6 +56,33 @@ test('MCP-04 text merge refuses a user-owned exa table without changing input', 
   assert.equal(result.text, input);
 });
 
+for (const [name, input] of [
+  ['quoted table segment', '[mcp_servers."exa"]\ncommand = "custom-exa"\n'],
+  ['quoted parent table segment', '["mcp_servers".exa]\ncommand = "custom-exa"\n'],
+  ['fully quoted table path', '["mcp_servers"."exa"]\ncommand = "custom-exa"\n'],
+  ['dotted assignment', 'mcp_servers.exa = { command = "custom-exa" }\n'],
+  ['quoted dotted assignment', '"mcp_servers"."exa" = { command = "custom-exa" }\n'],
+  ['inline table', 'mcp_servers = { exa = { command = "custom-exa" } }\n'],
+  ['quoted inline-table key', 'mcp_servers = { "exa" = { command = "custom-exa" } }\n'],
+]) {
+  test(`CR-01 text merge refuses ${name} without changing input`, () => {
+    const result = mergeMcpBlock(input, MCP_CTX);
+
+    assert.deepEqual(result.refused, { reason: 'user-owned' });
+    assert.equal(result.entry, null);
+    assert.equal(result.text, input);
+  });
+}
+
+test('CR-01 text merge refuses TOML it cannot confidently parse without changing input', () => {
+  const input = '[mcp_servers.exa\ncommand = "custom-exa"\n';
+  const result = mergeMcpBlock(input, MCP_CTX);
+
+  assert.deepEqual(result.refused, { reason: 'unparseable' });
+  assert.equal(result.entry, null);
+  assert.equal(result.text, input);
+});
+
 test('MCP-04 text merge is idempotent and emits exactly one marker block', () => {
   const once = mergeMcpBlock(FIX_USER_TOML, MCP_CTX).text;
   const twice = mergeMcpBlock(once, MCP_CTX).text;

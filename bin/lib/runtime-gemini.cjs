@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { parseJsoncFailClosed } = require('./jsonc.cjs');
 const {
   convertClaudeToGeminiAgent,
   convertClaudeToGeminiToml,
@@ -16,16 +17,9 @@ function shellQuote(value) {
 function parseSettings(text) {
   if (!text || !text.trim()) return {};
   try {
-    return JSON.parse(text);
-  } catch {
-    const stripped = text
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/^[ \t]*\/\/.*$/gm, '');
-    try {
-      return JSON.parse(stripped);
-    } catch (error) {
-      throw new Error(`mergeSettings: cannot parse settings.json: ${error.message}`);
-    }
+    return parseJsoncFailClosed(text);
+  } catch (error) {
+    throw new Error(`mergeSettings: cannot parse settings.json: ${error.message}`);
   }
 }
 
@@ -313,6 +307,17 @@ module.exports = {
   // OTO Phase 15 (MCP-05): separate hook — MCP registration must not couple to the enableAgents early-return (see RESEARCH Pitfall 8). Stdio shape: no url/httpUrl.
   mergeMcp,
   unmergeMcp,
+  preflightInstall(ctx) {
+    const target = path.join(ctx.configDir, 'settings.json');
+    const existing = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
+    // Pure dry-run through the exact transformation used later. Any parse or
+    // shape failure happens before payload, instruction marker, or state writes.
+    mergeSettings(existing, {
+      configDir: ctx.configDir,
+      otoVersion: ctx.otoVersion,
+      installedAt: 'preflight',
+    });
+  },
   onPreInstall(ctx) {
     const { findUpstreamMarkers } = require('./marker.cjs');
     const found = findUpstreamMarkers(path.join(ctx.configDir, 'GEMINI.md'));

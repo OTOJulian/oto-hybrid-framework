@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { expandTilde } = require('./args.cjs');
+const { parseJsoncFailClosed } = require('./jsonc.cjs');
 
 // Hook-fleet contract. Keep in sync with 05-RESEARCH.md Pattern 2 / Code Example 1.
 // validate-commit: PreToolUse / Bash because exit-2 blocking needs PreToolUse
@@ -50,21 +51,15 @@ function buildOtoEntries(configDir) {
   };
 }
 
-// JSONC tolerance: strict JSON first, then strip comment-only lines and block comments.
+// JSONC tolerance: strict JSON first, then comment-only lines. Block comments are
+// ambiguous relative to string contents without a tokenizer, so fail closed.
 // Source: simplified port of get-shit-done@v1.38.5 bin/install.js:543-589.
 function parseSettings(text) {
   if (!text || !text.trim()) return {};
   try {
-    return JSON.parse(text);
-  } catch {
-    const stripped = text
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/^[ \t]*\/\/.*$/gm, '');
-    try {
-      return JSON.parse(stripped);
-    } catch (error) {
-      throw new Error(`mergeSettings: cannot parse settings.json: ${error.message}`);
-    }
+    return parseJsoncFailClosed(text);
+  } catch (error) {
+    throw new Error(`mergeSettings: cannot parse settings.json: ${error.message}`);
   }
 }
 

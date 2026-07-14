@@ -139,6 +139,44 @@ test('codex external exa table wins as user-owned even alongside an oto block', 
   assert.equal(classifyExaRegistration('codex', ctx).status, 'user-owned');
 });
 
+for (const [name, text] of [
+  ['quoted table', '[mcp_servers."exa"]\ncommand = "user-node"\n'],
+  ['quoted parent table', '["mcp_servers".exa]\ncommand = "user-node"\n'],
+  ['dotted assignment', 'mcp_servers.exa = { command = "user-node" }\n'],
+  ['inline table', 'mcp_servers = { exa = { command = "user-node" } }\n'],
+]) {
+  test(`CR-01 Codex status classifies ${name} as user-owned`, (t) => {
+    const ctx = fixture(t, 'codex');
+    const { target } = resolveRuntimeMcpTarget('codex', ctx);
+    fs.writeFileSync(target, text);
+    assert.equal(classifyExaRegistration('codex', ctx).status, 'user-owned');
+  });
+}
+
+test('CR-01 Codex status reports unparseable TOML instead of not-registered', (t) => {
+  const ctx = fixture(t, 'codex');
+  const { target } = resolveRuntimeMcpTarget('codex', ctx);
+  fs.writeFileSync(target, '[mcp_servers.exa\ncommand = "user-node"\n');
+  assert.deepEqual(classifyExaRegistration('codex', ctx), {
+    runtime: 'codex',
+    status: 'not-registered',
+    target,
+    detail: 'unparseable',
+  });
+});
+
+test('CR-02 Gemini status refuses ambiguous block-comment JSONC', (t) => {
+  const ctx = fixture(t, 'gemini');
+  const { target } = resolveRuntimeMcpTarget('gemini', ctx);
+  fs.writeFileSync(target, '{"note":"literal /* keep */ text",\n// fallback\n"mcpServers":{}}');
+  assert.deepEqual(classifyExaRegistration('gemini', ctx), {
+    runtime: 'gemini',
+    status: 'not-registered',
+    target,
+    detail: 'unparseable',
+  });
+});
+
 test('coherence warns when exa_search is enabled but no runtime is registered', () => {
   assert.deepEqual(checkExaCoherence({
     exaSearchEnabled: true,

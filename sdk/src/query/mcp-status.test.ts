@@ -109,6 +109,28 @@ describe('SDK MCP status mirror', () => {
     expect(classifyExaRegistration('codex', ctx).status).toBe('user-owned');
   });
 
+  it.each([
+    '[mcp_servers."exa"]\ncommand = "user-node"\n',
+    '["mcp_servers".exa]\ncommand = "user-node"\n',
+    'mcp_servers.exa = { command = "user-node" }\n',
+    'mcp_servers = { exa = { command = "user-node" } }\n',
+  ])('classifies alternate logical Codex exa keys as user-owned', (text) => {
+    const ctx = fixture('codex');
+    const { target } = resolveRuntimeMcpTarget('codex', ctx);
+    writeFileSync(target, text);
+    expect(classifyExaRegistration('codex', ctx).status).toBe('user-owned');
+  });
+
+  it('reports ambiguous Gemini block-comment JSONC as unparseable', () => {
+    const ctx = fixture('gemini');
+    const { target } = resolveRuntimeMcpTarget('gemini', ctx);
+    writeFileSync(target, '{"note":"literal /* keep */ text",\n// fallback\n"mcpServers":{}}');
+    expect(classifyExaRegistration('gemini', ctx)).toMatchObject({
+      status: 'not-registered',
+      detail: 'unparseable',
+    });
+  });
+
   it('classifies drifted', () => {
     const ctx = fixture('gemini');
     const { target } = resolveRuntimeMcpTarget('gemini', ctx);

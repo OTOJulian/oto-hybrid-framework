@@ -8,6 +8,19 @@ const path = require('node:path');
 
 const claudeAdapter = require('../bin/lib/runtime-claude.cjs');
 
+test('CR-02 Claude settings paths refuse ambiguous block comments before writing', () => {
+  const before = '{\n  "note": "literal /* keep */ text",\n  // force JSONC fallback\n  "theme": "dark"\n}\n';
+
+  assert.throws(
+    () => claudeAdapter.mergeSettings(before, { configDir: '/tmp/claude', otoVersion: '0.5.0' }),
+    /ambiguous block comment/,
+  );
+  assert.throws(
+    () => claudeAdapter.unmergeSettings(before, { configDir: '/tmp/claude', otoVersion: '0.5.0' }),
+    /ambiguous block comment/,
+  );
+});
+
 function tempConfig(t) {
   const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-claude-mcp-'));
   t.after(() => fs.rmSync(configDir, { recursive: true, force: true }));

@@ -266,9 +266,8 @@ for (const fixture of GEMINI_TOLERATED_LIFECYCLE_FIXTURES) {
   });
 }
 
-// Known behavior (outside CR-01): install.cjs dispatches mergeSettings on settings.json before the MCP dispatch; null/primitive roots throw there (pre-existing). Pinned: no state file, bytes untouched. Adapter-level mergeMcp no-throw for these shapes is covered in tests/15-gemini-mcp-merge.test.cjs.
 for (const fixture of GEMINI_THROWING_ROOT_FIXTURES) {
-  test(`gemini lifecycle ${fixture.name} aborts in pre-existing mergeSettings without writing state (known behavior, outside CR-01)`, async (t) => {
+  test(`WR-01 Gemini ${fixture.name} preflight failure leaves no payload, marker, or state`, async (t) => {
     const { configDir, opts } = tempRuntime(t, geminiAdapter);
     const target = targetPath(geminiAdapter, configDir);
     fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -276,6 +275,28 @@ for (const fixture of GEMINI_THROWING_ROOT_FIXTURES) {
 
     await assert.rejects(installRuntime(geminiAdapter, { ...opts, exaMcp: 'register' }));
     assert.equal(fs.existsSync(path.join(configDir, 'oto', '.install.json')), false);
+    assert.equal(fs.existsSync(path.join(configDir, 'commands')), false);
+    assert.equal(fs.existsSync(path.join(configDir, 'hooks')), false);
+    assert.equal(fs.existsSync(path.join(configDir, 'GEMINI.md')), false);
     assert.equal(fs.readFileSync(target, 'utf8'), fixture.text);
+  });
+}
+
+for (const [name, text] of [
+  ['quoted-child-table', '[mcp_servers."exa"]\ncommand = "user-node"\n'],
+  ['quoted-parent-table', '["mcp_servers".exa]\ncommand = "user-node"\n'],
+  ['dotted-assignment', 'mcp_servers.exa = { command = "user-node" }\n'],
+  ['inline-table', 'mcp_servers = { exa = { command = "user-node" } }\n'],
+]) {
+  test(`CR-01 Codex lifecycle refuses ${name} without recording MCP ownership`, async (t) => {
+    const { configDir, opts } = tempRuntime(t, codexAdapter);
+    const target = targetPath(codexAdapter, configDir);
+    fs.writeFileSync(target, text);
+
+    await installRuntime(codexAdapter, { ...opts, exaMcp: 'register' });
+
+    const state = readState(path.join(configDir, 'oto', '.install.json'));
+    assert.equal(state.mcp, undefined);
+    assert.equal(fs.readFileSync(target, 'utf8').includes(text.trim()), true);
   });
 }
