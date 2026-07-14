@@ -12,6 +12,8 @@ const FLAG_CONFIG = {
     'config-dir': { type: 'string' },
     force: { type: 'boolean', default: false, short: 'f' },
     purge: { type: 'boolean', default: false },
+    'register-exa-mcp': { type: 'boolean', default: false },
+    'unregister-exa-mcp': { type: 'boolean', default: false },
     verbose: { type: 'boolean', default: false, short: 'v' },
     help: { type: 'boolean', default: false, short: 'h' },
   },
@@ -66,6 +68,14 @@ function parseCliArgs(argv) {
     throw new ArgError('--config-dir cannot be combined with multiple runtimes', 3);
   }
 
+  if (values['register-exa-mcp'] && values['unregister-exa-mcp']) {
+    throw new ArgError('--register-exa-mcp and --unregister-exa-mcp are mutually exclusive', 3);
+  }
+
+  if (action === 'uninstall' && (values['register-exa-mcp'] || values['unregister-exa-mcp'])) {
+    throw new ArgError('--register-exa-mcp and --unregister-exa-mcp are install-only', 3);
+  }
+
   if (!values.all && !values.help && runtimes.length === 0) {
     if (action === 'install') {
       runtimes.push('claude');
@@ -81,6 +91,8 @@ function parseCliArgs(argv) {
     configDir: values['config-dir'] ? path.resolve(expandTilde(values['config-dir'])) : null,
     force: values.force,
     purge: values.purge,
+    registerExaMcp: values['register-exa-mcp'],
+    unregisterExaMcp: values['unregister-exa-mcp'],
     verbose: values.verbose,
     help: values.help,
   };
