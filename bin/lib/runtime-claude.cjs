@@ -186,6 +186,11 @@ function buildExaEntry(launcherPath) {
   return { type: 'stdio', command: 'node', args: [launcherPath] };
 }
 
+// OTO Phase 15 gap closure (CR-01): fail closed on non-object roots/containers — refuse, preserve bytes, never record ownership.
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 function readClaudeJson(target) {
   try {
     return fs.readFileSync(target, 'utf8');
@@ -215,6 +220,11 @@ async function mergeMcp(ctx = {}) {
     };
   }
 
+  if (!isPlainObject(claudeState) ||
+      (claudeState.mcpServers !== undefined && !isPlainObject(claudeState.mcpServers))) {
+    return { registered: false, refused: { reason: 'incompatible-shape' }, entry: null, target };
+  }
+
   const desired = buildExaEntry(ctx.launcherPath);
   const existing = claudeState.mcpServers?.exa;
   if (
@@ -230,9 +240,7 @@ async function mergeMcp(ctx = {}) {
     };
   }
 
-  if (!claudeState.mcpServers || typeof claudeState.mcpServers !== 'object' || Array.isArray(claudeState.mcpServers)) {
-    claudeState.mcpServers = {};
-  }
+  if (claudeState.mcpServers === undefined) claudeState.mcpServers = {};
   claudeState.mcpServers.exa = desired;
   writeClaudeJson(target, claudeState);
   return { registered: true, refused: null, entry: desired, target };
@@ -244,6 +252,11 @@ async function unmergeMcp(ctx = {}) {
   try {
     claudeState = JSON.parse(readClaudeJson(target));
   } catch {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
+
+  if (!isPlainObject(claudeState) ||
+      (claudeState.mcpServers !== undefined && !isPlainObject(claudeState.mcpServers))) {
     return { removed: false, skipped: { reason: 'absent' }, target };
   }
 

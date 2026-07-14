@@ -52,10 +52,24 @@ function buildExaEntry(launcherPath) {
   return { command: 'node', args: [launcherPath] };
 }
 
+// OTO Phase 15 gap closure (CR-01): fail closed on non-object roots/containers — refuse, preserve bytes, never record ownership.
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 async function mergeMcp(ctx) {
   const target = path.join(ctx.configDir, 'settings.json');
   const existingText = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
-  const settings = parseSettings(existingText || '{}');
+  let settings;
+  try {
+    settings = parseSettings(existingText || '{}');
+  } catch {
+    return { registered: false, refused: { reason: 'unparseable' }, entry: null, target };
+  }
+  if (!isPlainObject(settings) ||
+      (settings.mcpServers !== undefined && !isPlainObject(settings.mcpServers))) {
+    return { registered: false, refused: { reason: 'incompatible-shape' }, entry: null, target };
+  }
   const entry = buildExaEntry(ctx.launcherPath);
   const existing = settings.mcpServers?.exa;
 
@@ -71,7 +85,7 @@ async function mergeMcp(ctx) {
   }
 
   if (!entriesEqual(existing, entry)) {
-    settings.mcpServers = settings.mcpServers || {};
+    if (settings.mcpServers === undefined) settings.mcpServers = {};
     settings.mcpServers.exa = entry;
     fs.mkdirSync(ctx.configDir, { recursive: true });
     fs.writeFileSync(target, JSON.stringify(settings, null, 2) + '\n');
@@ -86,7 +100,16 @@ async function unmergeMcp(ctx) {
     return { removed: false, skipped: { reason: 'absent' }, target };
   }
 
-  const settings = parseSettings(fs.readFileSync(target, 'utf8'));
+  let settings;
+  try {
+    settings = parseSettings(fs.readFileSync(target, 'utf8'));
+  } catch {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
+  if (!isPlainObject(settings) ||
+      (settings.mcpServers !== undefined && !isPlainObject(settings.mcpServers))) {
+    return { removed: false, skipped: { reason: 'absent' }, target };
+  }
   const existing = settings.mcpServers?.exa;
   if (existing === undefined) {
     return { removed: false, skipped: { reason: 'absent' }, target };
