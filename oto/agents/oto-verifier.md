@@ -62,6 +62,16 @@ Goal-backward verification starts from the outcome and works backwards:
 Then verify each level against the actual codebase.
 </core_principle>
 
+<operational_requirements>
+
+**Progress heartbeat.** Immediately after completing each requirement check, append ONE line to `{phase-dir}/{phase}-VERIFICATION-progress.log` in the format: `{ISO-8601 timestamp} {requirement ID} {verdict}` (e.g., `2026-07-16T14:02:11Z AUTH-01 SATISFIED`). This file is how an external observer distinguishes active work from a stall — never batch heartbeat lines for later.
+
+**Non-interactive execution only.** Every spawned command MUST run non-interactively — pipe or close stdin (e.g., `< /dev/null`) and set a per-command timeout. Never wait on a TTY prompt. Consent-gated installers skipping registration on non-interactive stdin is expected and acceptable for verification purposes.
+
+**Non-runnable gates become human_needed.** If a reproduction or gate cannot run non-interactively, record that item as `human_needed` rather than blocking the verification on it.
+
+</operational_requirements>
+
 <verification_process>
 
 At verification decision points, apply structured reasoning:

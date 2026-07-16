@@ -1329,6 +1329,11 @@ Verify phase achieved its GOAL, not just completed tasks.
 VERIFIER_SKILLS=$(oto-sdk query agent-skills oto-verifier 2>/dev/null || echo "")
 ```
 
+**Determine `verification_scope` BEFORE spawning the verifier:**
+
+- **First verification** (no existing `{phase_dir}/*-VERIFICATION.md`): `verification_scope` = full sweep of all must_haves and requirement IDs.
+- **Re-verification** (post-gap-closure or post-disposition): scope MUST be limited to closure-changed files plus the specific prior-blocker reproductions — e.g., `verification_scope: "closure-changed files plus CR-01, CR-02, and WR-01 reproductions only"` (the frontmatter key used in Phase 15's final verification). Do NOT re-run the full sweep on re-verification.
+
 ```
 Task(
   description="Verify phase {phase_number} goal achievement",
@@ -1336,6 +1341,7 @@ Task(
 Phase directory: {phase_dir}
 Phase goal: {goal from ROADMAP.md}
 Phase requirement IDs: {phase_req_ids}
+Verification scope: {verification_scope — full sweep | closure-changed files plus {prior blocker IDs} reproductions only}
 Check must_haves against actual codebase.
 Cross-reference requirement IDs from PLAN frontmatter against REQUIREMENTS.md — every ID MUST be accounted for.
 Create VERIFICATION.md.
@@ -1358,6 +1364,8 @@ ${VERIFIER_SKILLS}",
 ```
 
 > **ORCHESTRATOR RULE — CODEX RUNTIME**: After calling Task() above, stop working on this task immediately. Do not read more files, edit code, or run tests related to this task while the subagent is active. Wait for the subagent to return its result. This prevents duplicate work, conflicting edits, and wasted context. Only resume when the subagent result is available.
+
+> **VERIFIER LIVENESS POLICY**: The orchestrator enforces a timeout from OUTSIDE the verifier — default 30 minutes for the whole verification. The verifier appends a heartbeat line to `{phase_dir}/{phase}-VERIFICATION-progress.log` after every requirement check; absence of new lines in that file for 10+ minutes is a stall signal. On stall or timeout: kill the verifier and respawn it AT MOST once. If the respawned verifier stalls too, do NOT spawn another — run the verification inline in the orchestrator session instead. Never spawn a third verifier.
 
 Read status:
 ```bash
