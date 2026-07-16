@@ -29,7 +29,7 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 Phase: 16
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-07-14 - Completed quick task 260714-nzr: Extend review-machinery recalibration to remaining 7 review/audit agents
+Last activity: 2026-07-16 - Completed quick task 260716-qbp: Harden oto verifier operation and add runtime-sync drift guard
 
 Progress: [██████████] 100%
 
@@ -160,3 +160,4 @@ Resume file: None
 | 260713-in8 | Propagate review-machinery recalibration (260713-ffa) to Codex runtime root; Gemini skipped (no oto install) | 2026-07-13 | 7aaf84f |  | [260713-in8-propagate-review-machinery-recalibration](./quick/260713-in8-propagate-review-machinery-recalibration/) |
 | 260713-izl | Redirect rebrand dry-run test report output to OS tmpdirs and delete stale tracked reports/rebrand-dryrun.* so npm test leaves the tree clean | 2026-07-13 | f1e3755 |  | [260713-izl-stop-rebrand-dry-run-tests-from-writing-](./quick/260713-izl-stop-rebrand-dry-run-tests-from-writing-/) |
 | 260714-nzr | Extend review-machinery recalibration (260713-ffa) to remaining 7 review/audit agents; synced to ~/.claude and ~/.codex (.md + .toml); Gemini skipped (no oto install); Phase 14 ROADMAP checkbox fixed | 2026-07-14 | 4e69350 |  | [260714-nzr-extend-review-machinery-recalibration-to](./quick/260714-nzr-extend-review-machinery-recalibration-to/) |
+| 260716-qbp | Harden oto verifier operation (heartbeat, non-interactive commands, human_needed fallback; verification_scope + liveness policy in execute-phase) and add runtime-sync drift guard (scripts/check-runtime-sync.cjs + test + CLAUDE.md rule); synced to ~/.claude and ~/.codex (.md + .toml); gemini: no install, skipped | 2026-07-16 | 7060458 |  | [260716-qbp-harden-oto-verifier-operation-and-add-ru](./quick/260716-qbp-harden-oto-verifier-operation-and-add-ru/) |
