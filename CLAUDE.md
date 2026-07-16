@@ -198,6 +198,10 @@ Do not make direct repo edits outside an OTO workflow unless the user explicitly
 
 
 
+## Runtime Sync Guardrail
+
+Any change to oto/agents/, oto/workflows/, or oto/references/ must be synced to every installed runtime root (~/.claude, ~/.codex, and ~/.gemini if present) and diff-verified in the same task. Run node scripts/check-runtime-sync.cjs to confirm.
+
 <!-- GSD:profile-start -->
 ## Developer Profile
 
