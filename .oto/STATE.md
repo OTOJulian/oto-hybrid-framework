@@ -3,9 +3,9 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 16 Plan 06 Task 1 blocked on full SDK suite baseline
-last_updated: "2026-07-17T18:34:46.000Z"
-last_activity: 2026-07-17 -- Phase 16 Plan 06 stopped before HARD-04; full SDK suite 270 failed / 1332 passed
+stopped_at: Phase 16 Plan 06 regression gate — two persistent SDK offenders above baseline
+last_updated: "2026-07-17T19:10:11.000Z"
+last_activity: 2026-07-17 -- Phase 16 regression confirmed; HARD-04 and HARD-05 not started
 progress:
   total_phases: 3
   completed_phases: 2
@@ -27,15 +27,15 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 16 (agent-guidance-hardening) — EXECUTING
-Plan: 6 of 6 (Task 1 blocked)
-Status: Developer disposition required before HARD-04
-Last activity: 2026-07-17 -- Phase 16 Plan 06 stopped before HARD-04; full SDK suite 270 failed / 1332 passed
+Plan: 6 of 6 (Task 1 regression gate failed)
+Status: Blocked — persistent Phase 16 SDK regression
+Last activity: 2026-07-17 -- Phase 16 regression confirmed; HARD-04 and HARD-05 not started
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plans 01-05 are complete. Plan 06 is blocked before the HARD-04 live checkpoint because the required full SDK gate reproduces the broad `.planning` fixture vs `.oto` planning-root baseline (270 failed / 1332 passed). Developer decision: authorize a separately scoped SDK planning-root migration, or explicitly revise/disposition the full-SDK-green gate; then resume with `/oto-execute-phase 16`.
+Phase 16 Plans 01-05 are complete. Plan 06 stopped before HARD-04 because the baseline-diff gate found two persistent count regressions: `src/golden/read-only-parity.integration.test.ts` (22 vs baseline max 19; isolated 22/22) and `src/query/decomposed-handlers.test.ts` (8 vs baseline max 7; isolated 8/8). No DEFER disposition was recorded. See `16-SDK-BASELINE-DELTA.txt`; diagnose or re-plan these regressions before resuming `/oto-execute-phase 16`.
 
 ## Performance Metrics
 
