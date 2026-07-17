@@ -3,9 +3,9 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Completed 15-12-PLAN.md
-last_updated: "2026-07-17T17:57:50.550Z"
-last_activity: 2026-07-17 -- Phase 16 execution started
+stopped_at: Phase 16 Plan 06 Task 1 blocked on full SDK suite baseline
+last_updated: "2026-07-17T18:34:46.000Z"
+last_activity: 2026-07-17 -- Phase 16 Plan 06 stopped before HARD-04; full SDK suite 270 failed / 1332 passed
 progress:
   total_phases: 3
   completed_phases: 2
@@ -27,15 +27,15 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 16 (agent-guidance-hardening) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 16
-Last activity: 2026-07-17 -- Phase 16 execution started
+Plan: 6 of 6 (Task 1 blocked)
+Status: Developer disposition required before HARD-04
+Last activity: 2026-07-17 -- Phase 16 Plan 06 stopped before HARD-04; full SDK suite 270 failed / 1332 passed
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 15 is complete after the developer-authorized scoped closure passed at 10/10. Phase 16 has no CONTEXT.md yet, so the recommended next command is `/oto-discuss-phase 16`.
+Phase 16 Plans 01-05 are complete. Plan 06 is blocked before the HARD-04 live checkpoint because the required full SDK gate reproduces the broad `.planning` fixture vs `.oto` planning-root baseline (270 failed / 1332 passed). Developer decision: authorize a separately scoped SDK planning-root migration, or explicitly revise/disposition the full-SDK-green gate; then resume with `/oto-execute-phase 16`.
 
 ## Performance Metrics
 
