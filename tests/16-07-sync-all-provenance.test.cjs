@@ -8,6 +8,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { buildBareUpstream } = require('./fixtures/phase-09/build-bare-upstream.cjs');
+const { parseSyncArgs } = require('../bin/lib/sync-cli.cjs');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const REBRAND_REPORTS = [
@@ -94,6 +95,32 @@ async function setupSyncAllProject(t) {
   return project;
 }
 
+function resolvedSidecar(upstream, targetPath, body) {
+  return [
+    '---',
+    'kind: modified',
+    `upstream: ${upstream}`,
+    'prior_tag: v1.0.0',
+    `prior_sha: ${'a'.repeat(40)}`,
+    'current_tag: v1.1.0',
+    `current_sha: ${'b'.repeat(40)}`,
+    `target_path: ${targetPath}`,
+    'inventory_entry: null',
+    'timestamp: 2026-07-17T00:00:00.000Z',
+    'oto_version: 0.5.0',
+    '---',
+    '',
+    body,
+  ].join('\n');
+}
+
+async function writeConflictSidecar(project, upstream, targetPath, body) {
+  const sidecarPath = path.join(project, '.oto-sync-conflicts', upstream, `${targetPath}.md`);
+  await fsp.mkdir(path.dirname(sidecarPath), { recursive: true });
+  await fsp.writeFile(sidecarPath, resolvedSidecar(upstream, targetPath, body));
+  return sidecarPath;
+}
+
 test('WR-01: --upstream all preserves overlapping conflict evidence for both upstreams', async (t) => {
   await preserveFiles(t, REBRAND_REPORTS);
   const fixtureRoot = await makeTempRoot(t, 'oto-sync-all-upstream-fixture-');
@@ -122,4 +149,52 @@ test('WR-01: --upstream all preserves overlapping conflict evidence for both ups
   assert.match(gsdReport, /gsd/);
   assert.match(superpowersReport, /superpowers/);
   assert.equal(fs.existsSync(path.join(project, '.oto-sync-conflicts/REPORT.md')), false);
+});
+
+test('--accept auto-detects one upstream namespace and leaves the other namespace untouched', async (t) => {
+  const project = await makeTempRoot(t);
+  const targetPath = 'oto/workflows/one.md';
+  const gsdSidecar = await writeConflictSidecar(project, 'gsd', targetPath, '# accepted from gsd\n');
+  const untouchedSidecar = await writeConflictSidecar(project, 'superpowers', 'oto/workflows/other.md', '# untouched\n');
+
+  const result = runOtoSync(['--accept', targetPath], project);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(await fsp.readFile(path.join(project, targetPath), 'utf8'), '# accepted from gsd\n');
+  assert.equal(fs.existsSync(gsdSidecar), false);
+  assert.equal(fs.existsSync(untouchedSidecar), true);
+});
+
+test('--accept fails loud on ambiguous provenance and --upstream disambiguates', async (t) => {
+  const project = await makeTempRoot(t);
+  const targetPath = 'oto/workflows/shared.md';
+  const gsdSidecar = await writeConflictSidecar(project, 'gsd', targetPath, '# accepted from gsd\n');
+  const superpowersSidecar = await writeConflictSidecar(project, 'superpowers', targetPath, '# retained from superpowers\n');
+
+  const ambiguous = runOtoSync(['--accept', targetPath], project);
+  assert.notEqual(ambiguous.status, 0);
+  assert.match(ambiguous.stderr, /both upstreams/);
+  assert.match(ambiguous.stderr, /--upstream/);
+  assert.equal(fs.existsSync(gsdSidecar), true);
+  assert.equal(fs.existsSync(superpowersSidecar), true);
+
+  const resolved = runOtoSync(['--accept', targetPath, '--upstream', 'gsd'], project);
+  assert.equal(resolved.status, 0, resolved.stderr || resolved.stdout);
+  assert.equal(await fsp.readFile(path.join(project, targetPath), 'utf8'), '# accepted from gsd\n');
+  assert.equal(fs.existsSync(gsdSidecar), false);
+  assert.equal(fs.existsSync(superpowersSidecar), true);
+});
+
+test('accept flags allow one explicit upstream but reject sync targets and all', () => {
+  const parsed = parseSyncArgs(['--accept', 'oto/workflows/x.md', '--upstream', 'gsd']);
+  assert.equal(parsed.mode, 'accept');
+  assert.equal(parsed.upstream, 'gsd');
+  assert.throws(
+    () => parseSyncArgs(['--accept', 'oto/workflows/x.md', '--to', 'v1.0.0']),
+    /cannot be combined with --to/
+  );
+  assert.throws(
+    () => parseSyncArgs(['--accept', 'oto/workflows/x.md', '--upstream', 'all']),
+    /--upstream must be gsd or superpowers when used with --accept flags/
+  );
 });

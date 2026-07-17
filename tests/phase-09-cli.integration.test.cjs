@@ -215,12 +215,18 @@ test('D-19: oto sync --status shows pending conflicts and last-synced refs', asy
   await fsp.mkdir(path.join(root, '.oto-sync-conflicts/oto/workflows'), { recursive: true });
   await fsp.writeFile(path.join(root, '.oto-sync-conflicts/oto/workflows/a.added.md'), 'x');
   await fsp.writeFile(path.join(root, '.oto-sync-conflicts/oto/workflows/b.deleted.md'), 'x');
+  await fsp.mkdir(path.join(root, '.oto-sync-conflicts/gsd/oto/workflows'), { recursive: true });
+  await fsp.mkdir(path.join(root, '.oto-sync-conflicts/superpowers/nested'), { recursive: true });
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts/gsd/oto/workflows/c.md'), 'x');
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts/gsd/REPORT.md'), 'generated report');
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts/superpowers/nested/REPORT.md'), 'nested generated report');
 
   const code = await runStatus();
   const output = writes.join('');
   assert.equal(code, 0);
   assert.match(output, /v1\.1\.0/);
-  assert.match(output, /M=0 A=1 D=1/);
+  assert.match(output, /pending conflicts: M=1 A=1 D=1/);
+  assert.match(output, /pending conflicts \[gsd\]: M=1 A=0 D=0/);
 });
 
 test('Pitfall 9: git --version parsing - lenient regex; fail-loud on unparseable output', () => {
