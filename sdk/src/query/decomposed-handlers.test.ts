@@ -349,12 +349,13 @@ describe('websearch', () => {
     vi.restoreAllMocks();
   });
 
-  it('returns available:false when BRAVE_API_KEY is not set', async () => {
+  it('returns available:false when neither Brave credential source is set', async () => {
     delete process.env.BRAVE_API_KEY;
     const result = await websearch([], tmpDir);
     const data = result.data as Record<string, unknown>;
     expect(data.available).toBe(false);
-    expect(data.reason).toBe('BRAVE_API_KEY not set');
+    // Phase 16 HARD-01 adds the ~/.oto/brave_api_key fallback after the env rung.
+    expect(data.reason).toBe('No Brave key: set BRAVE_API_KEY or ~/.oto/brave_api_key');
   });
 
   it('returns error when query is empty', async () => {

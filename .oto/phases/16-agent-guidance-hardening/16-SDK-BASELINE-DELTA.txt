@@ -2,176 +2,134 @@
 
 ## Gate Definition
 
-Authoritative baseline: `.oto/phases/14-key-storage-reconciliation/14-SDK-BASELINE.txt`, the Plan 14-16 two-run union.
+Authoritative baseline: `.oto/phases/14-key-storage-reconciliation/14-SDK-BASELINE.txt`, the Plan 14-16 two-run union as amended by the developer on 2026-07-17.
 
 Rules applied:
 
 1. Every currently failing file must appear in the 41-file baseline union.
-2. Every current per-file failure count must be less than or equal to the baseline `max_failed` value.
-3. Each apparent offender is rerun in isolation twice. It is a FLAKE if either isolated run meets the baseline criterion and PERSISTENT only if both isolated runs exceed it.
-4. Any PERSISTENT offender is a Phase 16 regression. The inherited SDK debt must not be dispositioned and HARD-04 must not begin.
+2. Every current per-file failure count must be less than or equal to its authoritative `max_failed` value.
+3. The two `list.todos` / `todo.match-phase` failures remain real, failing, and counted; no golden row is excluded.
+4. This is a baseline-relative regression gate. It does not claim that the full SDK suite is green.
+
+## Developer-Approved Amendment
+
+The developer approved raising only `src/golden/read-only-parity.integration.test.ts` from `max_failed=19` to `max_failed=21` in the authoritative baseline. The exact +2 are the tracked WR-02 planning-root divergence: legacy CJS scans `.planning`, while the SDK reads the real `.oto/todos`. Pre-Phase-16 commit `e4c661b` exposed that divergence by adding a pending todo.
+
+The prior causal investigation established:
+
+- Removing only the pre-Phase-16 todo makes both `list.todos` and `todo.match-phase` parity assertions pass.
+- Reverting Phase 16 SDK-touching commits, including `ddb5c5a` and the 16-02 agent-skills changes, does not remove those two failures.
+- The two todo golden rows were not edited or excluded.
+- No planning-root migration was started.
+
+The amendment is recorded in the authoritative baseline and dispositioned as DEFER in `16-DISPOSITIONS.md`, referencing Phase 15 WR-02.
+
+## Approved Stale-Expectation Corrections
+
+Two pre-HARD-01 websearch expectations encoded the old CJS-only reason `BRAVE_API_KEY not set`. The developer approved aligning them to the intentional Phase 16 SDK env-or-keyfile contract:
+
+`No Brave key: set BRAVE_API_KEY or ~/.oto/brave_api_key`
+
+The decomposed handler expectation now asserts that contract. The golden parity harness normalizes the old CJS no-key reason only when `row.canonical === 'websearch'`; no todo row is normalized or excluded.
+
+Focused command:
+
+`cd sdk && npx vitest run src/query/decomposed-handlers.test.ts src/golden/read-only-parity.integration.test.ts`
+
+Focused result:
+
+```text
+src/query/decomposed-handlers.test.ts: 7 failed (amended baseline max 7)
+src/golden/read-only-parity.integration.test.ts: 21 failed (amended baseline max 21)
+websearch decomposed assertion: PASS
+websearch golden parity row: PASS
+list.todos golden parity row: FAIL and counted
+todo.match-phase golden parity row: FAIL and counted
+```
 
 ## Fresh Full-SDK Run
 
 Command: `cd sdk && npx vitest run`
 
-The isolated worktree had no `sdk/node_modules`, so the first attempt stopped before collection with `ENOTFOUND registry.npmjs.org`. The collected run used a temporary `sdk/node_modules` symlink to the repository's already-installed pinned SDK dependencies, invoked the exact command above from this worktree, captured the complete raw transcript, and removed the symlink afterward.
+Raw output was captured at `/private/tmp/phase16-sdk-full-amended.txt` during this execution.
 
 Result:
 
 ```text
 Test Files  40 failed | 51 passed (91)
-Tests       270 failed | 1332 passed (1602)
-Duration    3.72s
+Tests       268 failed | 1334 passed (1602)
+Duration    3.59s
 Exit code   1
 ```
 
-All 40 currently failing file names are members of the authoritative 41-file union. Two files exceeded their recorded per-file maxima and therefore required isolated adjudication.
+This is expected inherited WR-02 fixture debt under the approved disposition. It is not a green full SDK suite.
 
-## Current Failed Files
+## Amended 41-File Union Comparison
 
 ```text
-src/context-engine.test.ts | failed=12
-src/e2e.integration.test.ts | failed=3
-src/golden/golden.integration.test.ts | failed=16
-src/golden/read-only-parity.integration.test.ts | failed=22
-src/init-e2e.integration.test.ts | failed=1
-src/phase-runner.integration.test.ts | failed=5
-src/query/check-auto-mode.test.ts | failed=3
-src/query/check-completion.test.ts | failed=3
-src/query/check-decision-coverage.test.ts | failed=4
-src/query/check-gates.test.ts | failed=3
-src/query/check-verification-status.test.ts | failed=5
-src/query/commit.test.ts | failed=4
-src/query/config-gates.test.ts | failed=2
-src/query/decomposed-handlers.test.ts | failed=8
-src/query/detect-phase-type.test.ts | failed=5
-src/query/init-complex.test.ts | failed=15
-src/query/init-progress-precedence.test.ts | failed=6
-src/query/init.test.ts | failed=13
-src/query/intel.test.ts | failed=2
-src/query/phase-lifecycle.test.ts | failed=35
-src/query/phase-list-queries.test.ts | failed=4
-src/query/phase-ready.test.ts | failed=1
-src/query/phase.test.ts | failed=14
-src/query/profile.test.ts | failed=1
-src/query/progress.test.ts | failed=2
-src/query/requirements-extract-from-plans.test.ts | failed=1
-src/query/roadmap-update-plan-progress.test.ts | failed=3
-src/query/roadmap.test.ts | failed=16
-src/query/route-next-action.test.ts | failed=2
-src/query/skills.test.ts | failed=3
-src/query/state-mutation.test.ts | failed=20
-src/query/state.test.ts | failed=17
-src/query/sub-repos-root.integration.test.ts | failed=2
-src/query/template.test.ts | failed=4
-src/query/uat.test.ts | failed=1
-src/query/verify.test.ts | failed=3
-src/query/workspace.test.ts | failed=1
-src/query/workstream.test.ts | failed=2
-src/workflow-agent-skills-consistency.test.ts | failed=1
-src/ws-transport.test.ts | failed=5
+src/context-engine.test.ts | current_failed=12 | amended_baseline_max=12 | PASS
+src/e2e.integration.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/golden/golden.integration.test.ts | current_failed=16 | amended_baseline_max=16 | PASS
+src/golden/read-only-parity.integration.test.ts | current_failed=21 | amended_baseline_max=21 | PASS
+src/init-e2e.integration.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/phase-runner.integration.test.ts | current_failed=5 | amended_baseline_max=5 | PASS
+src/query/check-auto-mode.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/query/check-completion.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/query/check-decision-coverage.test.ts | current_failed=4 | amended_baseline_max=4 | PASS
+src/query/check-gates.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/query/check-verification-status.test.ts | current_failed=5 | amended_baseline_max=5 | PASS
+src/query/commit.test.ts | current_failed=4 | amended_baseline_max=4 | PASS
+src/query/config-gates.test.ts | current_failed=2 | amended_baseline_max=2 | PASS
+src/query/decomposed-handlers.test.ts | current_failed=7 | amended_baseline_max=7 | PASS
+src/query/detect-phase-type.test.ts | current_failed=5 | amended_baseline_max=5 | PASS
+src/query/init-complex.test.ts | current_failed=15 | amended_baseline_max=15 | PASS
+src/query/init-progress-precedence.test.ts | current_failed=6 | amended_baseline_max=6 | PASS
+src/query/init.test.ts | current_failed=13 | amended_baseline_max=13 | PASS
+src/query/intel.test.ts | current_failed=2 | amended_baseline_max=2 | PASS
+src/query/phase-lifecycle.test.ts | current_failed=35 | amended_baseline_max=35 | PASS
+src/query/phase-list-queries.test.ts | current_failed=4 | amended_baseline_max=4 | PASS
+src/query/phase-ready.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/query/phase.test.ts | current_failed=14 | amended_baseline_max=14 | PASS
+src/query/profile.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/query/progress.test.ts | current_failed=2 | amended_baseline_max=2 | PASS
+src/query/requirements-extract-from-plans.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/query/roadmap-update-plan-progress.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/query/roadmap.test.ts | current_failed=16 | amended_baseline_max=16 | PASS
+src/query/route-next-action.test.ts | current_failed=2 | amended_baseline_max=2 | PASS
+src/query/skills.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/query/state-mutation.test.ts | current_failed=20 | amended_baseline_max=21 | PASS
+src/query/state.test.ts | current_failed=17 | amended_baseline_max=17 | PASS
+src/query/sub-repos-root.integration.test.ts | current_failed=2 | amended_baseline_max=2 | PASS
+src/query/template.test.ts | current_failed=4 | amended_baseline_max=4 | PASS
+src/query/uat.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/query/verify.test.ts | current_failed=3 | amended_baseline_max=3 | PASS
+src/query/workspace.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/query/workstream.test.ts | current_failed=2 | amended_baseline_max=2 | PASS
+src/workflow-agent-skills-consistency.test.ts | current_failed=1 | amended_baseline_max=1 | PASS
+src/ws-transport.test.ts | current_failed=5 | amended_baseline_max=5 | PASS
 ```
 
-## Baseline Union Comparison
+Baseline-only file not failing in this run: `src/query/registry.test.ts`.
 
-All 41 authoritative baseline entries are included below. `CLEARED` means the baseline member did not fail in the current run.
+Comparison summary:
 
 ```text
-src/context-engine.test.ts | current_failed=12 | baseline_max=12 | WITHIN
-src/e2e.integration.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/golden/golden.integration.test.ts | current_failed=16 | baseline_max=16 | WITHIN
-src/golden/read-only-parity.integration.test.ts | current_failed=22 | baseline_max=19 | OVER
-src/init-e2e.integration.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/phase-runner.integration.test.ts | current_failed=5 | baseline_max=5 | WITHIN
-src/query/check-auto-mode.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/query/check-completion.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/query/check-decision-coverage.test.ts | current_failed=4 | baseline_max=4 | WITHIN
-src/query/check-gates.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/query/check-verification-status.test.ts | current_failed=5 | baseline_max=5 | WITHIN
-src/query/commit.test.ts | current_failed=4 | baseline_max=4 | WITHIN
-src/query/config-gates.test.ts | current_failed=2 | baseline_max=2 | WITHIN
-src/query/decomposed-handlers.test.ts | current_failed=8 | baseline_max=7 | OVER
-src/query/detect-phase-type.test.ts | current_failed=5 | baseline_max=5 | WITHIN
-src/query/init-complex.test.ts | current_failed=15 | baseline_max=15 | WITHIN
-src/query/init-progress-precedence.test.ts | current_failed=6 | baseline_max=6 | WITHIN
-src/query/init.test.ts | current_failed=13 | baseline_max=13 | WITHIN
-src/query/intel.test.ts | current_failed=2 | baseline_max=2 | WITHIN
-src/query/phase-lifecycle.test.ts | current_failed=35 | baseline_max=35 | WITHIN
-src/query/phase-list-queries.test.ts | current_failed=4 | baseline_max=4 | WITHIN
-src/query/phase-ready.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/query/phase.test.ts | current_failed=14 | baseline_max=14 | WITHIN
-src/query/profile.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/query/progress.test.ts | current_failed=2 | baseline_max=2 | WITHIN
-src/query/registry.test.ts | current_failed=0 | baseline_max=1 | CLEARED
-src/query/requirements-extract-from-plans.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/query/roadmap-update-plan-progress.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/query/roadmap.test.ts | current_failed=16 | baseline_max=16 | WITHIN
-src/query/route-next-action.test.ts | current_failed=2 | baseline_max=2 | WITHIN
-src/query/skills.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/query/state-mutation.test.ts | current_failed=20 | baseline_max=21 | WITHIN
-src/query/state.test.ts | current_failed=17 | baseline_max=17 | WITHIN
-src/query/sub-repos-root.integration.test.ts | current_failed=2 | baseline_max=2 | WITHIN
-src/query/template.test.ts | current_failed=4 | baseline_max=4 | WITHIN
-src/query/uat.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/query/verify.test.ts | current_failed=3 | baseline_max=3 | WITHIN
-src/query/workspace.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/query/workstream.test.ts | current_failed=2 | baseline_max=2 | WITHIN
-src/workflow-agent-skills-consistency.test.ts | current_failed=1 | baseline_max=1 | WITHIN
-src/ws-transport.test.ts | current_failed=5 | baseline_max=5 | WITHIN
+current_failed_files=40
+baseline_union_files=41
+new_files=0
+over_max_files=0
 ```
 
 ## Isolated Adjudication
 
-### PERSISTENT: src/golden/read-only-parity.integration.test.ts
+NONE. No current file exceeds the amended baseline and no new failing file exists, so no offender reruns are required.
 
-Baseline criterion: `failed <= 19`.
+## Scope Disposition
 
-Command for each run: `cd sdk && npx vitest run src/golden/read-only-parity.integration.test.ts`
-
-```text
-Run 1: exit 1; Test Files 1 failed (1); Tests 22 failed | 18 passed (40); Duration 2.46s
-Run 2: exit 1; Test Files 1 failed (1); Tests 22 failed | 18 passed (40); Duration 2.35s
-```
-
-Both isolated runs exceeded the baseline maximum by 3. Classification: `PERSISTENT`.
-
-### PERSISTENT: src/query/decomposed-handlers.test.ts
-
-Baseline criterion: `failed <= 7`.
-
-Command for each run: `cd sdk && npx vitest run src/query/decomposed-handlers.test.ts`
-
-```text
-Run 1: exit 1; Test Files 1 failed (1); Tests 8 failed | 24 passed (32); Duration 344ms
-Run 2: exit 1; Test Files 1 failed (1); Tests 8 failed | 24 passed (32); Duration 345ms
-```
-
-Both isolated runs exceeded the baseline maximum by 1. Classification: `PERSISTENT`.
-
-## Root-Cause Classification (2026-07-17)
-
-The four excess assertions were bisected against Phase 16's SDK-touching changes before any fix was attempted:
-
-- Reverting `ddb5c5a`, `ee0317a` + `b01d1d9`, or `9cf3d11` leaves all four excess assertions failing.
-- `src/query/decomposed-handlers.test.ts` — `websearch returns available:false when BRAVE_API_KEY is not set` — and the golden `websearch` parity row assert the old exact reason `BRAVE_API_KEY not set`. Commit `ce91d4d` intentionally added the HARD-01 Brave keyfile rung and changed the no-key reason to `No Brave key: set BRAVE_API_KEY or ~/.oto/brave_api_key`. At `ce91d4d^` the old assertions pass while the new Phase 16 keyfile tests fail; at `ce91d4d` all five credential-resolution tests pass while these two old expectations fail. These are stale pre-Phase-16 expectations, not production-code regressions. They remain unedited pending developer approval.
-- The `list.todos` and `todo.match-phase` golden parity rows differ because pre-Phase-16 commit `e4c661b` added a real `.oto/todos/pending/` item. The SDK correctly reports one pending todo; legacy CJS still scans `.planning` and reports zero. Temporarily removing only that todo makes both assertions pass. This is the tracked WR-02 planning-root debt family, not a Phase 16 production-code regression. Fixing the parity in production would begin the separately scoped planning-root migration; hiding it in the golden test would weaken a real parity check. Neither action was taken.
-
-The baseline gate verdict remains `FAIL`: causal classification does not adjust the baseline, maxima, or adjudication rule.
-
-## Fixture-Debt Mapping and Scope Decision
-
-The current failure set still carries the tracked WR-02 planning-root debt family: fixtures and golden captures expect `.planning/` roots and `gsd_state_version` markers while the OTO-native implementation consumes `.oto/` and `oto_state_version`. The 40 failed-file names all map to the recorded Plan 14-16 union, but the two persistent per-file count increases do not satisfy the authorized baseline-relative disposition rule.
-
-No inherited-debt DEFER disposition was recorded. No broader SDK planning-root migration was started. That migration remains a separately planned bounded work item.
+The inherited WR-02 `.planning` fixture-root / `gsd_state_version` debt is DEFERRED under the developer-approved bounded disposition in `16-DISPOSITIONS.md`. The broader planning-root migration remains a separately planned, bounded task and is not part of Plan 16-06. It must be scheduled before milestone close if milestone hard gates require the full SDK suite to be green.
 
 ## Verdict
 
-NO NEW FAILURES: FAIL
+NO NEW FAILURES: PASS
 
-Persistent gate-offender files awaiting developer decision:
-
-- `src/golden/read-only-parity.integration.test.ts` — 22 current; baseline max 19; isolated runs 22 and 22.
-- `src/query/decomposed-handlers.test.ts` — 8 current; baseline max 7; isolated runs 8 and 8.
-
-Plan 16-06 stops before HARD-04. HARD-04, HARD-05, phase verification, and code review did not run.
+Plan 16-06 may proceed to the HARD-04 human checkpoint. HARD-04 has not been simulated; HARD-05 has not started.
