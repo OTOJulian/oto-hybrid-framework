@@ -20,6 +20,13 @@ test('shared search reference defines the runtime-neutral fallback contract', ()
   assert.match(content, /429/);
   assert.match(content, /oto-sdk query websearch/);
   assert.match(content, /tool-not-found/);
+  assert.match(content, /"available": false/);
+  assert.match(content, /tool list/);
+  assert.equal(content.includes('`exa_search`'), false);
+  assert.equal(content.includes('`brave_search`'), false);
+  assert.equal(content.includes('`firecrawl`'), false);
+  assert.equal(content.includes('carries three booleans'), false);
+  assert.equal(content.includes('_available'), false);
   assert.equal(content.includes('mcp__'), false, 'reference must not contain runtime-specific MCP namespaces');
 
   const exaIndex = content.indexOf('Exa semantic search');
