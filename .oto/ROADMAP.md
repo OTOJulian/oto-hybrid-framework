@@ -155,7 +155,7 @@ Notes: HARD-02's boolean-validation and no-plaintext-guard test families natural
   3. With no key or server present, research flows complete with zero user-facing errors via the Brave/WebSearch fallback (regression floor holds)
   4. An end-to-end check proves `mcp__exa__*` tools reach a tools-restricted subagent (guards the claude-code#13898 regression class)
   5. The generated runtime matrix has an Exa MCP row per runtime, docs cover setup with qualitative (not hard-coded) rate-limit phrasing, and `oto sync --dry-run` passes the conflict-surface check at milestone close
-**Plans**: 6 plans
+**Plans**: 8 plans (6 complete + 2 gap closure)
 
 Plans:
 - [x] 16-01-PLAN.md — Shared runtime-neutral search-tools.md reference + three researchers consume it by include (GUID-01/02)
@@ -164,8 +164,10 @@ Plans:
 - [x] 16-04-PLAN.md — Runtime-matrix Exa MCP section (regen-diff gated) + docs/search-integrations.md with qualitative rate-limit phrasing (HARD-03)
 - [x] 16-05-PLAN.md — Debugger/advisor mcp__exa__* frontmatter + include (GUID-03) + transform-output grep-guards (GUID-04/05)
 - [x] 16-06-PLAN.md — HARD-04 live subagent e2e checkpoint (keyed + keyless legs, wildcard contingency) + HARD-05 sync dry-run + phase close
+- [ ] 16-07-PLAN.md — Gap closure (HARD-05/WR-01): per-upstream `.oto-sync-conflicts/<upstream>/` namespacing, provenance-safe --status/--accept, e2e --upstream all overlap test
+- [ ] 16-08-PLAN.md — Gap closure (GUID-01/WR-03): runtime-observable availability contract in search-tools.md + end-to-end init→spawn-prompt coherence and live Brave-probe tests
 
-Notes: Consolidate the shared reference BEFORE extending guidance to new agents (the three researchers already disagree with each other). Light research flag: re-verify Exa free-tier limits at docs-writing time; phrase qualitatively. Verify Codex/Gemini MCP tool naming empirically against transformed agent output.
+Notes: Consolidate the shared reference BEFORE extending guidance to new agents (the three researchers already disagree with each other). Light research flag: re-verify Exa free-tier limits at docs-writing time; phrase qualitatively. Verify Codex/Gemini MCP tool naming empirically against transformed agent output. Gap plans 16-07/16-08 close the two 16-VERIFICATION.md blockers; WR-02 remains developer-approved DEFER (tracked debt, not re-planned).
 
 ## Progress
 
@@ -185,7 +187,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 12/12 | Complete    | 2026-07-14 |
-| 16. Agent Guidance + Hardening | v0.5.0 | 6/6 | Complete   | 2026-07-17 |
+| 16. Agent Guidance + Hardening | v0.5.0 | 6/8 | Gap closure | — |
 
 ---
 
