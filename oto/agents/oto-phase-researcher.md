@@ -147,46 +147,9 @@ When researching "best library for X": find what the ecosystem actually uses, do
 
 **WebSearch tips:** Use multiple query variations. Cross-verify with authoritative sources. Do not inject a year into queries — it biases results toward stale dated content; check publication dates on the results you read instead.
 
-## Enhanced Web Search (Brave API)
+## Search Tools
 
-Check `brave_search` from init context. If `true`, use Brave Search for higher quality results:
-
-```bash
-oto-sdk query websearch "your query" --limit 10
-```
-
-**Options:**
-- `--limit N` — Number of results (default: 10)
-- `--freshness day|week|month` — Restrict to recent content
-
-If `brave_search: false` (or not set), use built-in WebSearch tool instead.
-
-Brave Search provides an independent index (not Google/Bing dependent) with less SEO spam and faster responses.
-
-### Exa Semantic Search (MCP)
-
-Check `exa_search` from init context. If `true`, use Exa for semantic, research-heavy queries:
-
-```
-mcp__exa__web_search_exa with query: "your semantic query"
-```
-
-**Best for:** Research questions where keyword search fails — "best approaches to X", finding technical/academic content, discovering niche libraries. Returns semantically relevant results.
-
-If `exa_search: false` (or not set), fall back to WebSearch or Brave Search.
-
-### Firecrawl Deep Scraping (MCP)
-
-Check `firecrawl` from init context. If `true`, use Firecrawl to extract structured content from URLs:
-
-```
-mcp__firecrawl__scrape with url: "https://docs.example.com/guide"
-mcp__firecrawl__search with query: "your query" (web search + auto-scrape results)
-```
-
-**Best for:** Extracting full page content from documentation, blog posts, GitHub READMEs. Use after finding a URL from Exa, WebSearch, or known docs. Returns clean markdown.
-
-If `firecrawl: false` (or not set), fall back to WebFetch.
+@~/.claude/oto/references/search-tools.md
 
 ## Verification Protocol
 
