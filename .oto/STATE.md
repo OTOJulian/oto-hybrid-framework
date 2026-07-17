@@ -3,9 +3,9 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 16 Plan 06 — stale-test and WR-02 debt decision required
-last_updated: "2026-07-17T20:29:42.000Z"
-last_activity: 2026-07-17 -- Four excess SDK assertions root-caused; no production-code regression found
+stopped_at: Phase 16 Plan 06 Task 2 — HARD-04 human verification checkpoint
+last_updated: "2026-07-17T20:51:50.000Z"
+last_activity: 2026-07-17 -- Developer-approved baseline amendment applied; SDK delta gate PASS
 progress:
   total_phases: 3
   completed_phases: 2
@@ -27,15 +27,15 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 16 (agent-guidance-hardening) — EXECUTING
-Plan: 6 of 6 (Task 1 decision gate)
-Status: Blocked — developer decision on stale expectations and WR-02 parity debt
-Last activity: 2026-07-17 -- Four excess SDK assertions root-caused; no production-code regression found
+Plan: 6 of 6 (Task 2 HARD-04 checkpoint)
+Status: Human verification required — keyed and keyless live legs
+Last activity: 2026-07-17 -- Developer-approved baseline amendment applied; SDK delta gate PASS
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plans 01-05 are complete. Plan 06 stopped before HARD-04. Root-cause bisect found that two excess websearch assertions are stale pre-`ce91d4d` expectations for the intentionally changed HARD-01 keyfile-aware reason, while two todo parity assertions expose the tracked WR-02 CJS `.planning` versus SDK `.oto` debt after pre-Phase-16 commit `e4c661b` added a pending todo. No code, test, baseline, or gate was changed. Developer decision is required before resuming `/oto-execute-phase 16`.
+Phase 16 Plans 01-05 are complete. Plan 06 Task 1 passed its developer-approved baseline-relative SDK gate: `decomposed-handlers=7`, `read-only-parity=21`, 40 inherited failing files, zero new/over-max files, and `NO NEW FAILURES: PASS`. Complete the HARD-04 keyed/keyless live checkpoint, then resume `/oto-execute-phase 16` for HARD-05, code review, and verification.
 
 ## Performance Metrics
 
@@ -114,6 +114,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - **Phase 15 pre-task (FRESH-CR-02, deferred from Phase 14 fresh review):** own per-runtime config-dir resolution plus the `/oto-settings-integrations` per-runtime status surface across Claude, Codex, Gemini, and custom config directories.
 - **Phase 16 pre-task (FRESH-CR-03, deferred from Phase 14 fresh review):** alongside WR-04, own effective root-to-workstream secret-status flags and root-layer legacy migration, including inherited booleans and legacy-string post-state.
 - **Post-Phase 15 tooling quick task:** `oto-sdk query verify.codebase-drift` still targets removed `get-shit-done/bin/gsd-tools.cjs`, so the non-blocking drift gate skips with `sdk-exception`. Fix the OTO-native helper routing and add a JSON-contract regression via `/oto-quick`. Tracked in `.oto/todos/pending/2026-07-14-fix-codebase-drift-stale-gsd-helper-path.md`.
+- **Pre-milestone-close bounded task (WR-02 planning-root migration):** schedule the CJS/SDK `.planning` → `.oto` planning-root and stale-fixture migration as its own bounded task; do not fold it into Plan 16-06. It remains required before milestone close if milestone hard gates require the full SDK suite to be green. Evidence and the developer-approved temporary baseline amendment are recorded in `16-DISPOSITIONS.md` and `16-SDK-BASELINE-DELTA.txt`.
 
 ### Blockers/Concerns
 
