@@ -110,6 +110,8 @@ Common entry points:
 
 - [`docs/oto-command-routing-guide.pdf`](docs/oto-command-routing-guide.pdf) - a
   visual guide to which `/oto-*` command to use for a given task.
+- [`docs/search-integrations.md`](docs/search-integrations.md) - Exa MCP setup,
+  Brave search, and the fallback ladder.
 - [`docs/upstream-sync.md`](docs/upstream-sync.md) - how to pull, rebrand, and
   merge upstream changes.
 - [`docs/rebrand-engine.md`](docs/rebrand-engine.md) - how the rule-typed

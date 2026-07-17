@@ -167,3 +167,10 @@ _oto v0.4.1 - generated_
 
 **Codex column at v0.1.0 close: 100% green (D-09).**
 **Gemini column per D-12 daily-peer bar: 100% green.**
+
+## 6. MCP Servers per Runtime
+| MCP server | Claude | Codex | Gemini |
+| --- | --- | --- | --- |
+| `exa` (launcher-stdio, `oto/hooks/oto-exa-mcp.js`, pinned `exa-mcp-server@3.2.1`) | `~/.claude.json` `mcpServers.exa` (user scope, additive JSON merge, oto-fingerprinted) | `~/.codex/config.toml` OTO-marker `[mcp_servers.exa]` block | `~/.gemini/settings.json` `mcpServers.exa` (stdio `command`+`args`, no `url`/`httpUrl`) |
+
+Tool surface: exactly `web_search_exa`, `web_fetch_exa`, `web_search_advanced_exa` (MCP-06). Registration is consent-gated (default No) and conditional on a detected key (MCP-01/MCP-07); uninstall removes only oto-fingerprinted entries (MCP-08).
