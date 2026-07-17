@@ -132,6 +132,17 @@ test('Pitfall 12: --main ref emits stderr warning before clone', async (t) => {
   assert.match(writes.join(''), /branch pin .* drifts/);
 });
 
+test("documented 'latest' ref clones the upstream default branch HEAD", async (t) => {
+  const { root, fixture } = await makeFixture(t);
+  const destDir = path.join(root, 'sync', 'gsd');
+
+  const record = await pullUpstream({ name: 'gsd', url: fixture.bareUrl, ref: 'latest', destDir });
+
+  assert.equal(record.ref, 'latest');
+  assert.equal(record.ref_kind, 'branch');
+  assert.equal(await fsp.readFile(path.join(destDir, 'current', 'README.md'), 'utf8'), 'line1\nline2 EDIT\nline3 EDIT\n');
+});
+
 test('Pitfall 10: re-pull of identical SHA short-circuits via git ls-remote', async (t) => {
   const { root, fixture } = await makeFixture(t);
   const destDir = path.join(root, 'sync', 'gsd');

@@ -142,10 +142,17 @@ async function runFullSync(parsed) {
     if (upstream !== 'gsd' && upstream !== 'superpowers') {
       throw new Error(`unknown upstream '${upstream}' (must be gsd, superpowers, or all)`);
     }
-    const status = await runOneFullSync(upstream, parsed);
-    if (status !== 0) return status;
   }
-  return 0;
+  return runUpstreamSequence(upstreams, (upstream) => runOneFullSync(upstream, parsed));
+}
+
+async function runUpstreamSequence(upstreams, runner) {
+  let exitCode = 0;
+  for (const upstream of upstreams) {
+    const status = await runner(upstream);
+    if (status !== 0 && exitCode === 0) exitCode = status;
+  }
+  return exitCode;
 }
 
 async function countConflicts(conflictsDir) {
@@ -229,4 +236,4 @@ async function runSync(argv) {
   }
 }
 
-module.exports = { runSync, parseSyncArgs, runStatus, runFullSync };
+module.exports = { runSync, parseSyncArgs, runStatus, runFullSync, runUpstreamSequence };

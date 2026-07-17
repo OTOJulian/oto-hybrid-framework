@@ -6,7 +6,6 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 const { mergeOneFile, looksBinary, emitYamlHeader } = require('../bin/lib/sync-merge.cjs');
 
 const TRIO = path.join(__dirname, 'fixtures/phase-09/three-version-trio');
@@ -36,23 +35,49 @@ test('SYN-04: 3-way merge - same-line clash returns exit > 0 + content with <<<<
   assert.match(result.content, /<<<<<<<|=======|>>>>>>>/);
 });
 
-test('SYN-04 / Pitfall 1: missing input file -> exit 255 -> mergeOneFile throws diagnostic error', () => {
-  assert.throws(() => {
-    mergeOneFile({
-      otoPath: path.join(TRIO, 'conflict-current.txt'),
-      basePath: path.join(TRIO, 'missing.txt'),
-      otherPath: path.join(TRIO, 'conflict-other.txt'),
-      targetPath: 'missing.txt',
-    });
-  }, /unexpected null trio/);
+test('SYN-04: first sync without a prior marks differing local/upstream content as conflict', () => {
+  const result = mergeOneFile({
+    otoPath: path.join(TRIO, 'conflict-current.txt'),
+    basePath: path.join(TRIO, 'missing.txt'),
+    otherPath: path.join(TRIO, 'conflict-other.txt'),
+    targetPath: 'first-sync-conflict.txt',
+  });
 
-  const raw = spawnSync('git', [
-    'merge-file', '-p',
-    path.join(TRIO, 'conflict-current.txt'),
-    path.join(TRIO, 'missing.txt'),
-    path.join(TRIO, 'conflict-other.txt'),
-  ], { encoding: 'utf8' });
-  assert.equal(raw.status, 255);
+  assert.equal(result.kind, 'conflict');
+  assert.equal(result.hunks, 1);
+  assert.match(result.content, /<<<<<<< oto-current/);
+  assert.match(result.content, />>>>>>> upstream-rebranded/);
+});
+
+test('SYN-04: first sync without a prior marks identical local/upstream content clean', async (t) => {
+  const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'oto-first-sync-'));
+  t.after(() => fsp.rm(root, { recursive: true, force: true }));
+  const oto = path.join(root, 'oto.txt');
+  const upstream = path.join(root, 'upstream.txt');
+  await fsp.writeFile(oto, 'same\n');
+  await fsp.writeFile(upstream, 'same\n');
+
+  const result = mergeOneFile({
+    otoPath: oto,
+    basePath: path.join(root, 'missing-prior.txt'),
+    otherPath: upstream,
+    targetPath: 'first-sync-clean.txt',
+  });
+
+  assert.equal(result.kind, 'clean');
+  assert.equal(result.content, 'same\n');
+});
+
+test('SYN-04: first sync without a prior marks local-only inventory content deleted upstream', () => {
+  const result = mergeOneFile({
+    otoPath: path.join(TRIO, 'current.txt'),
+    basePath: path.join(TRIO, 'missing-prior.txt'),
+    otherPath: path.join(TRIO, 'missing-upstream.txt'),
+    targetPath: 'first-sync-deleted.txt',
+  });
+
+  assert.equal(result.kind, 'deleted');
+  assert.equal(result.content.toString('utf8'), 'alpha-EDITED\nbeta\ngamma\n');
 });
 
 test('SYN-04 / Pitfall 4: binary input (NUL byte in first 8KB) routed to sidecar - git merge-file NOT invoked', async (t) => {

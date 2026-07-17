@@ -65,6 +65,24 @@ function mergeOneFile({ otoPath, basePath, otherPath, targetPath }) {
   if (otoBuf == null && baseBuf == null && otherBuf != null) {
     return { kind: 'added', content: otherBuf };
   }
+  if (otoBuf != null && baseBuf == null && otherBuf != null) {
+    if (looksBinary(otoBuf) || looksBinary(otherBuf)) {
+      return { kind: 'binary', content: otherBuf };
+    }
+    if (otoBuf.equals(otherBuf)) {
+      return { kind: 'clean', content: otherBuf.toString('utf8') };
+    }
+    const otoText = otoBuf.toString('utf8').replace(/\n?$/, '\n');
+    const upstreamText = otherBuf.toString('utf8').replace(/\n?$/, '\n');
+    return {
+      kind: 'conflict',
+      content: `<<<<<<< oto-current\n${otoText}=======\n${upstreamText}>>>>>>> upstream-rebranded\n`,
+      hunks: 1,
+    };
+  }
+  if (otoBuf != null && baseBuf == null && otherBuf == null) {
+    return { kind: 'deleted', content: otoBuf };
+  }
   if (otoBuf != null && baseBuf != null && otherBuf == null) {
     return { kind: 'deleted', content: baseBuf };
   }

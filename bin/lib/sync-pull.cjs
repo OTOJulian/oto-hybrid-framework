@@ -18,7 +18,7 @@ function validateRef(ref) {
 
 function classifyRef(ref) {
   if (SHA_RE.test(ref)) return 'sha';
-  if (ref === 'main' || ref === 'master') return 'branch';
+  if (ref === 'latest' || ref === 'main' || ref === 'master') return 'branch';
   return 'tag-or-branch';
 }
 
@@ -85,7 +85,7 @@ async function pullUpstream({ name, url, ref, destDir }) {
   assertGitVersion();
   validateRef(ref);
 
-  if (ref === 'main' || ref === 'master') {
+  if (ref === 'latest' || ref === 'main' || ref === 'master') {
     process.stderr.write(`oto sync: warning — branch pin '${ref}' drifts silently between syncs. Prefer a tag.\n`);
   }
 
@@ -96,7 +96,7 @@ async function pullUpstream({ name, url, ref, destDir }) {
 
   let resolvedSha = null;
   try {
-    resolvedSha = resolveSha(url, ref);
+    resolvedSha = resolveSha(url, ref === 'latest' ? 'HEAD' : ref);
   } catch {
     resolvedSha = null;
   }
@@ -108,7 +108,9 @@ async function pullUpstream({ name, url, ref, destDir }) {
 
   await rotateSnapshots(destDir);
 
-  if (kind === 'sha') {
+  if (ref === 'latest') {
+    runGit(['clone', '--depth', '1', url, current]);
+  } else if (kind === 'sha') {
     runGit(['clone', url, current]);
     runGit(['checkout', ref], { cwd: current });
   } else {

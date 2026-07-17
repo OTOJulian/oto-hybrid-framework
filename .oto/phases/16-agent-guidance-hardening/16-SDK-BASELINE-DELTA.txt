@@ -133,3 +133,26 @@ The inherited WR-02 `.planning` fixture-root / `gsd_state_version` debt is DEFER
 NO NEW FAILURES: PASS
 
 Plan 16-06 may proceed to the HARD-04 human checkpoint. HARD-04 has not been simulated; HARD-05 has not started.
+
+## Final Close Rerun (2026-07-17)
+
+Command: `cd sdk && npx --no-install vitest run --reporter=json --outputFile=/private/tmp/phase16-sdk-final.json`
+
+```text
+Test Files  40 failed | 51 passed (91)
+Tests       268 failed | 1334 passed (1602)
+Exit code   1 (expected inherited-debt result)
+
+current_failed_files=40
+baseline_union_files=41
+new_files=0
+over_max_files=0
+
+src/query/decomposed-handlers.test.ts=7 (max 7)
+src/golden/read-only-parity.integration.test.ts=21 (max 21)
+src/query/state-mutation.test.ts=20 (max 21)
+```
+
+Final verdict: `NO NEW FAILURES: PASS`.
+
+The full SDK suite remains red only within the developer-approved inherited WR-02 disposition. This rerun does not adjust the baseline, exclude either todo-parity golden row, or begin the planning-root migration.

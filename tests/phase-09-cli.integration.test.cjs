@@ -7,7 +7,7 @@ const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const { parseSyncArgs, runStatus } = require('../bin/lib/sync-cli.cjs');
+const { parseSyncArgs, runStatus, runUpstreamSequence } = require('../bin/lib/sync-cli.cjs');
 const { assertGitVersion } = require('../bin/lib/sync-pull.cjs');
 const { buildBareUpstream } = require('./fixtures/phase-09/build-bare-upstream.cjs');
 
@@ -124,6 +124,17 @@ test("D-19: bin/install.js dispatches 'oto sync ...' to bin/lib/sync-cli.cjs", (
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /oto sync — status/);
   assert.doesNotMatch(result.stderr, /Invalid argument/);
+});
+
+test("--upstream all visits both upstreams and preserves a finding status", async () => {
+  const calls = [];
+  const status = await runUpstreamSequence(['gsd', 'superpowers'], async (upstream) => {
+    calls.push(upstream);
+    return upstream === 'gsd' ? 1 : 0;
+  });
+
+  assert.deepEqual(calls, ['gsd', 'superpowers']);
+  assert.equal(status, 1);
 });
 
 test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> end-to-end against bare-repo fixture (default --dry-run, no writes)', async (t) => {

@@ -214,6 +214,7 @@ function applyCoverageCleanup(text) {
     { pattern: /gsd_state_version/g, to: 'oto_state_version' },
     { pattern: /gsd-sdk/g, to: 'oto-sdk' },
     { pattern: /(?<![A-Za-z])gsd(?=[A-Z_\d-])/g, to: 'oto' },
+    { pattern: /(?<=\\b)gsd(?=-)/g, to: 'oto' },
     { pattern: /(?<![A-Za-z])GSD(?=[A-Z_\d-])/g, to: 'OTO' },
     { pattern: /gsd(?=[A-Z][a-z])/g, to: 'oto' },
     { pattern: /GSD(?=[A-Z][a-z])/g, to: 'OTO' },

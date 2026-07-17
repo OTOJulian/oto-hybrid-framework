@@ -39,3 +39,33 @@ test('coverage manifest reports non-allowlisted post failures', () => {
   }, { pathGlobs: [], literals: [], regexes: [] });
   assert.deepEqual(failures, [{ path: 'foo.md', token: 'gsd', count: 5 }]);
 });
+
+test('current upstream-only regression tests are explicitly coverage-allowlisted', () => {
+  const allowlist = loadAllowlist();
+  const sources = new Set(allowlist.pathGlobs.map((entry) => entry.source));
+  for (const relPath of [
+    'tests/bug-2808-skill-hyphen-name.test.cjs',
+    'tests/bug-3677-agent-colon-namespace-leak.test.cjs',
+    'tests/enh-2792-namespace-skills.test.cjs',
+  ]) {
+    assert.ok(sources.has(relPath), `missing explicit upstream-only coverage classification: ${relPath}`);
+  }
+});
+
+test('coverage cleanup rebrands a gsd-hyphen regex in retained install-profiles', { timeout: 30000 }, async (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oto-coverage-install-profiles-'));
+  const out = path.join(root, 'out');
+  const reportsDir = path.join(root, 'reports');
+  const source = path.join(root, 'get-shit-done', 'bin', 'lib', 'install-profiles.cjs');
+  fs.mkdirSync(path.dirname(source), { recursive: true });
+  fs.writeFileSync(source, "const matches = content.match(/\\bgsd-[a-z][a-z-]*/g);\n");
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const result = await engine.run({ mode: 'apply', target: root, out, reportsDir, owner: 'OTOJulian' });
+
+  assert.equal(result.exitCode, 0);
+  assert.equal(
+    fs.readFileSync(path.join(out, 'oto', 'bin', 'lib', 'install-profiles.cjs'), 'utf8'),
+    "const matches = content.match(/\\boto-[a-z][a-z-]*/g);\n",
+  );
+});
