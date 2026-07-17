@@ -55,6 +55,16 @@ const FRONTMATTER_ROWS = [
   ['model_reasoning_effort', 'n/a', 'profile-resolved .toml', 'n/a'],
 ];
 
+// OTO Phase 16 (HARD-03): MCP server registration per runtime (Phase 15 adapters).
+const MCP_SERVER_ROWS = [
+  [
+    '`exa` (launcher-stdio, `oto/hooks/oto-exa-mcp.js`, pinned `exa-mcp-server@3.2.1`)',
+    '`~/.claude.json` `mcpServers.exa` (user scope, additive JSON merge, oto-fingerprinted)',
+    '`~/.codex/config.toml` OTO-marker `[mcp_servers.exa]` block',
+    '`~/.gemini/settings.json` `mcpServers.exa` (stdio `command`+`args`, no `url`/`httpUrl`)',
+  ],
+];
+
 const KNOWN_CLAUDE_TOOLS = [
   ...Object.keys(claudeToGeminiTools),
   'Task',
@@ -297,6 +307,10 @@ function renderMatrix(ctx = {}) {
     renderTable(['/oto-* command', 'Claude', 'Codex', 'Gemini', 'Notes'], commandRows),
     '**Codex column at v0.1.0 close: 100% green (D-09).**',
     '**Gemini column per D-12 daily-peer bar: 100% green.**',
+    '',
+    '## 6. MCP Servers per Runtime',
+    renderTable(['MCP server', 'Claude', 'Codex', 'Gemini'], MCP_SERVER_ROWS),
+    'Tool surface: exactly `web_search_exa`, `web_fetch_exa`, `web_search_advanced_exa` (MCP-06). Registration is consent-gated (default No) and conditional on a detected key (MCP-01/MCP-07); uninstall removes only oto-fingerprinted entries (MCP-08).',
     '',
   ].join('\n');
 }
