@@ -91,14 +91,15 @@ Test files are created RED-first inside the same tasks that turn them green (tdd
 - Installed Claude debugger contains one `mcp__exa__*` wildcard; installed shared search reference byte-matches the repository copy.
 - `detectKeySource('exa').source` — `keyfile`; no credential bytes were printed.
 
-### Blocking gate — Phase 16 regression
+### Blocking gate — persistent assertion deltas awaiting developer decision
 
 - `cd sdk && npx vitest run` — FAIL: 40 test files failed, 51 passed; 270 tests failed, 1332 passed.
 - The machine comparison against Plan 14-16's authoritative 41-file two-run union found no new failing file name, but found two per-file count offenders: `src/golden/read-only-parity.integration.test.ts` at 22 failures versus baseline max 19, and `src/query/decomposed-handlers.test.ts` at 8 failures versus baseline max 7.
 - Both offenders are **PERSISTENT** under the terminal baseline rule. Two isolated runs of `read-only-parity` each failed 22 tests; two isolated runs of `decomposed-handlers` each failed 8 tests. Neither run met its baseline maximum.
 - Durable evidence: `16-SDK-BASELINE-DELTA.txt`, verdict `NO NEW FAILURES: FAIL`.
+- Root-cause bisect found no production-code regression: two excess websearch assertions encode the old pre-`ce91d4d` reason string despite the intentional HARD-01 Brave keyfile behavior, while two todo parity assertions expose the tracked CJS `.planning` versus SDK `.oto` WR-02 debt after pre-Phase-16 commit `e4c661b` added a real pending todo. No code or tests were edited under the stale-expectation decision rule.
 - The inherited WR-02 `.planning` fixture-root / `gsd_state_version` debt was **not dispositioned** because the zero-net-new precondition failed. No broader SDK planning-root migration was started.
-- Task 2 HARD-04 was not presented or simulated. HARD-05, phase verification, and code review did not run. Plan 16-06 is stopped on this Phase 16 regression.
+- Task 2 HARD-04 was not presented or simulated. HARD-05, phase verification, and code review did not run. Plan 16-06 is stopped for the developer's explicit stale-test/debt decision.
 
 ---
 

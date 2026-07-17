@@ -3,9 +3,9 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
-stopped_at: Phase 16 Plan 06 regression gate — two persistent SDK offenders above baseline
-last_updated: "2026-07-17T19:10:11.000Z"
-last_activity: 2026-07-17 -- Phase 16 regression confirmed; HARD-04 and HARD-05 not started
+stopped_at: Phase 16 Plan 06 — stale-test and WR-02 debt decision required
+last_updated: "2026-07-17T20:29:42.000Z"
+last_activity: 2026-07-17 -- Four excess SDK assertions root-caused; no production-code regression found
 progress:
   total_phases: 3
   completed_phases: 2
@@ -27,15 +27,15 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 16 (agent-guidance-hardening) — EXECUTING
-Plan: 6 of 6 (Task 1 regression gate failed)
-Status: Blocked — persistent Phase 16 SDK regression
-Last activity: 2026-07-17 -- Phase 16 regression confirmed; HARD-04 and HARD-05 not started
+Plan: 6 of 6 (Task 1 decision gate)
+Status: Blocked — developer decision on stale expectations and WR-02 parity debt
+Last activity: 2026-07-17 -- Four excess SDK assertions root-caused; no production-code regression found
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plans 01-05 are complete. Plan 06 stopped before HARD-04 because the baseline-diff gate found two persistent count regressions: `src/golden/read-only-parity.integration.test.ts` (22 vs baseline max 19; isolated 22/22) and `src/query/decomposed-handlers.test.ts` (8 vs baseline max 7; isolated 8/8). No DEFER disposition was recorded. See `16-SDK-BASELINE-DELTA.txt`; diagnose or re-plan these regressions before resuming `/oto-execute-phase 16`.
+Phase 16 Plans 01-05 are complete. Plan 06 stopped before HARD-04. Root-cause bisect found that two excess websearch assertions are stale pre-`ce91d4d` expectations for the intentionally changed HARD-01 keyfile-aware reason, while two todo parity assertions expose the tracked WR-02 CJS `.planning` versus SDK `.oto` debt after pre-Phase-16 commit `e4c661b` added a pending todo. No code, test, baseline, or gate was changed. Developer decision is required before resuming `/oto-execute-phase 16`.
 
 ## Performance Metrics
 

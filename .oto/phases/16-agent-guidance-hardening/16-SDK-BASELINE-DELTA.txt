@@ -149,6 +149,16 @@ Run 2: exit 1; Test Files 1 failed (1); Tests 8 failed | 24 passed (32); Duratio
 
 Both isolated runs exceeded the baseline maximum by 1. Classification: `PERSISTENT`.
 
+## Root-Cause Classification (2026-07-17)
+
+The four excess assertions were bisected against Phase 16's SDK-touching changes before any fix was attempted:
+
+- Reverting `ddb5c5a`, `ee0317a` + `b01d1d9`, or `9cf3d11` leaves all four excess assertions failing.
+- `src/query/decomposed-handlers.test.ts` — `websearch returns available:false when BRAVE_API_KEY is not set` — and the golden `websearch` parity row assert the old exact reason `BRAVE_API_KEY not set`. Commit `ce91d4d` intentionally added the HARD-01 Brave keyfile rung and changed the no-key reason to `No Brave key: set BRAVE_API_KEY or ~/.oto/brave_api_key`. At `ce91d4d^` the old assertions pass while the new Phase 16 keyfile tests fail; at `ce91d4d` all five credential-resolution tests pass while these two old expectations fail. These are stale pre-Phase-16 expectations, not production-code regressions. They remain unedited pending developer approval.
+- The `list.todos` and `todo.match-phase` golden parity rows differ because pre-Phase-16 commit `e4c661b` added a real `.oto/todos/pending/` item. The SDK correctly reports one pending todo; legacy CJS still scans `.planning` and reports zero. Temporarily removing only that todo makes both assertions pass. This is the tracked WR-02 planning-root debt family, not a Phase 16 production-code regression. Fixing the parity in production would begin the separately scoped planning-root migration; hiding it in the golden test would weaken a real parity check. Neither action was taken.
+
+The baseline gate verdict remains `FAIL`: causal classification does not adjust the baseline, maxima, or adjudication rule.
+
 ## Fixture-Debt Mapping and Scope Decision
 
 The current failure set still carries the tracked WR-02 planning-root debt family: fixtures and golden captures expect `.planning/` roots and `gsd_state_version` markers while the OTO-native implementation consumes `.oto/` and `oto_state_version`. The 40 failed-file names all map to the recorded Plan 14-16 union, but the two persistent per-file count increases do not satisfy the authorized baseline-relative disposition rule.
@@ -159,7 +169,7 @@ No inherited-debt DEFER disposition was recorded. No broader SDK planning-root m
 
 NO NEW FAILURES: FAIL
 
-Persistent Phase 16 regression files:
+Persistent gate-offender files awaiting developer decision:
 
 - `src/golden/read-only-parity.integration.test.ts` — 22 current; baseline max 19; isolated runs 22 and 22.
 - `src/query/decomposed-handlers.test.ts` — 8 current; baseline max 7; isolated runs 8 and 8.
