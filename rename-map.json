@@ -52,6 +52,9 @@
     "GEMINI_CONFIG_DIR",
     "CURSOR_PLUGIN_ROOT",
     "COPILOT_CLI",
+    "tests/bug-2808-skill-hyphen-name.test.cjs",
+    "tests/bug-3677-agent-colon-namespace-leak.test.cjs",
+    "tests/enh-2792-namespace-skills.test.cjs",
     { "pattern": "subagent_type=\"(general-purpose|generalPurpose|general|X|general_purpose_task)\"", "reason": "Generic agent-type values in install.js examples, not gsd-* identifiers" },
     { "pattern": "Superpowers \\(the upstream framework\\)", "reason": "Attribution context - preserve upstream name when explicitly attributed" }
   ],
