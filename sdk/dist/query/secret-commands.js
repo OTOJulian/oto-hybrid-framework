@@ -6,9 +6,10 @@
  * only from piped stdin or a silent interactive TTY prompt (D-09), stores it
  * in a 0600 keyfile, and returns masked output only.
  */
-import { accessSync, constants, existsSync, readFileSync, statSync } from 'node:fs';
+import { accessSync, constants, existsSync, statSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createInterface } from 'node:readline';
+import { loadConfig } from '../config.js';
 import { ErrorClassification, GSDError } from '../errors.js';
 import { planningPaths } from './helpers.js';
 import { configSet } from './config-mutation.js';
@@ -188,27 +189,21 @@ export async function secretClear(args, projectDir, workstream) {
         raw,
     };
 }
-function readConfig(projectDir, workstream) {
-    try {
-        const parsed = JSON.parse(readFileSync(planningPaths(projectDir, workstream).config, 'utf8'));
-        return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-            ? parsed
-            : {};
-    }
-    catch {
-        return {};
-    }
-}
 /** Report masked key sources and flag state for one or every integration. */
 export async function secretStatus(args, projectDir, workstream) {
     const slugs = args[0] === undefined ? INTEGRATION_SLUGS : [resolveSlug(args[0])];
-    // Phase 14 gap-closure (SECR-03, WR-01): status must self-heal legacy strings like every other read path.
-    // Fail-open is safe here: this handler's display is masked-only by construction (D-10) and never returns raw config values.
+    // oto: FRESH-CR-03 — status must heal and reflect the ROOT layer, not just the selected workstream
     try {
-        await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config);
+        await migrateLegacyIntegrationKeys(planningPaths(projectDir).config);
     }
     catch { /* masked display still renders */ }
-    const config = readConfig(projectDir, workstream);
+    if (workstream) {
+        try {
+            await migrateLegacyIntegrationKeys(planningPaths(projectDir, workstream).config);
+        }
+        catch { /* masked display still renders */ }
+    }
+    const config = await loadConfig(projectDir, workstream);
     const integrations = [];
     const lines = [];
     for (const slug of slugs) {
