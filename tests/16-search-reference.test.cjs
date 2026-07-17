@@ -30,11 +30,13 @@ test('shared search reference defines the runtime-neutral fallback contract', ()
   assert.ok(builtInIndex > braveIndex, 'built-in rung must follow Brave');
 });
 
-test('researcher agents consume the shared search reference without drifted guidance', () => {
+test('all Exa-enabled agents consume the shared search reference without drifted guidance', () => {
   for (const name of [
     'oto-phase-researcher',
     'oto-project-researcher',
     'oto-ui-researcher',
+    'oto-debugger',
+    'oto-advisor-researcher',
   ]) {
     const agentPath = path.join(REPO_ROOT, 'oto/agents', `${name}.md`);
     const content = fs.readFileSync(agentPath, 'utf8');
@@ -46,5 +48,9 @@ test('researcher agents consume the shared search reference without drifted guid
     assert.equal(content.includes('mcp__exa__web_search_exa'), false, `${name} must not retain the Exa namespace`);
     assert.equal(content.includes('Check `exa_search`'), false, `${name} must not retain the Exa availability gate`);
     assert.equal(content.includes('Check `brave_search`'), false, `${name} must not retain the Brave availability gate`);
+
+    if (name === 'oto-debugger' || name === 'oto-advisor-researcher') {
+      assert.match(content, /^tools:.*mcp__exa__\*/m, `${name} must grant the Exa server wildcard`);
+    }
   }
 });
