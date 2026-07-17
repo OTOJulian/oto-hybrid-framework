@@ -3,9 +3,9 @@ oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: verifying
-stopped_at: Phase 16 code review gate
+stopped_at: Phase 16 independent verification
 last_updated: "2026-07-17T21:25:06.838Z"
-last_activity: 2026-07-17 -- Plan 16-06 complete; HARD-04 approved and HARD-05 recorded; entering code review
+last_activity: 2026-07-17 -- Code review recorded 3 warnings; regression and schema gates complete; entering independent verification
 progress:
   total_phases: 3
   completed_phases: 2
@@ -28,14 +28,14 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 Phase: 16 (agent-guidance-hardening) — VERIFYING
 Plan: 6 of 6 complete
-Status: Code review required before independent verification
-Last activity: 2026-07-17 -- Plan 16-06 complete; HARD-04 approved and HARD-05 recorded
+Status: Independent phase verification in progress
+Last activity: 2026-07-17 -- Code review recorded 3 warnings; regression and schema gates complete
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plans 01-06 are complete. HARD-04 passed both live legs, HARD-05 recorded the full sync dry-run conflict surface, and the amended SDK delta gate remains `NO NEW FAILURES: PASS`. Run the required Phase 16 code review, regression/drift gates, and independent phase verification.
+Phase 16 Plans 01-06 are complete. HARD-04 passed both live legs, HARD-05 recorded the full sync dry-run conflict surface, and the amended SDK delta gate remains `NO NEW FAILURES: PASS`. The advisory review recorded three warnings in `16-REVIEW.md`; independent phase verification is now authoritative for completion or gap routing.
 
 ## Performance Metrics
 
