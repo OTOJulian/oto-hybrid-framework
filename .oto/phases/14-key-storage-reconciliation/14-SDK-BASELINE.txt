@@ -19,7 +19,7 @@ Plan 14-19 must compare against the union below and adjudicate apparent offender
 src/context-engine.test.ts | max_failed=12 | runs=1,2
 src/e2e.integration.test.ts | max_failed=3 | runs=1,2
 src/golden/golden.integration.test.ts | max_failed=16 | runs=1,2
-src/golden/read-only-parity.integration.test.ts | max_failed=19 | runs=1,2
+src/golden/read-only-parity.integration.test.ts | max_failed=21 | runs=1,2
 src/init-e2e.integration.test.ts | max_failed=1 | runs=1,2
 src/phase-runner.integration.test.ts | max_failed=5 | runs=1,2
 src/query/check-auto-mode.test.ts | max_failed=3 | runs=1,2
@@ -57,6 +57,10 @@ src/query/workspace.test.ts | max_failed=1 | runs=1,2
 src/query/workstream.test.ts | max_failed=2 | runs=1,2
 src/workflow-agent-skills-consistency.test.ts | max_failed=1 | runs=1,2
 src/ws-transport.test.ts | max_failed=5 | runs=1,2
+
+## Developer-Approved Amendment (2026-07-17)
+
+The developer approved raising `src/golden/read-only-parity.integration.test.ts` from `max_failed=19` to `max_failed=21`. The exact +2 are the tracked WR-02 planning-root divergence: legacy CJS scans `.planning` while the SDK reads the real `.oto/todos`, so the `list.todos` and `todo.match-phase` golden rows disagree after pre-Phase-16 commit `e4c661b` added a pending todo. The causal proof is recorded in `.oto/phases/16-agent-guidance-hardening/16-SDK-BASELINE-DELTA.txt`; it establishes that these two failures are not caused by Phase 16 production changes. The two todo parity rows remain unchanged, failing, and counted until the separately planned planning-root migration fixes CJS. This amendment does not authorize that migration inside Plan 16-06.
 
 ## Flake Drift
 
@@ -465,4 +469,3 @@ undefined
       Tests  268 failed | 1227 passed (1495)
    Start at  20:50:10
    Duration  3.36s (transform 2.06s, setup 0ms, collect 8.73s, tests 15.53s, environment 7ms, prepare 3.70s)
-

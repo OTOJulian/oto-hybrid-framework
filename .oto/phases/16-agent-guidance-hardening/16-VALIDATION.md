@@ -48,7 +48,7 @@ created: 2026-07-17
 | 16-04-02 | 04 | 1 | HARD-03 | T-16-04-01 | No key values / no numeric quotas in docs | grep gate | `test -f docs/search-integrations.md && ! grep -nE '[0-9,]+ ?(requests|req|calls|QPS)' docs/search-integrations.md` | n/a (grep) | ✅ green |
 | 16-05-01 | 05 | 2 | GUID-03 | T-16-05-01 | Grant limited to 3 read-only Exa tools | structural | `node --test tests/16-search-reference.test.cjs && node scripts/check-runtime-sync.cjs` | ✅ (extends 16-01 file) | ✅ green |
 | 16-05-02 | 05 | 2 | GUID-04, GUID-05 | T-16-05-02 | Real transforms in-process; OUTPUT greps | unit | `node --test tests/16-transformed-tool-names.test.cjs` | ✅ | ✅ green |
-| 16-06-01 | 06 | 3 | all | — | Key never printed (source label only) | gate | `npm test && node scripts/check-runtime-sync.cjs` | ✅ | ❌ red — persistent SDK baseline offenders |
+| 16-06-01 | 06 | 3 | all | — | Key never printed (source label only) | gate | `npm test && node scripts/check-runtime-sync.cjs`; SDK amended-baseline delta | ✅ | ⚠️ DEFER — automated repo gates green; SDK baseline-relative PASS |
 | 16-06-02 | 06 | 3 | HARD-04, HARD-01 | T-16-06-01 | Key never pasted into transcript | manual (checkpoint) | n/a — checkpoint:human-verify | n/a | ⬜ pending |
 | 16-06-03 | 06 | 3 | HARD-05 | T-16-06-02, T-16-06-03 | Conflict baseline recorded; keyfile restored | scripted manual | `oto sync --upstream all --to latest --dry-run` (network) | n/a | ⬜ pending |
 
@@ -91,15 +91,14 @@ Test files are created RED-first inside the same tasks that turn them green (tdd
 - Installed Claude debugger contains one `mcp__exa__*` wildcard; installed shared search reference byte-matches the repository copy.
 - `detectKeySource('exa').source` — `keyfile`; no credential bytes were printed.
 
-### Blocking gate — persistent assertion deltas awaiting developer decision
+### Developer-approved SDK baseline-relative disposition
 
-- `cd sdk && npx vitest run` — FAIL: 40 test files failed, 51 passed; 270 tests failed, 1332 passed.
-- The machine comparison against Plan 14-16's authoritative 41-file two-run union found no new failing file name, but found two per-file count offenders: `src/golden/read-only-parity.integration.test.ts` at 22 failures versus baseline max 19, and `src/query/decomposed-handlers.test.ts` at 8 failures versus baseline max 7.
-- Both offenders are **PERSISTENT** under the terminal baseline rule. Two isolated runs of `read-only-parity` each failed 22 tests; two isolated runs of `decomposed-handlers` each failed 8 tests. Neither run met its baseline maximum.
-- Durable evidence: `16-SDK-BASELINE-DELTA.txt`, verdict `NO NEW FAILURES: FAIL`.
-- Root-cause bisect found no production-code regression: two excess websearch assertions encode the old pre-`ce91d4d` reason string despite the intentional HARD-01 Brave keyfile behavior, while two todo parity assertions expose the tracked CJS `.planning` versus SDK `.oto` WR-02 debt after pre-Phase-16 commit `e4c661b` added a real pending todo. No code or tests were edited under the stale-expectation decision rule.
-- The inherited WR-02 `.planning` fixture-root / `gsd_state_version` debt was **not dispositioned** because the zero-net-new precondition failed. No broader SDK planning-root migration was started.
-- Task 2 HARD-04 was not presented or simulated. HARD-05, phase verification, and code review did not run. Plan 16-06 is stopped for the developer's explicit stale-test/debt decision.
+- The developer approved updating the two stale websearch expectations to the intentional HARD-01 env-or-keyfile reason. Focused rerun: `src/query/decomposed-handlers.test.ts` returned to 7 inherited failures and `src/golden/read-only-parity.integration.test.ts` returned to 21.
+- The developer approved amending only `src/golden/read-only-parity.integration.test.ts` from `max_failed=19` to `max_failed=21`. The exact +2 remain the failing, counted `list.todos` and `todo.match-phase` golden rows caused by tracked WR-02 planning-root divergence after pre-Phase-16 commit `e4c661b` added a pending todo.
+- Fresh `cd sdk && npx vitest run` — expected inherited-debt FAIL: 40 files failed, 51 passed; 268 tests failed, 1334 passed. This is not a green full SDK suite.
+- Machine comparison against the amended authoritative 41-file union: 40 current failing files, 0 new files, 0 files over their maxima. `16-SDK-BASELINE-DELTA.txt` verdict: `NO NEW FAILURES: PASS`.
+- `16-DISPOSITIONS.md` records **DEFER**, references Phase 15 WR-02, and preserves the broader planning-root migration as a separately planned bounded task required before milestone close if the milestone hard gates require full SDK green.
+- Task 1 is complete only under this developer-approved baseline-relative disposition. Task 2 HARD-04 remains pending and has not been simulated. HARD-05, code review, and phase verification have not run.
 
 ---
 
