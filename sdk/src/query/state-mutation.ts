@@ -1204,7 +1204,9 @@ export const stateMilestoneSwitch: QueryHandler = async (args, projectDir, works
     // bug #2630: any sync-based approach races against the very file it is
     // about to rewrite.
     const fm: Record<string, unknown> = {
-      gsd_state_version: '1.0',
+      oto_state_version: typeof existingFm.oto_state_version === 'string'
+        ? existingFm.oto_state_version
+        : '1.0',
       milestone: version,
       milestone_name: name,
       status: 'planning',
@@ -1220,10 +1222,6 @@ export const stateMilestoneSwitch: QueryHandler = async (args, projectDir, works
     };
     // Preserve frontmatter-only fields the caller may still care about
     // (paused_at cleared deliberately — a new milestone is a fresh start).
-    if (existingFm.gsd_state_version) {
-      fm.gsd_state_version = existingFm.gsd_state_version;
-    }
-
     const yamlStr = reconstructFrontmatter(fm);
     const assembled = `---\n${yamlStr}\n---\n\n${newBody.replace(/^\n+/, '')}`;
     await writeFile(statePath, normalizeMd(assembled), 'utf-8');

@@ -305,6 +305,21 @@ describe('stateBeginPhase', () => {
     expect(content).toContain('State Mutations');
   });
 
+  it('preserves the canonical oto_state_version marker when beginning a phase', async () => {
+    const canonicalState = MINIMAL_STATE.replace(
+      'gsd_state_version: 1.0',
+      'oto_state_version: 1.0',
+    );
+    await writeFile(join(tmpDir, '.planning', 'STATE.md'), canonicalState, 'utf-8');
+
+    const { stateBeginPhase } = await import('./state-mutation.js');
+    await stateBeginPhase(['16', 'Agent Guidance Hardening', '6'], tmpDir);
+
+    const content = await readFile(join(tmpDir, '.planning', 'STATE.md'), 'utf-8');
+    expect(content).toMatch(/^oto_state_version:\s*1\.0$/m);
+    expect(content).not.toMatch(/^gsd_state_version:/m);
+  });
+
   // ─── Bug #2420: flag-form args not parsed ────────────────────────────
   it('bug-2420: parses --phase/--name/--plans flag-form args correctly', async () => {
     const { stateBeginPhase } = await import('./state-mutation.js');
@@ -847,7 +862,7 @@ describe('stateMilestoneSwitch', () => {
     // frontmatter, a milestone switch must stomp the frontmatter with the new
     // version/name and reset progress counters.
     const stateContent = `---
-gsd_state_version: 1.0
+oto_state_version: 1.0
 milestone: v1.0
 milestone_name: Foundation
 status: completed
@@ -874,7 +889,7 @@ Last activity: 2026-04-20 -- v1.0 shipped
 
 - [Phase 1]: Use Node 20
 `;
-    const planningDir = join(tmpDir, '.planning');
+    const planningDir = join(tmpDir, '.oto');
     await mkdir(join(planningDir, 'phases'), { recursive: true });
     await writeFile(join(planningDir, 'STATE.md'), stateContent, 'utf-8');
     // ROADMAP advertises the new milestone
@@ -901,6 +916,8 @@ Last activity: 2026-04-20 -- v1.0 shipped
     const fm = extractFrontmatter(after);
 
     // The heart of #2630 — frontmatter must reflect the NEW milestone.
+    expect(fm.oto_state_version).toBe('1.0');
+    expect(fm.gsd_state_version).toBeUndefined();
     expect(fm.milestone).toBe('v1.1');
     expect(fm.milestone_name).toBe('Notifications');
     // Status resets to planning (Defining requirements phase).

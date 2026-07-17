@@ -12,7 +12,7 @@
  * // { phase: '10', plan: '01' }
  *
  * const result = await frontmatterGet(['STATE.md'], '/project');
- * // { data: { gsd_state_version: '1.0', milestone: 'v3.0', ... } }
+ * // { data: { oto_state_version: '1.0', milestone: 'v3.0', ... } }
  * ```
  */
 import { readFile } from 'node:fs/promises';

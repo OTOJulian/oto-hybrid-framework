@@ -10,7 +10,7 @@
  * import { stateJson, stateGet, stateSnapshot } from './state.js';
  *
  * const loaded = await stateJson([], '/project');
- * // { data: { gsd_state_version: '1.0', milestone: 'v3.0', ... } }
+ * // { data: { oto_state_version: '1.0', milestone: 'v3.0', ... } }
  *
  * const field = await stateGet(['Status'], '/project');
  * // { data: { Status: 'executing' } }
@@ -172,7 +172,10 @@ export async function buildStateFrontmatter(bodyContent, projectDir, workstream)
     if (normalizedStatus === 'unknown' && typeof existingFm.status === 'string' && existingFm.status && existingFm.status !== 'unknown') {
         normalizedStatus = existingFm.status;
     }
-    const fm = { gsd_state_version: '1.0' };
+    const stateVersion = typeof existingFm.oto_state_version === 'string'
+        ? existingFm.oto_state_version
+        : '1.0';
+    const fm = { oto_state_version: stateVersion };
     if (milestone)
         fm.milestone = milestone;
     if (milestoneName)
