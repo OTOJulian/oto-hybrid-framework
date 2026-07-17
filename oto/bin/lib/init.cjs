@@ -352,18 +352,11 @@ function cmdInitPlanPhase(cwd, phase, raw, options = {}) {
 function cmdInitNewProject(cwd, raw) {
   const config = loadConfig(cwd);
 
-  // Detect Brave Search API key availability
-  const homedir = require('os').homedir();
-  const braveKeyFile = path.join(homedir, '.oto', 'brave_api_key');
-  const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
-
-  // Detect Firecrawl API key availability
-  const firecrawlKeyFile = path.join(homedir, '.oto', 'firecrawl_api_key');
-  const hasFirecrawl = !!(process.env.FIRECRAWL_API_KEY || fs.existsSync(firecrawlKeyFile));
-
-  // Detect Exa API key availability
-  const exaKeyFile = path.join(homedir, '.oto', 'exa_api_key');
-  const hasExaSearch = !!(process.env.EXA_API_KEY || fs.existsSync(exaKeyFile));
+  // oto: HARD-01 — availability must use detectKeySource (Phase 15 D-15), not bare existence
+  const { detectKeySource } = require('./secrets.cjs');
+  const hasBraveSearch = detectKeySource('brave').source !== null;
+  const hasFirecrawl = detectKeySource('firecrawl').source !== null;
+  const hasExaSearch = detectKeySource('exa').source !== null;
 
   // Detect existing code (cross-platform — no Unix `find` dependency)
   let hasCode = false;
