@@ -330,18 +330,20 @@ Also run once with the key removed from the environment to witness the fallback 
 | A2 | `~/.gemini` remains without an oto install through this phase (sync tasks skip it with a notice) | Runtime State Inventory | If the user installs Gemini mid-phase, sync tasks must include it; `check-runtime-sync.cjs` auto-detects, so drift would be caught |
 | A3 | SDK `init-complex.ts:187` mirrors the CJS bare-existsSync availability pattern (grep-located, not read line-by-line) | Pattern 4 | If already fixed, the SDK half of the HARD-01 alignment is a no-op — verify at planning/execution time with a 5-line read |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Wildcard `mcp__exa__*` vs exact 3-tool enumeration in subagent frontmatter**
+All three questions were resolved during planning; adopting plans noted per question.
+
+1. **Wildcard `mcp__exa__*` vs exact 3-tool enumeration in subagent frontmatter** — RESOLVED: wildcard form adopted in 16-05 Task 1 (consistency with the three researchers); empirical confirmation + exact-enumeration contingency in 16-06 Tasks 2-3
    - What we know: docs (current) say wildcards work; issue #53865 (v2.1.119) said they didn't and was closed not-planned; installed CLI is 2.1.212; three researchers already ship the wildcard form and Phase 15's checkpoint saw Exa tools work in a live session (but that checkpoint exercised registration, not a tools-restricted subagent).
    - What's unclear: wildcard behavior on 2.1.212 specifically, inside a `tools:`-restricted subagent.
    - Recommendation: keep wildcard form for consistency with the three researchers UNLESS the HARD-04 checkpoint fails it — in which case switch all five to exact enumeration (3 names, pinned surface, trivially cheap). Sequence HARD-04 early enough that the outcome can adjust GUID-03 frontmatter within the phase.
 
-2. **HARD-05 timing: "milestone close" vs "phase close"**
+2. **HARD-05 timing: "milestone close" vs "phase close"** — RESOLVED: phase close == milestone close; dry-run is 16-06 Task 3's verification step with recorded results and dispositioned new conflicts
    - What we know: HARD-05 says "at milestone close"; Phase 16 is the last v0.5.0 phase, so phase close ≈ milestone close.
    - Recommendation: make `oto sync --upstream all --to latest --dry-run` (requires network + upstream fetch) the final plan's verification step, with results recorded; treat NEW conflicts in files this milestone touched as findings to disposition, not auto-failures (pre-existing conflict baseline may exist).
 
-3. **Where the "docs" for HARD-03 live**
+3. **Where the "docs" for HARD-03 live** — RESOLVED: new `docs/search-integrations.md` + README Documentation-section link, per 16-04 Task 2
    - What we know: README has Install / Supported runtimes / Documentation sections; `docs/` holds deep guides (rebrand-engine.md, upstream-sync.md); 15-USER-SETUP.md is a phase artifact, not user docs.
    - Recommendation: short README subsection (setup: key via `/oto-settings-integrations`, consent-gated registration, qualitative rate-limit caveat, fallback behavior) + link into a `docs/search-integrations.md` if length demands; planner's discretion on split.
 
