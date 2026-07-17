@@ -153,7 +153,7 @@ test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> end-to-end a
   assert.equal(await fsp.readFile(path.join(project, 'oto/local-sentinel.md'), 'utf8'), 'local sentinel\n');
   assert.equal(fs.existsSync(path.join(project, 'oto/README.md')), false);
   assert.equal(fs.existsSync(path.join(project, 'oto/workflows/sample.md')), false);
-  assert.equal(fs.existsSync(path.join(project, '.oto-sync-conflicts/REPORT.md')), true);
+  assert.equal(fs.existsSync(path.join(project, '.oto-sync-conflicts/gsd/REPORT.md')), true);
 });
 
 test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> --apply writes to oto/', async (t) => {
@@ -180,7 +180,7 @@ test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> --apply writ
   assert.equal(second.status, 0, second.stderr || second.stdout);
   assert.match(await fsp.readFile(path.join(project, 'oto/workflows/sample.md'), 'utf8'), /local oto note/);
   assert.equal(await fsp.readFile(path.join(project, 'oto/workflows/added.md'), 'utf8'), '# added\n');
-  const report = await fsp.readFile(path.join(project, '.oto-sync-conflicts/REPORT.md'), 'utf8');
+  const report = await fsp.readFile(path.join(project, '.oto-sync-conflicts/gsd/REPORT.md'), 'utf8');
   assert.match(report, /v1\.1\.0/);
   const logStat = await fsp.stat(path.join(project, '.oto-sync/BREAKING-CHANGES-gsd.md'));
   assert.ok(logStat.size > beforeLogSize);
