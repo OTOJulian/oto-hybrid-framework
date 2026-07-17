@@ -2,16 +2,16 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
-stopped_at: Phase 16 Plan 06 Task 2 — HARD-04 human verification checkpoint
-last_updated: "2026-07-17T20:51:50.000Z"
-last_activity: 2026-07-17 -- Developer-approved baseline amendment applied; SDK delta gate PASS
+status: verifying
+stopped_at: Phase 16 code review gate
+last_updated: "2026-07-17T21:25:06.838Z"
+last_activity: 2026-07-17 -- Plan 16-06 complete; HARD-04 approved and HARD-05 recorded; entering code review
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 37
-  completed_plans: 35
-  percent: 95
+  completed_plans: 37
+  percent: 100
 ---
 
 # Project State
@@ -26,16 +26,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — EXECUTING
-Plan: 6 of 6 (Task 2 HARD-04 checkpoint)
-Status: Human verification required — keyed and keyless live legs
-Last activity: 2026-07-17 -- Developer-approved baseline amendment applied; SDK delta gate PASS
+Phase: 16 (agent-guidance-hardening) — VERIFYING
+Plan: 6 of 6 complete
+Status: Code review required before independent verification
+Last activity: 2026-07-17 -- Plan 16-06 complete; HARD-04 approved and HARD-05 recorded
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plans 01-05 are complete. Plan 06 Task 1 passed its developer-approved baseline-relative SDK gate: `decomposed-handlers=7`, `read-only-parity=21`, 40 inherited failing files, zero new/over-max files, and `NO NEW FAILURES: PASS`. Complete the HARD-04 keyed/keyless live checkpoint, then resume `/oto-execute-phase 16` for HARD-05, code review, and verification.
+Phase 16 Plans 01-06 are complete. HARD-04 passed both live legs, HARD-05 recorded the full sync dry-run conflict surface, and the amended SDK delta gate remains `NO NEW FAILURES: PASS`. Run the required Phase 16 code review, regression/drift gates, and independent phase verification.
 
 ## Performance Metrics
 
