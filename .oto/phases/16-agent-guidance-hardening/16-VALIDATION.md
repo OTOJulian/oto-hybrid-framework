@@ -48,7 +48,7 @@ created: 2026-07-17
 | 16-04-02 | 04 | 1 | HARD-03 | T-16-04-01 | No key values / no numeric quotas in docs | grep gate | `test -f docs/search-integrations.md && ! grep -nE '[0-9,]+ ?(requests|req|calls|QPS)' docs/search-integrations.md` | n/a (grep) | ✅ green |
 | 16-05-01 | 05 | 2 | GUID-03 | T-16-05-01 | Grant limited to 3 read-only Exa tools | structural | `node --test tests/16-search-reference.test.cjs && node scripts/check-runtime-sync.cjs` | ✅ (extends 16-01 file) | ✅ green |
 | 16-05-02 | 05 | 2 | GUID-04, GUID-05 | T-16-05-02 | Real transforms in-process; OUTPUT greps | unit | `node --test tests/16-transformed-tool-names.test.cjs` | ✅ | ✅ green |
-| 16-06-01 | 06 | 3 | all | — | Key never printed (source label only) | gate | `npm test && node scripts/check-runtime-sync.cjs` | ✅ | ⚠️ blocked — full SDK suite red |
+| 16-06-01 | 06 | 3 | all | — | Key never printed (source label only) | gate | `npm test && node scripts/check-runtime-sync.cjs` | ✅ | ❌ red — persistent SDK baseline offenders |
 | 16-06-02 | 06 | 3 | HARD-04, HARD-01 | T-16-06-01 | Key never pasted into transcript | manual (checkpoint) | n/a — checkpoint:human-verify | n/a | ⬜ pending |
 | 16-06-03 | 06 | 3 | HARD-05 | T-16-06-02, T-16-06-03 | Conflict baseline recorded; keyfile restored | scripted manual | `oto sync --upstream all --to latest --dry-run` (network) | n/a | ⬜ pending |
 
@@ -91,12 +91,14 @@ Test files are created RED-first inside the same tasks that turn them green (tdd
 - Installed Claude debugger contains one `mcp__exa__*` wildcard; installed shared search reference byte-matches the repository copy.
 - `detectKeySource('exa').source` — `keyfile`; no credential bytes were printed.
 
-### Blocking gate
+### Blocking gate — Phase 16 regression
 
-- `cd sdk && npx vitest run` — BLOCKED: 40 test files failed, 51 passed; 270 tests failed, 1332 passed.
-- The failures reproduce the pre-existing broad `.planning`-fixture versus `.oto` planning-root baseline recorded in `16-03-SUMMARY.md`; representative failures cannot resolve fixture `STATE.md` and `ROADMAP.md` files created under unmarked `.planning/` roots.
-- No supported Vitest configuration or environment switch was found. Repair would require a broad SDK fixture/source migration beyond Plan 16-06's declared files and is not authorized as a bounded verification-only change.
-- Task 2 HARD-04 was not presented or simulated. Task 1 remains incomplete until the full SDK suite is green or the plan gate is explicitly dispositioned by the developer.
+- `cd sdk && npx vitest run` — FAIL: 40 test files failed, 51 passed; 270 tests failed, 1332 passed.
+- The machine comparison against Plan 14-16's authoritative 41-file two-run union found no new failing file name, but found two per-file count offenders: `src/golden/read-only-parity.integration.test.ts` at 22 failures versus baseline max 19, and `src/query/decomposed-handlers.test.ts` at 8 failures versus baseline max 7.
+- Both offenders are **PERSISTENT** under the terminal baseline rule. Two isolated runs of `read-only-parity` each failed 22 tests; two isolated runs of `decomposed-handlers` each failed 8 tests. Neither run met its baseline maximum.
+- Durable evidence: `16-SDK-BASELINE-DELTA.txt`, verdict `NO NEW FAILURES: FAIL`.
+- The inherited WR-02 `.planning` fixture-root / `gsd_state_version` debt was **not dispositioned** because the zero-net-new precondition failed. No broader SDK planning-root migration was started.
+- Task 2 HARD-04 was not presented or simulated. HARD-05, phase verification, and code review did not run. Plan 16-06 is stopped on this Phase 16 regression.
 
 ---
 
