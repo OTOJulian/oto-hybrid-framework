@@ -18,7 +18,15 @@ describe('Read-only golden parity (JSON toEqual)', () => {
     const gsdOutput = await captureGsdToolsOutput(row.cjs, row.cjsArgs, REPO_ROOT);
     const registry = createRegistry();
     const sdkResult = await registry.dispatch(row.canonical, row.sdkArgs, REPO_ROOT);
-    expect(sdkResult.data).toEqual(gsdOutput);
+    let expected = gsdOutput;
+    if (row.canonical === 'websearch' && (gsdOutput as { reason?: unknown }).reason === 'BRAVE_API_KEY not set') {
+      // Phase 16 HARD-01 intentionally adds the Brave keyfile fallback to the SDK contract.
+      expected = {
+        ...(gsdOutput as Record<string, unknown>),
+        reason: 'No Brave key: set BRAVE_API_KEY or ~/.oto/brave_api_key',
+      };
+    }
+    expect(sdkResult.data).toEqual(expected);
   });
 });
 
