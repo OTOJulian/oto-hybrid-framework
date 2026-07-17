@@ -1,9 +1,10 @@
 /**
  * Web search query handler — Brave Search API integration.
  *
- * Provides web search for researcher agents. Returns { available: false }
- * gracefully when BRAVE_API_KEY is missing so agents can fall back to
- * built-in WebSearch tools.
+ * Provides web search for researcher agents. Resolves Brave credentials from
+ * BRAVE_API_KEY first, then ~/.oto/brave_api_key, and returns
+ * { available: false } gracefully when neither is available so agents can
+ * fall back to built-in WebSearch tools.
  *
  * @example
  * ```typescript
@@ -15,18 +16,24 @@
  */
 
 import type { QueryHandler } from './utils.js';
+import { readKeyfile } from './secrets.js';
 
 /**
  * Search the web via Brave Search API.
- * Requires BRAVE_API_KEY env var.
+ * Uses BRAVE_API_KEY when set, otherwise ~/.oto/brave_api_key.
  *
  * Args: query [--limit N] [--freshness day|week|month]
  */
 export const websearch: QueryHandler = async (args) => {
-  const apiKey = process.env.BRAVE_API_KEY;
+  // oto: HARD-01 — Brave rung must honor the Phase-14 keyfile story, env-first (D-15 ordering)
+  const envKey = process.env.BRAVE_API_KEY;
+  const apiKey =
+    typeof envKey === 'string' && envKey.trim() !== ''
+      ? envKey
+      : readKeyfile('brave')?.value;
 
   if (!apiKey) {
-    return { data: { available: false, reason: 'BRAVE_API_KEY not set' } };
+    return { data: { available: false, reason: 'No Brave key: set BRAVE_API_KEY or ~/.oto/brave_api_key' } };
   }
 
   const query = args[0];
