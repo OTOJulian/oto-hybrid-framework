@@ -1,17 +1,17 @@
 ---
-oto_state_version: 1.0
+gsd_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: ready_to_plan
-stopped_at: "Phase 15 disposition-authorized closure verified at 10/10; ready to plan Phase 16"
-last_updated: "2026-07-14T20:58:53Z"
-last_activity: 2026-07-14 -- Phase 15 scoped closure verification passed; Phase 16 is ready to plan
+status: executing
+stopped_at: Completed 15-12-PLAN.md
+last_updated: "2026-07-17T16:22:20.884Z"
+last_activity: 2026-07-17 -- Phase 16 planning complete
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 31
+  total_plans: 37
   completed_plans: 31
-  percent: 100
+  percent: 84
 ---
 
 # Project State
@@ -28,8 +28,8 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 Phase: 16
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-16 - Completed quick task 260716-qbp: Harden oto verifier operation and add runtime-sync drift guard
+Status: Ready to execute
+Last activity: 2026-07-17 -- Phase 16 planning complete
 
 Progress: [██████████] 100%
 
