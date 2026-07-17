@@ -110,8 +110,7 @@ function resolvedSidecar(upstream, targetPath, body) {
     'oto_version: 0.5.0',
     '---',
     '',
-    body,
-  ].join('\n');
+  ].join('\n') + body;
 }
 
 async function writeConflictSidecar(project, upstream, targetPath, body) {
