@@ -29,8 +29,8 @@ progress_log_lines: 9
 
 ## Verdict
 
-**Status:** `gaps_found`  
-**Score:** **7/9 requirements passed**  
+**Status:** `gaps_found`
+**Score:** **7/9 requirements passed**
 **Blocking gaps:** **2**
 
 Phase 16's core implementation is largely present and its automated search, transform, documentation, runtime-sync, repository, and baseline-relative SDK gates reproduce successfully. The developer-approved HARD-04 evidence is sufficient and was not duplicated. However, two fresh review reproductions invalidate explicit phase contracts:
@@ -119,5 +119,5 @@ No source, baseline, golden row, STATE, ROADMAP, REQUIREMENTS, plan, summary, or
 
 ---
 
-_Verified: 2026-07-17T21:45:51Z_  
+_Verified: 2026-07-17T21:45:51Z_
 _Verifier: Codex (oto-verifier, independent full sweep)_
