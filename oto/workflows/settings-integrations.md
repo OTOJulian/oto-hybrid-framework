@@ -386,10 +386,15 @@ spaces, or shell metacharacters).
 and re-prompt.
 
 For a selected slug, prompt for the comma-separated skill list (text input).
-Show the current value if any, offer Leave / Replace / Clear. Write via:
+Show the current value if any, offer Leave / Replace / Clear. After collecting
+the text input, split on `,`, trim each entry, and drop empty entries. Validate
+EACH resulting skill name against `^(global:)?[a-zA-Z0-9_-]+$`. If any entry
+fails validation, print the existing rejection message naming the offending
+entry and re-prompt; never write a partial list. Persist the validated names as
+a JSON array via:
 
 ```bash
-oto-sdk query config-set agent_skills.<slug> "<skill-a,skill-b,skill-c>" ${WS_ARGS[@]+"${WS_ARGS[@]}"}
+oto-sdk query config-set agent_skills.<slug> '["skill-a","skill-b"]' ${WS_ARGS[@]+"${WS_ARGS[@]}"}
 ```
 
 Loop until "Done".
@@ -451,6 +456,6 @@ Quick commands:
 - [ ] API keys written only to `~/.oto/<integration>_api_key` (0600) via secret-set stdin/TTY; config.json holds booleans only; nothing plaintext ever echoed, logged, or displayed
 - [ ] Set/Replace guidance uses the `! oto-sdk query secret-set` flow; Clear uses `secret-clear`
 - [ ] Masked confirmation table uses `****<last-4>` for set keys and `(unset)` for null
-- [ ] `review.models.<cli>` and `agent_skills.<agent-type>` keys validated against `[a-zA-Z0-9_-]+` before write
+- [ ] `review.models.<cli>` and `agent_skills.<agent-type>` keys validated against `[a-zA-Z0-9_-]+`; each skill NAME is validated against `[a-zA-Z0-9_-]+` with an optional `global:` prefix before the JSON-array write
 - [ ] Config merge preserves all keys outside the three sections this workflow owns
 </success_criteria>

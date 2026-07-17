@@ -1610,6 +1610,12 @@ function buildAgentSkillsBlock(config, agentType, projectRoot) {
   if (typeof skillPaths === 'string') skillPaths = [skillPaths];
   if (!Array.isArray(skillPaths) || skillPaths.length === 0) return '';
 
+  // oto: WR-04 — legacy configs persisted comma-joined lists as one string; split and trim
+  skillPaths = skillPaths
+    .flatMap(p => (typeof p === 'string' ? p.split(',') : [p]))
+    .map(p => (typeof p === 'string' ? p.trim() : p))
+    .filter(p => p !== '');
+
   const validPaths = [];
   for (const skillPath of skillPaths) {
     if (typeof skillPath !== 'string') continue;
