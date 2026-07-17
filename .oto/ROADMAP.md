@@ -158,10 +158,10 @@ Notes: HARD-02's boolean-validation and no-plaintext-guard test families natural
 **Plans**: 6 plans
 
 Plans:
-- [ ] 16-01-PLAN.md — Shared runtime-neutral search-tools.md reference + three researchers consume it by include (GUID-01/02)
-- [ ] 16-02-PLAN.md — CJS availability via detectKeySource in cmdInitNewProject + WR-04 agent_skills JSON-array persistence and e2e (HARD-01)
-- [ ] 16-03-PLAN.md — SDK coherence: Brave keyfile rung in websearch + FRESH-CR-03 root-aware secret-status + single dist rebuild (HARD-01)
-- [ ] 16-04-PLAN.md — Runtime-matrix Exa MCP section (regen-diff gated) + docs/search-integrations.md with qualitative rate-limit phrasing (HARD-03)
+- [x] 16-01-PLAN.md — Shared runtime-neutral search-tools.md reference + three researchers consume it by include (GUID-01/02)
+- [x] 16-02-PLAN.md — CJS availability via detectKeySource in cmdInitNewProject + WR-04 agent_skills JSON-array persistence and e2e (HARD-01)
+- [x] 16-03-PLAN.md — SDK coherence: Brave keyfile rung in websearch + FRESH-CR-03 root-aware secret-status + single dist rebuild (HARD-01)
+- [x] 16-04-PLAN.md — Runtime-matrix Exa MCP section (regen-diff gated) + docs/search-integrations.md with qualitative rate-limit phrasing (HARD-03)
 - [ ] 16-05-PLAN.md — Debugger/advisor mcp__exa__* frontmatter + include (GUID-03) + transform-output grep-guards (GUID-04/05)
 - [ ] 16-06-PLAN.md — HARD-04 live subagent e2e checkpoint (keyed + keyless legs, wildcard contingency) + HARD-05 sync dry-run + phase close
 
@@ -185,7 +185,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 12/12 | Complete    | 2026-07-14 |
-| 16. Agent Guidance + Hardening | v0.5.0 | 0/6 | Planned | - |
+| 16. Agent Guidance + Hardening | v0.5.0 | 4/6 | In Progress|  |
 
 ---
 

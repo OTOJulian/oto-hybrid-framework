@@ -1,17 +1,17 @@
 ---
-gsd_state_version: 1.0
+oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: executing
 stopped_at: Completed 15-12-PLAN.md
-last_updated: "2026-07-17T16:22:20.884Z"
-last_activity: 2026-07-17 -- Phase 16 planning complete
+last_updated: "2026-07-17T17:57:50.550Z"
+last_activity: 2026-07-17 -- Phase 16 execution started
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 37
-  completed_plans: 31
-  percent: 84
+  completed_plans: 35
+  percent: 95
 ---
 
 # Project State
@@ -22,14 +22,14 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 16 — agent-guidance-+-hardening
+**Current focus:** Phase 16 — agent-guidance-hardening
 
 ## Current Position
 
-Phase: 16
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-07-17 -- Phase 16 planning complete
+Phase: 16 (agent-guidance-hardening) — EXECUTING
+Plan: 1 of 6
+Status: Executing Phase 16
+Last activity: 2026-07-17 -- Phase 16 execution started
 
 Progress: [██████████] 100%
 
