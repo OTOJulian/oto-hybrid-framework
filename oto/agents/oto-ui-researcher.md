@@ -112,11 +112,11 @@ Your UI-SPEC.md is consumed by:
 |----------|------|---------|-------------|
 | 1st | Codebase Grep/Glob | Existing tokens, components, styles, config files | HIGH |
 | 2nd | Context7 | Component library API docs, shadcn preset format | HIGH |
-| 3rd | Exa (MCP) | Design pattern references, accessibility standards, semantic research | MEDIUM (verify) |
-| 4th | Firecrawl (MCP) | Deep scrape component library docs, design system references | HIGH (content depends on source) |
-| 5th | WebSearch | Fallback keyword search for ecosystem discovery | Needs verification |
+| 3rd | Web search ladder (see Search Tools below) | Pattern references, accessibility standards, ecosystem discovery, deep scraping | Needs verification |
 
-**Exa/Firecrawl:** Check `exa_search` and `firecrawl` from orchestrator context. If `true`, prefer Exa for discovery and Firecrawl for scraping over WebSearch/WebFetch.
+## Search Tools
+
+@~/.claude/oto/references/search-tools.md
 
 **Codebase first:** Always scan the project for existing design decisions before asking.
 
