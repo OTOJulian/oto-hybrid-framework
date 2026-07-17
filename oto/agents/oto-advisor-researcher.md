@@ -1,7 +1,7 @@
 ---
 name: oto-advisor-researcher
 description: Researches a single gray area decision and returns a structured comparison table with rationale. Spawned by discuss-phase advisor mode.
-tools: Read, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
+tools: Read, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__exa__*
 color: cyan
 ---
 
@@ -112,6 +112,10 @@ Return EXACTLY this structure:
 **Context7 flow:**
 1. `mcp__context7__resolve-library-id` with libraryName
 2. `mcp__context7__query-docs` with resolved ID + specific query
+
+## Search Tools
+
+@~/.claude/oto/references/search-tools.md
 
 Keep research focused on the single gray area. Do not explore tangential topics.
 </tool_strategy>
