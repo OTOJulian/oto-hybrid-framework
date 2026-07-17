@@ -2,10 +2,10 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: verifying
-stopped_at: Phase 16 independent verification
-last_updated: "2026-07-17T21:25:06.838Z"
-last_activity: 2026-07-17 -- Code review recorded 3 warnings; regression and schema gates complete; entering independent verification
+status: gaps_found
+stopped_at: Phase 16 verification gaps_found — 7/9 requirements
+last_updated: "2026-07-17T21:47:44.000Z"
+last_activity: 2026-07-17 -- Independent verification found 2 blocking gaps (HARD-05, GUID-01)
 progress:
   total_phases: 3
   completed_phases: 2
@@ -26,16 +26,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — VERIFYING
+Phase: 16 (agent-guidance-hardening) — GAPS FOUND
 Plan: 6 of 6 complete
-Status: Independent phase verification in progress
-Last activity: 2026-07-17 -- Code review recorded 3 warnings; regression and schema gates complete
+Status: 7/9 requirements verified; 2 bounded gaps require closure plans
+Last activity: 2026-07-17 -- Independent verification found HARD-05 and GUID-01 blockers
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plans 01-06 are complete. HARD-04 passed both live legs, HARD-05 recorded the full sync dry-run conflict surface, and the amended SDK delta gate remains `NO NEW FAILURES: PASS`. The advisory review recorded three warnings in `16-REVIEW.md`; independent phase verification is now authoritative for completion or gap routing.
+Phase 16 execution and advisory review are complete, but `16-VERIFICATION.md` is authoritative at `gaps_found` (7/9). Plan bounded fixes for HARD-05 durable all-upstream evidence and GUID-01 availability-contract wiring with `/oto-plan-phase 16 --gaps`. The approved WR-02 planning-root migration remains separate and must not be folded into these gaps.
 
 ## Performance Metrics
 
