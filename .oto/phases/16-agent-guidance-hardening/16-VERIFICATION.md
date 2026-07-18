@@ -1,15 +1,16 @@
 ---
 phase: 16-agent-guidance-hardening
-verified: "2026-07-18T00:20:37Z"
-verified_at: "2026-07-18T00:20:37Z"
-verifier: "Codex (oto-verifier, independent bounded re-verification)"
+verified: "2026-07-18T13:54:37Z"
+verified_at: "2026-07-18T13:54:37Z"
+timestamp: "2026-07-18T13:54:37Z"
+verifier: "Codex (oto-verifier, independent bounded Plan 16-09 re-verification)"
 status: gaps_found
 score: "8/9"
 blocker_count: 1
-head: "899ae9358e51204b456c0bdf8ebc890c56309812"
-verification_scope: "bounded re-verification of Plans 16-07 and 16-08 closure files, the two prior blockers, and fresh review WR-01"
+head: "3a04a99461e4fd9180c594998ffa396faac74da9"
+verification_scope: "bounded verification of the four Plan 16-09 closure files, original HARD-05/WR-01 explicit and auto-detected deletion-acceptance reproductions, and fresh review WR-03 legacy-body provenance reproduction only"
 requirements:
-  GUID-01: passed
+  GUID-01: passed_carried_forward
   GUID-02: passed_carried_forward
   GUID-03: passed_carried_forward
   GUID-04: passed_carried_forward
@@ -19,14 +20,15 @@ requirements:
   HARD-04: passed_carried_forward
   HARD-05: gaps_found
 review_adjudication:
-  prior_verifier_WR-01: resolved
-  prior_verifier_WR-03: resolved
-  fresh_review_WR-01: blocking
+  original_WR-01: resolved
+  fresh_WR-03: blocking
   developer_approved_WR-02: defer_carried_forward
-progress_log_lines: 19
+  completed_gap_cycles: 2
+  automatic_third_gap_plan: not_recommended
+progress_log_lines: 32
 ---
 
-# Phase 16: Agent Guidance + Hardening — Bounded Re-verification Report
+# Phase 16: Agent Guidance + Hardening — Bounded Plan 16-09 Re-verification
 
 ## Verdict
 
@@ -34,112 +36,99 @@ progress_log_lines: 19
 
 **Score:** **8/9 requirements passed**
 
-**Blocking gaps:** **1**
+**Sole current blocker:** **HARD-05 / fresh review WR-03**
 
-Plans 16-07 and 16-08 close both blockers from the prior full-sweep verification: the all-upstream sync path now preserves both upstreams' durable sidecars and reports, and the canonical search guidance now uses runtime-observable availability with a working keyless Brave probe. GUID-01 therefore passes.
+Plan 16-09 closes the original WR-01 defect for both explicit and auto-detected namespaced deletion acceptance. However, fresh real-CLI evidence independently reproduces WR-03: a legacy flat sidecar with no valid `upstream` field in its YAML header is accepted when its Markdown body contains an exact `upstream: superpowers` line. The command exits 0 and performs all destructive mutations. That contradicts the required header-only provenance policy, fail-before-mutation semantics, and the user-facing documentation. HARD-05 therefore remains `gaps_found`.
 
-One independently reproduced closure-review warning remains blocking. `--accept-deletion <path> --upstream superpowers` resolves the Superpowers sidecar correctly but then updates the first inventory row matching `target_path`, regardless of upstream. With duplicate GSD/Superpowers inventory targets ordered GSD first, the command exits 0, removes the selected Superpowers sidecar and local target, changes the GSD row to `dropped_upstream`, and leaves the Superpowers row at `keep`. Because provenance-safe deletion acceptance is an explicit Plan 16-07 must-have under HARD-05, HARD-05 remains `gaps_found`.
+## Bounded Scope
 
-## Scope
+This was not a full phase sweep. Verification was limited to:
 
-This was a bounded re-verification, not a new full sweep. It covered:
+1. The four closure-changed Plan 16-09 files: `bin/lib/sync-cli.cjs`, `bin/lib/sync-accept.cjs`, `tests/16-07-sync-all-provenance.test.cjs`, and `docs/upstream-sync.md`.
+2. Fresh real-CLI reproductions of original HARD-05 / WR-01 for explicit `--upstream superpowers` and auto-detected sole-Superpowers namespaced deletion sidecars.
+3. Fresh real-CLI reproduction of code-review WR-03 using a legacy flat sidecar with no valid header provenance and an exact valid-looking provenance line in the Markdown body.
 
-1. The eight closure source/test/doc files declared by Plans 16-07 and 16-08.
-2. The prior HARD-05 / verifier WR-01 all-upstream evidence-overwrite blocker.
-3. The prior GUID-01 / verifier WR-03 runtime-observable availability blocker.
-4. Fresh closure-review WR-01, including all three advertised accept modes and duplicate-target ambiguity behavior.
-
-GUID-02 through GUID-05, HARD-01, HARD-03, HARD-04, and the developer-approved WR-02 DEFER disposition were not reopened. Their prior statuses are carried forward unchanged.
+GUID-01 through GUID-05, HARD-01, HARD-03, HARD-04, all previously resolved blockers, and the developer-approved WR-02 DEFER were not reopened. Their prior passed/deferred statuses are carried forward unchanged.
 
 ## Requirement Accounting
 
-| Requirement | Verdict | Bounded evidence |
+| Requirement | Verdict | Evidence |
 |---|---|---|
-| **GUID-01** — shared runtime-neutral Exa → Brave → built-in ladder with no Exa retry after 429 | **PASSED** | The canonical reference gates Exa and Firecrawl from the runtime tool list and Brave from the structured SDK response. The ten-consumer shape check passed, and the real keyless `bin/oto-sdk.js query websearch "availability probe"` subprocess exited 0 with `available: false` and the fixed `No Brave key` reason. Source-to-installed runtime sync passed for Claude and Codex; Gemini was skipped because no oto install exists. |
-| **GUID-02** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **GUID-03** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **GUID-04** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **GUID-05** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **HARD-01** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **HARD-03** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **HARD-04** | **PASSED — CARRIED FORWARD** | Not reopened by instruction. |
-| **HARD-05** — milestone-close upstream-sync hygiene and durable conflict surface | **GAPS FOUND** | The prior overwrite blocker is fixed: the real `--upstream all` overlap regression preserved both namespaced sidecars and both per-upstream `REPORT.md` files. However, the Plan 16-07 acceptance contract is not provenance-safe for deletion acceptance: namespace selection is discarded before inventory mutation, so the wrong upstream row can be marked dropped. |
+| **GUID-01** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **GUID-02** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **GUID-03** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **GUID-04** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **GUID-05** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **HARD-01** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **HARD-03** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **HARD-04** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
+| **HARD-05** | **GAPS FOUND** | Original WR-01 is closed, but WR-03 proves legacy-flat provenance is scanned from the Markdown body and can authorize destructive acceptance without valid YAML-header provenance. |
 
-## Prior Blocker Reproductions
+## HARD-05 Fresh Adjudication
 
-### Prior verifier WR-01 / HARD-05 — RESOLVED
+### Original WR-01 — RESOLVED
 
-The merged focused suite ran the real `oto sync --upstream all` path against an overlapping two-upstream fixture. It verified:
+Two independent temporary projects invoked the shipped CLI through `node bin/install.js sync ...`. Each inventory contained duplicate rows ordered GSD first, then Superpowers.
 
-- `.oto-sync-conflicts/gsd/<target>.md` and `.oto-sync-conflicts/superpowers/<target>.md` both survive;
-- `.oto-sync-conflicts/gsd/REPORT.md` and `.oto-sync-conflicts/superpowers/REPORT.md` both survive;
-- no legacy flat `REPORT.md` replaces either report;
-- status aggregation counts namespaced records while skipping reports; and
-- ordinary `--accept` auto-detection, ambiguity refusal, and explicit upstream disambiguation work.
+| Selection path | Exit | Inventory after | Sidecar/target effects | Verdict |
+|---|---:|---|---|---|
+| `--accept-deletion oto/workflows/dup.md --upstream superpowers` with both namespaced sidecars | 0 | `gsd: keep`; `superpowers: dropped_upstream` | GSD sidecar remained byte-identical (`96fb9d0…`); Superpowers sidecar and local target were removed | **PASS** |
+| `--accept-deletion oto/workflows/dup.md` with only the Superpowers namespaced sidecar | 0 | `gsd: keep`; `superpowers: dropped_upstream` | Selected sidecar and local target were removed | **PASS** |
 
-Result: the original all-upstream evidence-overwrite blocker is closed.
+The selected identity now survives `resolveAcceptTarget` and is passed as `upstream: resolved.upstream`; `acceptDeletion` matches both `target_path` and `upstream`. The original wrong-row mutation is closed.
 
-### Prior verifier WR-03 / GUID-01 — RESOLVED
+### Fresh WR-03 — REPRODUCED, BLOCKING
 
-The closure tests and direct runtime guard verified the replacement contract:
+The independent fixture used:
 
-- the shared reference contains no retired context-booleans or `_available` premise;
-- Exa and Firecrawl use observable tool-list gates;
-- the Brave rung uses the documented structured CLI probe;
-- all five spawn workflows and all five agent sources avoid promising unavailable context fields;
-- the keyless Brave probe exits 0 and returns `available: false` with `No Brave key` reason; and
-- installed Claude and Codex copies are byte-aligned with source.
+- a legacy flat `.oto-sync-conflicts/oto/workflows/dup.md.deleted.md` sidecar;
+- YAML frontmatter containing `kind: deleted` and `target_path`, but no valid `upstream` field;
+- Markdown body containing the exact line `upstream: superpowers`; and
+- duplicate inventory rows ordered GSD first, then Superpowers.
 
-Result: the canonical guidance can now be followed as written, so GUID-01 passes.
+The real command `node bin/install.js sync --accept-deletion oto/workflows/dup.md` produced:
 
-## Fresh Review WR-01 Adjudication
+- exit code **0** and `accepted-deletion: oto/workflows/dup.md`;
+- inventory SHA-256 changed from `f5fd5c3521beaf7eecaf08fa26b9db3755b6814b147ae0a5601ddc708f79be98` to `51ad299a083f69cbbb058c05ead501afe714818b11be16417c2792ee8ae113bd`;
+- verdicts became `gsd: keep`, `superpowers: dropped_upstream`;
+- sidecar SHA-256 `d215bfb02212138b738a1d5ddbdb5ab472113d29dc6a812c62eb0c9c509f6466` changed to missing; and
+- local target SHA-256 `fda6c87ced60341e65074fb335e25a047cba333cc6e47823e09e2d73b8a2d336` changed to missing.
 
-### `--accept` — provenance-safe in the tested duplicate-target case
+The refusal and byte-preservation contract therefore failed on all three mutation surfaces: inventory, sidecar, and local target.
 
-With both GSD and Superpowers modified sidecars present for the same target, explicit `--upstream superpowers` wrote the Superpowers content, removed only the Superpowers sidecar, and preserved the GSD sidecar.
+### Cause
 
-### `--accept-deletion` — BLOCKING provenance defect
+`bin/lib/sync-accept.cjs` already defines `HEADER_RE`, but `acceptDeletion` applies `/^upstream: (gsd|superpowers)$/m` directly to the complete raw sidecar. The line anchor prevents partial-line matches but does not confine the search to YAML frontmatter. An exact body line is consequently treated as trusted provenance.
 
-Two independent real-CLI fixtures reproduced the defect:
+## Docs Truthfulness and Test Coverage
 
-| Selection path | Selected evidence | Resulting inventory verdicts |
-|---|---|---|
-| Explicit `--upstream superpowers` | Superpowers deletion sidecar | `gsd: dropped_upstream`, `superpowers: keep` |
-| Auto-detected sole Superpowers sidecar | Superpowers deletion sidecar | `gsd: dropped_upstream`, `superpowers: keep` |
+`docs/upstream-sync.md` states that a legacy flat record resolves provenance from the sidecar's `upstream:` YAML header and refuses when that header is missing or invalid with duplicate inventory rows. The fresh WR-03 fixture demonstrates that this statement is not currently true.
 
-The cause is direct: `resolveAcceptDir` returns only a directory, `runSync` passes no upstream identity to `acceptDeletion`, and `acceptDeletion` uses `.find(candidate => candidate.target_path === relPath)`. The first duplicate target wins regardless of selected provenance.
-
-### `--keep-deleted` — namespace-safe within the Plan 16-07 must-have
-
-With duplicate GSD and Superpowers deletion sidecars, explicit `--upstream superpowers` preserved the local target, removed only the Superpowers sidecar, retained the GSD sidecar, and added the target to the path-level divergence list. This mode does not mutate an upstream inventory row. The divergence record is intentionally path-level, so the bounded finding is limited to deletion acceptance.
-
-### Ambiguity guard — passed
-
-For both `--accept-deletion` and `--keep-deleted`, omitting `--upstream` while both upstream sidecars existed failed loud, mentioned both upstreams, and left both sidecars and the local target unchanged.
+The scoped Plan 16-09 suite passed **25/25**, including its headerless duplicate-row refusal test. That test removes the header line, but its body contains no exact valid-looking `upstream:` line. No scoped regression exercises headerless/invalid frontmatter plus body provenance, so the passing suite does not cover WR-03.
 
 ## Fresh Verification Evidence
 
-| Command / reproduction | Result |
+| Check | Result |
 |---|---|
-| `node --test tests/16-07-sync-all-provenance.test.cjs tests/phase-09-cli.integration.test.cjs tests/16-search-reference.test.cjs tests/16-availability-coherence.test.cjs` | **21 passed, 0 failed, 0 skipped** |
-| `node scripts/check-runtime-sync.cjs` | **PASS** — Claude `ok`, Codex `ok`, Gemini skipped because no install exists |
-| Explicit duplicate-target Superpowers `--accept-deletion` CLI fixture | **BLOCKER REPRODUCED** — GSD row changed; Superpowers row unchanged |
-| Auto-detected sole-Superpowers deletion CLI fixture with duplicate inventory rows | **BLOCKER REPRODUCED** — GSD row changed; Superpowers row unchanged |
-| Explicit duplicate-target Superpowers `--accept` CLI fixture | **PASS** — selected content/sidecar only |
-| Explicit duplicate-target Superpowers `--keep-deleted` CLI fixture | **PASS within bounded must-have** — selected sidecar only; local target and other sidecar preserved |
-| Dual-upstream deletion-sidecar ambiguity fixtures | **PASS** — both deletion modes failed loud without mutation |
-| `node bin/oto-sdk.js query verify.schema-drift 16` | **PASS** — `drift_detected: false`, `blocking: false` |
-| `npm test` | 973 total: **969 passed, 1 failed, 3 skipped**; sole failure was sandbox DNS `ENOTFOUND registry.npmjs.org` in install-smoke |
-| Network-enabled `node --test tests/phase-04-mr01-install-smoke.test.cjs` | **1 passed, 0 failed**; confirms the sandbox-only failure is not a code regression |
+| Fresh explicit namespaced WR-01 CLI fixture | **PASS** — only Superpowers inventory row changed; unselected GSD sidecar preserved byte-for-byte |
+| Fresh auto-detected namespaced WR-01 CLI fixture | **PASS** — only Superpowers inventory row changed |
+| Fresh legacy-body WR-03 CLI fixture | **FAIL / BLOCKER REPRODUCED** — exit 0; inventory mutated; flat sidecar and local target deleted |
+| `node --test tests/16-07-sync-all-provenance.test.cjs tests/phase-09-accept-helper.test.cjs tests/phase-09-cli.integration.test.cjs` | **25 passed, 0 failed, 0 skipped** — confirms current suite misses WR-03 |
+| `node --check bin/lib/sync-cli.cjs && node --check bin/lib/sync-accept.cjs` | **PASS** |
+| `git diff --check 899ae93..HEAD -- <four Plan 16-09 files>` | **PASS** |
 
-## Blocking Gap
+No full phase suite, SDK suite, runtime-sync sweep, prior GUID/HARD reproduction, or third gap cycle was run. Those were explicitly outside this bounded verification scope.
 
-Preserve selected upstream identity through deletion acceptance. Pass the validated resolved upstream into `acceptDeletion` and match the inventory entry by both `target_path` and `upstream`, with an explicit policy for legacy flat sidecars. Add CLI-level regressions for both explicit and unambiguous auto-detected Superpowers selection with duplicate target paths, plus retain the ambiguity and `--keep-deleted` coverage.
+## Sole Blocking Gap and Routing
 
-No implementation, STATE, ROADMAP, REQUIREMENTS, disposition, baseline, golden-row, plan, or summary file was modified by this verifier. The only repository artifacts updated were this report and its heartbeat log. `INTERVIEW-BRIEF-oto.md` remains untouched.
+HARD-05 needs one bounded correction: inspect provenance only inside the YAML frontmatter block, accept only a valid unambiguous `upstream: gsd|superpowers` field there, and preserve the existing unique-row compatibility fallback. Add a real-CLI regression that places an exact valid-looking `upstream:` line only in the Markdown body and asserts nonzero exit plus byte-preservation of inventory, sidecar, and local target.
+
+Two gap cycles have already run. Do **not** start a third automatic gap plan. Route WR-03 as the sole unresolved blocker to `16-DISPOSITIONS.md` and developer triage for an explicit fix/defer decision. The original WR-01 is closed; WR-02 remains developer-approved DEFER and was not reopened.
+
+No implementation code, STATE, ROADMAP, REQUIREMENTS, disposition, baseline, golden-row, plan, or summary file was modified by this verifier. Only this report and its heartbeat log were updated; `INTERVIEW-BRIEF-oto.md` remains untouched.
 
 ---
 
-_Verified: 2026-07-18T00:20:37Z_
+_Verified: 2026-07-18T13:54:37Z_
 
-_Verifier: Codex (oto-verifier, independent bounded re-verification)_
+_Verifier: Codex (oto-verifier, independent bounded Plan 16-09 re-verification)_
