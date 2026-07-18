@@ -1,75 +1,68 @@
 ---
-status: issues_found
 phase: 16-agent-guidance-hardening
-reviewed: "2026-07-17T21:31:27Z"
+reviewed: "2026-07-18T00:10:50Z"
 depth: standard
-files_reviewed: 31
+files_reviewed: 8
+files_reviewed_list:
+  - scripts/sync-upstream/merge.cjs
+  - bin/lib/sync-cli.cjs
+  - tests/phase-09-cli.integration.test.cjs
+  - tests/16-07-sync-all-provenance.test.cjs
+  - docs/upstream-sync.md
+  - oto/references/search-tools.md
+  - tests/16-search-reference.test.cjs
+  - tests/16-availability-coherence.test.cjs
 findings:
   critical: 0
-  warning: 3
+  warning: 1
   info: 0
-  total: 3
+  total: 1
+status: issues_found
 ---
 
-# Phase 16 Code Review
+# Phase 16: Closure Code Review Report
 
-## Scope and verification
+**Reviewed:** 2026-07-18T00:10:50Z
+**Depth:** standard
+**Files Reviewed:** 8
+**Status:** issues_found
 
-Reviewed all 31 explicitly scoped Phase 16 source, generated SDK, agent, documentation, sync, rebrand, and test files, plus the Phase 16 plans/summaries and adjacent workflow/merge implementations needed to verify the shipped paths. The developer-approved WR-02 planning-root divergence was treated as inherited context, not a Phase 16 finding.
+## Summary
 
-Fresh verification:
+The review was limited to the Plan 16-07 and 16-08 closure changes. Previously passed GUID-02..05, HARD-01, HARD-03, and HARD-04 were not reopened, and the developer-approved WR-02 DEFER disposition was preserved.
 
-- Focused `node:test` run across the Phase 16, runtime-matrix, coverage, and sync suites: **84 passed, 0 failed**.
-- Focused Vitest run for Brave keyfile fallback and secret-status inheritance: **9 passed, 0 failed**.
-- `sdk/node_modules/.bin/tsc --noEmit`: **passed**.
-- `node scripts/check-runtime-sync.cjs`: **passed** for Claude and Codex; Gemini skipped because no install exists.
-- Focused first-sync reproduction confirmed that a second upstream overwrites the first upstream's same-path sidecar.
-- Focused rebrand reproduction confirmed that the three new test-path allowlist entries preserve raw `gsd-*` and `.planning` tokens while the engine exits 0.
+The per-upstream sidecar/report layout and runtime-observable search guidance are otherwise coherent, and the focused closure suite passed. One provenance defect remains in the newly namespaced deletion-accept path: resolving the correct sidecar namespace does not carry the selected upstream into the inventory mutation, so an overlapping target can update the wrong upstream's row.
 
-## Warning
+## Warnings
 
-### WR-01 — `--upstream all` overwrites the first upstream's conflict artifacts with the second upstream's results
+### WR-01: Namespaced deletion acceptance mutates the first matching inventory row, not the selected upstream row
 
-**Files:** `bin/lib/sync-cli.cjs:128-136,139-155`, `bin/lib/sync-merge.cjs:160-165,279-300,323-325`, `tests/phase-09-cli.integration.test.cjs:129-138`
+**Classification:** BLOCKER
 
-Phase 16 changed the all-upstream path to continue after a nonzero finding status, but both legs still invoke merge without an upstream-specific conflict directory. Both therefore write to the shared `.oto-sync-conflicts` tree, and sidecars are keyed only by target path; `REPORT.md` is also regenerated in place. Any target present in both upstreams is overwritten by the later Superpowers leg, and the root report retains only that second leg.
+**File:** `bin/lib/sync-cli.cjs:247-249`
 
-A focused reproduction ran `mergeAll` for GSD and then Superpowers against the same `shared/x.md`. The final sidecar declared `upstream: superpowers`, contained the Superpowers body, and no longer contained the GSD body. The new test only exercises `runUpstreamSequence` with a fake runner, so it proves both callbacks run but does not exercise or detect artifact loss.
+**Issue:** `resolveAcceptDir` correctly selects the GSD or Superpowers sidecar directory, but `runSync` passes only `relPath`, `otoDir`, `conflictsDir`, and `inventoryPath` to `acceptDeletion`. The accept helper consequently identifies the inventory record by `target_path` alone. When both upstreams own the same target path—the exact overlap that Plan 16-07 now supports—`--accept-deletion <path> --upstream superpowers` can mark the earlier GSD row `dropped_upstream`, leave the Superpowers row as `keep`, delete the local target, remove the Superpowers sidecar, and still exit 0.
 
-**Impact:** The documented `--upstream all` command can discard actionable GSD conflict evidence and leave `oto sync --accept` operating on the wrong upstream's sidecar for overlapping paths. Terminal output from the original run may contain both counts, but the durable conflict surface does not.
+Fresh reproduction used two inventory entries ordered GSD then Superpowers and only a Superpowers deletion sidecar. The explicit Superpowers command returned 0 with these resulting verdicts:
 
-**Required fix:** Namespace conflict artifacts by upstream when `all` is selected (for example `.oto-sync-conflicts/gsd/` and `.oto-sync-conflicts/superpowers/`) or build an aggregate format that preserves both provenance records without collisions. Add an end-to-end all-upstream test with one overlapping target and assert both sidecars/reports remain available after the second leg.
+```text
+gsd:         dropped_upstream
+superpowers: keep
+```
 
-### WR-02 — New upstream regression tests are excluded wholesale from rebranding, so raw GSD paths and names can pass the coverage gate
+This violates the plan's claim that all three accept modes are provenance-safe and leaves durable sync metadata inconsistent with the user's explicit selection. The current closure tests cover namespace resolution only for `--accept`; they do not exercise `--accept-deletion` or `--keep-deleted` with overlapping targets.
 
-**Files:** `rename-map.json:55-57`, `scripts/rebrand/lib/engine.cjs:316-323`, `tests/phase-02-coverage-manifest.test.cjs:43-52`
+**Fix:** Preserve the resolved upstream identity as well as the directory. Pass that identity into deletion acceptance and match the inventory entry by both `target_path` and `upstream` (with an explicit, validated legacy-flat policy). Add CLI-level regressions for auto-detected and explicitly disambiguated `--accept-deletion` cases with duplicate target paths, asserting that only the selected upstream row changes. Add the corresponding `--keep-deleted` namespace-resolution regression so all three advertised modes are locked.
 
-The three newly discovered upstream test files were added to `do_not_rename`. The engine's allowlisted-file branch copies those files byte-for-byte and skips every identifier/path/package transform. The accompanying regression only asserts that the path entries are present in the allowlist; it does not verify that the tests remain valid in the oto tree.
+## Verification Evidence
 
-A focused engine reproduction at `tests/bug-2808-skill-hyphen-name.test.cjs` containing both `gsd-skill` and `.planning` exited 0 with zero matches and copied both raw tokens unchanged. This turns the coverage gate green by exempting the whole test rather than classifying or porting its semantics.
+- Closure-focused Node test run: 45 passed, 0 failed, 1 skipped because `OTO_SYNC_CORPUS` was not set.
+- `node scripts/check-runtime-sync.cjs`: Claude and Codex `ok`; Gemini skipped because no oto install exists.
+- `git diff --check` on the eight closure files: passed.
+- Direct deletion-accept reproduction: failed provenance as described in WR-01.
 
-**Impact:** A later sync acceptance can import tests that exercise upstream GSD names/roots instead of oto behavior, or fail for reasons hidden by the rebrand coverage gate. These tests are executable regression assets, not attribution/license content that should remain byte-identical.
+---
 
-**Required fix:** Remove the three whole-file `do_not_rename` entries. Port their relevant identifiers and planning paths through precise rules or explicitly classify the files as drop/needs-manual-port in the sync inventory. Replace the allowlist-presence assertion with an applied-output test proving the accepted test uses oto names/roots and remains executable.
-
-### WR-03 — The shared search reference requires availability booleans that the actual agent spawn paths do not provide
-
-**Files:** `oto/references/search-tools.md:7-14,23,41-45`, `oto/bin/lib/init.cjs:438-441`, `tests/16-availability-coherence.test.cjs:49-78`, `tests/16-search-reference.test.cjs:11-29`; adjacent evidence: `oto/workflows/new-project.md:59-67,755-796`, `oto/workflows/plan-phase.md:30-50,349-390`, `oto/workflows/ui-phase.md:19-30,123-164`, `oto/workflows/diagnose-issues.md:86-104`, `oto/workflows/discuss-phase/modes/advisor.md:90-106`
-
-The canonical reference says every init/orchestrator context carries `exa_search`, `brave_search`, and `firecrawl`, and tells agents to trust those fields before attempting a rung. The implemented init contract actually emits `exa_search_available`, `brave_search_available`, and `firecrawl_available`. The new-project workflow does not parse those three fields, and the reviewed researcher/debugger/advisor spawn prompts do not inject either spelling. Several of those workflows use init handlers that do not expose search availability at all.
-
-The tests validate reference prose and init output independently, so they remain green without proving the key link from availability detection to the five consuming agents. The approved HARD-04 keyless leg demonstrates that the missing-tool/tool-not-found fallback works in one debugger session; it does not establish the reference's claimed boolean gate across the shipped spawn paths.
-
-**Impact:** Agents cannot follow the canonical "never attempt an unavailable tool" instruction from the promised context. They may probe Brave without a key or reason about Exa/Firecrawl availability from tool absence rather than the defined gate, and configured Brave availability is not explicitly conveyed to workflows that are supposed to choose it.
-
-**Required fix:** Define one canonical field spelling and thread those booleans into every consuming spawn prompt, or revise the reference to derive availability from the actual runtime tool list and structured Brave response. Add an end-to-end workflow-shape test that starts from init output and asserts the five agent prompts receive the exact availability contract they consume.
-
-## Reviewed concerns with no finding
-
-- Brave credential resolution remains environment-first, reads the canonical keyfile only as fallback, and does not log or return key bytes. Focused tests cover no-key, empty-keyfile, keyfile-only, and environment-precedence cases.
-- `secretStatus` migrates the root layer before the selected workstream layer, reads the effective root-under-workstream config, and constructs only masked status data. Source and committed distribution behavior match for the reviewed changes.
-- The five agent sources contain no deprecated Exa tool names; the production Codex/Gemini transforms preserve/filter namespaces according to the Phase 16 contract, and installed Claude/Codex copies pass the runtime drift guard.
-- `latest` resolves remote default `HEAD`, the first-sync null-trio cases are explicit and non-destructive, and both upstream legs now execute after ordinary fail-loud finding statuses. WR-01 is specifically about preserving their durable outputs.
-- The full SDK suite's remaining 268 failures stay within the developer-approved amended baseline: 40 current failing files, zero new files, and zero files over their maxima. The two todo-parity rows remain failing and counted; the separately bounded WR-02 planning-root migration was not started.
-
-## REVIEW COMPLETE
+_Reviewed: 2026-07-18T00:10:50Z_
+_Reviewer: Codex (oto-code-reviewer)_
+_Depth: standard_
