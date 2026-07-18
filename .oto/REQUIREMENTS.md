@@ -40,7 +40,7 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 - [x] **HARD-02**: `node:test` coverage exists for adapter merge/unmerge round-trips, boolean config validation, and a no-plaintext-key-in-tracked-files guard
 - [ ] **HARD-03**: The generated runtime matrix gains an Exa MCP row per runtime, and docs cover setup with qualitative (not hard-coded) rate-limit phrasing
 - [ ] **HARD-04**: An end-to-end check verifies `mcp__exa__*` tools actually reach a tools-restricted subagent (guards the claude-code#13898 regression class)
-- [ ] **HARD-05**: `oto sync --dry-run` conflict-surface check passes at milestone close (this milestone touches GSD-shared files)
+- [x] **HARD-05**: `oto sync --dry-run` conflict-surface check passes at milestone close (this milestone touches GSD-shared files)
 
 ## Future Requirements (v0.5.x+)
 
@@ -95,7 +95,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HARD-01 | Phase 16 | Pending |
 | HARD-03 | Phase 16 | Pending |
 | HARD-04 | Phase 16 | Pending |
-| HARD-05 | Phase 16 | Pending |
+| HARD-05 | Phase 16 | Complete |
 
 **Coverage:**
 - v0.5.0 requirements: 23 total

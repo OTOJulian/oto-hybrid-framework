@@ -2,16 +2,16 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
-stopped_at: Completed 15-12-PLAN.md
-last_updated: "2026-07-18T13:20:37.599Z"
-last_activity: 2026-07-18 -- Phase 16 planning complete
+status: verifying
+stopped_at: Completed 16-09-PLAN.md
+last_updated: "2026-07-18T13:43:31.348Z"
+last_activity: 2026-07-18
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 40
-  completed_plans: 39
-  percent: 98
+  completed_plans: 40
+  percent: 100
 ---
 
 # Project State
@@ -22,20 +22,20 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 16 — agent-guidance-hardening gap closure
+**Current focus:** Phase 16 — agent-guidance-hardening
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — GAPS FOUND
-Plan: 8 of 8 complete
-Status: Ready to execute
-Last activity: 2026-07-18 -- Phase 16 planning complete
+Phase: 16 (agent-guidance-hardening) — EXECUTING
+Plan: 9 of 9 complete
+Status: Phase complete — ready for verification
+Last activity: 2026-07-18
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 gap plans 16-07 and 16-08 are executed. Bounded re-verification is authoritative at `gaps_found` (8/9): the prior HARD-05 durable-evidence and GUID-01 guidance blockers are closed, but one HARD-05 blocker remains because `--accept-deletion` discards the selected upstream before inventory mutation. Plan the second and final bounded gap cycle with `/oto-plan-phase 16 --gaps`. The approved WR-02 planning-root migration remains separate and must not be folded into this gap.
+Phase 16 Plan 16-09 is executed and the deletion-acceptance provenance regression is green. Run the prescribed bounded re-review and independent re-verification over the four Plan 16-09 closure files only; do not reopen previously passed requirements or the developer-approved WR-02 DEFER disposition.
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Phase 16 gap plans 16-07 and 16-08 are executed. Bounded re-verification is auth
 | Phase 15 P10 | 13h 31m | 2 tasks | 8 files |
 | Phase 15 P11 | 8 min | 2 tasks | 5 files |
 | Phase 15 P12 | 8 min | 2 tasks | 7 files |
+| Phase 16 P09 | 7 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
 - [Phase 15]: Settings renders native MCP status verbatim and gates actions from the structured runtime array. — Keeps user-facing output truthful while making action availability machine-driven.
 - [Phase 15]: Replace and Clear require separate default-No confirmation after global key-scope disclosure. — Prevents uninformed mutation of the credential shared by root and workstreams.
 - [Phase 15]: Native SDK workstream routing preserves session-scoped pointer semantics from the CJS resolver. — The mandated SDK migration must not regress concurrent-session isolation.
+- [Phase 16]: Namespaced deletion acceptance carries the resolver-selected upstream into the inventory mutation. — Prevents duplicate target paths from mutating another upstream's row.
+- [Phase 16]: Legacy flat deletion sidecars trust only an exact gsd or superpowers header; ambiguous duplicates fail loud. — Preserves single-row compatibility without guessing provenance.
 
 ### Pending Todos
 
@@ -138,8 +141,8 @@ Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are
 
 ## Session Continuity
 
-Last session: 2026-07-14T19:33:04.108Z
-Stopped at: Completed 15-12-PLAN.md
+Last session: 2026-07-18T13:42:45.261Z
+Stopped at: Completed 16-09-PLAN.md
 Resume file: None
 
 ### Quick Tasks Completed

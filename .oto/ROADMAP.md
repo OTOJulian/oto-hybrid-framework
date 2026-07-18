@@ -166,7 +166,7 @@ Plans:
 - [x] 16-06-PLAN.md — HARD-04 live subagent e2e checkpoint (keyed + keyless legs, wildcard contingency) + HARD-05 sync dry-run + phase close
 - [x] 16-07-PLAN.md — Gap closure (HARD-05/WR-01): per-upstream `.oto-sync-conflicts/<upstream>/` namespacing, provenance-safe --status/--accept, e2e --upstream all overlap test
 - [x] 16-08-PLAN.md — Gap closure (GUID-01/WR-03): runtime-observable availability contract in search-tools.md + end-to-end init→spawn-prompt coherence and live Brave-probe tests
-- [ ] 16-09-PLAN.md — Gap closure (HARD-05/fresh WR-01): carry resolved upstream identity into acceptDeletion, match inventory by target_path AND upstream, legacy-flat header policy + CLI regressions
+- [x] 16-09-PLAN.md — Gap closure (HARD-05/fresh WR-01): carry resolved upstream identity into acceptDeletion, match inventory by target_path AND upstream, legacy-flat header policy + CLI regressions
 
 Notes: Consolidate the shared reference BEFORE extending guidance to new agents (the three researchers already disagree with each other). Light research flag: re-verify Exa free-tier limits at docs-writing time; phrase qualitatively. Verify Codex/Gemini MCP tool naming empirically against transformed agent output. Gap plans 16-07/16-08 closed the two original blockers; gap plan 16-09 closes the remaining bounded re-verification blocker (HARD-05/fresh WR-01 deletion-acceptance provenance). WR-02 remains developer-approved DEFER (tracked debt, not re-planned).
 
@@ -188,7 +188,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 12/12 | Complete    | 2026-07-14 |
-| 16. Agent Guidance + Hardening | v0.5.0 | 8/8 | Gaps found | — |
+| 16. Agent Guidance + Hardening | v0.5.0 | 9/9 | Complete   | 2026-07-18 |
 
 ---
 
