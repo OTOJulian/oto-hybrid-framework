@@ -4,11 +4,11 @@ milestone: v0.5.0
 milestone_name: Exa Search Integration
 status: verifying
 stopped_at: Completed 16-09-PLAN.md
-last_updated: "2026-07-18T13:43:31.348Z"
-last_activity: 2026-07-18
+last_updated: "2026-07-18T13:54:37Z"
+last_activity: 2026-07-18 -- bounded re-verification found WR-03
 progress:
   total_phases: 3
-  completed_phases: 3
+  completed_phases: 2
   total_plans: 40
   completed_plans: 40
   percent: 100
@@ -26,16 +26,16 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — EXECUTING
+Phase: 16 (agent-guidance-hardening) — GAPS FOUND
 Plan: 9 of 9 complete
-Status: Phase complete — ready for verification
-Last activity: 2026-07-18
+Status: Developer triage required — bounded gap cycles exhausted
+Last activity: 2026-07-18 -- bounded re-verification found WR-03
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 Plan 16-09 is executed and the deletion-acceptance provenance regression is green. Run the prescribed bounded re-review and independent re-verification over the four Plan 16-09 closure files only; do not reopen previously passed requirements or the developer-approved WR-02 DEFER disposition.
+Phase 16 remains at `gaps_found` (8/9). Plan 16-09 closed the original namespaced WR-01 defect, but bounded review and independent re-verification reproduced WR-03: Markdown-body `upstream:` content can be mistaken for legacy YAML-header provenance and authorize destructive deletion acceptance. Both automatic gap cycles are exhausted. Developer triage is required on the **FIX** disposition in `16-DISPOSITIONS.md`; do not run a third `/oto-plan-phase 16 --gaps` loop.
 
 ## Performance Metrics
 
