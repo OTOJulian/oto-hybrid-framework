@@ -63,13 +63,32 @@ async function acceptConflict({ relPath, otoDir, conflictsDir }) {
   return { acceptedPath: target };
 }
 
-async function acceptDeletion({ relPath, otoDir, conflictsDir, inventoryPath }) {
+async function acceptDeletion({ relPath, otoDir, conflictsDir, inventoryPath, upstream = null }) {
+  if (upstream !== null && upstream !== 'gsd' && upstream !== 'superpowers') {
+    throw new Error(`invalid upstream '${upstream}' for deletion acceptance (must be gsd or superpowers)`);
+  }
   const sidecar = assertSafeAcceptPath(conflictsDir, `${relPath}.deleted.md`);
   const target = targetPathFor(otoDir, relPath);
-  await readSidecar(sidecar);
+  const raw = await readSidecar(sidecar);
+  let resolvedUpstream = upstream;
+  if (!resolvedUpstream) {
+    const headerMatch = /^upstream: (gsd|superpowers)$/m.exec(raw);
+    if (headerMatch) resolvedUpstream = headerMatch[1];
+  }
   const inventory = JSON.parse(await fsp.readFile(inventoryPath, 'utf8'));
-  const entry = (inventory.entries || []).find((candidate) => candidate.target_path === relPath);
-  if (!entry) throw new Error(`No inventory entry with target_path '${relPath}'`);
+  const entries = inventory.entries || [];
+  let entry;
+  if (resolvedUpstream) {
+    entry = entries.find((candidate) => candidate.target_path === relPath && candidate.upstream === resolvedUpstream);
+    if (!entry) throw new Error(`No inventory entry with target_path '${relPath}' and upstream '${resolvedUpstream}'`);
+  } else {
+    const matches = entries.filter((candidate) => candidate.target_path === relPath);
+    if (matches.length === 0) throw new Error(`No inventory entry with target_path '${relPath}'`);
+    if (matches.length > 1) {
+      throw new Error(`Multiple inventory entries share target_path '${relPath}' and the legacy flat sidecar has no valid upstream header; refusing to guess provenance`);
+    }
+    entry = matches[0];
+  }
   entry.verdict = 'dropped_upstream';
   await fsp.writeFile(inventoryPath, `${JSON.stringify(inventory, null, 2)}\n`);
   try {

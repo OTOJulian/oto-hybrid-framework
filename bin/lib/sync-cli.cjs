@@ -208,9 +208,9 @@ async function runStatus() {
   return 0;
 }
 
-function resolveAcceptDir(conflictsRoot, relPath, suffix, upstreamFlag) {
+function resolveAcceptTarget(conflictsRoot, relPath, suffix, upstreamFlag) {
   assertSafeAcceptPath(conflictsRoot, relPath + suffix);
-  if (upstreamFlag) return path.join(conflictsRoot, upstreamFlag);
+  if (upstreamFlag) return { dir: path.join(conflictsRoot, upstreamFlag), upstream: upstreamFlag };
 
   const upstreams = ['gsd', 'superpowers'].filter((upstream) =>
     fs.existsSync(path.join(conflictsRoot, upstream, relPath + suffix))
@@ -218,8 +218,8 @@ function resolveAcceptDir(conflictsRoot, relPath, suffix, upstreamFlag) {
   if (upstreams.length === 2) {
     throw new Error(`'${relPath}' has pending records from both upstreams; disambiguate with --upstream gsd or --upstream superpowers`);
   }
-  if (upstreams.length === 1) return path.join(conflictsRoot, upstreams[0]);
-  return conflictsRoot;
+  if (upstreams.length === 1) return { dir: path.join(conflictsRoot, upstreams[0]), upstream: upstreams[0] };
+  return { dir: conflictsRoot, upstream: null };
 }
 
 async function runSync(argv) {
@@ -239,20 +239,20 @@ async function runSync(argv) {
 
     if (parsed.mode === 'status') return await runStatus();
     if (parsed.mode === 'accept') {
-      const resolvedConflictsDir = resolveAcceptDir(conflictsDir, parsed.accept, '.md', parsed.upstream);
-      await acceptConflict({ relPath: parsed.accept, otoDir, conflictsDir: resolvedConflictsDir });
+      const resolved = resolveAcceptTarget(conflictsDir, parsed.accept, '.md', parsed.upstream);
+      await acceptConflict({ relPath: parsed.accept, otoDir, conflictsDir: resolved.dir });
       process.stdout.write(`accepted: ${parsed.accept}\n`);
       return 0;
     }
     if (parsed.mode === 'accept-deletion') {
-      const resolvedConflictsDir = resolveAcceptDir(conflictsDir, parsed['accept-deletion'], '.deleted.md', parsed.upstream);
-      await acceptDeletion({ relPath: parsed['accept-deletion'], otoDir, conflictsDir: resolvedConflictsDir, inventoryPath });
+      const resolved = resolveAcceptTarget(conflictsDir, parsed['accept-deletion'], '.deleted.md', parsed.upstream);
+      await acceptDeletion({ relPath: parsed['accept-deletion'], otoDir, conflictsDir: resolved.dir, inventoryPath, upstream: resolved.upstream });
       process.stdout.write(`accepted-deletion: ${parsed['accept-deletion']}\n`);
       return 0;
     }
     if (parsed.mode === 'keep-deleted') {
-      const resolvedConflictsDir = resolveAcceptDir(conflictsDir, parsed['keep-deleted'], '.deleted.md', parsed.upstream);
-      await keepDeleted({ relPath: parsed['keep-deleted'], conflictsDir: resolvedConflictsDir, allowlistPath });
+      const resolved = resolveAcceptTarget(conflictsDir, parsed['keep-deleted'], '.deleted.md', parsed.upstream);
+      await keepDeleted({ relPath: parsed['keep-deleted'], conflictsDir: resolved.dir, allowlistPath });
       process.stdout.write(`kept-deleted: ${parsed['keep-deleted']}\n`);
       return 0;
     }
