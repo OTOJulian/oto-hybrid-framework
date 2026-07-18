@@ -2,10 +2,10 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: milestone_complete
-stopped_at: Phase 16 verified and complete
-last_updated: "2026-07-18T14:26:01Z"
-last_activity: 2026-07-18 -- Phase 16 WR-03 bounded closure verified 9/9
+status: completed
+stopped_at: Completed 16-09-PLAN.md
+last_updated: "2026-07-18T19:41:39.990Z"
+last_activity: 2026-07-18
 progress:
   total_phases: 3
   completed_phases: 3
@@ -18,24 +18,23 @@ progress:
 
 ## Project Reference
 
-See: .oto/PROJECT.md (updated 2026-07-10)
+See: .oto/PROJECT.md (updated 2026-07-18)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** v0.5.0 milestone audit and close
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — COMPLETE
-Plan: 9 of 9 complete
-Status: Milestone implementation complete — ready for audit
-Last activity: 2026-07-18 -- WR-03 bounded closure verified 9/9
+Milestone: v0.5.0 Exa Search Integration — SHIPPED 2026-07-18 (tag v0.5.0)
+Status: Between milestones — next milestone not yet defined
+Last activity: 2026-07-18 — v0.5.0 archived (roadmap + requirements), PROJECT.md evolved, tagged
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 is verified and complete at 9/9. WR-03 closed through the developer-approved dispositions-authorized bounded FIX; WR-02 remains approved DEFER. Run `/oto-audit-milestone` to validate v0.5.0 before archival and release preparation.
+v0.5.0 is shipped, archived, and tagged. Closed without a separate milestone audit (developer-accepted); WR-02 planning-root fixture debt remains approved DEFER. Run `/oto-new-milestone` to start the next cycle (questioning → research → requirements → roadmap). New phases number from 17.
 
 ## Performance Metrics
 
@@ -74,71 +73,43 @@ Phase 16 is verified and complete at 9/9. WR-03 closed through the developer-app
 
 ### Roadmap Evolution
 
-- 2026-07-10: v0.5.0 roadmap created. Three phases (14-16) per research's strict dependency chain — key storage reconciliation (SECR-01..04) → MCP registration across all three runtimes (MCP-01..09 + HARD-02) → agent guidance + hardening (GUID-01..05 + HARD-01/03/04/05). 23/23 requirements mapped, no orphans, no duplicates. HARD-02 mapped to Phase 15 (its adapter round-trip family tests Phase 15 code and is the TOML-corruption hard gate; Phase 14's validation/no-plaintext test families land there and complete under HARD-02). Phases number from 14 (above the highest existing folder, 13); existing phase directories are never renamed/moved/deleted.
+- 2026-07-18: v0.5.0 shipped (phases 14-16; key-storage reconciliation, Exa MCP registration in all three runtimes, shared agent guidance + hardening). Archives: `.oto/milestones/v0.5.0-*`. Next phases number from 17.
 - 2026-05-26: v0.4.0 shipped (phases 11-13; SDK port, query registry, dogfood `.oto/` migration). Archives: `.oto/milestones/v0.4.0-*`.
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table. Recent/forward-relevant:
+Full log: PROJECT.md Key Decisions table (v0.5.0 decisions recorded at close). Forward-relevant:
 
-- v0.5.0 phases number from 14 (above highest existing phase folder, 13); never collide with accumulated v0.1.0-v0.4.0 directories.
-- Transport/auth ADR (launcher-stdio vs remote HTTP) must be recorded at the top of Phase 15 before registration code lands; research recommends launcher-stdio.
-- Key-storage fix covers all three integrations (`exa_search`, `brave_search`, `firecrawl`) with the shared mechanism, not just Exa.
-- Sync hygiene is a cross-cutting v0.5.0 constraint: new logic in oto-only files where possible; shared-file diffs small and commented; `oto sync --dry-run` verified at milestone close (HARD-05).
+- New phases number from 17 (above the highest existing phase folder, 16); accumulated phase directories are never renamed/moved/deleted.
 - All installer changes go in the live `bin/lib/` installer; `oto/bin/install.js` is a vestigial GSD reference.
-- [Phase 14]: CJS integration flags accept booleans only; API keys live in environment variables or 0600 ~/.oto keyfiles. — Prevents tracked config from persisting secret material.
-- [Phase 14]: Legacy config conflicts preserve the existing keyfile and drop the config string with masked notices. — A deliberately created keyfile is the safer source of truth.
-- [Phase 14]: SDK integration validation runs before the config lock or write — Non-boolean values never reach tracked config.
-- [Phase 14]: Both SDK read paths invoke best-effort legacy migration — Legacy strings self-heal without blocking normal reads.
-- [Phase 14]: Secret values enter through stdin or a muted TTY prompt only; argv and handler output remain plaintext-free. — Prevents keys from leaking through shell history, process listings, logs, or agent transcripts.
-- [Phase 14]: Native query handlers may provide optional raw display text while preserving structured data for programmatic consumers. — Lets human-facing status commands render exact masked lines without breaking registry callers.
-- [Phase 14]: Settings Set/Replace delegates key entry to the user's hidden terminal prompt; the workflow never receives secret material. — Keeps keys out of chat, argv, shell history, and tracked config.
-- [Phase 14]: The no-plaintext regression guard scans exactly git-tracked .oto files. — Protects the remote exfiltration surface without fixture false positives.
-- [Phase 15]: Exa MCP uses a shipped launcher-stdio process pinned to exa-mcp-server@3.2.1 with an exact three-tool positional argument and no credentials in runtime configuration. — One launcher gives Claude Code, Codex, and Gemini the same environment-first or regular-keyfile secret resolution and deterministic tool surface.
-- [Phase 15]: D-15 read paths follow symlinks only to regular non-empty files without chmod-healing targets. — Supports password-manager-managed files while rejecting dangling and non-regular objects.
-- [Phase 15]: WR-07 write paths retain lstat and O_NOFOLLOW symlink refusal. — Read usability does not weaken the established write-through-symlink boundary.
-- [Phase 15]: All key availability gates use detectKeySource rather than bare filesystem existence. — Empty and dangling keyfiles must not enable integrations or registration.
-- [Phase 15]: Codex MCP registration uses a separate marker block from hooks. — Hook refreshes cannot overwrite the Exa entry.
-- [Phase 15]: Codex MCP unmerge requires an exact inner-block fingerprint match. — User-owned or drifted entries remain untouched.
-- [Phase 15]: Claude MCP registration resolves .claude.json exclusively from CLAUDE_CONFIG_DIR or HOME, independent of the installer settings directory. — Claude Code reads this live state file outside settingsFilename, so registration must follow the runtime environment rather than ctx.configDir.
-- [Phase 15]: Claude state is rewritten only after strict JSON parsing and ownership checks; drifted, user-owned, and unparseable content remains untouched. — Claude's state file contains user history and onboarding data, making additive preservation and fingerprint-gated removal mandatory.
-- [Phase 15]: Gemini MCP registration is separate from mergeSettings, so experimental.enableAgents false cannot suppress Exa registration. — Keeps MCP availability independent from agent-dependent hook settings.
-- [Phase 15]: Gemini Exa entries contain only command and args, with exact parsed entries used as ownership fingerprints. — Avoids the SSE URL trap and preserves user-owned or drifted entries.
-- [Phase 15]: Persist consent separately from install fingerprints — Keeps user intent independent from mutation ownership evidence
-- [Phase 15]: Resolve all install targets before consent — Guarantees one prompt and one decision map per install command
-- [Phase 15]: Settings renders native MCP status verbatim and gates actions from the structured runtime array. — Keeps user-facing output truthful while making action availability machine-driven.
-- [Phase 15]: Replace and Clear require separate default-No confirmation after global key-scope disclosure. — Prevents uninformed mutation of the credential shared by root and workstreams.
-- [Phase 15]: Native SDK workstream routing preserves session-scoped pointer semantics from the CJS resolver. — The mandated SDK migration must not regress concurrent-session isolation.
-- [Phase 16]: Namespaced deletion acceptance carries the resolver-selected upstream into the inventory mutation. — Prevents duplicate target paths from mutating another upstream's row.
-- [Phase 16]: Legacy flat deletion sidecars trust only an exact gsd or superpowers header; ambiguous duplicates fail loud. — Preserves single-row compatibility without guessing provenance.
+- Sync hygiene: new logic in oto-only files where possible; shared-file diffs small and commented; `oto sync --dry-run` verified at milestone close.
+- Integration config flags are boolean-only; keys live in env vars or 0600 `~/.oto` keyfiles; all availability gates use `detectKeySource`, never bare file existence.
+- MCP registration is additive, consent-gated (default No), fingerprint-owned per runtime; user-owned/drifted/unparseable entries are refused, never overwritten.
 
 ### Pending Todos
 
-- **Phase 16 pre-task (WR-04, deferred from Phase 14 review):** the settings workflow persists comma-separated agent skills as ONE quoted string (`oto/workflows/settings-integrations.md` agent-skills step); consumers treat it as a single nonexistent skill path. Phase 16 (agent guidance — owns the agent_skills consumers) must parse/trim/validate each name, persist a JSON array, and add an end-to-end two-skill injection test. Tracked in `.oto/phases/14-key-storage-reconciliation/14-DISPOSITIONS.md`.
-- **Phase 15 pre-task (FRESH-CR-02, deferred from Phase 14 fresh review):** own per-runtime config-dir resolution plus the `/oto-settings-integrations` per-runtime status surface across Claude, Codex, Gemini, and custom config directories.
-- **Phase 16 pre-task (FRESH-CR-03, deferred from Phase 14 fresh review):** alongside WR-04, own effective root-to-workstream secret-status flags and root-layer legacy migration, including inherited booleans and legacy-string post-state.
-- **Post-Phase 15 tooling quick task:** `oto-sdk query verify.codebase-drift` still targets removed `get-shit-done/bin/gsd-tools.cjs`, so the non-blocking drift gate skips with `sdk-exception`. Fix the OTO-native helper routing and add a JSON-contract regression via `/oto-quick`. Tracked in `.oto/todos/pending/2026-07-14-fix-codebase-drift-stale-gsd-helper-path.md`.
-- **Pre-milestone-close bounded task (WR-02 planning-root migration):** schedule the CJS/SDK `.planning` → `.oto` planning-root and stale-fixture migration as its own bounded task; do not fold it into Plan 16-06. It remains required before milestone close if milestone hard gates require the full SDK suite to be green. Evidence and the developer-approved temporary baseline amendment are recorded in `16-DISPOSITIONS.md` and `16-SDK-BASELINE-DELTA.txt`.
+- **Tooling quick task:** `oto-sdk query verify.codebase-drift` still targets removed `get-shit-done/bin/gsd-tools.cjs`, so the non-blocking drift gate skips with `sdk-exception`. Fix the OTO-native helper routing and add a JSON-contract regression via `/oto-quick`. Tracked in `.oto/todos/pending/2026-07-14-fix-codebase-drift-stale-gsd-helper-path.md`.
+- **Deferred debt (WR-02 planning-root migration):** CJS/SDK `.planning` → `.oto` planning-root and stale-fixture migration, developer-approved DEFER at v0.5.0 close under the amended SDK baseline. Required before any future gate that needs the full SDK suite green without the amendment. Evidence: `16-DISPOSITIONS.md`, `16-SDK-BASELINE-DELTA.txt`.
 
 ### Blockers/Concerns
 
-- Active secret-hygiene defect (research-confirmed): `/oto-settings-integrations` writes raw API-key strings into git-tracked `.oto/config.json`, and the live SDK write path has no masking. Phase 14 fixes this first; avoid touching integration keys via settings until then.
+None. The v0.5.0-opening secret-hygiene defect (raw keys in tracked config) was fixed and regression-guarded in Phase 14.
 
 ## Deferred Items
 
-Items acknowledged and deferred at v0.4.0 milestone close on 2026-05-26. All are pre-v0.4.0 historical noise carried in the open-artifact audit, plus one follow-up surfaced by Phase 12 verification:
+Items acknowledged and deferred at v0.5.0 milestone close on 2026-07-18 (20 open-artifact-audit items plus tracked follow-ups). The debug session, the four May quick tasks, and both context-question rows were previously acknowledged at the v0.4.0 close; the twelve 2026-06/07 quick tasks are all already shipped (see Quick Tasks Completed below) and are flagged only because their directories lack STATE files.
 
 | Category | Item | Status | Note |
 |----------|------|--------|------|
 | debug | knowledge-base | unknown | Stale debug session from 2026-05-05 (pre-v0.4.0); has a `resolved/` subdir. Close or archive via `/oto-debug` cleanup. |
-| quick_task | 260505-bxx-port-gsds-codex-command-to-skill-adapter | committed | Already shipped (commit f56522c); audit flags it only because the quick-task dir lacks a STATE file. |
-| quick_task | 260505-cxx-exclude-runtime-worktrees-from-migrate | committed | Already shipped (commit 69f8969). |
-| quick_task | 260506-axx-expose-migrate-through-public-cli | committed | Already shipped (commit df7aba5). |
-| quick_task | 260506-bxx-skip-gitignored-migrate-artifacts | committed | Already shipped (commit 4230d59). |
+| quick_task | 16 directories (260505-bxx … 260716-qbp) | committed | All shipped with commits recorded in Quick Tasks Completed; audit flags them only for missing STATE files. |
+| todo | 2026-07-14-fix-codebase-drift-stale-gsd-helper-path | pending | `verify.codebase-drift` targets the removed GSD helper; fix via `/oto-quick`. |
 | context_question | Phase 02 (02-CONTEXT.md) | stale | v0.3.0-era discuss question left flagged; phase shipped and verified. |
 | context_question | Phase 11 (11-CONTEXT.md) | stale | Discuss questions answered during planning; phase shipped and verified. |
-| follow-up | init.cjs `.planning/` leak + milestone.complete marker | open | `oto/bin/lib/init.cjs:554` returns `task_dir: .planning/quick/…` (SDK handler correct); `oto-sdk query milestone.complete` rewrote the STATE.md frontmatter marker to `gsd_state_version` (restored manually). Both are ported CJS/SDK tooling still emitting GSD-era identifiers — fix via `/oto-quick`. |
-| follow-up | config-mutation.ts:349 global defaults path reads `~/.gsd/defaults.json` while CJS `config.cjs:66` reads `~/.oto/defaults.json` | open | GSD-era path divergence found during Phase 14; out of D-08 scope (keyfiles only) — fix via `/oto-quick` alongside the other GSD-era identifier cleanups |
+| debt | WR-02 planning-root fixture migration | deferred (approved) | See Pending Todos; amended SDK baseline recorded in `16-SDK-BASELINE-DELTA.txt`. |
+| gap | No v0.5.0 milestone audit | accepted | Close proceeded on phase-level verification with developer approval; `/oto-audit-milestone` remains available retroactively. |
+| follow-up | init.cjs `.planning/` leak + milestone.complete marker | open | `oto/bin/lib/init.cjs:554` returns `task_dir: .planning/quick/…` (SDK handler correct); GSD-era identifiers in ported tooling — fix via `/oto-quick`. Note: the v0.5.0 requirements archive header also emitted a `.planning/REQUIREMENTS.md` reference (corrected by hand at close). |
+| follow-up | config-mutation.ts:349 reads `~/.gsd/defaults.json` vs CJS `config.cjs:66` `~/.oto/defaults.json` | open | GSD-era path divergence found during Phase 14; out of D-08 scope — fix via `/oto-quick` alongside the other identifier cleanups. |
 
 ## Session Continuity
 

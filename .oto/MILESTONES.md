@@ -1,5 +1,40 @@
 # Milestones
 
+## v0.5.0 Exa Search Integration (Shipped: 2026-07-18)
+
+**Archive:**
+
+- [Roadmap](milestones/v0.5.0-ROADMAP.md)
+- [Requirements](milestones/v0.5.0-REQUIREMENTS.md)
+
+**Scope:** 3 phases (14-16), 40 plans, 89 tasks, 23 requirements (SECR-01..04, MCP-01..09, GUID-01..05, HARD-01..05). 381 commits since v0.4.0 (range includes the interim v0.4.1 tag and the quick-task stream); the raw diff (+40,703/−340,134 across 1,487 files) is dominated by removing the vendored `foundation-frameworks/` snapshots — the net authored surface is the secrets/keyfile layer, three per-runtime MCP adapters, the pinned launcher hook, the shared search-guidance reference, and per-upstream sync-conflict namespacing.
+
+**Release status:** shipped, tagged. All three phases verified; Phase 16 closed 9/9 after the dispositions-authorized WR-03 bounded fix.
+
+**Key accomplishments:**
+
+- Key-storage overhaul: integration API keys (Exa/Brave/Firecrawl) live only in 0600 `~/.oto` keyfiles or env vars; tracked `.oto/config.json` is boolean-only in both CJS and SDK write paths, with self-healing legacy migration, transactional/compensating secret set/clear, lock-protected migration, and a no-plaintext-in-tracked-files guard.
+- Consent-gated Exa MCP registration across all three runtimes: additive merge into `~/.claude.json`, an OTO-marker `[mcp_servers.exa]` block in `~/.codex/config.toml`, and a stdio-shape `mcpServers.exa` entry in `~/.gemini/settings.json` — idempotent, fingerprint-owned, drift-safe on uninstall, never via CLI shell-outs, default-No consent persisted per runtime.
+- Launcher-stdio transport (ADR-16): a shipped hook-channel launcher pins `exa-mcp-server@3.2.1` with exactly three tools (`web_search_exa`, `web_fetch_exa`, `web_search_advanced_exa`) and keeps credential bytes out of argv and runtime configuration.
+- Shared agent guidance: one runtime-neutral search-tools reference (Exa → Brave → WebSearch fallback ladder, never-retry-on-429) consumed by all five search-using agents, with deprecated-tool-name guards verified against transformed Codex/Gemini output — not just source.
+- Hardening to shipping standard: keyless-fallback regression floor (zero user-facing errors without a key), a live e2e proving `mcp__exa__*` tools reach a tools-restricted subagent (claude-code#13898 regression class), runtime-matrix Exa rows plus a public setup guide with qualitative rate-limit phrasing, and provenance-safe per-upstream sync-conflict namespacing.
+- Per-runtime settings surface: `/oto-settings-integrations` gained masked stdin-only key set/replace/clear, six-state live MCP registration status per runtime, doctor coherence warnings, and register/unregister controls.
+
+**Verification:**
+
+- Phases 14-16 closed through bounded review/verification cycles (19, 12, and 9 plans including gap-closure waves); every review finding dispositioned in per-phase DISPOSITIONS files.
+- Phase 16 final repository gate green; the amended SDK baseline delta shows no new persistent failures beyond the captured two-run baseline (`16-SDK-BASELINE-DELTA.txt`).
+- HARD-04 live e2e passed on both keyed and keyless legs; HARD-05 `oto sync --dry-run` conflict surface recorded for both upstreams without applying upstream content.
+
+**Known gaps at close:**
+
+- No v0.5.0 milestone audit was run (`/oto-audit-milestone`); close proceeded on phase-level verification with developer approval (consistent with v0.3.0/v0.4.0, which also closed without separate audits).
+- WR-02 planning-root fixture migration remains developer-approved DEFER — tracked debt in `16-DISPOSITIONS.md` and STATE.md pending todos; required before any future gate that needs the full SDK suite green without the amended baseline.
+
+**Known deferred items at close:** 20 (see STATE.md Deferred Items) — 16 already-shipped quick tasks flagged only for missing STATE files, 1 stale pre-v0.4.0 debug session, 2 phases with stale CONTEXT questions, and 1 pending tooling todo (codebase-drift query still targets the removed GSD helper path).
+
+---
+
 ## v0.4.0 SDK + Dogfood (Shipped: 2026-05-26)
 
 **Archive:**
