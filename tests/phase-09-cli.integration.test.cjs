@@ -153,7 +153,7 @@ test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> end-to-end a
   assert.equal(await fsp.readFile(path.join(project, 'oto/local-sentinel.md'), 'utf8'), 'local sentinel\n');
   assert.equal(fs.existsSync(path.join(project, 'oto/README.md')), false);
   assert.equal(fs.existsSync(path.join(project, 'oto/workflows/sample.md')), false);
-  assert.equal(fs.existsSync(path.join(project, '.oto-sync-conflicts/REPORT.md')), true);
+  assert.equal(fs.existsSync(path.join(project, '.oto-sync-conflicts/gsd/REPORT.md')), true);
 });
 
 test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> --apply writes to oto/', async (t) => {
@@ -180,7 +180,7 @@ test('SYN-07 (override): oto sync --upstream gsd --to <fixture-tag> --apply writ
   assert.equal(second.status, 0, second.stderr || second.stdout);
   assert.match(await fsp.readFile(path.join(project, 'oto/workflows/sample.md'), 'utf8'), /local oto note/);
   assert.equal(await fsp.readFile(path.join(project, 'oto/workflows/added.md'), 'utf8'), '# added\n');
-  const report = await fsp.readFile(path.join(project, '.oto-sync-conflicts/REPORT.md'), 'utf8');
+  const report = await fsp.readFile(path.join(project, '.oto-sync-conflicts/gsd/REPORT.md'), 'utf8');
   assert.match(report, /v1\.1\.0/);
   const logStat = await fsp.stat(path.join(project, '.oto-sync/BREAKING-CHANGES-gsd.md'));
   assert.ok(logStat.size > beforeLogSize);
@@ -215,12 +215,18 @@ test('D-19: oto sync --status shows pending conflicts and last-synced refs', asy
   await fsp.mkdir(path.join(root, '.oto-sync-conflicts/oto/workflows'), { recursive: true });
   await fsp.writeFile(path.join(root, '.oto-sync-conflicts/oto/workflows/a.added.md'), 'x');
   await fsp.writeFile(path.join(root, '.oto-sync-conflicts/oto/workflows/b.deleted.md'), 'x');
+  await fsp.mkdir(path.join(root, '.oto-sync-conflicts/gsd/oto/workflows'), { recursive: true });
+  await fsp.mkdir(path.join(root, '.oto-sync-conflicts/superpowers/nested'), { recursive: true });
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts/gsd/oto/workflows/c.md'), 'x');
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts', 'gsd', 'REPORT.md'), 'generated report');
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts/superpowers/nested/REPORT.md'), 'nested generated report');
 
   const code = await runStatus();
   const output = writes.join('');
   assert.equal(code, 0);
   assert.match(output, /v1\.1\.0/);
-  assert.match(output, /M=0 A=1 D=1/);
+  assert.match(output, /pending conflicts: M=1 A=1 D=1/);
+  assert.match(output, /pending conflicts \[gsd\]: M=1 A=0 D=0/);
 });
 
 test('Pitfall 9: git --version parsing - lenient regex; fail-loud on unparseable output', () => {

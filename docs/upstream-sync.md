@@ -50,9 +50,11 @@ resolution helpers:
    delegates modified-file merge work to `git merge-file` so non-overlapping
    changes land automatically.
 5. **Surface and accept** - Same-line conflicts, upstream adds, and upstream
-   deletions are written to `.oto-sync-conflicts/`. After review, the operator
-   resolves them through `oto sync --accept`, `--accept-deletion`, or
-   `--keep-deleted`.
+   deletions are written to `.oto-sync-conflicts/<upstream>/`. Each leg also
+   writes `.oto-sync-conflicts/<upstream>/REPORT.md`, so an `--upstream all`
+   run preserves separate GSD and Superpowers reports. After review, the
+   operator resolves sidecars through `oto sync --accept`,
+   `--accept-deletion`, or `--keep-deleted`.
 
 The stage scripts are intentionally runnable on their own for debugging:
 
@@ -66,10 +68,10 @@ node scripts/sync-upstream/merge.cjs --upstream gsd --apply
 ## Conflict resolution
 
 Modified-file conflicts are written as Markdown sidecars under
-`.oto-sync-conflicts/<target-path>.md`. Each file starts with a small YAML
-header that records the conflict kind, upstream name, prior ref, current ref,
-target path, and inventory entry. The body is the `git merge-file` result with
-standard conflict markers.
+`.oto-sync-conflicts/<upstream>/<target-path>.md`. Each file starts with a
+small YAML header that records the conflict kind, upstream name, prior ref,
+current ref, target path, and inventory entry. The body is the
+`git merge-file` result with standard conflict markers.
 
 Added files use `.added.md` sidecars. Deleted files use `.deleted.md` sidecars.
 These are deliberate review gates: oto never silently deletes local files, and
@@ -79,6 +81,15 @@ After resolving a modified conflict, remove all merge markers and run:
 
 ```sh
 oto sync --accept oto/workflows/plan-phase.md
+```
+
+The accept commands auto-detect the upstream namespace when only one pending
+record exists for the target. If both upstreams recorded the same target, the
+command fails without changing either sidecar; disambiguate explicitly:
+
+```sh
+oto sync --accept oto/workflows/plan-phase.md --upstream gsd
+oto sync --accept oto/workflows/plan-phase.md --upstream superpowers
 ```
 
 For an upstream deletion, choose one of:
@@ -114,8 +125,8 @@ hardcoded for GSD and Superpowers. A third upstream would need:
 3. Rename-map entries for that upstream's command, path, env var, URL, and skill
    surfaces.
 4. Inventory classifications for all retained files.
-5. Merge/report updates so `.oto-sync-conflicts/REPORT.md` can identify the new
-   source.
+5. Merge/report updates so `.oto-sync-conflicts/<upstream>/REPORT.md` can
+   identify the new source without clobbering another upstream's report.
 6. Regression tests covering pull, rebrand, merge, and accept behavior.
 
 That is real architecture work, not release polish, so v0.1.0 keeps the sync

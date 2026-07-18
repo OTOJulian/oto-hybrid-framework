@@ -46,6 +46,10 @@ async function main() {
     process.stderr.write('sync-merge: --upstream {gsd|superpowers} required\n');
     process.exit(2);
   }
+  if (values.upstream !== 'gsd' && values.upstream !== 'superpowers') {
+    process.stderr.write('sync-merge: --upstream must be gsd or superpowers\n');
+    process.exit(2);
+  }
 
   const upstream = values.upstream;
   const syncMetaDir = path.resolve(values['sync-meta-dir']);
@@ -55,7 +59,7 @@ async function main() {
   const priorRebrandedDir = values['prior-rebranded-dir']
     ? path.resolve(values['prior-rebranded-dir'])
     : path.resolve(`.oto-sync/rebranded/${upstream}/prior`);
-  const conflictsDir = path.resolve(values['conflicts-dir']);
+  const conflictsDir = path.resolve(values['conflicts-dir'], upstream);
   const pinPath = values['pin-file']
     ? path.resolve(values['pin-file'])
     : path.resolve(`.oto-sync/upstream/${upstream}/last-synced-commit.json`);
