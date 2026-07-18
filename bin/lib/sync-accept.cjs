@@ -72,7 +72,8 @@ async function acceptDeletion({ relPath, otoDir, conflictsDir, inventoryPath, up
   const raw = await readSidecar(sidecar);
   let resolvedUpstream = upstream;
   if (!resolvedUpstream) {
-    const headerMatch = /^upstream: (gsd|superpowers)$/m.exec(raw);
+    const header = HEADER_RE.exec(raw)?.[1] || '';
+    const headerMatch = /^upstream: (gsd|superpowers)$/m.exec(header);
     if (headerMatch) resolvedUpstream = headerMatch[1];
   }
   const inventory = JSON.parse(await fsp.readFile(inventoryPath, 'utf8'));
