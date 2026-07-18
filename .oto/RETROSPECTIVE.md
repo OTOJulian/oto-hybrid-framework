@@ -141,6 +141,54 @@
 
 ---
 
+## Milestone: v0.5.0 - Exa Search Integration
+
+**Shipped:** 2026-07-18
+**Phases:** 3 | **Plans:** 40 | **Requirements:** 23/23
+
+### What Was Built
+
+- Key-storage reconciliation: integration API keys (Exa/Brave/Firecrawl) confined to 0600 `~/.oto` keyfiles or env vars; boolean-only tracked config enforced in both CJS and SDK write paths with self-healing legacy migration, transactional secret set/clear, and a no-plaintext-in-tracked-files guard.
+- Consent-gated, idempotent, fingerprint-owned Exa MCP registration across Claude Code, Codex, and Gemini via oto's adapters, with drift-safe uninstall and a shipped launcher pinning `exa-mcp-server@3.2.1` to exactly three tools (ADR-16).
+- One runtime-neutral search-tools reference (Exa → Brave → WebSearch fallback, never-retry-on-429) consumed by five agents, with deprecated-name guards checked against transformed Codex/Gemini output.
+- Hardening: keyless-fallback regression floor, live tools-restricted-subagent e2e (claude-code#13898 class), runtime-matrix Exa rows, public setup docs, and per-upstream sync-conflict namespacing with provenance-safe deletion acceptance.
+
+### What Worked
+
+- The strict three-phase dependency chain (keys → registration → guidance) held: each phase consumed exactly what the previous one made real (`detectKeySource`, then live tools), so no phase shipped guidance or registration ahead of its substrate.
+- Recording the transport decision as an ADR (ADR-16, launcher-stdio) before any adapter code landed prevented the registration phase from relitigating transport per runtime.
+- Adapter round-trip tests as hard gates (byte-identical Codex TOML, additive `.claude.json`, Gemini shape) caught corruption classes before they touched real user config; refusal-over-overwrite for user-owned/drifted entries proved the right default everywhere.
+- Bounded convergence contracts (Phase 14's 19-plan gap-closure waves, Phase 16's dispositions-authorized WR-03 fix) kept deep review cycles from becoming open-ended — every finding got an explicit disposition instead of a silent drop.
+
+### What Was Inefficient
+
+- Phase 14 grew from 4 planned plans to 19 through five gap-closure waves — the secret-handling surface (two write paths × migration × transactions × locking) was under-scoped at planning time; the review machinery found real defects, but plan-count churn was the cost.
+- The full SDK suite could not be brought green without the `.planning` → `.oto` fixture migration (WR-02), forcing a developer-approved amended baseline at close — deferred debt that any future full-suite gate will trip over.
+- The milestone closed without a `/oto-audit-milestone` run (developer-accepted); phase-level verification substituted, but this is the third consecutive close without an independent cross-phase audit.
+- Ported closeout tooling still leaks GSD-era identifiers: the v0.5.0 requirements archive header cited `.planning/REQUIREMENTS.md` and had to be corrected by hand — the same bug class the v0.4.0 retro flagged (init.cjs `.planning/` leak, `gsd_state_version` marker), still unfixed.
+
+### Patterns Established
+
+- **ADR-before-adapter:** cross-runtime integration decisions (transport, auth, tool surface) get an ADR before per-runtime code lands.
+- **Refuse, never overwrite:** runtime config mutation requires fingerprint ownership; user-owned, drifted, or unparseable content is refused and reported, in every adapter.
+- **Usable-key detection over file existence:** all availability gates go through `detectKeySource`; empty/dangling keyfiles enable nothing.
+- **Verify transformed output, not source:** runtime-parity claims (tool names, namespaces) are checked against actual Codex/Gemini transforms.
+- **Bounded convergence contract:** deep review cycles close through explicit per-finding dispositions with a developer-approved terminal gate, not through unbounded re-review.
+
+### Key Lessons
+
+1. Security-surface phases need a planning multiplier: dual write paths, migration, and concurrency each multiply the review surface — Phase 14's 4→19 plan growth was predictable in hindsight and should inform scoping of any future secrets/state-integrity phase.
+2. Deferred fixture debt compounds at gates: WR-02 was cheap to defer per-phase but forced an amended baseline at milestone close; schedule root-migration debt before the milestone that needs its suite green.
+3. The GSD-era identifier leak class keeps resurfacing at every close (v0.4.0: state marker; v0.5.0: archive header). The `/oto-quick` cleanup batch (init.cjs, defaults path, drift helper, archive header emitter) should be done early next cycle, not re-deferred.
+4. Consent UX consolidates well: resolving all install targets before one aggregated prompt (one decision map per install command) avoided the N-prompts-per-runtime trap.
+
+### Cost Observations
+
+- Most plans ran 3–14 min; the outliers were review-driven (Phase 15 P10 at 13h31m wall-clock spanned a paused live checkpoint). The dominant spend was gap-closure convergence in Phase 14, not first-pass implementation.
+- Live e2e checkpoints (keyed + keyless legs, real Claude registration round-trip) were the highest-value manual minutes — consistent with every prior retro's "real dogfood over smoke files" finding.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -151,6 +199,7 @@
 | v0.2.0 | 2 | Tight post-release command additions (`/oto-migrate`, `/oto-log`) with per-runtime parity. |
 | v0.3.0 | 3 | Surgical ADR-07 partial reversal — restored three agents and de-deferred two commands without re-inflating the agent footprint. |
 | v0.4.0 | 3 | Shipped the `oto-sdk` query CLI and dogfooded the repo onto `.oto/` — closed the two leakiest deferred items the v0.3.0 retro named. |
+| v0.5.0 | 3 | First third-party service integration (Exa MCP) shipped end-to-end: secrets hygiene, per-runtime registration adapters, shared agent guidance — governed by ADR-before-adapter and bounded convergence contracts. |
 
 ### Cumulative Quality
 
@@ -160,6 +209,7 @@
 | v0.2.0 | `npm test` passed: 533 pass, 1 expected skip, 0 fail | Milestone audit `passed`, threats_open 0 across phases |
 | v0.3.0 | `npm test` passed: 612 pass, 1 expected skip, 0 fail | Per-phase VERIFICATION + SECURITY + REVIEW clean; per-runtime parity smoke green |
 | v0.4.0 | `npm test` passed: 627 pass, 1 expected skip, 0 fail | Per-phase VERIFICATION + SECURITY + REVIEW clean (Phase 12 backfilled at close); clean-install `oto-sdk` smoke + cross-binary parity green |
+| v0.5.0 | `npm test` passed: 964 pass, 0 fail, 3 skipped (final Phase 16 gate) | Per-phase bounded verification cycles; SDK amended-baseline gate NO NEW FAILURES; live keyed + keyless e2e passed; no separate milestone audit (developer-accepted); WR-02 fixture debt deferred |
 
 ### Top Lessons
 
@@ -168,3 +218,5 @@
 3. ADR reversal is cheap when the original ADR named the reactivation criterion — keep that pattern.
 4. Engine blind-spot regression-guard tests (ABSENCE assertions) outlast individual fixups.
 5. Per-phase verification/security is the gate, not plan completion — backfill it before archiving rather than waiving it, and enforce it before a phase is marked done.
+6. Runtime-config mutation earns trust through refusal: fingerprint ownership, additive merges, and refuse-on-drift made three different config formats safely writable — reuse this adapter discipline for any future integration.
+7. Scope security-surface phases with a multiplier (write paths × migration × concurrency): Phase 14's 4→19 plan growth is the calibration point.
