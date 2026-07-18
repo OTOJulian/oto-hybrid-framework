@@ -1,68 +1,68 @@
 ---
 phase: 16-agent-guidance-hardening
-reviewed: "2026-07-18T00:10:50Z"
+reviewed: "2026-07-18T13:50:43Z"
 depth: standard
-files_reviewed: 8
+review_cycle: bounded-second-cycle-after-16-09
+files_reviewed: 4
 files_reviewed_list:
-  - scripts/sync-upstream/merge.cjs
   - bin/lib/sync-cli.cjs
-  - tests/phase-09-cli.integration.test.cjs
+  - bin/lib/sync-accept.cjs
   - tests/16-07-sync-all-provenance.test.cjs
   - docs/upstream-sync.md
-  - oto/references/search-tools.md
-  - tests/16-search-reference.test.cjs
-  - tests/16-availability-coherence.test.cjs
 findings:
   critical: 0
   warning: 1
-  info: 0
-  total: 1
+  info: 1
+  total: 2
 status: issues_found
 ---
 
-# Phase 16: Closure Code Review Report
+# Phase 16: Bounded Plan 16-09 Re-Review
 
-**Reviewed:** 2026-07-18T00:10:50Z
+**Reviewed:** 2026-07-18T13:50:43Z
 **Depth:** standard
-**Files Reviewed:** 8
+**Files Reviewed:** 4
 **Status:** issues_found
 
 ## Summary
 
-The review was limited to the Plan 16-07 and 16-08 closure changes. Previously passed GUID-02..05, HARD-01, HARD-03, and HARD-04 were not reopened, and the developer-approved WR-02 DEFER disposition was preserved.
+This second-cycle review was limited to the four Plan 16-09 closure files and the HARD-05 / prior WR-01 deletion-acceptance reproduction. GUID-01..05, HARD-01, HARD-03, HARD-04, resolved earlier blockers, and the developer-approved WR-02 DEFER were not reopened.
 
-The per-upstream sidecar/report layout and runtime-observable search guidance are otherwise coherent, and the focused closure suite passed. One provenance defect remains in the newly namespaced deletion-accept path: resolving the correct sidecar namespace does not carry the selected upstream into the inventory mutation, so an overlapping target can update the wrong upstream's row.
+Plan 16-09 fixes the original namespaced duplicate-row defect: explicit and auto-detected Superpowers deletion acceptance now carry the selected upstream into `acceptDeletion` and mutate only the Superpowers inventory row. However, the new legacy-flat fallback does not actually restrict provenance lookup to the YAML header. A body line can be mistaken for header provenance, bypassing the required ambiguity refusal and authorizing a destructive acceptance. This remains blocking for HARD-05.
 
-## Warnings
+## Blocking Actionable Findings
 
-### WR-01: Namespaced deletion acceptance mutates the first matching inventory row, not the selected upstream row
+### WR-03: Legacy-flat provenance is scanned from the entire sidecar, not its YAML header
 
 **Classification:** BLOCKER
 
-**File:** `bin/lib/sync-cli.cjs:247-249`
+**File:** `bin/lib/sync-accept.cjs:72-76`
 
-**Issue:** `resolveAcceptDir` correctly selects the GSD or Superpowers sidecar directory, but `runSync` passes only `relPath`, `otoDir`, `conflictsDir`, and `inventoryPath` to `acceptDeletion`. The accept helper consequently identifies the inventory record by `target_path` alone. When both upstreams own the same target path—the exact overlap that Plan 16-07 now supports—`--accept-deletion <path> --upstream superpowers` can mark the earlier GSD row `dropped_upstream`, leave the Superpowers row as `keep`, delete the local target, remove the Superpowers sidecar, and still exit 0.
+**Related coverage gap:** `tests/16-07-sync-all-provenance.test.cjs:332-348`
 
-Fresh reproduction used two inventory entries ordered GSD then Superpowers and only a Superpowers deletion sidecar. The explicit Superpowers command returned 0 with these resulting verdicts:
+**Issue:** The fallback applies `/^upstream: (gsd|superpowers)$/m` directly to the complete sidecar text returned by `readSidecar`. The expression is line-anchored, but it is not bounded by the opening and closing `---` delimiters. Consequently, a legacy flat sidecar whose YAML header has no valid `upstream:` field is still treated as provenance-resolved if its Markdown body contains a line such as `upstream: superpowers`.
 
-```text
-gsd:         dropped_upstream
-superpowers: keep
-```
+Fresh CLI reproduction used a flat deletion sidecar with a header containing only `kind` and `target_path`, followed by `upstream: superpowers` in the body, plus duplicate GSD-first/Superpowers inventory rows. `oto sync --accept-deletion oto/workflows/dup.md` exited 0, marked the Superpowers row `dropped_upstream`, deleted the local target, and removed the sidecar. It should have refused to guess because the YAML header supplied no provenance.
 
-This violates the plan's claim that all three accept modes are provenance-safe and leaves durable sync metadata inconsistent with the user's explicit selection. The current closure tests cover namespace resolution only for `--accept`; they do not exercise `--accept-deletion` or `--keep-deleted` with overlapping targets.
+This contradicts the Plan 16-09 must-have and `docs/upstream-sync.md:97-100`, both of which define the legacy source as the sidecar's YAML header and require missing or invalid header provenance to fail loud when duplicate rows exist. It also weakens the fail-before-mutation guarantee: the command proceeds to all three mutations instead of rejecting the malformed legacy record.
 
-**Fix:** Preserve the resolved upstream identity as well as the directory. Pass that identity into deletion acceptance and match the inventory entry by both `target_path` and `upstream` (with an explicit, validated legacy-flat policy). Add CLI-level regressions for auto-detected and explicitly disambiguated `--accept-deletion` cases with duplicate target paths, asserting that only the selected upstream row changes. Add the corresponding `--keep-deleted` namespace-resolution regression so all three advertised modes are locked.
+**Fix:** Extract only the YAML frontmatter block (the module already has `HEADER_RE`) before inspecting `upstream`. Accept exactly one valid `upstream: gsd` or `upstream: superpowers` field from that block; treat no valid field or duplicate/conflicting fields as unresolved provenance. Preserve the unique-row compatibility fallback, but refuse duplicate inventory rows before mutation when header provenance is unresolved. Add a CLI regression where the header omits `upstream` while the body contains an exact valid-looking `upstream:` line, and assert nonzero exit plus byte-preservation of inventory, sidecar, and local target. A duplicate/conflicting-header regression would also lock the stated validation policy.
+
+## Informational Observations
+
+### INFO-01: The original namespaced duplicate-row defect is resolved
+
+The selected upstream now survives namespace resolution through the deletion-acceptance dispatch, and inventory selection uses both `target_path` and `upstream`. The explicit and auto-detected Superpowers fixtures preserve the GSD row at `keep`, mark only the Superpowers row `dropped_upstream`, and retain the unselected sidecar where applicable. Ambiguous dual namespaces still fail before mutation, `--keep-deleted` remains path-level, and the scoped path-traversal guards were not weakened by the Plan 16-09 diff.
 
 ## Verification Evidence
 
-- Closure-focused Node test run: 45 passed, 0 failed, 1 skipped because `OTO_SYNC_CORPUS` was not set.
-- `node scripts/check-runtime-sync.cjs`: Claude and Codex `ok`; Gemini skipped because no oto install exists.
-- `git diff --check` on the eight closure files: passed.
-- Direct deletion-accept reproduction: failed provenance as described in WR-01.
+- `node --test tests/16-07-sync-all-provenance.test.cjs tests/phase-09-accept-helper.test.cjs tests/phase-09-cli.integration.test.cjs`: 25 passed, 0 failed.
+- `git diff --check 899ae93..88f2f56 -- <four scoped files>`: passed.
+- `tests/phase-09-accept-helper.test.cjs` SHA-256 remained `ce4c017d0929ad14f93f206363c9967fb0fef40de7e2b59078ab60a5d106abda`.
+- Fresh legacy-body provenance reproduction: failed the required refusal behavior; exit 0, Superpowers row mutated, local target deleted, and sidecar deleted.
 
 ---
 
-_Reviewed: 2026-07-18T00:10:50Z_
+_Reviewed: 2026-07-18T13:50:43Z_
 _Reviewer: Codex (oto-code-reviewer)_
 _Depth: standard_
