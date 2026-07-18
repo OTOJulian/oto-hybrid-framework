@@ -1,14 +1,14 @@
 ---
 phase: 16-agent-guidance-hardening
-verified: "2026-07-18T13:54:37Z"
-verified_at: "2026-07-18T13:54:37Z"
-timestamp: "2026-07-18T13:54:37Z"
-verifier: "Codex (oto-verifier, independent bounded Plan 16-09 re-verification)"
-status: gaps_found
-score: "8/9"
-blocker_count: 1
-head: "3a04a99461e4fd9180c594998ffa396faac74da9"
-verification_scope: "bounded verification of the four Plan 16-09 closure files, original HARD-05/WR-01 explicit and auto-detected deletion-acceptance reproductions, and fresh review WR-03 legacy-body provenance reproduction only"
+verified: "2026-07-18T14:26:01Z"
+verified_at: "2026-07-18T14:26:01Z"
+timestamp: "2026-07-18T14:26:01Z"
+verifier: "Codex (oto-verifier, independent dispositions-authorized WR-03 bounded closure)"
+status: passed
+score: "9/9"
+blocker_count: 0
+head: "40590d05fd13fd54754057bdb8bbf8dc87f383f2"
+verification_scope: "dispositions-authorized bounded WR-03 closure verification limited to bin/lib/sync-accept.cjs, tests/16-07-sync-all-provenance.test.cjs, the real shipped-CLI WR-03 refusal reproduction, and the valid-header control"
 requirements:
   GUID-01: passed_carried_forward
   GUID-02: passed_carried_forward
@@ -18,117 +18,107 @@ requirements:
   HARD-01: passed_carried_forward
   HARD-03: passed_carried_forward
   HARD-04: passed_carried_forward
-  HARD-05: gaps_found
+  HARD-05: passed
 review_adjudication:
-  original_WR-01: resolved
-  fresh_WR-03: blocking
+  original_WR-01: resolved_carried_forward
+  fresh_WR-03: resolved
   developer_approved_WR-02: defer_carried_forward
-  completed_gap_cycles: 2
-  automatic_third_gap_plan: not_recommended
-progress_log_lines: 32
+  closure_authority: dispositions_authorized_not_third_gap_cycle
+progress_log_lines: 37
 ---
 
-# Phase 16: Agent Guidance + Hardening — Bounded Plan 16-09 Re-verification
+# Phase 16: Agent Guidance + Hardening — WR-03 Bounded Closure Verification
 
 ## Verdict
 
-**Status:** `gaps_found`
+**Status:** `passed`
 
-**Score:** **8/9 requirements passed**
+**Score:** **9/9 requirements passed**
 
-**Sole current blocker:** **HARD-05 / fresh review WR-03**
+The developer-approved WR-03 FIX disposition is independently verified. `acceptDeletion` now reads legacy provenance only from the delimited YAML frontmatter capture, refuses duplicate-row deletion acceptance when that header lacks a valid upstream, and performs no mutation on refusal. The reproduced Markdown-body provenance line can no longer authorize a destructive action.
 
-Plan 16-09 closes the original WR-01 defect for both explicit and auto-detected namespaced deletion acceptance. However, fresh real-CLI evidence independently reproduces WR-03: a legacy flat sidecar with no valid `upstream` field in its YAML header is accepted when its Markdown body contains an exact `upstream: superpowers` line. The command exits 0 and performs all destructive mutations. That contradicts the required header-only provenance policy, fail-before-mutation semantics, and the user-facing documentation. HARD-05 therefore remains `gaps_found`.
+This is a dispositions-authorized bounded closure, not a third gap cycle. WR-02 remains developer-approved **DEFER** and was not reopened.
 
 ## Bounded Scope
 
-This was not a full phase sweep. Verification was limited to:
+Verification was limited exactly to:
 
-1. The four closure-changed Plan 16-09 files: `bin/lib/sync-cli.cjs`, `bin/lib/sync-accept.cjs`, `tests/16-07-sync-all-provenance.test.cjs`, and `docs/upstream-sync.md`.
-2. Fresh real-CLI reproductions of original HARD-05 / WR-01 for explicit `--upstream superpowers` and auto-detected sole-Superpowers namespaced deletion sidecars.
-3. Fresh real-CLI reproduction of code-review WR-03 using a legacy flat sidecar with no valid header provenance and an exact valid-looking provenance line in the Markdown body.
+1. `bin/lib/sync-accept.cjs`;
+2. `tests/16-07-sync-all-provenance.test.cjs`;
+3. the real shipped-CLI WR-03 fixture with no valid header upstream and body line `upstream: superpowers`; and
+4. the real shipped-CLI valid-header control with `upstream: superpowers` inside delimited frontmatter.
 
-GUID-01 through GUID-05, HARD-01, HARD-03, HARD-04, all previously resolved blockers, and the developer-approved WR-02 DEFER were not reopened. Their prior passed/deferred statuses are carried forward unchanged.
+GUID-01 through GUID-05, HARD-01, HARD-03, HARD-04, original WR-01, and all other previously passed Phase 16 evidence were not reopened. Their prior passed statuses are carried forward.
 
 ## Requirement Accounting
 
 | Requirement | Verdict | Evidence |
 |---|---|---|
-| **GUID-01** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **GUID-02** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **GUID-03** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **GUID-04** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **GUID-05** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **HARD-01** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **HARD-03** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **HARD-04** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded scope. |
-| **HARD-05** | **GAPS FOUND** | Original WR-01 is closed, but WR-03 proves legacy-flat provenance is scanned from the Markdown body and can authorize destructive acceptance without valid YAML-header provenance. |
+| **GUID-01** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **GUID-02** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **GUID-03** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **GUID-04** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **GUID-05** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **HARD-01** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **HARD-03** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **HARD-04** | **PASSED — CARRIED FORWARD** | Previously verified; outside this bounded closure. |
+| **HARD-05** | **PASSED** | WR-03 real-CLI refusal, valid-header control, scoped compatibility suite, implementation-order inspection, and authorized commit-scope check all passed. |
 
-## HARD-05 Fresh Adjudication
+## HARD-05 / WR-03 Fresh Evidence
 
-### Original WR-01 — RESOLVED
+### Reproduced refusal path
 
-Two independent temporary projects invoked the shipped CLI through `node bin/install.js sync ...`. Each inventory contained duplicate rows ordered GSD first, then Superpowers.
+`node --test --test-name-pattern='WR-03' tests/16-07-sync-all-provenance.test.cjs` passed **1/1**.
 
-| Selection path | Exit | Inventory after | Sidecar/target effects | Verdict |
-|---|---:|---|---|---|
-| `--accept-deletion oto/workflows/dup.md --upstream superpowers` with both namespaced sidecars | 0 | `gsd: keep`; `superpowers: dropped_upstream` | GSD sidecar remained byte-identical (`96fb9d0…`); Superpowers sidecar and local target were removed | **PASS** |
-| `--accept-deletion oto/workflows/dup.md` with only the Superpowers namespaced sidecar | 0 | `gsd: keep`; `superpowers: dropped_upstream` | Selected sidecar and local target were removed | **PASS** |
+The test invokes the shipped CLI through `node bin/install.js sync --accept-deletion oto/workflows/dup.md` against duplicate GSD/Superpowers inventory rows. Its legacy flat sidecar has a delimited YAML header with no valid `upstream` field and a Markdown body containing the exact line `upstream: superpowers`.
 
-The selected identity now survives `resolveAcceptTarget` and is passed as `upstream: resolved.upstream`; `acceptDeletion` matches both `target_path` and `upstream`. The original wrong-row mutation is closed.
+Fresh assertions confirmed:
 
-### Fresh WR-03 — REPRODUCED, BLOCKING
+- nonzero refusal;
+- byte-for-byte unchanged inventory;
+- byte-for-byte unchanged deletion sidecar; and
+- byte-for-byte unchanged local target.
 
-The independent fixture used:
+### Valid-header control
 
-- a legacy flat `.oto-sync-conflicts/oto/workflows/dup.md.deleted.md` sidecar;
-- YAML frontmatter containing `kind: deleted` and `target_path`, but no valid `upstream` field;
-- Markdown body containing the exact line `upstream: superpowers`; and
-- duplicate inventory rows ordered GSD first, then Superpowers.
+`node --test --test-name-pattern='validated header' tests/16-07-sync-all-provenance.test.cjs` passed **1/1**.
 
-The real command `node bin/install.js sync --accept-deletion oto/workflows/dup.md` produced:
+The real shipped CLI accepted the legacy flat sidecar whose delimited frontmatter contains `upstream: superpowers`, selected only the Superpowers duplicate inventory row, and retained intended deletion-acceptance behavior.
 
-- exit code **0** and `accepted-deletion: oto/workflows/dup.md`;
-- inventory SHA-256 changed from `f5fd5c3521beaf7eecaf08fa26b9db3755b6814b147ae0a5601ddc708f79be98` to `51ad299a083f69cbbb058c05ead501afe714818b11be16417c2792ee8ae113bd`;
-- verdicts became `gsd: keep`, `superpowers: dropped_upstream`;
-- sidecar SHA-256 `d215bfb02212138b738a1d5ddbdb5ab472113d29dc6a812c62eb0c9c509f6466` changed to missing; and
-- local target SHA-256 `fda6c87ced60341e65074fb335e25a047cba333cc6e47823e09e2d73b8a2d336` changed to missing.
+### Scoped compatibility
 
-The refusal and byte-preservation contract therefore failed on all three mutation surfaces: inventory, sidecar, and local target.
+`node --test tests/16-07-sync-all-provenance.test.cjs tests/phase-09-accept-helper.test.cjs tests/phase-09-cli.integration.test.cjs` completed:
 
-### Cause
+- **26 passed**
+- **0 failed**
+- **0 skipped**
 
-`bin/lib/sync-accept.cjs` already defines `HEADER_RE`, but `acceptDeletion` applies `/^upstream: (gsd|superpowers)$/m` directly to the complete raw sidecar. The line anchor prevents partial-line matches but does not confine the search to YAML frontmatter. An exact body line is consequently treated as trusted provenance.
+## Implementation and Commit-Scope Inspection
 
-## Docs Truthfulness and Test Coverage
+`node --check bin/lib/sync-accept.cjs` passed.
 
-`docs/upstream-sync.md` states that a legacy flat record resolves provenance from the sidecar's `upstream:` YAML header and refuses when that header is missing or invalid with duplicate inventory rows. The fresh WR-03 fixture demonstrates that this statement is not currently true.
+In `acceptDeletion`, the strict `upstream: gsd|superpowers` matcher is applied only to `HEADER_RE.exec(raw)?.[1]`, the content captured between the opening and closing YAML delimiters. The duplicate-row ambiguity guard throws before the first mutation: the guard is at lines 88–90, while `entry.verdict`, inventory serialization, local-target removal, and sidecar removal begin at line 93 and later.
 
-The scoped Plan 16-09 suite passed **25/25**, including its headerless duplicate-row refusal test. That test removes the header line, but its body contains no exact valid-looking `upstream:` line. No scoped regression exercises headerless/invalid frontmatter plus body provenance, so the passing suite does not cover WR-03.
+The authorized RED/GREEN commits are exactly scoped:
 
-## Fresh Verification Evidence
+- RED `407baa983750dfa2a86b309934325357e5216a9b` changes only `tests/16-07-sync-all-provenance.test.cjs`.
+- GREEN `7a7acb7334330af39af48d0dcfdd501bac98f592` changes only `bin/lib/sync-accept.cjs`.
+- `git diff --check 407baa9^..7a7acb7 -- bin/lib/sync-accept.cjs tests/16-07-sync-all-provenance.test.cjs` passed.
 
-| Check | Result |
-|---|---|
-| Fresh explicit namespaced WR-01 CLI fixture | **PASS** — only Superpowers inventory row changed; unselected GSD sidecar preserved byte-for-byte |
-| Fresh auto-detected namespaced WR-01 CLI fixture | **PASS** — only Superpowers inventory row changed |
-| Fresh legacy-body WR-03 CLI fixture | **FAIL / BLOCKER REPRODUCED** — exit 0; inventory mutated; flat sidecar and local target deleted |
-| `node --test tests/16-07-sync-all-provenance.test.cjs tests/phase-09-accept-helper.test.cjs tests/phase-09-cli.integration.test.cjs` | **25 passed, 0 failed, 0 skipped** — confirms current suite misses WR-03 |
-| `node --check bin/lib/sync-cli.cjs && node --check bin/lib/sync-accept.cjs` | **PASS** |
-| `git diff --check 899ae93..HEAD -- <four Plan 16-09 files>` | **PASS** |
+## Carried Disposition and Environment Note
 
-No full phase suite, SDK suite, runtime-sync sweep, prior GUID/HARD reproduction, or third gap cycle was run. Those were explicitly outside this bounded verification scope.
+WR-02 remains developer-approved **DEFER** exactly as recorded in `16-DISPOSITIONS.md`; this bounded closure did not reopen it.
 
-## Sole Blocking Gap and Routing
+The previously recorded full-suite result was **976 passed, 1 failed, 3 skipped**. The sole failure was the sandbox-limited `ENOTFOUND registry.npmjs.org` install-smoke test, and the same install-smoke passed **1/1** with network access. Per the developer's explicit direction, this is accepted as environment-limited and the full suite was not rerun or chased during this closure.
 
-HARD-05 needs one bounded correction: inspect provenance only inside the YAML frontmatter block, accept only a valid unambiguous `upstream: gsd|superpowers` field there, and preserve the existing unique-row compatibility fallback. Add a real-CLI regression that places an exact valid-looking `upstream:` line only in the Markdown body and asserts nonzero exit plus byte-preservation of inventory, sidecar, and local target.
+`INTERVIEW-BRIEF-oto.md` remained untouched.
 
-Two gap cycles have already run. Do **not** start a third automatic gap plan. Route WR-03 as the sole unresolved blocker to `16-DISPOSITIONS.md` and developer triage for an explicit fix/defer decision. The original WR-01 is closed; WR-02 remains developer-approved DEFER and was not reopened.
+## Completion Gate
 
-No implementation code, STATE, ROADMAP, REQUIREMENTS, disposition, baseline, golden-row, plan, or summary file was modified by this verifier. Only this report and its heartbeat log were updated; `INTERVIEW-BRIEF-oto.md` remains untouched.
+No blocking gap remains in the authorized WR-03 closure. HARD-05 is passed and Phase 16's requirement score is **9/9**. The orchestrator may record the closure evidence in `16-DISPOSITIONS.md`, mark Phase 16 complete in ROADMAP with the completion date, advance STATE, and create the standard tracking commits.
 
 ---
 
-_Verified: 2026-07-18T13:54:37Z_
+_Verified: 2026-07-18T14:26:01Z_
 
-_Verifier: Codex (oto-verifier, independent bounded Plan 16-09 re-verification)_
+_Verifier: Codex (oto-verifier, independent dispositions-authorized WR-03 bounded closure)_
