@@ -120,6 +120,54 @@ async function writeConflictSidecar(project, upstream, targetPath, body) {
   return sidecarPath;
 }
 
+function deletionSidecar(upstream, targetPath, body = '# deleted upstream\n') {
+  return [
+    '---',
+    'kind: deleted',
+    `upstream: ${upstream}`,
+    'prior_tag: v1.0.0',
+    `prior_sha: ${'a'.repeat(40)}`,
+    'current_tag: v1.1.0',
+    `current_sha: ${'b'.repeat(40)}`,
+    `target_path: ${targetPath}`,
+    'inventory_entry: null',
+    'timestamp: 2026-07-17T00:00:00.000Z',
+    'oto_version: 0.5.0',
+    '---',
+    '',
+  ].join('\n') + body;
+}
+
+async function writeDeletionSidecar(project, upstream, targetPath, headerUpstream = upstream) {
+  const namespace = upstream ? [upstream] : [];
+  const sidecarPath = path.join(project, '.oto-sync-conflicts', ...namespace, `${targetPath}.deleted.md`);
+  await fsp.mkdir(path.dirname(sidecarPath), { recursive: true });
+  await fsp.writeFile(sidecarPath, deletionSidecar(headerUpstream, targetPath));
+  return sidecarPath;
+}
+
+async function setupDeletionProject(t, entries) {
+  const project = await makeTempRoot(t, 'oto-sync-deletion-provenance-');
+  await fsp.mkdir(path.join(project, 'oto/workflows'), { recursive: true });
+  await fsp.writeFile(path.join(project, 'oto/workflows/dup.md'), '# local copy\n');
+  await writeJson(path.join(project, 'decisions/file-inventory.json'), {
+    version: '1',
+    generated_at: '2026-07-17T00:00:00.000Z',
+    entries,
+  });
+  await writeJson(path.join(project, 'decisions/sync-allowlist.json'), {
+    version: '1',
+    oto_owned_globs: [],
+    oto_diverged_paths: [],
+  });
+  return project;
+}
+
+async function inventoryVerdicts(project) {
+  const inventory = JSON.parse(await fsp.readFile(path.join(project, 'decisions/file-inventory.json'), 'utf8'));
+  return Object.fromEntries(inventory.entries.map((entry) => [entry.upstream, entry.verdict]));
+}
+
 test('WR-01: --upstream all preserves overlapping conflict evidence for both upstreams', async (t) => {
   await preserveFiles(t, REBRAND_REPORTS);
   const fixtureRoot = await makeTempRoot(t, 'oto-sync-all-upstream-fixture-');
@@ -196,4 +244,129 @@ test('accept flags allow one explicit upstream but reject sync targets and all',
     () => parseSyncArgs(['--accept', 'oto/workflows/x.md', '--upstream', 'all']),
     /--upstream must be gsd or superpowers when used with --accept flags/
   );
+});
+
+test('--accept-deletion --upstream superpowers mutates only the Superpowers duplicate inventory row', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  const gsdSidecar = await writeDeletionSidecar(project, 'gsd', targetPath);
+  const superpowersSidecar = await writeDeletionSidecar(project, 'superpowers', targetPath);
+
+  const result = runOtoSync(['--accept-deletion', targetPath, '--upstream', 'superpowers'], project);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.deepEqual(await inventoryVerdicts(project), { gsd: 'keep', superpowers: 'dropped_upstream' });
+  assert.equal(fs.existsSync(gsdSidecar), true);
+  assert.equal(fs.existsSync(superpowersSidecar), false);
+  assert.equal(fs.existsSync(path.join(project, targetPath)), false);
+});
+
+test('--accept-deletion auto-detects Superpowers and mutates only its duplicate inventory row', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  const superpowersSidecar = await writeDeletionSidecar(project, 'superpowers', targetPath);
+
+  const result = runOtoSync(['--accept-deletion', targetPath], project);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.deepEqual(await inventoryVerdicts(project), { gsd: 'keep', superpowers: 'dropped_upstream' });
+  assert.equal(fs.existsSync(superpowersSidecar), false);
+  assert.equal(fs.existsSync(path.join(project, targetPath)), false);
+});
+
+test('ambiguous deletion sidecars fail loud without mutation for both deletion modes', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  const gsdSidecar = await writeDeletionSidecar(project, 'gsd', targetPath);
+  const superpowersSidecar = await writeDeletionSidecar(project, 'superpowers', targetPath);
+
+  for (const mode of ['--accept-deletion', '--keep-deleted']) {
+    const result = runOtoSync([mode, targetPath], project);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /both upstreams/);
+    assert.match(result.stderr, /--upstream/);
+    assert.deepEqual(await inventoryVerdicts(project), { gsd: 'keep', superpowers: 'keep' });
+    assert.equal(fs.existsSync(gsdSidecar), true);
+    assert.equal(fs.existsSync(superpowersSidecar), true);
+    assert.equal(await fsp.readFile(path.join(project, targetPath), 'utf8'), '# local copy\n');
+  }
+});
+
+test('--keep-deleted --upstream superpowers removes only its sidecar and records path-level divergence', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  const gsdSidecar = await writeDeletionSidecar(project, 'gsd', targetPath);
+  const superpowersSidecar = await writeDeletionSidecar(project, 'superpowers', targetPath);
+
+  const result = runOtoSync(['--keep-deleted', targetPath, '--upstream', 'superpowers'], project);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(await fsp.readFile(path.join(project, targetPath), 'utf8'), '# local copy\n');
+  assert.equal(fs.existsSync(gsdSidecar), true);
+  assert.equal(fs.existsSync(superpowersSidecar), false);
+  const allowlist = JSON.parse(await fsp.readFile(path.join(project, 'decisions/sync-allowlist.json'), 'utf8'));
+  assert.deepEqual(allowlist.oto_diverged_paths, [targetPath]);
+  assert.deepEqual(await inventoryVerdicts(project), { gsd: 'keep', superpowers: 'keep' });
+});
+
+test('legacy flat deletion sidecar selects duplicate inventory provenance from its validated header', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  await writeDeletionSidecar(project, null, targetPath, 'superpowers');
+
+  const result = runOtoSync(['--accept-deletion', targetPath], project);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.deepEqual(await inventoryVerdicts(project), { gsd: 'keep', superpowers: 'dropped_upstream' });
+  assert.equal(fs.existsSync(path.join(project, '.oto-sync-conflicts', `${targetPath}.deleted.md`)), false);
+  assert.equal(fs.existsSync(path.join(project, targetPath)), false);
+});
+
+test('legacy flat deletion sidecar without a valid upstream refuses to guess duplicate provenance', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  const sidecar = await writeDeletionSidecar(project, null, targetPath, 'superpowers');
+  const withoutUpstream = (await fsp.readFile(sidecar, 'utf8')).replace(/^upstream: .*\n/m, '');
+  await fsp.writeFile(sidecar, withoutUpstream);
+
+  const result = runOtoSync(['--accept-deletion', targetPath], project);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /refusing to guess provenance/);
+  assert.deepEqual(await inventoryVerdicts(project), { gsd: 'keep', superpowers: 'keep' });
+  assert.equal(fs.existsSync(sidecar), true);
+  assert.equal(await fsp.readFile(path.join(project, targetPath), 'utf8'), '# local copy\n');
+});
+
+test('legacy flat deletion sidecar without an upstream keeps unique-row compatibility', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [inventoryEntry('gsd', targetPath)]);
+  const sidecar = await writeDeletionSidecar(project, null, targetPath, 'gsd');
+  const withoutUpstream = (await fsp.readFile(sidecar, 'utf8')).replace(/^upstream: .*\n/m, '');
+  await fsp.writeFile(sidecar, withoutUpstream);
+
+  const result = runOtoSync(['--accept-deletion', targetPath], project);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.deepEqual(await inventoryVerdicts(project), { gsd: 'dropped_upstream' });
+  assert.equal(fs.existsSync(sidecar), false);
+  assert.equal(fs.existsSync(path.join(project, targetPath)), false);
 });
