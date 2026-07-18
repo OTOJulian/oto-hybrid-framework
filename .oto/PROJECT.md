@@ -12,7 +12,7 @@ It is built for a single developer who likes GSD's spec-driven workflow but does
 
 ## Current State
 
-**v0.5.0 in progress — Phase 14 (Key Storage Reconciliation) complete 2026-07-13.** Integration API keys now live only in `~/.oto/<integration>_api_key` (mode 0600) or env vars; committed `.oto/config.json` holds booleans only, enforced in both CJS and SDK write paths with self-healing migration for legacy string values. Verified 4/4 (SECR-01..04) post-triage; two dispositioned deferrals are owned by Phase 15 (per-runtime config-dir resolution) and Phase 16 (workstream secret-status parity).
+**v0.5.0 implementation complete — milestone audit pending as of 2026-07-18.** Phases 14–16 are complete and verified: integration keys remain outside tracked config, Exa MCP registration works across Claude Code/Codex/Gemini, shared agent guidance and transformed tool naming are covered, and upstream-sync deletion acceptance preserves provenance and refuses before mutation when legacy header provenance is unresolved. Phase 16 passed 9/9 after the developer-approved WR-03 bounded closure. WR-02 planning-root fixture debt remains developer-approved DEFER and separately tracked.
 
 **v0.4.0 (SDK + Dogfood) shipped on 2026-05-26.** v0.3.0 shipped 2026-05-18; v0.2.0 on 2026-05-07; v0.1.0 on 2026-05-04; v0.1.1 was an interim Codex parity tag (2026-05-05) superseded by v0.2.0.
 
@@ -82,6 +82,7 @@ Archive:
 - v0.2.0 Release - 32/32 requirements (REQ-MIG-01..10 + D-01..D-22) complete and audited.
 - v0.3.0 Release - 20/20 requirements (AGNT-01..03, WF-ING-01..04, WF-EVAL-01..02, CMD-01..03, INST-01..03, TEST-01..03, ADR-01, PRTY-01) complete; all three phases verified, security cleared.
 - v0.4.0 Release - 8/8 requirements (SDK-01..05, DOG-01..03) complete; all three phases verified and security-cleared (Phase 12 verification + security backfilled at close). `oto-sdk` query CLI ships working on a clean install; this repo now dogfoods `.oto/`.
+- v0.5.0 implementation - 23/23 milestone requirements complete across Phases 14–16; Phase 16 independently verified 9/9 after the dispositions-authorized WR-03 closure. Milestone audit and archival remain pending; WR-02 is an approved deferred planning-root fixture debt item.
 - `oto-sdk` query CLI - ported GSD `sdk/` subpackage under an `oto-sdk` surface, installer PATH-wiring, `.oto/`-pathed query registry, and tiered fallback (read-only degrades, structural/stateful fails fast); clean-install smoke + cross-binary parity green.
 - Dogfood migration - this repo's planning root moved `.planning/` → `.oto/` via pure `git mv` (history preserved), clean cutover, no path override; `node:test` guards self-management.
 - Claude Code happy path - approved through MR-01 end-to-end dogfood.
@@ -95,12 +96,7 @@ Archive:
 
 ### Active
 
-v0.5.0 scope — REQ-IDs defined in `.oto/REQUIREMENTS.md`:
-
-- [ ] Exa MCP server registration per runtime (Claude Code / Codex / Gemini) via installer and/or `/oto-settings-integrations`
-- [ ] `exa_search` key-storage fix — API key kept out of committed `.oto/config.json`; boolean toggle and secret storage reconciled
-- [ ] Exa guidance extended to non-researcher search-using agents
-- [ ] Tests, runtime matrix entry, and docs for the Exa integration
+None. v0.5.0 implementation and phase verification are complete; milestone audit is the next gate.
 
 ### Next Milestone Goals
 
@@ -173,4 +169,4 @@ After each milestone:
 4. Update this document with decisions that should constrain future work.
 
 ---
-*Last updated: 2026-07-13 — Phase 14 (Key Storage Reconciliation) complete; verified 4/4*
+*Last updated: 2026-07-18 — v0.5.0 implementation complete; Phase 16 verified 9/9; milestone audit pending*
