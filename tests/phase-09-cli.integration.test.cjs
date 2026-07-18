@@ -218,7 +218,7 @@ test('D-19: oto sync --status shows pending conflicts and last-synced refs', asy
   await fsp.mkdir(path.join(root, '.oto-sync-conflicts/gsd/oto/workflows'), { recursive: true });
   await fsp.mkdir(path.join(root, '.oto-sync-conflicts/superpowers/nested'), { recursive: true });
   await fsp.writeFile(path.join(root, '.oto-sync-conflicts/gsd/oto/workflows/c.md'), 'x');
-  await fsp.writeFile(path.join(root, '.oto-sync-conflicts/gsd/REPORT.md'), 'generated report');
+  await fsp.writeFile(path.join(root, '.oto-sync-conflicts', 'gsd', 'REPORT.md'), 'generated report');
   await fsp.writeFile(path.join(root, '.oto-sync-conflicts/superpowers/nested/REPORT.md'), 'nested generated report');
 
   const code = await runStatus();
