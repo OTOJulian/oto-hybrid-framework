@@ -92,6 +92,15 @@ oto sync --accept oto/workflows/plan-phase.md --upstream gsd
 oto sync --accept oto/workflows/plan-phase.md --upstream superpowers
 ```
 
+`--accept-deletion` marks `dropped_upstream` on the inventory row matching BOTH
+the target path and the selected upstream, so duplicate GSD/Superpowers targets
+never mutate the wrong upstream's row. Legacy flat sidecars (no `gsd/` or
+`superpowers/` namespace) resolve provenance from the sidecar's `upstream:` YAML
+header; if the header is missing or invalid and more than one inventory row
+shares the target path, the command refuses rather than guessing.
+`--keep-deleted` records path-level divergence and does not mutate inventory
+rows.
+
 For an upstream deletion, choose one of:
 
 ```sh
