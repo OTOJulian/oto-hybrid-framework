@@ -36,7 +36,10 @@ async function buildBareUpstream({ rootDir }) {
   const workDir = path.join(rootDir, 'work');
   await fsp.mkdir(rootDir, { recursive: true });
 
-  runGit(['init', '--bare', 'upstream.git'], { cwd: rootDir });
+  // -b main: keep the bare repo's HEAD on the branch we push, independent of
+  // the host's init.defaultBranch (CI runners default to master, leaving HEAD
+  // unborn and breaking 'latest'-ref clones).
+  runGit(['init', '--bare', '-b', 'main', 'upstream.git'], { cwd: rootDir });
   runGit(['clone', `file://${bareDir}`, 'work'], { cwd: rootDir });
   runGit(['checkout', '-b', 'main'], { cwd: workDir });
 
