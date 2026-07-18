@@ -28,18 +28,18 @@ Requirements for this milestone. Each maps to roadmap phases (numbered from 14).
 
 ### Agent Guidance (GUID)
 
-- [ ] **GUID-01**: A shared, runtime-neutral search-tools reference exists with the Exa → Brave → WebSearch fallback ladder and a never-retry-on-429 rule
-- [ ] **GUID-02**: The three researcher agents (`oto-phase-researcher`, `oto-project-researcher`, `oto-ui-researcher`) consume the shared reference; guidance drift between them is removed
-- [ ] **GUID-03**: `oto-debugger` and `oto-advisor-researcher` gain `mcp__exa__*` frontmatter and search guidance via the shared reference
-- [ ] **GUID-04**: No deprecated Exa tool names (`crawling_exa`, `get_code_context_exa`, `deep_researcher_*`, etc.) appear in any shipped agent or reference prose
-- [ ] **GUID-05**: Codex and Gemini transformed agent output is verified for correct tool naming (checked against transformed output, not just source)
+- [x] **GUID-01**: A shared, runtime-neutral search-tools reference exists with the Exa → Brave → WebSearch fallback ladder and a never-retry-on-429 rule
+- [x] **GUID-02**: The three researcher agents (`oto-phase-researcher`, `oto-project-researcher`, `oto-ui-researcher`) consume the shared reference; guidance drift between them is removed
+- [x] **GUID-03**: `oto-debugger` and `oto-advisor-researcher` gain `mcp__exa__*` frontmatter and search guidance via the shared reference
+- [x] **GUID-04**: No deprecated Exa tool names (`crawling_exa`, `get_code_context_exa`, `deep_researcher_*`, etc.) appear in any shipped agent or reference prose
+- [x] **GUID-05**: Codex and Gemini transformed agent output is verified for correct tool naming (checked against transformed output, not just source)
 
 ### Hardening (HARD)
 
-- [ ] **HARD-01**: With no key or server present, research flows complete with zero user-facing errors via the Brave/WebSearch fallback (regression floor)
+- [x] **HARD-01**: With no key or server present, research flows complete with zero user-facing errors via the Brave/WebSearch fallback (regression floor)
 - [x] **HARD-02**: `node:test` coverage exists for adapter merge/unmerge round-trips, boolean config validation, and a no-plaintext-key-in-tracked-files guard
-- [ ] **HARD-03**: The generated runtime matrix gains an Exa MCP row per runtime, and docs cover setup with qualitative (not hard-coded) rate-limit phrasing
-- [ ] **HARD-04**: An end-to-end check verifies `mcp__exa__*` tools actually reach a tools-restricted subagent (guards the claude-code#13898 regression class)
+- [x] **HARD-03**: The generated runtime matrix gains an Exa MCP row per runtime, and docs cover setup with qualitative (not hard-coded) rate-limit phrasing
+- [x] **HARD-04**: An end-to-end check verifies `mcp__exa__*` tools actually reach a tools-restricted subagent (guards the claude-code#13898 regression class)
 - [x] **HARD-05**: `oto sync --dry-run` conflict-surface check passes at milestone close (this milestone touches GSD-shared files)
 
 ## Future Requirements (v0.5.x+)
@@ -87,14 +87,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MCP-08 | Phase 15 | Complete |
 | MCP-09 | Phase 15 | Complete |
 | HARD-02 | Phase 15 | Complete |
-| GUID-01 | Phase 16 | Pending |
-| GUID-02 | Phase 16 | Pending |
-| GUID-03 | Phase 16 | Pending |
-| GUID-04 | Phase 16 | Pending |
-| GUID-05 | Phase 16 | Pending |
-| HARD-01 | Phase 16 | Pending |
-| HARD-03 | Phase 16 | Pending |
-| HARD-04 | Phase 16 | Pending |
+| GUID-01 | Phase 16 | Complete |
+| GUID-02 | Phase 16 | Complete |
+| GUID-03 | Phase 16 | Complete |
+| GUID-04 | Phase 16 | Complete |
+| GUID-05 | Phase 16 | Complete |
+| HARD-01 | Phase 16 | Complete |
+| HARD-03 | Phase 16 | Complete |
+| HARD-04 | Phase 16 | Complete |
 | HARD-05 | Phase 16 | Complete |
 
 **Coverage:**

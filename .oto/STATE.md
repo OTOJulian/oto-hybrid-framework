@@ -2,13 +2,13 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: verifying
-stopped_at: Completed 16-09-PLAN.md
-last_updated: "2026-07-18T13:54:37Z"
-last_activity: 2026-07-18 -- bounded re-verification found WR-03
+status: milestone_complete
+stopped_at: Phase 16 verified and complete
+last_updated: "2026-07-18T14:26:01Z"
+last_activity: 2026-07-18 -- Phase 16 WR-03 bounded closure verified 9/9
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 40
   completed_plans: 40
   percent: 100
@@ -22,20 +22,20 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 16 — agent-guidance-hardening
+**Current focus:** v0.5.0 milestone audit and close
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — GAPS FOUND
+Phase: 16 (agent-guidance-hardening) — COMPLETE
 Plan: 9 of 9 complete
-Status: Developer triage required — bounded gap cycles exhausted
-Last activity: 2026-07-18 -- bounded re-verification found WR-03
+Status: Milestone implementation complete — ready for audit
+Last activity: 2026-07-18 -- WR-03 bounded closure verified 9/9
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 remains at `gaps_found` (8/9). Plan 16-09 closed the original namespaced WR-01 defect, but bounded review and independent re-verification reproduced WR-03: Markdown-body `upstream:` content can be mistaken for legacy YAML-header provenance and authorize destructive deletion acceptance. Both automatic gap cycles are exhausted. Developer triage is required on the **FIX** disposition in `16-DISPOSITIONS.md`; do not run a third `/oto-plan-phase 16 --gaps` loop.
+Phase 16 is verified and complete at 9/9. WR-03 closed through the developer-approved dispositions-authorized bounded FIX; WR-02 remains approved DEFER. Run `/oto-audit-milestone` to validate v0.5.0 before archival and release preparation.
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Phase 16 remains at `gaps_found` (8/9). Plan 16-09 closed the original namespace
 |-------|-------|-------|----------|
 | 14 | 19 | - | - |
 | 15 | 12 | - | - |
+| 16 | 9 | - | - |
 
 *Updated after each plan completion*
 | Phase 14 P01 | 8 min | 2 tasks | 5 files |
