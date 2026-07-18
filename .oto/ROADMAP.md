@@ -187,7 +187,7 @@ Phases execute in numeric order: 14 → 15 → 16 (decimal insertions, if any, b
 | 13. Dogfood migration to `.oto/` | v0.4.0 | 4/4 | Complete | 2026-05-26 |
 | 14. Key Storage Reconciliation | v0.5.0 | 19/19 | Complete    | 2026-07-13 |
 | 15. Exa MCP Registration (All Three Runtimes) | v0.5.0 | 12/12 | Complete    | 2026-07-14 |
-| 16. Agent Guidance + Hardening | v0.5.0 | 8/8 | Complete   | 2026-07-18 |
+| 16. Agent Guidance + Hardening | v0.5.0 | 8/8 | Gaps found | — |
 
 ---
 

@@ -2,16 +2,16 @@
 oto_state_version: 1.0
 milestone: v0.5.0
 milestone_name: Exa Search Integration
-status: executing
+status: Gaps found
 stopped_at: Completed 15-12-PLAN.md
-last_updated: "2026-07-17T23:44:34.093Z"
-last_activity: 2026-07-17 -- Phase 16 execution started
+last_updated: "2026-07-18T00:22:42.272Z"
+last_activity: "2026-07-18 -- Phase 16 bounded re-verification: gaps_found (8/9)"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 39
-  completed_plans: 37
-  percent: 95
+  completed_plans: 39
+  percent: 100
 ---
 
 # Project State
@@ -22,20 +22,20 @@ See: .oto/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Stop framework-switching - one installable framework where GSD's planning/execution workflow and Superpowers' capabilities coexist behind a single, consistent `/oto-*` command surface across Claude Code, Codex, and Gemini CLI.
 
-**Current focus:** Phase 16 — agent-guidance-hardening
+**Current focus:** Phase 16 — agent-guidance-hardening gap closure
 
 ## Current Position
 
-Phase: 16 (agent-guidance-hardening) — EXECUTING
-Plan: 1 of 8
-Status: Executing Phase 16
-Last activity: 2026-07-17 -- Phase 16 execution started
+Phase: 16 (agent-guidance-hardening) — GAPS FOUND
+Plan: 8 of 8 complete
+Status: Gaps found
+Last activity: 2026-07-18 -- Phase 16 bounded re-verification: gaps_found (8/9)
 
 Progress: [██████████] 100%
 
 ## Next Command
 
-Phase 16 execution and advisory review are complete, but `16-VERIFICATION.md` is authoritative at `gaps_found` (7/9). Plan bounded fixes for HARD-05 durable all-upstream evidence and GUID-01 availability-contract wiring with `/oto-plan-phase 16 --gaps`. The approved WR-02 planning-root migration remains separate and must not be folded into these gaps.
+Phase 16 gap plans 16-07 and 16-08 are executed. Bounded re-verification is authoritative at `gaps_found` (8/9): the prior HARD-05 durable-evidence and GUID-01 guidance blockers are closed, but one HARD-05 blocker remains because `--accept-deletion` discards the selected upstream before inventory mutation. Plan the second and final bounded gap cycle with `/oto-plan-phase 16 --gaps`. The approved WR-02 planning-root migration remains separate and must not be folded into this gap.
 
 ## Performance Metrics
 
