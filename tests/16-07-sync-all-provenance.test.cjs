@@ -356,6 +356,35 @@ test('legacy flat deletion sidecar without a valid upstream refuses to guess dup
   assert.equal(await fsp.readFile(path.join(project, targetPath), 'utf8'), '# local copy\n');
 });
 
+test('WR-03: legacy flat deletion ignores body provenance and refuses before mutation', async (t) => {
+  const targetPath = 'oto/workflows/dup.md';
+  const project = await setupDeletionProject(t, [
+    inventoryEntry('gsd', targetPath),
+    inventoryEntry('superpowers', targetPath),
+  ]);
+  const inventoryPath = path.join(project, 'decisions/file-inventory.json');
+  const target = path.join(project, targetPath);
+  const sidecar = await writeDeletionSidecar(project, null, targetPath, 'superpowers');
+  const bodyProvenance = (await fsp.readFile(sidecar, 'utf8'))
+    .replace(/^upstream: .*\n/m, '')
+    .replace('# deleted upstream\n', '# deleted upstream\n\nupstream: superpowers\n');
+  await fsp.writeFile(sidecar, bodyProvenance);
+
+  const before = {
+    inventory: await fsp.readFile(inventoryPath),
+    sidecar: await fsp.readFile(sidecar),
+    target: await fsp.readFile(target),
+  };
+
+  const result = runOtoSync(['--accept-deletion', targetPath], project);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /refusing to guess provenance/);
+  assert.deepEqual(await fsp.readFile(inventoryPath), before.inventory);
+  assert.deepEqual(await fsp.readFile(sidecar), before.sidecar);
+  assert.deepEqual(await fsp.readFile(target), before.target);
+});
+
 test('legacy flat deletion sidecar without an upstream keeps unique-row compatibility', async (t) => {
   const targetPath = 'oto/workflows/dup.md';
   const project = await setupDeletionProject(t, [inventoryEntry('gsd', targetPath)]);
